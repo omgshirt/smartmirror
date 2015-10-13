@@ -1,0 +1,2 @@
+# smartmirror
+Main application
