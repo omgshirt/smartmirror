@@ -25,3 +25,12 @@ proguard/
 
 # Log Files
 *.log
+
+*.iml
+app/app.iml
+.idea/gradle.xml
+.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/.idea/libraries
