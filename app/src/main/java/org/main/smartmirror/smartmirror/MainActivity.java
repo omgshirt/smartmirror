@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -52,6 +53,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
+    public void LinkVoice(View view)
+    {
+            Intent intent=new Intent(this,Voice_Recognition.class);
+
+        startActivity(intent);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
