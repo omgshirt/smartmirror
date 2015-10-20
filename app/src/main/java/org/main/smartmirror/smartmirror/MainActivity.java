@@ -1,12 +1,8 @@
 package org.main.smartmirror.smartmirror;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -99,9 +95,13 @@ public class MainActivity extends AppCompatActivity
                 fragment = new NewsFragment();
                 title = "News";
                 break;
-            case R.id.nav_events:
-                fragment = new EventsFragment();
-                title = "Events";
+            case R.id.nav_calendar:
+                fragment = new CalendarFragment();
+                title = "Calendar";
+                break;
+            case R.id.nav_weather:
+                fragment = new WeatherFragment();
+                title = "Weather";
                 break;
         }
         if(fragment != null){

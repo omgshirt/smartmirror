@@ -9,7 +9,7 @@ import android.widget.Button;
 /**
  * Created by Master N on 10/17/2015.
  */
-public class EventsFragment extends Fragment {
+public class CalendarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Button button = new Button(getActivity());
