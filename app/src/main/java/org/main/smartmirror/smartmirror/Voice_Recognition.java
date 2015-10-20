@@ -22,9 +22,13 @@ public class Voice_Recognition extends AppCompatActivity {
     public ListView list;
     public Button speakButton;
     int RESULT_SPEECH=1;
+    tts tts;
+    Thread ttsVoice;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        tts = new tts(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice__recognition);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -67,6 +71,7 @@ public class Voice_Recognition extends AppCompatActivity {
 
         Toast toast = Toast.makeText(getApplicationContext(),"You said "+word, Toast.LENGTH_LONG);
         toast.show();
+        startVoice(word);
 
     }
 
@@ -86,6 +91,21 @@ public class Voice_Recognition extends AppCompatActivity {
             Log.d("TEXTTOSPEECH", "voice to text in voice to text: " + speechtext);
 
         }
+    }
+
+    private void startVoice(final String w) {
+        ttsVoice = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tts.speakText(w);
+                    Thread.sleep(2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        ttsVoice.start();
     }
 
 }
