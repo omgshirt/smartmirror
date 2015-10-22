@@ -6,60 +6,62 @@ import android.speech.tts.UtteranceProgressListener;
 
 import java.util.Locale;
 
-public class tts {
-    static TextToSpeech ttobj;
-    Context context;
-    static boolean isSpeaking = false;
-    static TextToSpeech.OnInitListener ttsListner;
-    static String textToSpeak;
-    public tts(Context c) {
-        context = c;
-        ttsListner = new TextToSpeech.OnInitListener() {
+public class Tts {
+    static TextToSpeech mTtObject;
+    Context mContext;
+    static boolean mIsSpeaking = false;
+    static TextToSpeech.OnInitListener mTtsListner;
+    static String mTextToSpeak;
+    public Tts(Context c) {
+        mContext = c;
+        mTtsListner = new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status== TextToSpeech.SUCCESS) {
-                    isSpeaking = true;
-                    ttobj.setLanguage(Locale.UK);
+                    mIsSpeaking = true;
+                    mTtObject.setLanguage(Locale.UK);
 
-                    ttobj.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                    mTtObject.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
 
                         }
+
                         @Override
                         public void onDone(String utteranceId) {
-                            isSpeaking=false; stop();
+                            mIsSpeaking = false;
+                            Stop();
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-                            isSpeaking = false;
+                            mIsSpeaking = false;
                         }
                     });
-                    ttobj.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH,null, null);
+                    mTtObject.speak(mTextToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
 
                 }
             }
         };
     }
-    public void start(final String text){
-        textToSpeak = text;
-        ttobj = new TextToSpeech(context,ttsListner);
+    public void Start(final String text){
+        mTextToSpeak = text;
+        mTtObject = new TextToSpeech(mContext, mTtsListner);
     }
 
-    public boolean isSpeaking() {
-        return isSpeaking;
+    public boolean IsSpeaking() {
+        return mIsSpeaking;
     }
 
-    public void stop(){
-        if(ttobj !=null){
-            ttobj.stop();
-            ttobj.shutdown();
-            isSpeaking = false;
-            ttobj = null;
+    public void Stop(){
+        if(mTtObject !=null){
+            mTtObject.stop();
+            mTtObject.shutdown();
+            mIsSpeaking = false;
+            mTtObject = null;
         }
     }
-    public void speakText(String text){
-        start(text);
+    public void SpeakText(String text){
+        Start(text);
     }
 }
