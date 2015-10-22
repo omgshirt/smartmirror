@@ -13,9 +13,9 @@ import android.widget.TextView;
 public class NewsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        TextView t = new TextView(getActivity());
-        t.setText("SmartMirror News");
-        t.setTextSize(15);
-        return t;
+        TextView txtFragmentLabel = new TextView(getActivity());
+        txtFragmentLabel.setText("SmartMirror News");
+        txtFragmentLabel.setTextSize(15);
+        return txtFragmentLabel;
     }
 }

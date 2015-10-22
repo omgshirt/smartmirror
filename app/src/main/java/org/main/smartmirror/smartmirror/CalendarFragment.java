@@ -12,8 +12,8 @@ import android.widget.Button;
 public class CalendarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Button button = new Button(getActivity());
-        button.setText("Events Today");
-        return button;
+        Button btnEvents = new Button(getActivity());
+        btnEvents.setText("Events Today");
+        return btnEvents;
     }
 }

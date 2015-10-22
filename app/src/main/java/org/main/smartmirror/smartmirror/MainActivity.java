@@ -22,15 +22,18 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
     private String mSpeechText;
-    private String[] mFragments = {"news","calendar","weather"};
-    private tts mTts;
-    private int RESULT_SPEECH = 1;
+    private String NEWS="news";
+    private String CALENDAR="calendar";
+    private String WEATHER="weather";
+    private Tts mTts;
+    private int RESULT_SPEECH=1;
     private Thread mSpeechTread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mTts = new tts(this);
+        mTts = new Tts(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -82,25 +85,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        displayView(item.getItemId());
-       /* int id = item.getItemId();
-
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);*/
+        DisplayView(item.getItemId());
         return true;
     }
 
-    public void displayView(int viewId){
+    public void DisplayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
 
@@ -136,30 +125,26 @@ public class MainActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         String word;
-        Fragment fragment = null;
         if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             mSpeechText = matches.get(0);
         }
         word = mSpeechText;
-//        Toast toast = Toast.makeText(getApplicationContext(),"You said " + word, Toast.LENGTH_LONG);
-//        toast.show();
         if(word.contains("show")) {
-            if (word.contains(mFragments[0])) {
-                startVoice(mFragments[0]);
-                displayView(R.id.nav_news);
-            } else if (word.contains(mFragments[1])) {
-                startVoice(mFragments[1]);
-                displayView(R.id.nav_calendar);
-            } else if (word.contains(mFragments[2])) {
-                startVoice(mFragments[2]);
-                displayView(R.id.nav_weather);
+            if (word.contains(NEWS)) {
+                StartVoice(NEWS);
+                DisplayView(R.id.nav_news);
+            } else if (word.contains(CALENDAR)) {
+                StartVoice(CALENDAR);
+                DisplayView(R.id.nav_calendar);
+            } else if (word.contains(WEATHER)) {
+                StartVoice(WEATHER);
+                DisplayView(R.id.nav_weather);
             }
-//            startVoice(word);
         }
     }
 
-    public void startVoiceRecognitionActivity(View v) {
+    public void StartVoiceRecognitionActivity(View v) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
         try {
@@ -173,13 +158,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startVoice(final String word){
+    private void StartVoice(final String word){
         final String response = "showing " + word;
         mSpeechTread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTts.speakText(response);
+                    mTts.SpeakText(response);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
