@@ -1,7 +1,9 @@
 package org.main.smartmirror.smartmirror;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -10,15 +12,25 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private String mSpeechText;
+    private String[] mFragments = {"news","calendar","weather"};
+    private tts mTts;
+    private int RESULT_SPEECH = 1;
+    private Thread mSpeechTread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mTts = new tts(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -120,8 +132,60 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    public void startVoice(View v){
-        Intent voice = new Intent(this, Voice_Recognition.class);
-        startActivity(voice);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        String word;
+        Fragment fragment = null;
+        if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            mSpeechText = matches.get(0);
+        }
+        word = mSpeechText;
+//        Toast toast = Toast.makeText(getApplicationContext(),"You said " + word, Toast.LENGTH_LONG);
+//        toast.show();
+        if(word.contains("show")) {
+            if (word.contains(mFragments[0])) {
+                startVoice(mFragments[0]);
+                displayView(R.id.nav_news);
+            } else if (word.contains(mFragments[1])) {
+                startVoice(mFragments[1]);
+                displayView(R.id.nav_calendar);
+            } else if (word.contains(mFragments[2])) {
+                startVoice(mFragments[2]);
+                displayView(R.id.nav_weather);
+            }
+//            startVoice(word);
+        }
+    }
+
+    public void startVoiceRecognitionActivity(View v) {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+        try {
+            startActivityForResult(intent, RESULT_SPEECH);
+        } catch (ActivityNotFoundException a) {
+            Toast t = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
+            t.show();
+            //try text input here if voice not available
+            Log.d("TEXTTOSPEECH", "voice to text in voice to text: " + mSpeechText);
+
+        }
+    }
+
+    private void startVoice(final String word){
+        final String response = "showing " + word;
+        mSpeechTread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mTts.speakText(response);
+                    Thread.sleep(2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        mSpeechTread.start();
     }
 }
