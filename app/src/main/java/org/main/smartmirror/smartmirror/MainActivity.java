@@ -22,18 +22,15 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
     private String mSpeechText;
-    private String NEWS="news";
-    private String CALENDAR="calendar";
-    private String WEATHER="weather";
-    private Tts mTts;
-    private int RESULT_SPEECH=1;
+    private String[] mFragments = {"news","calendar","weather","sports"};
+    private TextToSpeach mTts;
+    private int RESULT_SPEECH = 1;
     private Thread mSpeechTread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mTts = new Tts(this);
+        mTts = new TextToSpeach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -85,11 +82,25 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        DisplayView(item.getItemId());
+        displayView(item.getItemId());
+       /* int id = item.getItemId();
+
+        if (id == R.id.nav_camara) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);*/
         return true;
     }
 
-    public void DisplayView(int viewId){
+    public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
 
@@ -105,6 +116,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_weather:
                 fragment = new WeatherFragment();
                 title = "Weather";
+                break;
+            case R.id.nav_sports:
+                fragment = new SportsFragment();
+                title = "Sports";
                 break;
         }
         if(fragment != null){
@@ -125,22 +140,29 @@ public class MainActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         String word;
+        Fragment fragment = null;
         if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             mSpeechText = matches.get(0);
         }
         word = mSpeechText;
+//        Toast toast = Toast.makeText(getApplicationContext(),"You said " + word, Toast.LENGTH_LONG);
+//        toast.show();
         if(word.contains("show")) {
-            if (word.contains(NEWS)) {
-                StartVoice(NEWS);
-                DisplayView(R.id.nav_news);
-            } else if (word.contains(CALENDAR)) {
-                StartVoice(CALENDAR);
-                DisplayView(R.id.nav_calendar);
-            } else if (word.contains(WEATHER)) {
-                StartVoice(WEATHER);
-                DisplayView(R.id.nav_weather);
+            if (word.contains(mFragments[0])) {
+                startVoice(mFragments[0]);
+                displayView(R.id.nav_news);
+            } else if (word.contains(mFragments[1])) {
+                startVoice(mFragments[1]);
+                displayView(R.id.nav_calendar);
+            } else if (word.contains(mFragments[2])) {
+                startVoice(mFragments[2]);
+                displayView(R.id.nav_weather);
+            } else if (word.contains(mFragments[3])) {
+                startVoice(mFragments[3]);
+                displayView(R.id.nav_sports);
             }
+//            startVoice(word);
         }
     }
 
@@ -158,13 +180,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void StartVoice(final String word){
+    private void startVoice(final String word){
         final String response = "showing " + word;
         mSpeechTread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTts.SpeakText(response);
+                    mTts.speakText(response);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
