@@ -1,6 +1,7 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -22,14 +23,22 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static Context mContext; // Hold the app context
+    private Preferences mPreferences;
     private String mSpeechText;
     private String[] mFragments = {"news","calendar","weather","sports"};
     private TextToSpeach mTts;
     private int RESULT_SPEECH = 1;
-    private Thread mSpeechTread;
+    private Thread mSpeechThread;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Load any application preferences. If prefs do not exist, set them to defaults
+        mContext = getApplicationContext();
+        mPreferences = Preferences.getInstance();
+
         mTts = new TextToSpeach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -182,7 +191,7 @@ public class MainActivity extends AppCompatActivity
 
     private void startVoice(final String word){
         final String response = "showing " + word;
-        mSpeechTread = new Thread(new Runnable() {
+        mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -193,6 +202,11 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-        mSpeechTread.start();
+        mSpeechThread.start();
+    }
+
+
+    public static Context getContextForApplication() {
+        return mContext;
     }
 }

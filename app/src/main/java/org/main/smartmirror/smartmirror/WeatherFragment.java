@@ -7,17 +7,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
-/**
- * Created by Master N on 10/20/2015.
- */
 public class WeatherFragment extends Fragment {
+
+    public WeatherFragment() {
+
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            // Use initialisation data
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        TextView txtFragmentLabel = new TextView(getActivity());
-        txtFragmentLabel.setText("SmartMirror Weather");
-        txtFragmentLabel.setTextSize(25);
-        return txtFragmentLabel;
+
+        return inflater.inflate(R.layout.weather_fragment, container, false);
     }
 }
