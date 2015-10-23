@@ -22,15 +22,18 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private String mSpeechText;
-    private String[] mFragments = {"news","calendar","weather","sports"};
-    private TextToSpeach mTts;
-    private int RESULT_SPEECH = 1;
+
+    private final String NEWS = "News";
+    private final String CALENDAR = "Calendar";
+    private final String WEATHER = "Weather";
+    private final String SPORTS = "Sports";
+    private final int RESULT_SPEECH = 1;
+    private TextToSpeach mTextToSpeach;
     private Thread mSpeechTread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mTts = new TextToSpeach(this);
+        mTextToSpeach = new TextToSpeach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -83,20 +86,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         displayView(item.getItemId());
-       /* int id = item.getItemId();
-
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);*/
         return true;
     }
 
@@ -107,19 +96,19 @@ public class MainActivity extends AppCompatActivity
         switch (viewId) {
             case R.id.nav_news:
                 fragment = new NewsFragment();
-                title = "News";
+                title = NEWS;
                 break;
             case R.id.nav_calendar:
                 fragment = new CalendarFragment();
-                title = "Calendar";
+                title = CALENDAR;
                 break;
             case R.id.nav_weather:
                 fragment = new WeatherFragment();
-                title = "Weather";
+                title = WEATHER;
                 break;
             case R.id.nav_sports:
                 fragment = new SportsFragment();
-                title = "Sports";
+                title = SPORTS;
                 break;
         }
         if(fragment != null){
@@ -127,11 +116,9 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.content_frame, fragment);
             ft.commit();
         }
-
         if(getSupportActionBar() != null){
             getSupportActionBar().setTitle(title);
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
@@ -139,30 +126,27 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        String word;
-        Fragment fragment = null;
+        String voiceInput = null;
         if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            mSpeechText = matches.get(0);
+            voiceInput = matches.get(0);
         }
-        word = mSpeechText;
-//        Toast toast = Toast.makeText(getApplicationContext(),"You said " + word, Toast.LENGTH_LONG);
-//        toast.show();
-        if(word.contains("show")) {
-            if (word.contains(mFragments[0])) {
-                startVoice(mFragments[0]);
-                displayView(R.id.nav_news);
-            } else if (word.contains(mFragments[1])) {
-                startVoice(mFragments[1]);
-                displayView(R.id.nav_calendar);
-            } else if (word.contains(mFragments[2])) {
-                startVoice(mFragments[2]);
-                displayView(R.id.nav_weather);
-            } else if (word.contains(mFragments[3])) {
-                startVoice(mFragments[3]);
-                displayView(R.id.nav_sports);
+        if(voiceInput != null) {
+            if (voiceInput.contains("show")) {
+                if (voiceInput.contains(NEWS.toLowerCase())) {
+                    startVoice(NEWS);
+                    displayView(R.id.nav_news);
+                } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
+                    startVoice(CALENDAR);
+                    displayView(R.id.nav_calendar);
+                } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+                    startVoice(WEATHER);
+                    displayView(R.id.nav_weather);
+                } else if (voiceInput.contains(SPORTS.toLowerCase())) {
+                    startVoice(SPORTS);
+                    displayView(R.id.nav_sports);
+                }
             }
-//            startVoice(word);
         }
     }
 
@@ -172,11 +156,8 @@ public class MainActivity extends AppCompatActivity
         try {
             startActivityForResult(intent, RESULT_SPEECH);
         } catch (ActivityNotFoundException a) {
-            Toast t = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
-            t.show();
-            //try text input here if voice not available
-            Log.d("TEXTTOSPEECH", "voice to text in voice to text: " + mSpeechText);
-
+            Toast tstNoSupport = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
+            tstNoSupport.show();
         }
     }
 
@@ -186,7 +167,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 try {
-                    mTts.speakText(response);
+                    mTextToSpeach.SpeakText(response);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
