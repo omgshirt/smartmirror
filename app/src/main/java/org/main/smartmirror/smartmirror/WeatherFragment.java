@@ -17,7 +17,7 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         TextView txtFragmentLabel = new TextView(getActivity());
         txtFragmentLabel.setText("SmartMirror Weather");
-        txtFragmentLabel.setTextSize(15);
+        txtFragmentLabel.setTextSize(25);
         return txtFragmentLabel;
     }
 }
