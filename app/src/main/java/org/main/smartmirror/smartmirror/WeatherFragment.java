@@ -33,12 +33,11 @@ public class WeatherFragment extends Fragment {
     private TextView txtDailyHigh;
     private TextView txtDailyLow;
 
-    private TextView cityField;
+    Handler mHandler = new Handler();
 
-    Handler handler = new Handler();
+    public WeatherFragment() {}
 
-    public WeatherFragment() {
-    }
+    // TODO: set up a service provider to update time and weather info
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +47,7 @@ public class WeatherFragment extends Fragment {
             // Use initialisation data
         }
         mPreferences = Preferences.getInstance();
-        String city = "LosAngeles,us";
+        String city = "5341114";
         updateWeatherData(city, mPreferences.getTempFormat());
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
     }
@@ -65,14 +64,17 @@ public class WeatherFragment extends Fragment {
         txtWeatherIcon = (TextView)view.findViewById(R.id.weather_icon);
         txtDailyHigh = (TextView)view.findViewById(R.id.daily_high);
         txtDailyLow = (TextView)view.findViewById(R.id.daily_low);
-        cityField = (TextView)view.findViewById(R.id.cityField);
 
         txtWeatherIcon.setTypeface(weatherFont);
+        setDateAndTimeDisplay();
 
-        // set the date and time fields based on Preferences
+        return view;
+    }
+
+    // set the date and time fields based on Preferences
+    private void setDateAndTimeDisplay() {
         txtCurrentDate.setText(getFormattedTime(mPreferences.getDateFormat()));
         txtCurrentTime.setText(getFormattedTime(mPreferences.getTimeFormat()));
-        return view;
     }
 
     // convert the current time into the format provided
@@ -83,12 +85,13 @@ public class WeatherFragment extends Fragment {
         return date;
     }
 
+    // Get weather data from API and display
     private void updateWeatherData(final String city, final String tempFormat){
         new Thread(){
             public void run(){
                 final JSONObject json = FetchWeather.getJSON(getActivity().getApplicationContext(), city, tempFormat);
                 if(json == null){
-                    handler.post(new Runnable(){
+                    mHandler.post(new Runnable(){
                         public void run(){
                             Toast.makeText(getActivity(),
                                     getActivity().getString(R.string.place_not_found),
@@ -96,7 +99,7 @@ public class WeatherFragment extends Fragment {
                         }
                     });
                 } else {
-                    handler.post(new Runnable(){
+                    mHandler.post(new Runnable(){
                         public void run(){
                             renderWeather(json);
                         }
@@ -108,12 +111,6 @@ public class WeatherFragment extends Fragment {
 
     private void renderWeather(JSONObject json){
         try {
-            /*
-            cityField.setText(json.getString("name").toUpperCase(Locale.US) +
-                    ", " +
-                    json.getJSONObject("sys").getString("country"));
-            */
-
             Log.i("WEATHER_API", json.toString());
 
             JSONObject weather = json.getJSONArray("weather").getJSONObject(0);
@@ -143,17 +140,18 @@ public class WeatherFragment extends Fragment {
             Double tempMin = main.getDouble("temp_min");
             txtDailyLow.setText(String.format("Low: %.0f", tempMin));
 
-            // TODO: set weather forecast
+            // TODO: set up hourly weather forecasts
 
         }catch(Exception e){
             Log.e("SimpleWeather", "One or more fields not found in the JSON data");
         }
     }
 
-    private void setWeatherIcon(int actualId, long sunrise, long sunset){
-        int id = actualId / 100;
+    // choose weather icon based on returned weatherId
+    private void setWeatherIcon(int weatherId, long sunrise, long sunset){
+        int id = weatherId / 100;
         String icon = "";
-        if(actualId == 800){
+        if(weatherId == 800){
             long currentTime = new Date().getTime();
             if(currentTime>=sunrise && currentTime<sunset) {
                 icon = getActivity().getString(R.string.weather_sunny);

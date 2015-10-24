@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private String mSpeechText;
-    private String[] mFragments = {"news","calendar","weather","sports"};
+    private String[] mFragments = {"news","calendar","weather","sports","settings","preferences"};
     private TextToSpeach mTts;
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // start with weather displayed
+        displayView(R.id.nav_weather);
     }
 
     @Override
@@ -79,9 +82,8 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            displayView(id);
         }
 
         return super.onOptionsItemSelected(item);
@@ -130,6 +132,10 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SportsFragment();
                 title = "Sports";
                 break;
+            case R.id.action_settings:
+                fragment = new SettingsFragment();
+                title= "Settings";
+                break;
         }
         if(fragment != null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -155,8 +161,8 @@ public class MainActivity extends AppCompatActivity
             mSpeechText = matches.get(0);
         }
         word = mSpeechText;
-//        Toast toast = Toast.makeText(getApplicationContext(),"You said " + word, Toast.LENGTH_LONG);
-//        toast.show();
+        Log.i("VOICE", word);           // print voice results to LogCat
+
         if(word.contains("show")) {
             if (word.contains(mFragments[0])) {
                 startVoice(mFragments[0]);
@@ -170,8 +176,10 @@ public class MainActivity extends AppCompatActivity
             } else if (word.contains(mFragments[3])) {
                 startVoice(mFragments[3]);
                 displayView(R.id.nav_sports);
+            } else if (word.contains(mFragments[4]) || word.contains(mFragments[5]) ) {
+                startVoice(mFragments[4]);
+                displayView(R.id.action_settings);
             }
-//            startVoice(word);
         }
     }
 
@@ -204,7 +212,6 @@ public class MainActivity extends AppCompatActivity
         });
         mSpeechThread.start();
     }
-
 
     public static Context getContextForApplication() {
         return mContext;

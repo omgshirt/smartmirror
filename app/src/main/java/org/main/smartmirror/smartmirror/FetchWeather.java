@@ -15,7 +15,10 @@ import android.util.Log;
 public class FetchWeather {
 
     private static final String OPEN_WEATHER_MAP_API =
-            "http://api.openweathermap.org/data/2.5/weather?q=%s&units=%s";
+            "http://api.openweathermap.org/data/2.5/weather?id=%s&units=%s";
+
+    //private static final String OPEN_WEATHER_MAP_API =
+      //      "http://api.openweathermap.org/data/2.5/forecast?id=%s&units=%s";
 
     public static JSONObject getJSON(Context context, String city, String tempFormat){
         try {

@@ -22,4 +22,13 @@
     <string name="weather_cloudy">\uf041</string>
     <string name="weather_snowy">\uf01b</string>
     <string name="weather_rainy">\uf019</string>
+
+    <!-- Settings strings -->
+    <string name="settings_weather_units">Weather Units</string>
+    <string name="settings_speech_never">Never</string>
+    <string name="settings_speech_rare">Rarely</string>
+    <string name="settings_speech_often">Often</string>
+    <string name="settings_speech_always">Always</string>
+
+
 </resources>

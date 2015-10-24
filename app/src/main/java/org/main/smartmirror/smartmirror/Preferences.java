@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * Created by Brian on 10/22/2015.
@@ -27,6 +28,11 @@ public class Preferences {
     public static final String PREFS_TIME_FORMAT = "MIRROR_PREFS_TIME_FORMAT";
     public static final String PREFS_WIND_FORMAT = "MIRROR_PREFS_WIND_FORMAT";
 
+    public static final float SPEECH_NEVER = 0;
+    public static final float SPEECH_RARE = .25f;
+    public static final float SPEECH_OFTEN = .5f;
+    public static final float SPEECH_ALWAYS = 1;
+
     public static final int FAHRENHEIT = 0;
     public static final int CELSIUS = 1;
     public static final String MPH = "mph";
@@ -44,7 +50,7 @@ public class Preferences {
         sharedPreferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         // grab saved values from sharedPreferences if they exist, if not use defaults
-        mSpeechFrequency = sharedPreferences.getFloat(PREFS_SPEECH_FREQ, (float) 1);
+        mSpeechFrequency = sharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
         mTempUnits = sharedPreferences.getInt(PREFS_TEMP_UNIT, FAHRENHEIT);
         mWindDisplayFormat = sharedPreferences.getString(PREFS_WIND_FORMAT, MPH);
         mVolume = sharedPreferences.getFloat(PREFS_VOL, (float) .8);
@@ -58,9 +64,13 @@ public class Preferences {
         return mPreferences;
     }
 
-    // ------- VOLUME ---------
-    public void setVolume(double vol) {
-        float volume = (float) vol;
+    /**
+     *
+     * @param vol set system volume (0-1)
+     *            This may not be required
+     */
+    public void setVolume(float vol) {
+        float volume = vol;
         if (volume > 1 || volume < 0) {
             return;
         }
@@ -75,12 +85,15 @@ public class Preferences {
         return mVolume;
     }
 
-    // ------- TEMPERATURE UNITS ---------
+    /**
+     *
+     * @param unit const for temp display: 0 / 1
+     */
     public void setTempUnits(int unit) {
         if (unit == FAHRENHEIT || unit == CELSIUS) {
             mTempUnits = unit;
             SharedPreferences.Editor edit = sharedPreferences.edit();
-            edit.putFloat(PREFS_TEMP_UNIT, mTempUnits);
+            edit.putInt(PREFS_TEMP_UNIT, mTempUnits);
             edit.apply();
         }
     }
@@ -104,7 +117,10 @@ public class Preferences {
         return format;
     }
 
-    // --------- DATE FORMAT  ---------
+    /**
+     *
+     * @param format string for displaying date in SimpleDateFormat
+     */
     public void setDateFormat(String format) {
         // might do some validation here
         mDateFormat = format;
@@ -117,7 +133,10 @@ public class Preferences {
         return mDateFormat;
     }
 
-    // --------- TIME FORMAT  ---------
+    /**
+     *
+     * @param format string for displaying time in SimpleDateFormat
+     */
     public void setTimeFormat(String format) {
         // might do some validation here
         mTimeFormat = format;
@@ -130,7 +149,11 @@ public class Preferences {
         return mTimeFormat;
     }
 
-    // ----------- WIND DISPLAY FORMAT ------------
+    /**
+     *
+     * @param format string for displaying wind speed
+     *               "mph" or "kph"
+     */
     public void setWindDisplayFormat(String format) {
         mWindDisplayFormat = format;
     }
@@ -139,4 +162,19 @@ public class Preferences {
         return mWindDisplayFormat;
     }
 
+    /**
+     *
+     * @param frequency how often the TTS should speak (0-1)
+     */
+    public void setSpeechFrequency(float frequency) {
+        if (frequency < 0 || frequency > 1) return;
+        mSpeechFrequency = frequency;
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putFloat(PREFS_SPEECH_FREQ, mSpeechFrequency);
+        edit.apply();
+    }
+
+    public float getSpeechFrequency() {
+        return mSpeechFrequency;
+    }
 }
