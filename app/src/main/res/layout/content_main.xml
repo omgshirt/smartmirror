@@ -14,10 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:onClick="StartVoiceRecognitionActivity"
-        android:text="SPEAK"/>
+        android:text="SPEAK"
+        android:background="#000000"
+        android:textColor="#ffffff" />
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/content_frame">
+        android:id="@+id/content_frame"
+        android:background="#000000">
     </FrameLayout>
 </LinearLayout>
