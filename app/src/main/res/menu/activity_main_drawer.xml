@@ -4,12 +4,14 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/nav_calendar" android:icon="@android:drawable/ic_menu_gallery"
             android:title="Calendar"/>
-        <item android:id="@+id/nav_news" android:icon="@android:drawable/ic_menu_camera"
+        <item android:id="@+id/nav_news" android:icon="@android:drawable/ic_menu_gallery"
             android:title="News"/>
         <item android:id="@+id/nav_sports" android:icon="@android:drawable/ic_menu_gallery"
             android:title="Sports"/>
         <item android:id="@+id/nav_weather" android:icon="@android:drawable/ic_menu_gallery"
             android:title="Weather"/>
+        <item android:id="@+id/nav_settings" android:icon="@android:drawable/ic_menu_gallery"
+            android:title="Settings"/>
 
         <!--<item android:id="@+id/nav_camara" android:icon="@android:drawable/ic_menu_camera"
             android:title="Selfie" />

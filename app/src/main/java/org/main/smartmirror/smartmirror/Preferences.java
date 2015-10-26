@@ -22,28 +22,38 @@ public class Preferences {
     // constants define the names of the values to be saved to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
     public static final String PREFS_VOL = "MIRROR_PREFS_VOL";
-    public static final String PREFS_TEMP_UNIT = "MIRROR_PREFS_TEMP_UNIT";
+    public static final String PREFS_WEATHER_UNIT = "MIRROR_PREFS_WEATHER_UNIT";
     public static final String PREFS_SPEECH_FREQ = "MIRROR_PREFS_SPEECH_FREQ";
     public static final String PREFS_DATE_FORMAT = "MIRROR_PREFS_DATE_FORMAT";
     public static final String PREFS_TIME_FORMAT = "MIRROR_PREFS_TIME_FORMAT";
-    public static final String PREFS_WIND_FORMAT = "MIRROR_PREFS_WIND_FORMAT";
+    public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
+    public static final String PREFS_CAMERA_ENABLED = "MIRROR_PREFS_CAMERA_ENABLED";
+    public static final String PREFS_WAKEON_SOUND = "MIRROR_PREFS_WAKEON_SOUND";
 
+    // chance for TTS to happen (0-1)
     public static final float SPEECH_NEVER = 0;
     public static final float SPEECH_RARE = .25f;
     public static final float SPEECH_OFTEN = .5f;
     public static final float SPEECH_ALWAYS = 1;
 
-    public static final int FAHRENHEIT = 0;
-    public static final int CELSIUS = 1;
+    // Constants for screen brightness (0-255)
+    public static final int BRIGHTNESS_VERYLOW = 50;
+    public static final int BRIGHTNESS_LOW = 100;
+    public static final int BRIGHTNESS_MEDIUM = 150;
+    public static final int BRIGHTNESS_HIGH = 200;
+    public static final int BRIGHTNESS_VERYHIGH = 250;
+
+    public static final int IMPERIAL = 0;
+    public static final int METRIC = 1;
     public static final String MPH = "mph";
     public static final String KPH = "kph";
 
-    private int mTempUnits = FAHRENHEIT;    // control which unit scale to use for temperature (0,1)
+    private int mDisplayUnits = IMPERIAL;    // control which unit scale to use for temperature (0,1)
     private float mVolume;                  // control volume for TTS and other sounds (0-1)
     private float mSpeechFrequency;         // control how often TTS voice responses occur (0-1)
     private String mDateFormat = "EEE, LLL d";    // SimpleDateFormat string for displaying date
     private String mTimeFormat = "h:mm a";         // Default string for displaying time
-    private String mWindDisplayFormat = MPH;
+    private int mLightBrightness;                  // Night light brightness
 
     private Preferences() {
         Context appContext = MainActivity.getContextForApplication();
@@ -51,9 +61,9 @@ public class Preferences {
 
         // grab saved values from sharedPreferences if they exist, if not use defaults
         mSpeechFrequency = sharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
-        mTempUnits = sharedPreferences.getInt(PREFS_TEMP_UNIT, FAHRENHEIT);
-        mWindDisplayFormat = sharedPreferences.getString(PREFS_WIND_FORMAT, MPH);
+        mDisplayUnits = sharedPreferences.getInt(PREFS_WEATHER_UNIT, IMPERIAL);
         mVolume = sharedPreferences.getFloat(PREFS_VOL, (float) .8);
+        mLightBrightness = sharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_MEDIUM);
     }
 
     // returns the instance of the Preferences class, or creates one if it does not exist
@@ -85,39 +95,43 @@ public class Preferences {
         return mVolume;
     }
 
-    /**
+    /** Sets weather display as imperial or metric
      *
-     * @param unit const for temp display: 0 / 1
+     * @param unit
      */
-    public void setTempUnits(int unit) {
-        if (unit == FAHRENHEIT || unit == CELSIUS) {
-            mTempUnits = unit;
+    public void setDisplayUnits(int unit) {
+        if (unit == IMPERIAL || unit == METRIC) {
+            mDisplayUnits = unit;
             SharedPreferences.Editor edit = sharedPreferences.edit();
-            edit.putInt(PREFS_TEMP_UNIT, mTempUnits);
+            edit.putInt(PREFS_WEATHER_UNIT, mDisplayUnits);
             edit.apply();
         }
     }
 
+    public int getDisplayUnits(){
+        return mDisplayUnits;
+    }
+
+    // get a string representation of the units used for weather display
+    public String getDisplayUnitsAsString() {
+        if (mDisplayUnits == IMPERIAL)  { return "imperial"; }
+        else                            { return  "metric"; }
+    }
+
+    // returns the unicode string for deg C or deg F based on the WeatherIcons font set
     public String getTempUnits() {
         String units;
-        if (mTempUnits == FAHRENHEIT) {
-            units = "F";
-        } else {
-            units = "C";
+        Context appContext = MainActivity.getContextForApplication();
+        if (mDisplayUnits == IMPERIAL)  {
+            units = appContext.getResources().getString(R.string.weather_deg_f);
+        }
+        else {
+            units = appContext.getResources().getString(R.string.weather_deg_c);
         }
         return units;
     }
 
-    public String getTempFormat(){
-        String format;
-        if (mTempUnits == FAHRENHEIT) {
-            format = "imperial";
-        } else
-            format = "metric";
-        return format;
-    }
-
-    /**
+    /** Set the string used to format date display
      *
      * @param format string for displaying date in SimpleDateFormat
      */
@@ -133,7 +147,7 @@ public class Preferences {
         return mDateFormat;
     }
 
-    /**
+    /** set string used to format time dis
      *
      * @param format string for displaying time in SimpleDateFormat
      */
@@ -149,17 +163,13 @@ public class Preferences {
         return mTimeFormat;
     }
 
-    /**
-     *
-     * @param format string for displaying wind speed
-     *               "mph" or "kph"
-     */
-    public void setWindDisplayFormat(String format) {
-        mWindDisplayFormat = format;
-    }
-
     public String getWindDisplayFormat() {
-        return mWindDisplayFormat;
+        String val;
+        if (mDisplayUnits == IMPERIAL) {
+            val = MPH;
+        } else
+            val = KPH;
+        return val;
     }
 
     /**
@@ -176,5 +186,22 @@ public class Preferences {
 
     public float getSpeechFrequency() {
         return mSpeechFrequency;
+    }
+
+    /** Set brightness value used by night light
+     *
+     *  @param brightness int (0-255)
+     */
+    public void setLightBrightness(int brightness) {
+        if (brightness < 0 || brightness > 255) return;
+
+        mLightBrightness = brightness;
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putInt(PREFS_LIGHT_BRIGHTNESS, mLightBrightness);
+        edit.apply();
+    }
+
+    public int getLightBrightness () {
+        return mLightBrightness;
     }
 }

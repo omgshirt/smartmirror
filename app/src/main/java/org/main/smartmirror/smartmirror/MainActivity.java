@@ -54,6 +54,18 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Hide UI and actionbar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        decorView.setSystemUiVisibility(uiOptions);
+        getSupportActionBar().hide();
+
         // start with weather displayed
         displayView(R.id.nav_weather);
     }
@@ -133,6 +145,7 @@ public class MainActivity extends AppCompatActivity
                 title = "Sports";
                 break;
             case R.id.action_settings:
+            case R.id.nav_settings:
                 fragment = new SettingsFragment();
                 title= "Settings";
                 break;
@@ -162,22 +175,24 @@ public class MainActivity extends AppCompatActivity
         }
         word = mSpeechText;
         Log.i("VOICE", word);           // print voice results to LogCat
+        String response;
 
         if(word.contains("show")) {
+            response = "showing ";
             if (word.contains(mFragments[0])) {
-                startVoice(mFragments[0]);
+                startVoice(response + mFragments[0]);
                 displayView(R.id.nav_news);
             } else if (word.contains(mFragments[1])) {
-                startVoice(mFragments[1]);
+                startVoice(response + mFragments[1]);
                 displayView(R.id.nav_calendar);
             } else if (word.contains(mFragments[2])) {
-                startVoice(mFragments[2]);
+                startVoice(response + mFragments[2]);
                 displayView(R.id.nav_weather);
             } else if (word.contains(mFragments[3])) {
-                startVoice(mFragments[3]);
+                startVoice(response + mFragments[3]);
                 displayView(R.id.nav_sports);
             } else if (word.contains(mFragments[4]) || word.contains(mFragments[5]) ) {
-                startVoice(mFragments[4]);
+                startVoice(response + mFragments[4]);
                 displayView(R.id.action_settings);
             }
         }
@@ -197,13 +212,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startVoice(final String word){
-        final String response = "showing " + word;
+    private void startVoice(final String phrase){
         mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTts.speakText(response);
+                    mTts.speakText(phrase);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();

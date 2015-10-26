@@ -2,32 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
+	android:layout_height="match_parent"
 	android:padding="15dp"
 	android:orientation="vertical"
 	tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
 	<!-- Date and time -->
-	<TextView
-		android:id="@+id/cityField"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="horizontal">
-		<TextView
-			android:id="@+id/current_time"
-			android:text="12:00 AM"
+
+		<TextClock
+			android:id="@+id/time_clock"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			android:textSize="60sp"
-			android:layout_marginRight="10dp"
+			/>
+
+		<TextClock
+			android:id="@+id/date_clock"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-		<TextView
-			android:id="@+id/current_date"
-			android:text="Mon, Jan 1"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
 			android:textSize="40sp"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
+			/>
 	</LinearLayout>
 	<!-- Current weather, temp and humidity-->
 	<LinearLayout
@@ -43,7 +41,7 @@
 		<!-- current temp -->
 		<TextView
 			android:id="@+id/current_temp"
-			android:text="70&#176;"
+			android:text="00&#176;"
 			android:textSize="60sp"
 			android:layout_marginRight="10dp"
 			android:layout_width="wrap_content"
@@ -52,45 +50,50 @@
 		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-			android:layout_marginStart="10dp"
+			android:layout_marginStart="20dp"
+			android:layout_gravity="center_vertical"
 			android:orientation="vertical">
             <!-- current humidity -->
-            <TextView
-                android:id="@+id/current_humidity"
-                android:text="Humidity: 30%"
-				android:textSize="25sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+				<TextView
+					android:id="@+id/current_humidity"
+					android:text="--"
+					android:textSize="25sp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
             <!-- current wind -->
-            <TextView
-                android:id="@+id/current_wind"
-				android:textSize="25sp"
-                android:text="Wind: 2 mph"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+				<TextView
+					android:id="@+id/current_wind"
+					android:text="--"
+					android:textSize="25sp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
 		</LinearLayout>
 		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-			android:layout_marginStart="10dp"
+			android:layout_marginStart="20dp"
+			android:layout_gravity="center_vertical"
 			android:orientation="vertical">
 			<!-- daily high -->
 			<TextView
 				android:id="@+id/daily_high"
-				android:text="100"
+				android:text="--"
 				android:textSize="25sp"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
+
 			<!-- daily low -->
 			<TextView
 				android:id="@+id/daily_low"
 				android:textSize="25sp"
-				android:text="0"
+				android:text="--"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
 		</LinearLayout>
+
 	</LinearLayout>
-	<!-- weather forecast for upcoming hours -->
+	<!-- weather forecast for upcoming hours // removed for now -->
+	<!--
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -102,5 +105,5 @@
 		<include android:id="@+id/forecast_h5" layout="@layout/weather_hourly_forecast"/>
 		<include android:id="@+id/forecast_h6" layout="@layout/weather_hourly_forecast"/>
 	</LinearLayout>
-
+	-->
 </LinearLayout>

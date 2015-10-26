@@ -13,7 +13,7 @@
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
-    <string name="degree_symbol">\u0176</string>
+
     <string name="weather_sunny">\uf00d</string>
     <string name="weather_clear_night">\uf02e</string>
     <string name="weather_thunder">\uf01e</string>
@@ -22,6 +22,15 @@
     <string name="weather_cloudy">\uf041</string>
     <string name="weather_snowy">\uf01b</string>
     <string name="weather_rainy">\uf019</string>
+
+    <string name="weather_humidity">\uf07a</string>
+    <string name="weather_deg_c">\uf03c</string>
+    <string name="weather_deg_f">\uf045</string>
+    <string name="weather_deg">\uf042</string>
+    <string name="weather_arrow_up">\uf058</string>
+    <string name="weather_arrow_down">\uf044</string>
+    <string name="weather_wind_strong">\uf050</string>
+
 
     <!-- Settings strings -->
     <string name="settings_weather_units">Weather Units</string>
