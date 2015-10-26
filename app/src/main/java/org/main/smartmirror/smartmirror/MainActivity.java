@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity
     private Preferences mPreferences;
     private String mSpeechText;
     private String[] mFragments = {"news","calendar","weather","sports","settings","preferences"};
-    private TextToSpeach mTts;
+    private TextToSpeech mTts;
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
 
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity
         mContext = getApplicationContext();
         mPreferences = Preferences.getInstance();
 
-        mTts = new TextToSpeach(this);
+        mTts = new TextToSpeech(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
