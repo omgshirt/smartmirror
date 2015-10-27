@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private String mSpeechText;
-    private String[] mFragments = {"news","calendar","weather","sports","settings","preferences"};
+    private String[] mFragments = {"news","calendar","weather","sports","settings","preferences","light"};
     private TextToSpeach mTts;
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
@@ -64,10 +65,22 @@ public class MainActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_IMMERSIVE;
         decorView.setSystemUiVisibility(uiOptions);
-        getSupportActionBar().hide();
+
+        try {
+            getSupportActionBar().hide();
+        } catch (Exception e) {
+
+        }
 
         // start with weather displayed
         displayView(R.id.nav_weather);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        // set screen brightness
+        mPreferences.setAppBrightness(this);
     }
 
     @Override
@@ -106,20 +119,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         displayView(item.getItemId());
-       /* int id = item.getItemId();
-
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);*/
         return true;
     }
 
@@ -135,6 +134,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_calendar:
                 fragment = new CalendarFragment();
                 title = "Calendar";
+                break;
+            case R.id.nav_light:
+                fragment = new LightFragment();
+                title = "Night Light";
                 break;
             case R.id.nav_weather:
                 fragment = new WeatherFragment();
@@ -194,6 +197,9 @@ public class MainActivity extends AppCompatActivity
             } else if (word.contains(mFragments[4]) || word.contains(mFragments[5]) ) {
                 startVoice(response + mFragments[4]);
                 displayView(R.id.action_settings);
+            } else if (word.contains(mFragments[6]) ) {
+                startVoice(response + mFragments[6]);
+                displayView(R.id.nav_light);
             }
         }
     }
@@ -227,7 +233,16 @@ public class MainActivity extends AppCompatActivity
         mSpeechThread.start();
     }
 
+    protected void onDestroy() {
+        Settings.System.putInt(getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS_MODE,
+                Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+        mPreferences.destroy();
+        super.onDestroy();
+    }
+
     public static Context getContextForApplication() {
         return mContext;
     }
+
 }

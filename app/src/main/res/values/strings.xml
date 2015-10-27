@@ -39,4 +39,9 @@
     <string name="settings_speech_often">Often</string>
     <string name="settings_speech_always">Always</string>
 
+    <string name="settings_vlow">Very Low</string>
+    <string name="settings_low">Low</string>
+    <string name="settings_medium">Medium</string>
+    <string name="settings_high">High</string>
+    <string name="settings_vhigh">Very High</string>
 </resources>

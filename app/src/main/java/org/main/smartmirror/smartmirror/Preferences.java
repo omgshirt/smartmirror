@@ -1,9 +1,11 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.WindowManager;
 
 /**
  * Created by Brian on 10/22/2015.
@@ -17,7 +19,7 @@ import android.util.Log;
 public class Preferences {
 
     private static Preferences mPreferences = null;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences mSharedPreferences;
 
     // constants define the names of the values to be saved to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
@@ -27,6 +29,7 @@ public class Preferences {
     public static final String PREFS_DATE_FORMAT = "MIRROR_PREFS_DATE_FORMAT";
     public static final String PREFS_TIME_FORMAT = "MIRROR_PREFS_TIME_FORMAT";
     public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
+    public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
     public static final String PREFS_CAMERA_ENABLED = "MIRROR_PREFS_CAMERA_ENABLED";
     public static final String PREFS_WAKEON_SOUND = "MIRROR_PREFS_WAKEON_SOUND";
 
@@ -37,11 +40,14 @@ public class Preferences {
     public static final float SPEECH_ALWAYS = 1;
 
     // Constants for screen brightness (0-255)
-    public static final int BRIGHTNESS_VERYLOW = 50;
-    public static final int BRIGHTNESS_LOW = 100;
-    public static final int BRIGHTNESS_MEDIUM = 150;
-    public static final int BRIGHTNESS_HIGH = 200;
+    public static final int BRIGHTNESS_VERYLOW = 10;
+    public static final int BRIGHTNESS_LOW = 60;
+    public static final int BRIGHTNESS_MEDIUM = 120;
+    public static final int BRIGHTNESS_HIGH = 160;
     public static final int BRIGHTNESS_VERYHIGH = 250;
+    public static final int BRIGHTNESS_DEFAULT = BRIGHTNESS_MEDIUM;
+
+    public static final float VOLUME_DEFAULT = 0.8f;        // not used currently
 
     public static final int IMPERIAL = 0;
     public static final int METRIC = 1;
@@ -54,16 +60,25 @@ public class Preferences {
     private String mDateFormat = "EEE, LLL d";    // SimpleDateFormat string for displaying date
     private String mTimeFormat = "h:mm a";         // Default string for displaying time
     private int mLightBrightness;                  // Night light brightness
+    private int mAppBrightness;                     // general brightness setting for other modes
 
     private Preferences() {
         Context appContext = MainActivity.getContextForApplication();
-        sharedPreferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        mSharedPreferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        // grab saved values from sharedPreferences if they exist, if not use defaults
-        mSpeechFrequency = sharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
-        mDisplayUnits = sharedPreferences.getInt(PREFS_WEATHER_UNIT, IMPERIAL);
-        mVolume = sharedPreferences.getFloat(PREFS_VOL, (float) .8);
-        mLightBrightness = sharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_MEDIUM);
+        // grab saved values from mSharedPreferences if they exist, if not use defaults
+        mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
+        mDisplayUnits = mSharedPreferences.getInt(PREFS_WEATHER_UNIT, IMPERIAL);
+        mVolume = mSharedPreferences.getFloat(PREFS_VOL, VOLUME_DEFAULT);
+        mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
+        mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_DEFAULT);
+    }
+
+    // Clean up any refs that might hang around to prevent leaks.
+    public void destroy(){
+
+        mPreferences = null;
+        mSharedPreferences = null;
     }
 
     // returns the instance of the Preferences class, or creates one if it does not exist
@@ -86,7 +101,7 @@ public class Preferences {
         }
 
         mVolume = volume;
-        SharedPreferences.Editor edit = sharedPreferences.edit();
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putFloat(PREFS_VOL, mVolume);
         edit.apply();
     }
@@ -102,7 +117,7 @@ public class Preferences {
     public void setDisplayUnits(int unit) {
         if (unit == IMPERIAL || unit == METRIC) {
             mDisplayUnits = unit;
-            SharedPreferences.Editor edit = sharedPreferences.edit();
+            SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putInt(PREFS_WEATHER_UNIT, mDisplayUnits);
             edit.apply();
         }
@@ -138,7 +153,7 @@ public class Preferences {
     public void setDateFormat(String format) {
         // might do some validation here
         mDateFormat = format;
-        SharedPreferences.Editor edit = sharedPreferences.edit();
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_DATE_FORMAT, mDateFormat);
         edit.apply();
     }
@@ -154,7 +169,7 @@ public class Preferences {
     public void setTimeFormat(String format) {
         // might do some validation here
         mTimeFormat = format;
-        SharedPreferences.Editor edit = sharedPreferences.edit();
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_TIME_FORMAT, mTimeFormat);
         edit.apply();
     }
@@ -179,7 +194,7 @@ public class Preferences {
     public void setSpeechFrequency(float frequency) {
         if (frequency < 0 || frequency > 1) return;
         mSpeechFrequency = frequency;
-        SharedPreferences.Editor edit = sharedPreferences.edit();
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putFloat(PREFS_SPEECH_FREQ, mSpeechFrequency);
         edit.apply();
     }
@@ -196,12 +211,44 @@ public class Preferences {
         if (brightness < 0 || brightness > 255) return;
 
         mLightBrightness = brightness;
-        SharedPreferences.Editor edit = sharedPreferences.edit();
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putInt(PREFS_LIGHT_BRIGHTNESS, mLightBrightness);
         edit.apply();
+
+        Log.i("LIGHT BRIGHTNESS:", Integer.toString(mLightBrightness));
     }
 
     public int getLightBrightness () {
         return mLightBrightness;
+    }
+
+    /** Set brightness value for the application
+     *
+     *  @param brightness int (0-255)
+     */
+    public void setAppBrightness(Activity activity, int brightness) {
+        if (brightness < 0 || brightness > 255) return;
+        mAppBrightness = brightness;
+
+        ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
+        sbh.setScreenBrightness(activity, mAppBrightness);
+
+        Log.i("APP BRIGHTNESS:", Integer.toString(mAppBrightness) );
+
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
+        edit.apply();
+    }
+
+    /**
+     * Sets the application and window brightness to value stored in preferences
+     *  Requires Activity context
+     */
+    public void setAppBrightness(Activity activity) {
+        setAppBrightness(activity, mAppBrightness);
+    }
+
+    public int getAppBrightness () {
+        return mAppBrightness;
     }
 }
