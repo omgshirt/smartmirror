@@ -1,6 +1,8 @@
 package org.main.smartmirror.smartmirror;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
 import android.provider.Settings;
 import android.view.WindowManager;
 

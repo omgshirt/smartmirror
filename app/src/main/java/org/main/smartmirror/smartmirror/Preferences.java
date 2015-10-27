@@ -3,9 +3,8 @@ package org.main.smartmirror.smartmirror;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.provider.Settings;
 import android.util.Log;
-import android.view.WindowManager;
+
 
 /**
  * Created by Brian on 10/22/2015.
@@ -146,6 +145,7 @@ public class Preferences {
         return units;
     }
 
+
     /** Set the string used to format date display
      *
      * @param format string for displaying date in SimpleDateFormat
@@ -215,7 +215,6 @@ public class Preferences {
         edit.putInt(PREFS_LIGHT_BRIGHTNESS, mLightBrightness);
         edit.apply();
 
-        Log.i("LIGHT BRIGHTNESS:", Integer.toString(mLightBrightness));
     }
 
     public int getLightBrightness () {
@@ -233,15 +232,13 @@ public class Preferences {
         ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
         sbh.setScreenBrightness(activity, mAppBrightness);
 
-        Log.i("APP BRIGHTNESS:", Integer.toString(mAppBrightness) );
-
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
         edit.apply();
     }
 
     /**
-     * Sets the application and window brightness to value stored in preferences
+     * Sets the application's current brightness to value stored in preferences
      *  Requires Activity context
      */
     public void setAppBrightness(Activity activity) {

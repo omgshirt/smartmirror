@@ -47,6 +47,7 @@ public class TextToSpeach {
     public void start(final String text){
         textToSpeak = text;
         ttobj = new TextToSpeech(context,ttsListner);
+        Log.i("TTS", "tts started");
     }
 
     public boolean isSpeaking() {

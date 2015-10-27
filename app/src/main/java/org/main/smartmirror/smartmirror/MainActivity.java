@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
@@ -38,6 +39,16 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         // Load any application preferences. If prefs do not exist, set them to defaults
         mContext = getApplicationContext();
+
+        // check for permission to write system settings on API 23 and greater.
+        // Get authorization on >= 23
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(!Settings.System.canWrite( getApplicationContext() )) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                startActivityForResult(intent, 1);
+            }
+        }
+
         mPreferences = Preferences.getInstance();
 
         mTts = new TextToSpeach(this);
@@ -79,7 +90,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
-        // set screen brightness
         mPreferences.setAppBrightness(this);
     }
 
@@ -170,7 +180,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        String word;
+        String word = "";
         Fragment fragment = null;
         if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
@@ -218,7 +228,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startVoice(final String phrase){
+    public void startVoice(final String phrase){
+        if (mTts != null) {
+            mTts.stop();
+        }
         mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -234,6 +247,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void onDestroy() {
+        if (mTts != null) {
+            mTts.stop();
+        }
         Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_BRIGHTNESS_MODE,
                 Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
