@@ -1,25 +1,24 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.Context;
-import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
-import android.util.Log;
 
 import java.util.Locale;
 import java.util.Random;
 
-public class TextToSpeach {
-    static TextToSpeech ttobj;
+
+public class TextToSpeechHelper {
+    static android.speech.tts.TextToSpeech ttobj;
     Context context;
     static boolean isSpeaking = false;
-    static TextToSpeech.OnInitListener ttsListner;
+    static android.speech.tts.TextToSpeech.OnInitListener ttsListner;
     static String textToSpeak;
-    public TextToSpeach(Context c) {
+    public TextToSpeechHelper(Context c) {
         context = c;
-        ttsListner = new TextToSpeech.OnInitListener() {
+        ttsListner = new android.speech.tts.TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                if (status== TextToSpeech.SUCCESS) {
+                if (status== android.speech.tts.TextToSpeech.SUCCESS) {
                     isSpeaking = true;
                     ttobj.setLanguage(Locale.UK);
 
@@ -38,7 +37,7 @@ public class TextToSpeach {
                             isSpeaking = false;
                         }
                     });
-                    ttobj.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH,null, null);
+                    ttobj.speak(textToSpeak, android.speech.tts.TextToSpeech.QUEUE_FLUSH,null, null);
 
                 }
             }
@@ -46,7 +45,7 @@ public class TextToSpeach {
     }
     public void start(final String text){
         textToSpeak = text;
-        ttobj = new TextToSpeech(context,ttsListner);
+        ttobj = new android.speech.tts.TextToSpeech(context,ttsListner);
     }
 
     public boolean isSpeaking() {
