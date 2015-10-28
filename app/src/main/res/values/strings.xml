@@ -31,5 +31,7 @@
     <string name="settings_speech_often">Often</string>
     <string name="settings_speech_always">Always</string>
 
+    <!-- Sports Strings -->
+    <string name="sports_error">Error with Sports Data</string>
 
 </resources>

@@ -1,6 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -24,6 +23,12 @@ public class SportsFragment extends Fragment {
 
     Handler mHandler = new Handler();
 
+    // this URL does some filtering so as to only retrieve the "headline" and "snippet" for each item,
+    // without the full text and other extras (date, etc).
+    // see the NYTIMES API console for JSON format
+    private String sportsUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
+            "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";
+
     public SportsFragment() {}
 
     public void onCreate(Bundle savedInstanceState) {
@@ -32,10 +37,9 @@ public class SportsFragment extends Fragment {
         if (args != null) {
             // Use initialisation data
         }
-        String headline = "Sports";
         String apiKey = getString(R.string.nyt_api_key);
-
-        updateSports(headline, apiKey);
+        sportsUrl += apiKey;
+        updateSports(sportsUrl);
     }
 
 
@@ -43,26 +47,22 @@ public class SportsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.sports_fragment, container, false);
-
-
         txtHeadline = (TextView)view.findViewById(R.id.headline);
-
 
         return view;
     }
 
 
     // Get sports headlines from api and display
-    private void updateSports(final String headline, final String apiKey){
+    private void updateSports(final String query){
         new Thread(){
             public void run(){
-                final JSONObject json = FetchSports.getJSON(headline, apiKey);
-
+                final JSONObject json = FetchURL.getJSON(query);
                 if(json == null){
                     mHandler.post(new Runnable(){
                         public void run(){
                             Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.place_not_found),
+                                    getActivity().getString(R.string.sports_error),
                                     Toast.LENGTH_LONG).show();
                         }
                     });
@@ -81,15 +81,18 @@ public class SportsFragment extends Fragment {
 
     private void renderSports(JSONObject json){
         try {
-            Log.i("NYT_API", json.toString());
 
-            JSONObject sportsHeadline = json.getJSONArray("Sports").getJSONObject(0);
-            //JSONObject sportsHeadline = json.getJSONObject("Sports");
-            txtHeadline.setText(sportsHeadline.toString());
+            Log.i("NYT_API", json.toString());
+            JSONObject response = json.getJSONObject("response");
+            JSONObject docs = response.getJSONArray("docs").getJSONObject(0);
+            String snippet = docs.getString("snippet");
+            JSONObject headline = docs.getJSONObject("headline");
+
+            txtHeadline.setText(headline.getString("main") + "\n" + snippet);
 
 
         }catch(Exception e){
-            Log.e("SimpleSports", "One or more fields not found in the JSON data");
+            Log.e("SPORTS ERROR", e.toString());
         }
     }
 
