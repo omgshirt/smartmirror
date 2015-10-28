@@ -38,8 +38,8 @@ public class TextToSpeach {
                             isSpeaking = false;
                         }
                     });
-                    ttobj.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH,null, null);
-
+                    // method for backwards compatibility
+                    ttobj.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
         };

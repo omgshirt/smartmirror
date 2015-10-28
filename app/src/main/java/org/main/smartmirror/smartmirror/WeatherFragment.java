@@ -12,6 +12,7 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.Date;
 import java.util.Random;
@@ -31,7 +32,6 @@ public class WeatherFragment extends Fragment {
     private TextView txtDailyHigh;
     private TextView txtDailyLow;
 
-    Handler mHandler = new Handler();
     private String mCityCode = "5341114";                 // openweatherapi id for the city to find
 
     // hold weather data for TTS
@@ -40,6 +40,8 @@ public class WeatherFragment extends Fragment {
     private int mCurrentTemp = -999;
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
+
+    Handler mHandler = new Handler();
 
     public WeatherFragment() {}
 
@@ -143,6 +145,7 @@ public class WeatherFragment extends Fragment {
             JSONObject weather = json.getJSONArray("weather").getJSONObject(0);
             JSONObject main = json.getJSONObject("main");
             JSONObject wind = json.getJSONObject("wind");
+
 
             // set Icon
             setWeatherIcon(weather.getInt("id"),

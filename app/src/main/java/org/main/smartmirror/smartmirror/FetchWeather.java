@@ -17,8 +17,10 @@ public class FetchWeather {
     private static final String OPEN_WEATHER_MAP_API =
             "http://api.openweathermap.org/data/2.5/weather?id=%s&units=%s";
 
-    //private static final String OPEN_WEATHER_MAP_API =
-      //      "http://api.openweathermap.org/data/2.5/forecast?id=%s&units=%s";
+    /*
+    private static final String OPEN_WEATHER_MAP_API =
+           "http://api.openweathermap.org/data/2.5/forecast?id=%s&units=%s";
+    */
 
     public static JSONObject getJSON(Context context, String city, String units){
         try {
@@ -32,8 +34,8 @@ public class FetchWeather {
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream()));
 
-            StringBuffer json = new StringBuffer(1024);
-            String tmp="";
+            StringBuilder json = new StringBuilder();
+            String tmp;
             while((tmp=reader.readLine())!=null)
                 json.append(tmp).append("\n");
             reader.close();
@@ -48,6 +50,7 @@ public class FetchWeather {
             return data;
             
         }catch(Exception e){
+            e.printStackTrace();
             return null;
         }
     }

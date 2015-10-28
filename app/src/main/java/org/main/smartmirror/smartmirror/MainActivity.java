@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity
     private Thread mSpeechThread;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Load any application preferences. If prefs do not exist, set them to defaults
@@ -135,6 +134,7 @@ public class MainActivity extends AppCompatActivity
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
+        if (mTts != null) mTts.stop();      // shut down any pending TTS
 
         switch (viewId) {
             case R.id.nav_news:
