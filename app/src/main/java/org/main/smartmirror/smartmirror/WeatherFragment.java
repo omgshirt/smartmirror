@@ -8,36 +8,42 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
+import java.util.Random;
+
 
 public class WeatherFragment extends Fragment {
-
-    public static final String DEGREE_SYMBOL = "\u00B0";
 
     Typeface weatherFont;
     Preferences mPreferences;
 
     private TextView txtWeatherIcon;
-    private TextView txtCurrentDate;
-    private TextView txtCurrentTime;
+    private TextClock clkTextClock;
+    private TextClock clkDateClock;
     private TextView txtCurrentTemp;
     private TextView txtCurrentWind;
     private TextView txtCurrentHumidity;
     private TextView txtDailyHigh;
     private TextView txtDailyLow;
 
+    private String mCityCode = "5341114";                 // openweatherapi id for the city to find
+
+    // hold weather data for TTS
+    private int mTempMax = -999;
+    private int mTempMin = -999;
+    private int mCurrentTemp = -999;
+    private int mCurrentHumidity = 0;
+    private int mCurrentWind = 0;
+
     Handler mHandler = new Handler();
 
     public WeatherFragment() {}
-
-    // TODO: set up a service provider to update time and weather info
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,17 +53,17 @@ public class WeatherFragment extends Fragment {
             // Use initialisation data
         }
         mPreferences = Preferences.getInstance();
-        String city = "5341114";
-        updateWeatherData(city, mPreferences.getTempFormat());
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
+        updateWeatherData(mCityCode, mPreferences.getDisplayUnitsAsString());
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.weather_fragment, container, false);
 
-        txtCurrentDate = (TextView)view.findViewById(R.id.current_date);
-        txtCurrentTime =(TextView)view.findViewById(R.id.current_time);
+        clkTextClock = (TextClock)view.findViewById(R.id.time_clock);
+        clkDateClock = (TextClock)view.findViewById(R.id.date_clock);
         txtCurrentHumidity = (TextView)view.findViewById(R.id.current_humidity);
         txtCurrentTemp = (TextView)view.findViewById(R.id.current_temp);
         txtCurrentWind = (TextView)view.findViewById(R.id.current_wind);
@@ -66,23 +72,46 @@ public class WeatherFragment extends Fragment {
         txtDailyLow = (TextView)view.findViewById(R.id.daily_low);
 
         txtWeatherIcon.setTypeface(weatherFont);
-        setDateAndTimeDisplay();
+        txtCurrentTemp.setTypeface(weatherFont);
+        txtDailyHigh.setTypeface(weatherFont);
+        txtDailyLow.setTypeface(weatherFont);
+
+        clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
+        clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
 
         return view;
     }
 
-    // set the date and time fields based on Preferences
-    private void setDateAndTimeDisplay() {
-        txtCurrentDate.setText(getFormattedTime(mPreferences.getDateFormat()));
-        txtCurrentTime.setText(getFormattedTime(mPreferences.getTimeFormat()));
-    }
+    private void saySomethingAboutWeather() {
+        Random rand = new Random();
+        String text = "";
+        switch (rand.nextInt(5)) {
+            case 0:
+                text = "the current temperature is " + mCurrentTemp + " degrees";
+                break;
+            case 1:
+                text = "the high today is " + mTempMax + " degrees";
+                break;
+            case 2:
+                text = "the low today is " + mTempMin + " degrees";
+                break;
+            case 3:
+                text = "the current humidity is " + mCurrentHumidity + " percent";
+                break;
+            case 4:
+                String speedUnits;
+                if( mPreferences.getWindDisplayFormat().equals(Preferences.KPH) )  {
+                    speedUnits = "kilometers per hour";
+                } else {
+                    speedUnits = "miles per hour";
+                }
+                text = "the current wind speed is " + mCurrentWind + "  " + speedUnits;
+                break;
+        }
 
-    // convert the current time into the format provided
-    private String getFormattedTime(String format) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
-        String date = sdf.format(new Date());
-        Log.d("%s", date);
-        return date;
+        if ( !text.equals("") ) {
+            ((MainActivity) getActivity()).startVoice(text);
+        }
     }
 
     // Get weather data from API and display
@@ -117,6 +146,7 @@ public class WeatherFragment extends Fragment {
             JSONObject main = json.getJSONObject("main");
             JSONObject wind = json.getJSONObject("wind");
 
+
             // set Icon
             setWeatherIcon(weather.getInt("id"),
                     json.getJSONObject("sys").getLong("sunrise") * 1000,
@@ -124,24 +154,30 @@ public class WeatherFragment extends Fragment {
 
             // Set Temp
             String tempFormat = mPreferences.getTempUnits();
-            txtCurrentTemp.setText(
-                    String.format("%.0f", main.getDouble("temp")) + DEGREE_SYMBOL + " " + tempFormat);
+            mCurrentTemp = (int)main.getDouble("temp");
+            txtCurrentTemp.setText( mCurrentTemp + tempFormat);
 
             // set humidity
-            txtCurrentHumidity.setText("Humidity: " + main.getString("humidity") + "%");
+            mCurrentHumidity = (int)main.getDouble("humidity");
+            String humidityText = "Humidity: " + mCurrentHumidity + "%";
+            txtCurrentHumidity.setText(humidityText);
 
             // set Wind Speed
-            String windSpeed = String.format("%.0f", wind.getDouble("speed"));
-            txtCurrentWind.setText("Wind: " + windSpeed + " " + mPreferences.getWindDisplayFormat());
+            mCurrentWind = (int) wind.getDouble("speed");
+            String windSpeed = "Wind: " + mCurrentWind + " " + mPreferences.getWindDisplayFormat();
+            txtCurrentWind.setText( windSpeed );
 
             // Set the dailyHigh and dailyLow
-            Double tempMax = main.getDouble("temp_max");
-            txtDailyHigh.setText(String.format("High: %.0f", tempMax));
-            Double tempMin = main.getDouble("temp_min");
-            txtDailyLow.setText(String.format("Low: %.0f", tempMin));
+            mTempMax = (int)main.getDouble("temp_max");
+            String maxIcon = getActivity().getString(R.string.weather_arrow_up);
+            txtDailyHigh.setText(maxIcon + mTempMax);
+
+            mTempMin = (int)main.getDouble("temp_min");
+            String minIcon = getActivity().getString(R.string.weather_arrow_down);
+            txtDailyLow.setText(minIcon + mTempMin);
 
             // TODO: set up hourly weather forecasts
-
+            saySomethingAboutWeather();
         }catch(Exception e){
             Log.e("SimpleWeather", "One or more fields not found in the JSON data");
         }

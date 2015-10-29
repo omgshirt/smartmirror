@@ -3,7 +3,9 @@ package org.main.smartmirror.smartmirror;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -23,23 +25,41 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private final String NEWS = "News";
+    private final String CALENDAR = "Calendar";
+    private final String WEATHER = "Weather";
+    private final String SPORTS = "Sports";
+    private final String LIGHT = "Light";
+    private final String SETTINGS = "Settings";
+    private final int RESULT_SPEECH = 1;
+    private TextToSpeach mTextToSpeach;
+    private Thread mSpeechTread;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private String mSpeechText;
-    private String[] mFragments = {"news","calendar","weather","sports","settings","preferences"};
-    private TextToSpeechHelper mTts;
+    private String[] mFragments = {"news","calendar","weather","sports","settings","preferences","light"};
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Load any application preferences. If prefs do not exist, set them to defaults
         mContext = getApplicationContext();
-        mPreferences = Preferences.getInstance();
 
-        mTts = new TextToSpeechHelper(this);
+        // check for permission to write system settings on API 23 and greater.
+        // Get authorization on >= 23
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(!Settings.System.canWrite( getApplicationContext() )) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                startActivityForResult(intent, 1);
+            }
+        }
+
+        mPreferences = Preferences.getInstance();
+        
+        mTextToSpeach = new TextToSpeach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -54,8 +74,31 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Hide UI and actionbar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        decorView.setSystemUiVisibility(uiOptions);
+
+        try {
+            getSupportActionBar().hide();
+        } catch (Exception e) {
+
+        }
+
         // start with weather displayed
         displayView(R.id.nav_weather);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mPreferences.setAppBrightness(this);
     }
 
     @Override
@@ -94,47 +137,39 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         displayView(item.getItemId());
-       /* int id = item.getItemId();
-
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);*/
         return true;
     }
 
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
+        if (mTextToSpeach != null) mTextToSpeach.stop();      // shut down any pending TTS
 
         switch (viewId) {
             case R.id.nav_news:
                 fragment = new NewsFragment();
-                title = "News";
+                title = NEWS;
                 break;
             case R.id.nav_calendar:
                 fragment = new CalendarFragment();
-                title = "Calendar";
+                title = CALENDAR;
+                break;
+            case R.id.nav_light:
+                fragment = new LightFragment();
+                title = LIGHT;
                 break;
             case R.id.nav_weather:
                 fragment = new WeatherFragment();
-                title = "Weather";
+                title = WEATHER;
                 break;
             case R.id.nav_sports:
                 fragment = new SportsFragment();
-                title = "Sports";
+                title = SPORTS;
                 break;
             case R.id.action_settings:
+            case R.id.nav_settings:
                 fragment = new SettingsFragment();
-                title= "Settings";
+                title= SETTINGS;
                 break;
         }
         if(fragment != null){
@@ -154,31 +189,32 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        String word;
-        Fragment fragment = null;
+        String voiceInput = null;
         if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            mSpeechText = matches.get(0);
+            voiceInput = matches.get(0);
         }
-        word = mSpeechText;
-        Log.i("VOICE", word);           // print voice results to LogCat
-
-        if(word.contains("show")) {
-            if (word.contains(mFragments[0])) {
-                startVoice(mFragments[0]);
-                displayView(R.id.nav_news);
-            } else if (word.contains(mFragments[1])) {
-                startVoice(mFragments[1]);
-                displayView(R.id.nav_calendar);
-            } else if (word.contains(mFragments[2])) {
-                startVoice(mFragments[2]);
-                displayView(R.id.nav_weather);
-            } else if (word.contains(mFragments[3])) {
-                startVoice(mFragments[3]);
-                displayView(R.id.nav_sports);
-            } else if (word.contains(mFragments[4]) || word.contains(mFragments[5]) ) {
-                startVoice(mFragments[4]);
-                displayView(R.id.action_settings);
+        if(voiceInput != null) {
+            if (voiceInput.contains("show")) {
+                if (voiceInput.contains(NEWS.toLowerCase())) {
+                    startVoice(NEWS);
+                    displayView(R.id.nav_news);
+                } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
+                    startVoice(CALENDAR);
+                    displayView(R.id.nav_calendar);
+                } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+                    startVoice(WEATHER);
+                    displayView(R.id.nav_weather);
+                } else if (voiceInput.contains(SPORTS.toLowerCase())) {
+                    startVoice(SPORTS);
+                    displayView(R.id.nav_sports);
+                } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+                    startVoice(LIGHT);
+                    displayView(R.id.nav_light);
+                } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+                    startVoice(SETTINGS);
+                    displayView(R.id.nav_settings);
+                }                    
             }
         }
     }
@@ -189,21 +225,20 @@ public class MainActivity extends AppCompatActivity
         try {
             startActivityForResult(intent, RESULT_SPEECH);
         } catch (ActivityNotFoundException a) {
-            Toast t = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
-            t.show();
-            //try text input here if voice not available
-            Log.d("TEXTTOSPEECH", "voice to text in voice to text: " + mSpeechText);
-
+            Toast tstNoSupport = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
+            tstNoSupport.show();
         }
     }
 
-    private void startVoice(final String word){
-        final String response = "showing " + word;
+    public void startVoice(final String phrase){
+        if (mTextToSpeach != null) {
+            mTextToSpeach.stop();
+        }
         mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTts.speakText(response);
+                    mTextToSpeach.SpeakText(phrase);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -213,7 +248,19 @@ public class MainActivity extends AppCompatActivity
         mSpeechThread.start();
     }
 
+    protected void onDestroy() {
+        if (mTextToSpeach != null) {
+            mTextToSpeach.stop();
+        }
+        Settings.System.putInt(getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS_MODE,
+                Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+        mPreferences.destroy();
+        super.onDestroy();
+    }
+
     public static Context getContextForApplication() {
         return mContext;
     }
+
 }
