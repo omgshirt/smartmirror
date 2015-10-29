@@ -1,8 +1,11 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -27,12 +30,35 @@ public class MainActivity extends AppCompatActivity
     private final String CALENDAR = "Calendar";
     private final String WEATHER = "Weather";
     private final String SPORTS = "Sports";
+    private final String LIGHT = "Light";
+    private final String SETTINGS = "Settings";
     private final int RESULT_SPEECH = 1;
     private TextToSpeach mTextToSpeach;
     private Thread mSpeechTread;
+    private static Context mContext; // Hold the app context
+    private Preferences mPreferences;
+    private String mSpeechText;
+    private String[] mFragments = {"news","calendar","weather","sports","settings","preferences","light"};
+    private int RESULT_SPEECH = 1;
+    private Thread mSpeechThread;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Load any application preferences. If prefs do not exist, set them to defaults
+        mContext = getApplicationContext();
+
+        // check for permission to write system settings on API 23 and greater.
+        // Get authorization on >= 23
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(!Settings.System.canWrite( getApplicationContext() )) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                startActivityForResult(intent, 1);
+            }
+        }
+
+        mPreferences = Preferences.getInstance();
+        
         mTextToSpeach = new TextToSpeach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -47,6 +73,32 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Hide UI and actionbar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        decorView.setSystemUiVisibility(uiOptions);
+
+        try {
+            getSupportActionBar().hide();
+        } catch (Exception e) {
+
+        }
+
+        // start with weather displayed
+        displayView(R.id.nav_weather);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mPreferences.setAppBrightness(this);
     }
 
     @Override
@@ -73,9 +125,8 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            displayView(id);
         }
 
         return super.onOptionsItemSelected(item);
@@ -92,6 +143,7 @@ public class MainActivity extends AppCompatActivity
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
+        if (mTextToSpeach != null) mTextToSpeach.stop();      // shut down any pending TTS
 
         switch (viewId) {
             case R.id.nav_news:
@@ -102,6 +154,10 @@ public class MainActivity extends AppCompatActivity
                 fragment = new CalendarFragment();
                 title = CALENDAR;
                 break;
+            case R.id.nav_light:
+                fragment = new LightFragment();
+                title = LIGHT;
+                break;
             case R.id.nav_weather:
                 fragment = new WeatherFragment();
                 title = WEATHER;
@@ -110,15 +166,22 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SportsFragment();
                 title = SPORTS;
                 break;
+            case R.id.action_settings:
+            case R.id.nav_settings:
+                fragment = new SettingsFragment();
+                title= SETTINGS;
+                break;
         }
         if(fragment != null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             ft.commit();
         }
+
         if(getSupportActionBar() != null){
             getSupportActionBar().setTitle(title);
         }
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
@@ -145,7 +208,13 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(SPORTS.toLowerCase())) {
                     startVoice(SPORTS);
                     displayView(R.id.nav_sports);
-                }
+                } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+                    startVoice(LIGHT);
+                    displayView(R.id.nav_light);
+                } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+                    startVoice(SETTINGS);
+                    displayView(R.id.nav_settings);
+                }                    
             }
         }
     }
@@ -161,19 +230,37 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startVoice(final String word){
-        final String response = "showing " + word;
-        mSpeechTread = new Thread(new Runnable() {
+    public void startVoice(final String phrase){
+        if (mTextToSpeach != null) {
+            mTextToSpeach.stop();
+        }
+        mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTextToSpeach.SpeakText(response);
+                    mTextToSpeach.SpeakText(phrase);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-        mSpeechTread.start();
+        mSpeechThread.start();
     }
+
+    protected void onDestroy() {
+        if (mTextToSpeach != null) {
+            mTextToSpeach.stop();
+        }
+        Settings.System.putInt(getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS_MODE,
+                Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+        mPreferences.destroy();
+        super.onDestroy();
+    }
+
+    public static Context getContextForApplication() {
+        return mContext;
+    }
+
 }

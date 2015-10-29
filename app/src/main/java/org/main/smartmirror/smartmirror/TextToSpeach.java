@@ -3,8 +3,10 @@ package org.main.smartmirror.smartmirror;
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.util.Log;
 
 import java.util.Locale;
+import java.util.Random;
 
 public class TextToSpeach {
     static TextToSpeech mTextToSpeech;
@@ -40,6 +42,8 @@ public class TextToSpeach {
                     });
                     mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
 
+                    // method for backwards compatibility
+                    ttobj.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
         };
@@ -61,6 +65,13 @@ public class TextToSpeach {
             mTextToSpeech = null;
         }
     }
+    public void speakText(String text){
+        // Check preferences for speech frequency
+        Random rand = new Random();
+        Preferences prefs = Preferences.getInstance();
+        if (rand.nextFloat() < prefs.getSpeechFrequency()) {
+            start(text);
+        }
     public void SpeakText(String text){
         Start(text);
     }

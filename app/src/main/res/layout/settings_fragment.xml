@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    android:orientation="vertical"
+    tools:context="org.main.smartmirror.smartmirror.SettingsFragment">
+    <!-- Application Brightness -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mirror Brightness"
+        android:textSize="20sp"/>
+    <RadioGroup
+        android:id="@+id/brightness_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/brightness_vlow"
+            android:text="@string/settings_vlow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/brightness_low"
+            android:text="@string/settings_low"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/brightness_medium"
+            android:text="@string/settings_medium"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/brightness_high"
+            android:text="@string/settings_high"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/brightness_vhigh"
+            android:text="@string/settings_vhigh"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RadioGroup>
+
+    <!-- night light brightness -->
+    <TextView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Night Light Brightness"
+        android:textSize="20sp"/>
+    <RadioGroup
+        android:id="@+id/light_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/light_vlow"
+            android:text="@string/settings_vlow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/light_low"
+            android:text="@string/settings_low"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/light_medium"
+            android:text="@string/settings_medium"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/light_high"
+            android:text="@string/settings_high"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/light_vhigh"
+            android:text="@string/settings_vhigh"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RadioGroup>
+
+
+    <!-- speech frequency settings -->
+    <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Speech Frequency"
+    android:textSize="20sp"/>
+    <RadioGroup
+        android:id="@+id/speech_frequency_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/speech_never"
+            android:text="@string/settings_speech_never"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/speech_rare"
+            android:layout_marginStart="20dp"
+            android:text="@string/settings_speech_rare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioButton
+            android:id="@+id/speech_often"
+            android:layout_marginStart="20dp"
+            android:text="@string/settings_speech_often"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioButton
+            android:id="@+id/speech_always"
+            android:layout_marginStart="20dp"
+            android:text="@string/settings_speech_always"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RadioGroup>
+
+    <!-- weather display units -->
+    <Switch
+        android:id="@+id/units_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="@string/settings_weather_units"
+        android:textSize="20sp"
+        android:textOn="Metric"
+        android:textOff="Imperial" />
+</LinearLayout>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:padding="15dp"
+	android:orientation="vertical"
+	tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
+	<!-- Date and time -->
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+
+		<TextClock
+			android:id="@+id/time_clock"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textSize="60sp"
+			/>
+
+		<TextClock
+			android:id="@+id/date_clock"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:textSize="40sp"
+			/>
+	</LinearLayout>
+	<!-- Current weather, temp and humidity-->
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<TextView
+			android:id="@+id/weather_icon"
+			android:textSize="60sp"
+			android:layout_marginRight="10dp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+		<!-- current temp -->
+		<TextView
+			android:id="@+id/current_temp"
+			android:text="00&#176;"
+			android:textSize="60sp"
+			android:layout_marginRight="10dp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_marginStart="20dp"
+			android:layout_gravity="center_vertical"
+			android:orientation="vertical">
+            <!-- current humidity -->
+				<TextView
+					android:id="@+id/current_humidity"
+					android:text="--"
+					android:textSize="25sp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+            <!-- current wind -->
+				<TextView
+					android:id="@+id/current_wind"
+					android:text="--"
+					android:textSize="25sp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+		</LinearLayout>
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_marginStart="20dp"
+			android:layout_gravity="center_vertical"
+			android:orientation="vertical">
+			<!-- daily high -->
+			<TextView
+				android:id="@+id/daily_high"
+				android:text="--"
+				android:textSize="25sp"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+
+			<!-- daily low -->
+			<TextView
+				android:id="@+id/daily_low"
+				android:textSize="25sp"
+				android:text="--"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+		</LinearLayout>
+
+	</LinearLayout>
+	<!-- weather forecast for upcoming hours // removed for now -->
+	<!--
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<include android:id="@+id/forecast_h1" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_h2" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_h3" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_h4" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_h5" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_h6" layout="@layout/weather_hourly_forecast"/>
+	</LinearLayout>
+	-->
+</LinearLayout>
