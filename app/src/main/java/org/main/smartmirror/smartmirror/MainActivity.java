@@ -1,8 +1,13 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -12,7 +17,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +34,21 @@ public class MainActivity extends AppCompatActivity
     private final int RESULT_SPEECH = 1;
     private TextToSpeach mTextToSpeach;
     private Thread mSpeechTread;
+    private Messenger mMessenger = null;
+    private boolean mBound;
+    private ServiceConnection mVoiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMessenger = new Messenger(service);
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mMessenger = null;
+            mBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +104,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        displayView(item.getItemId());
+        DisplayView(item.getItemId());
         return true;
     }
 
-    public void displayView(int viewId){
+    public void DisplayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
 
@@ -134,19 +153,34 @@ public class MainActivity extends AppCompatActivity
         if(voiceInput != null) {
             if (voiceInput.contains("show")) {
                 if (voiceInput.contains(NEWS.toLowerCase())) {
-                    startVoice(NEWS);
-                    displayView(R.id.nav_news);
+                    StartVoice(NEWS);
+                    DisplayView(R.id.nav_news);
                 } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
-                    startVoice(CALENDAR);
-                    displayView(R.id.nav_calendar);
+                    StartVoice(CALENDAR);
+                    DisplayView(R.id.nav_calendar);
                 } else if (voiceInput.contains(WEATHER.toLowerCase())) {
-                    startVoice(WEATHER);
-                    displayView(R.id.nav_weather);
+                    StartVoice(WEATHER);
+                    DisplayView(R.id.nav_weather);
                 } else if (voiceInput.contains(SPORTS.toLowerCase())) {
-                    startVoice(SPORTS);
-                    displayView(R.id.nav_sports);
+                    StartVoice(SPORTS);
+                    DisplayView(R.id.nav_sports);
                 }
             }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, VoiceService.class), mVoiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mBound) {
+            unbindService(mVoiceConnection);
+            mBound = false;
         }
     }
 
@@ -161,7 +195,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startVoice(final String word){
+    private void StartVoice(final String word){
         final String response = "showing " + word;
         mSpeechTread = new Thread(new Runnable() {
             @Override
