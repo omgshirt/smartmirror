@@ -25,11 +25,20 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private final String NEWS = "News";
+    private final String CALENDAR = "Calendar";
+    private final String WEATHER = "Weather";
+    private final String SPORTS = "Sports";
+    private final String LIGHT = "Light";
+    private final String SETTINGS = "Settings";
+    private final int RESULT_SPEECH = 1;
+    private TextToSpeach mTextToSpeach;
+    private Thread mSpeechTread;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private String mSpeechText;
     private String[] mFragments = {"news","calendar","weather","sports","settings","preferences","light"};
-    private TextToSpeach mTts;
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
 
@@ -49,8 +58,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         mPreferences = Preferences.getInstance();
-
-        mTts = new TextToSpeach(this);
+        
+        mTextToSpeach = new TextToSpeach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -134,33 +143,33 @@ public class MainActivity extends AppCompatActivity
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTts != null) mTts.stop();      // shut down any pending TTS
+        if (mTextToSpeach != null) mTextToSpeach.stop();      // shut down any pending TTS
 
         switch (viewId) {
             case R.id.nav_news:
                 fragment = new NewsFragment();
-                title = "News";
+                title = NEWS;
                 break;
             case R.id.nav_calendar:
                 fragment = new CalendarFragment();
-                title = "Calendar";
+                title = CALENDAR;
                 break;
             case R.id.nav_light:
                 fragment = new LightFragment();
-                title = "Night Light";
+                title = LIGHT;
                 break;
             case R.id.nav_weather:
                 fragment = new WeatherFragment();
-                title = "Weather";
+                title = WEATHER;
                 break;
             case R.id.nav_sports:
                 fragment = new SportsFragment();
-                title = "Sports";
+                title = SPORTS;
                 break;
             case R.id.action_settings:
             case R.id.nav_settings:
                 fragment = new SettingsFragment();
-                title= "Settings";
+                title= SETTINGS;
                 break;
         }
         if(fragment != null){
@@ -180,36 +189,32 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        String word = "";
-        Fragment fragment = null;
+        String voiceInput = null;
         if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            mSpeechText = matches.get(0);
+            voiceInput = matches.get(0);
         }
-        word = mSpeechText;
-        Log.i("VOICE", word);           // print voice results to LogCat
-        String response;
-
-        if(word.contains("show")) {
-            response = "showing ";
-            if (word.contains(mFragments[0])) {
-                startVoice(response + mFragments[0]);
-                displayView(R.id.nav_news);
-            } else if (word.contains(mFragments[1])) {
-                startVoice(response + mFragments[1]);
-                displayView(R.id.nav_calendar);
-            } else if (word.contains(mFragments[2])) {
-                startVoice(response + mFragments[2]);
-                displayView(R.id.nav_weather);
-            } else if (word.contains(mFragments[3])) {
-                startVoice(response + mFragments[3]);
-                displayView(R.id.nav_sports);
-            } else if (word.contains(mFragments[4]) || word.contains(mFragments[5]) ) {
-                startVoice(response + mFragments[4]);
-                displayView(R.id.action_settings);
-            } else if (word.contains(mFragments[6]) ) {
-                startVoice(response + mFragments[6]);
-                displayView(R.id.nav_light);
+        if(voiceInput != null) {
+            if (voiceInput.contains("show")) {
+                if (voiceInput.contains(NEWS.toLowerCase())) {
+                    startVoice(NEWS);
+                    displayView(R.id.nav_news);
+                } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
+                    startVoice(CALENDAR);
+                    displayView(R.id.nav_calendar);
+                } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+                    startVoice(WEATHER);
+                    displayView(R.id.nav_weather);
+                } else if (voiceInput.contains(SPORTS.toLowerCase())) {
+                    startVoice(SPORTS);
+                    displayView(R.id.nav_sports);
+                } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+                    startVoice(LIGHT);
+                    displayView(R.id.nav_light);
+                } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+                    startVoice(SETTINGS);
+                    displayView(R.id.nav_settings);
+                }                    
             }
         }
     }
@@ -220,23 +225,20 @@ public class MainActivity extends AppCompatActivity
         try {
             startActivityForResult(intent, RESULT_SPEECH);
         } catch (ActivityNotFoundException a) {
-            Toast t = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
-            t.show();
-            //try text input here if voice not available
-            Log.d("TEXTTOSPEECH", "voice to text in voice to text: " + mSpeechText);
-
+            Toast tstNoSupport = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
+            tstNoSupport.show();
         }
     }
 
     public void startVoice(final String phrase){
-        if (mTts != null) {
-            mTts.stop();
+        if (mTextToSpeach != null) {
+            mTextToSpeach.stop();
         }
         mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTts.speakText(phrase);
+                    mTextToSpeach.SpeakText(phrase);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -247,8 +249,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void onDestroy() {
-        if (mTts != null) {
-            mTts.stop();
+        if (mTextToSpeach != null) {
+            mTextToSpeach.stop();
         }
         Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_BRIGHTNESS_MODE,
