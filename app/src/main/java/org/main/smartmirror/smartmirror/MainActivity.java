@@ -15,7 +15,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,13 +31,9 @@ public class MainActivity extends AppCompatActivity
     private final String SPORTS = "Sports";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
-    private final int RESULT_SPEECH = 1;
-    private TextToSpeach mTextToSpeach;
-    private Thread mSpeechTread;
+    private TTSHelper mTextToSpeach;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
-    private String mSpeechText;
-    private String[] mFragments = {"news","calendar","weather","sports","settings","preferences","light"};
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
 
@@ -59,7 +54,7 @@ public class MainActivity extends AppCompatActivity
 
         mPreferences = Preferences.getInstance();
         
-        mTextToSpeach = new TextToSpeach(this);
+        mTextToSpeach = new TTSHelper(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -143,7 +138,7 @@ public class MainActivity extends AppCompatActivity
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTextToSpeach != null) mTextToSpeach.stop();      // shut down any pending TTS
+        if (mTextToSpeach != null) mTextToSpeach.Stop();      // shut down any pending TTS
 
         switch (viewId) {
             case R.id.nav_news:
@@ -232,7 +227,7 @@ public class MainActivity extends AppCompatActivity
 
     public void startVoice(final String phrase){
         if (mTextToSpeach != null) {
-            mTextToSpeach.stop();
+            mTextToSpeach.Stop();
         }
         mSpeechThread = new Thread(new Runnable() {
             @Override
@@ -250,7 +245,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void onDestroy() {
         if (mTextToSpeach != null) {
-            mTextToSpeach.stop();
+            mTextToSpeach.Stop();
         }
         Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_BRIGHTNESS_MODE,
