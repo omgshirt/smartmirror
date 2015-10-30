@@ -34,13 +34,10 @@ public class MainActivity extends AppCompatActivity
     private final String SETTINGS = "Settings";
     private final int RESULT_SPEECH = 1;
     private TextToSpeach mTextToSpeach;
-    private Thread mSpeechTread;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
-    private String mSpeechText;
-    private String[] mFragments = {"news","calendar","weather","sports","settings","preferences","light"};
-    private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
+
 
 
     @Override
@@ -132,7 +129,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -211,7 +207,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(LIGHT.toLowerCase())) {
                     startVoice(LIGHT);
                     displayView(R.id.nav_light);
-                } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+                } else if (voiceInput.contains(SETTINGS.toLowerCase()) || voiceInput.contains("preferences")) {
                     startVoice(SETTINGS);
                     displayView(R.id.nav_settings);
                 }                    
@@ -238,7 +234,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 try {
-                    mTextToSpeach.SpeakText(phrase);
+                    mTextToSpeach.speakText(phrase);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -248,6 +244,7 @@ public class MainActivity extends AppCompatActivity
         mSpeechThread.start();
     }
 
+    // Set system brightness back to auto, kill Preferences and clean up any running threads
     protected void onDestroy() {
         if (mTextToSpeach != null) {
             mTextToSpeach.stop();

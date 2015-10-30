@@ -99,6 +99,7 @@ public class WeatherFragment extends Fragment {
                 text = "the current humidity is " + mCurrentHumidity + " percent";
                 break;
             case 4:
+                if (mCurrentWind == 0) { saySomethingAboutWeather(); }
                 String speedUnits;
                 if( mPreferences.getWindDisplayFormat().equals(Preferences.KPH) )  {
                     speedUnits = "kilometers per hour";
