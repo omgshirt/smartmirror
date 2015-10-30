@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         if (mTTSHelper != null) {
-            mTTSHelper.stop();
+            mTTSHelper.destroy();
         }
         Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_BRIGHTNESS_MODE,

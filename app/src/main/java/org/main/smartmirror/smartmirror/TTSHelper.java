@@ -9,30 +9,31 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
 
+@SuppressWarnings("deprecation")
 public class TTSHelper {
-    static TextToSpeech mTextToSpeech;
-    Context mContext;
-    static boolean mIsSpeaking = false;
-    static TextToSpeech.OnInitListener mTextToSpeechListener;
-    static String mTextToSpeak;
+    private Context mContext;
+
+    private static TextToSpeech mTextToSpeech = null;
+    private static boolean mIsSpeaking = false;
+    private static TextToSpeech.OnInitListener mTextToSpeechListener;
+    private static String mTextToSpeak;
+
     public TTSHelper(Context c) {
         mContext = c;
         mTextToSpeechListener = new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status== TextToSpeech.SUCCESS) {
-                    mIsSpeaking = true;
                     mTextToSpeech.setLanguage(Locale.UK);
-
                     mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
                             Log.i("UTTERANCE_PROGRESS", "onStart called");
+                            mIsSpeaking = true;
                         }
 
                         @Override
                         public void onDone(String utteranceId) {
-                            mIsSpeaking = false;
                             Log.i("UTTERANCE_PROGRESS", "onDone called");
                             stop();
                         }
@@ -42,23 +43,45 @@ public class TTSHelper {
                             mIsSpeaking = false;
                         }
                     });
-                    // Map passes in the UtteranceProgressListener so we can handle callbacks from the TTS.speak event
-                    HashMap<String, String> map = new HashMap<>();
-                    map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "messageID");
-                    mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
+                    speak();
                 }
             }
         };
     }
 
-    // TODO: try creating and stashing an instance of TextToSpeech to see if it improves responsiveness
+    /** Check preferences for speech frequency. If successful, say the text
+     *
+     * @param text string to say
+     */
+    public void speakText(String text) {
+        Random rand = new Random();
+        Preferences prefs = Preferences.getInstance();
+        if (rand.nextFloat() < prefs.getSpeechFrequency()) {
+            start(text);
+        }
+    }
+
+    /**
+     * Initialize a TTS engine if necessary, then speak the text
+     * @param text string to say
+     */
     public void start(final String text){
         mTextToSpeak = text;
-        try {
-            mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (mTextToSpeech == null) {
+            try {
+                mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else
+            speak();
+    }
+
+    private void speak() {
+        // Map passes in the UtteranceProgressListener so we can handle callbacks from the TTS.speak event
+        HashMap<String, String> map = new HashMap<>();
+        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "messageID");
+        mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
     }
 
     public boolean isSpeaking() {
@@ -66,6 +89,17 @@ public class TTSHelper {
     }
 
     public void stop(){
+        if (mTextToSpeech != null) {
+            mTextToSpeech.stop();
+            mIsSpeaking = false;
+        }
+    }
+
+    /**
+     * Clean up any resources and kill the TTS engine
+     *
+     */
+    public void destroy() {
         if(mTextToSpeech !=null){
             mTextToSpeech.stop();
             mTextToSpeech.shutdown();
@@ -74,16 +108,12 @@ public class TTSHelper {
         }
     }
 
-    /** Check preferences for speech frequency. If successful, speak text
-     *
-     * @param text
+    /**
+     * Plays silence for the given duration. Adds to speech queue.
+     * @param duration duration in MS
      */
-    public void speakText(String text) {
 
-        Random rand = new Random();
-        Preferences prefs = Preferences.getInstance();
-        if (rand.nextFloat() < prefs.getSpeechFrequency()) {
-            start(text);
-        }
+    public void pause(int duration) {
+        mTextToSpeech.playSilence(duration, TextToSpeech.QUEUE_ADD, null);
     }
 }
