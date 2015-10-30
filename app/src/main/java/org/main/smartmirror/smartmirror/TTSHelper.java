@@ -5,14 +5,15 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 
 import java.util.Locale;
+import java.util.Random;
 
-public class TextToSpeach {
+public class TTSHelper {
     static TextToSpeech mTextToSpeech;
     Context mContext;
     static boolean mIsSpeaking = false;
     static TextToSpeech.OnInitListener mTextToSpeechListner;
     static String mTextToSpeak;
-    public TextToSpeach(Context c) {
+    public TTSHelper(Context c) {
         mContext = c;
         mTextToSpeechListner = new TextToSpeech.OnInitListener() {
             @Override
@@ -38,8 +39,8 @@ public class TextToSpeach {
                             mIsSpeaking = false;
                         }
                     });
-                    mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
-
+                    // method for backwards compatibility
+                    mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
         };
@@ -61,6 +62,15 @@ public class TextToSpeach {
             mTextToSpeech = null;
         }
     }
+    public void speakText(String text) {
+        // Check preferences for speech frequency
+        Random rand = new Random();
+        Preferences prefs = Preferences.getInstance();
+        if (rand.nextFloat() < prefs.getSpeechFrequency()) {
+            Start(text);
+        }
+    }
+
     public void SpeakText(String text){
         Start(text);
     }

@@ -1,10 +1,51 @@
 <resources>
-    <string name="app_name">smartmirror</string>
+    <string name="app_name">SmartMirror</string>
+    <string name="open_weather_map_api_key">74ab1bfc0374c634c12dedf9c12b1c03</string>
+    <string name="nyt_api_key">89899870d1024b962dc582806e3e9c34:3:73303333</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="Resuts_Speech">Speech Results</string>
-
+    <string name="results_speech">Speech Results</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_voice__recognition">Voice_Recognition</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- WEATHER STRINGS -->
+    <string name="place_not_found">Cannot Find Location</string>
+
+    <string name="weather_sunny">\uf00d</string>
+    <string name="weather_clear_night">\uf02e</string>
+    <string name="weather_thunder">\uf01e</string>
+    <string name="weather_drizzle">\uf00d</string>
+    <string name="weather_foggy">\uf014</string>
+    <string name="weather_cloudy">\uf041</string>
+    <string name="weather_snowy">\uf01b</string>
+    <string name="weather_rainy">\uf019</string>
+
+    <string name="weather_humidity">\uf07a</string>
+    <string name="weather_deg_c">\uf03c</string>
+    <string name="weather_deg_f">\uf045</string>
+    <string name="weather_deg">\uf042</string>
+    <string name="weather_arrow_up">\uf058</string>
+    <string name="weather_arrow_down">\uf044</string>
+    <string name="weather_wind_strong">\uf050</string>
+
+
+    <!-- Settings strings -->
+    <string name="settings_weather_units">Weather Units</string>
+    <string name="settings_speech_never">Never</string>
+    <string name="settings_speech_rare">Rarely</string>
+    <string name="settings_speech_often">Often</string>
+    <string name="settings_speech_always">Always</string>
+
+    <string name="settings_vlow">Very Low</string>
+    <string name="settings_low">Low</string>
+    <string name="settings_medium">Medium</string>
+    <string name="settings_high">High</string>
+    <string name="settings_vhigh">Very High</string>
+    <!-- Sports Strings -->
+    <string name="sports_error">Error with Sports Data</string>
+
 </resources>
