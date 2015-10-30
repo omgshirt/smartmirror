@@ -11,11 +11,11 @@ public class TTSHelper {
     static TextToSpeech mTextToSpeech;
     Context mContext;
     static boolean mIsSpeaking = false;
-    static TextToSpeech.OnInitListener mTextToSpeechListner;
+    static TextToSpeech.OnInitListener mTextToSpeechListener;
     static String mTextToSpeak;
     public TTSHelper(Context c) {
         mContext = c;
-        mTextToSpeechListner = new TextToSpeech.OnInitListener() {
+        mTextToSpeechListener = new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status== TextToSpeech.SUCCESS) {
@@ -47,7 +47,7 @@ public class TTSHelper {
     }
     public void Start(final String text){
         mTextToSpeak = text;
-        mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListner);
+        mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
     }
 
     public boolean IsSpeaking() {

@@ -85,7 +85,7 @@ public class WeatherFragment extends Fragment {
     private void saySomethingAboutWeather() {
         Random rand = new Random();
         String text = "";
-        switch (rand.nextInt(5)) {
+        switch (rand.nextInt(6)) {
             case 0:
                 text = "the current temperature is " + mCurrentTemp + " degrees";
                 break;

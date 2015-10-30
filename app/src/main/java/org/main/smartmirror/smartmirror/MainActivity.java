@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity
     private final String SPORTS = "Sports";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
-    private TTSHelper mTextToSpeach;
+    private TTSHelper mTextToSpeech;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private int RESULT_SPEECH = 1;
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity
 
         mPreferences = Preferences.getInstance();
         
-        mTextToSpeach = new TTSHelper(this);
+        mTextToSpeech = new TTSHelper(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTextToSpeach != null) mTextToSpeach.Stop();      // shut down any pending TTS
+        if (mTextToSpeech != null) mTextToSpeech.Stop();      // shut down any pending TTS
 
         switch (viewId) {
             case R.id.nav_news:
@@ -226,14 +226,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startVoice(final String phrase){
-        if (mTextToSpeach != null) {
-            mTextToSpeach.Stop();
+        if (mTextToSpeech != null) {
+            mTextToSpeech.Stop();
         }
         mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTextToSpeach.SpeakText(phrase);
+                    mTextToSpeech.SpeakText(phrase);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -244,8 +244,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void onDestroy() {
-        if (mTextToSpeach != null) {
-            mTextToSpeach.Stop();
+        if (mTextToSpeech != null) {
+            mTextToSpeech.Stop();
         }
         Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_BRIGHTNESS_MODE,

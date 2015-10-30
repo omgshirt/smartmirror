@@ -75,7 +75,6 @@ public class Preferences {
 
     // Clean up any refs that might hang around to prevent leaks.
     public void destroy(){
-
         mPreferences = null;
         mSharedPreferences = null;
     }
