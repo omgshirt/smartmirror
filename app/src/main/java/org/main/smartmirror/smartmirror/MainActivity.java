@@ -3,7 +3,6 @@ package org.main.smartmirror.smartmirror;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.content.ServiceConnection;
@@ -20,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,19 +41,20 @@ public class MainActivity extends AppCompatActivity
     private Preferences mPreferences;
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
-    private Messenger mMessenger = null;
     private boolean mBound;
+    private VoiceService mVoiceService;
     private ServiceConnection mVoiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mMessenger = new Messenger(service);
+            VoiceService.VoiceBinder binder = (VoiceService.VoiceBinder) service;
+            mVoiceService = binder.getService();
             mBound = true;
         }
 
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mMessenger = null;
+            mVoiceService = null;
             mBound = false;
         }
     };
@@ -201,14 +202,12 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        String voiceInput = null;
-        if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
-            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            voiceInput = matches.get(0);
-        }
+    public void voiceResult(){
+        String voiceInput=mVoiceService.getSpeech();
+        if(voiceInput == null)
+            Log.d("VoiceInput", "is NULL");
+        else
+            Log.d("VoiceInput", "is NOT NULL");
         if(voiceInput != null) {
             if (voiceInput.contains("show")) {
                 if (voiceInput.contains(NEWS.toLowerCase())) {
@@ -238,6 +237,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         bindService(new Intent(this, VoiceService.class), mVoiceConnection, Context.BIND_AUTO_CREATE);
+        mBound=true;
     }
 
     @Override
@@ -245,6 +245,7 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
         if(mBound) {
             unbindService(mVoiceConnection);
+            mVoiceConnection=null;
             mBound = false;
         }
     }
