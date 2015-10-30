@@ -31,12 +31,11 @@ public class MainActivity extends AppCompatActivity
     private final String SPORTS = "Sports";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
-    private TTSHelper mTextToSpeach;
+    private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private int RESULT_SPEECH = 1;
-    private Thread mSpeechThread;
-
+    //private Thread mSpeechThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity
 
         mPreferences = Preferences.getInstance();
         
-        mTextToSpeach = new TTSHelper(this);
+        mTTSHelper = new TTSHelper(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -74,16 +73,16 @@ public class MainActivity extends AppCompatActivity
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
                 //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+                //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
+                //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         decorView.setSystemUiVisibility(uiOptions);
 
         try {
             getSupportActionBar().hide();
-        } catch (Exception e) {
-
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
 
         // start with weather displayed
@@ -138,7 +137,7 @@ public class MainActivity extends AppCompatActivity
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTextToSpeach != null) mTextToSpeach.Stop();      // shut down any pending TTS
+        if (mTTSHelper != null) mTTSHelper.stop();      // shut down any pending TTS
 
         switch (viewId) {
             case R.id.nav_news:
@@ -226,15 +225,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startVoice(final String phrase){
-        if (mTextToSpeach != null) {
-            mTextToSpeach.Stop();
-        }
-        mSpeechThread = new Thread(new Runnable() {
+        Thread mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTextToSpeach.SpeakText(phrase);
-                    Thread.sleep(2000);
+                    mTTSHelper.speakText(phrase);
+                    //Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -243,9 +239,10 @@ public class MainActivity extends AppCompatActivity
         mSpeechThread.start();
     }
 
+    @Override
     protected void onDestroy() {
-        if (mTextToSpeach != null) {
-            mTextToSpeach.Stop();
+        if (mTTSHelper != null) {
+            mTTSHelper.stop();
         }
         Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_BRIGHTNESS_MODE,
