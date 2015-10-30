@@ -85,7 +85,7 @@ public class WeatherFragment extends Fragment {
     private void saySomethingAboutWeather() {
         Random rand = new Random();
         String text = "";
-        switch (rand.nextInt(6)) {
+        switch (rand.nextInt(5)) {
             case 0:
                 text = "the current temperature is " + mCurrentTemp + " degrees";
                 break;
@@ -169,12 +169,12 @@ public class WeatherFragment extends Fragment {
 
             // Set the dailyHigh and dailyLow
             mTempMax = (int)main.getDouble("temp_max");
-            String maxIcon = getActivity().getString(R.string.weather_arrow_up);
-            txtDailyHigh.setText(maxIcon + mTempMax);
+            String maxIcon = getActivity().getString(R.string.weather_arrow_up) + mTempMax;
+            txtDailyHigh.setText(maxIcon);
 
             mTempMin = (int)main.getDouble("temp_min");
-            String minIcon = getActivity().getString(R.string.weather_arrow_down);
-            txtDailyLow.setText(minIcon + mTempMin);
+            String minIcon = getActivity().getString(R.string.weather_arrow_down) + mTempMin;
+            txtDailyLow.setText(minIcon);
 
             // TODO: set up hourly weather forecasts
             saySomethingAboutWeather();
