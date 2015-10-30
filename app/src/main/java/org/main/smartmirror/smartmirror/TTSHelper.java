@@ -3,20 +3,19 @@ package org.main.smartmirror.smartmirror;
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
-import android.util.Log;
 
 import java.util.Locale;
 import java.util.Random;
 
-public class TextToSpeach {
+public class TTSHelper {
     static TextToSpeech mTextToSpeech;
     Context mContext;
     static boolean mIsSpeaking = false;
-    static TextToSpeech.OnInitListener mTextToSpeechListener;
+    static TextToSpeech.OnInitListener mTextToSpeechListner;
     static String mTextToSpeak;
-    public TextToSpeach(Context c) {
+    public TTSHelper(Context c) {
         mContext = c;
-        mTextToSpeechListener = new TextToSpeech.OnInitListener() {
+        mTextToSpeechListner = new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status== TextToSpeech.SUCCESS) {
@@ -32,7 +31,7 @@ public class TextToSpeach {
                         @Override
                         public void onDone(String utteranceId) {
                             mIsSpeaking = false;
-                            stop();
+                            Stop();
                         }
 
                         @Override
@@ -40,24 +39,22 @@ public class TextToSpeach {
                             mIsSpeaking = false;
                         }
                     });
-
-                    //mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
                     // method for backwards compatibility
                     mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
         };
     }
-    public void start(final String text){
+    public void Start(final String text){
         mTextToSpeak = text;
-        mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
+        mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListner);
     }
 
     public boolean IsSpeaking() {
         return mIsSpeaking;
     }
 
-    public void stop(){
+    public void Stop(){
         if(mTextToSpeech !=null){
             mTextToSpeech.stop();
             mTextToSpeech.shutdown();
@@ -70,7 +67,11 @@ public class TextToSpeach {
         Random rand = new Random();
         Preferences prefs = Preferences.getInstance();
         if (rand.nextFloat() < prefs.getSpeechFrequency()) {
-            start(text);
+            Start(text);
         }
+    }
+
+    public void SpeakText(String text){
+        Start(text);
     }
 }
