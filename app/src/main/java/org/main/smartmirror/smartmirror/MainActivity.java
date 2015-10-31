@@ -1,10 +1,10 @@
 package org.main.smartmirror.smartmirror;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -21,7 +21,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -34,12 +33,10 @@ public class MainActivity extends AppCompatActivity
     private final String SPORTS = "Sports";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
-    private TTSHelper mTextToSpeach;
+    private TTSHelper mTextToSpeech;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
-    private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
-    private boolean mBound;
     private SpeechRecognizer mSpeechRecognizer;
     private SpeechRecognitionListener mRecognitionListener;
 
@@ -60,7 +57,7 @@ public class MainActivity extends AppCompatActivity
 
         mPreferences = Preferences.getInstance();
         
-        mTextToSpeach = new TTSHelper(this);
+        mTextToSpeech = new TTSHelper(this);
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
         mRecognitionListener = new SpeechRecognitionListener();
         super.onCreate(savedInstanceState);
@@ -96,7 +93,14 @@ public class MainActivity extends AppCompatActivity
 
         // start with weather displayed
         displayView(R.id.nav_weather);
-        launchSpeech();
+        // add a delay
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                launchSpeech();
+            }
+        }, 8000);
     }
 
     @Override
@@ -147,7 +151,7 @@ public class MainActivity extends AppCompatActivity
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTextToSpeach != null) mTextToSpeach.Stop();      // shut down any pending TTS
+        if (mTextToSpeech != null) mTextToSpeech.Stop();      // shut down any pending TTS
 
         switch (viewId) {
             case R.id.nav_news:
@@ -230,14 +234,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startVoice(final String phrase){
-        if (mTextToSpeach != null) {
-            mTextToSpeach.Stop();
+        if (mTextToSpeech != null) {
+            mTextToSpeech.Stop();
         }
         mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTextToSpeach.SpeakText(phrase);
+                    mTextToSpeech.SpeakText(phrase);
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -248,8 +252,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void onDestroy() {
-        if (mTextToSpeach != null) {
-            mTextToSpeach.Stop();
+        if (mTextToSpeech != null) {
+            mTextToSpeech.Stop();
         }
         Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_BRIGHTNESS_MODE,
@@ -267,6 +271,7 @@ public class MainActivity extends AppCompatActivity
     public class SpeechRecognitionListener implements RecognitionListener {
 
         private String mSpokenCommand;
+        private Handler mHandler = new Handler();
 
         @Override
         public void onError(int error) {
@@ -274,14 +279,20 @@ public class MainActivity extends AppCompatActivity
                 launchSpeech();
             }
         }
-        //TODO add a pause so that the text to speech can say the name of the fragment
+
         @Override
         public void onResults(Bundle results) {
             ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             if(matches != null)
                 setSpokenCommand(matches.get(0));
             voiceResult(getSpokenCommand());
-            launchSpeech();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    launchSpeech();
+                }
+            }, 15000);
+
         }
 
         @Override

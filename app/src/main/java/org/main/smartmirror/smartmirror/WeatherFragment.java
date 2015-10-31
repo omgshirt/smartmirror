@@ -110,7 +110,7 @@ public class WeatherFragment extends Fragment {
         }
 
         if ( !text.equals("") ) {
-            //((MainActivity) getActivity()).startVoice(text);
+            ((MainActivity) getActivity()).startVoice(text);
         }
     }
 
