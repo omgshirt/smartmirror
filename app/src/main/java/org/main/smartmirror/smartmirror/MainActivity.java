@@ -2,15 +2,13 @@ package org.main.smartmirror.smartmirror;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.os.IBinder;
-import android.os.Messenger;
+import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -42,22 +40,9 @@ public class MainActivity extends AppCompatActivity
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
     private boolean mBound;
-    private VoiceService mVoiceService;
-    private ServiceConnection mVoiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            VoiceService.VoiceBinder binder = (VoiceService.VoiceBinder) service;
-            mVoiceService = binder.getService();
-            mBound = true;
-        }
+    private SpeechRecognizer mSpeechRecognizer;
+    private SpeechRecognitionListener mRecognitionListener;
 
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mVoiceService = null;
-            mBound = false;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +61,8 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance();
         
         mTextToSpeach = new TTSHelper(this);
+        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
+        mRecognitionListener = new SpeechRecognitionListener();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -109,6 +96,7 @@ public class MainActivity extends AppCompatActivity
 
         // start with weather displayed
         displayView(R.id.nav_weather);
+        launchSpeech();
     }
 
     @Override
@@ -202,8 +190,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    public void voiceResult(){
-        String voiceInput=mVoiceService.getSpeech();
+    public void voiceResult(String voiceInput){
         if(voiceInput == null)
             Log.d("VoiceInput", "is NULL");
         else
@@ -233,32 +220,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        bindService(new Intent(this, VoiceService.class), mVoiceConnection, Context.BIND_AUTO_CREATE);
-        mBound=true;
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if(mBound) {
-            unbindService(mVoiceConnection);
-            mVoiceConnection=null;
-            mBound = false;
-        }
-    }
-
-    public void StartVoiceRecognitionActivity(View v) {
+    public void launchSpeech(){
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
-        try {
-            startActivityForResult(intent, RESULT_SPEECH);
-        } catch (ActivityNotFoundException a) {
-            Toast tstNoSupport = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
-            tstNoSupport.show();
-        }
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+        mSpeechRecognizer.setRecognitionListener(mRecognitionListener);
+        mSpeechRecognizer.startListening(intent);
     }
 
     public void startVoice(final String phrase){
@@ -287,6 +255,8 @@ public class MainActivity extends AppCompatActivity
                 Settings.System.SCREEN_BRIGHTNESS_MODE,
                 Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
         mPreferences.destroy();
+        mSpeechRecognizer.destroy();
+        mRecognitionListener=null;
         super.onDestroy();
     }
 
@@ -294,4 +264,67 @@ public class MainActivity extends AppCompatActivity
         return mContext;
     }
 
+    public class SpeechRecognitionListener implements RecognitionListener {
+
+        private String mSpokenCommand;
+
+        @Override
+        public void onError(int error) {
+            if(error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT || error == SpeechRecognizer.ERROR_NO_MATCH){
+                launchSpeech();
+            }
+        }
+        //TODO add a pause so that the text to speech can say the name of the fragment
+        @Override
+        public void onResults(Bundle results) {
+            ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+            if(matches != null)
+                setSpokenCommand(matches.get(0));
+            voiceResult(getSpokenCommand());
+            launchSpeech();
+        }
+
+        @Override
+        public void onBeginningOfSpeech() {
+
+        }
+
+        @Override
+        public void onRmsChanged(float rmsdB) {
+
+        }
+
+        @Override
+        public void onBufferReceived(byte[] buffer) {
+
+        }
+
+        @Override
+        public void onEndOfSpeech() {
+
+        }
+
+        @Override
+        public void onPartialResults(Bundle partialResults) {
+
+        }
+
+        @Override
+        public void onEvent(int eventType, Bundle params) {
+
+        }
+
+        @Override
+        public void onReadyForSpeech(Bundle params) {
+
+        }
+
+        public void setSpokenCommand(String command){
+            mSpokenCommand = command;
+        }
+
+        public String getSpokenCommand(){
+            return mSpokenCommand;
+        }
+    }
 }
