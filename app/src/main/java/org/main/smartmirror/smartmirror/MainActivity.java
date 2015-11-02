@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private int RESULT_SPEECH = 1;
-    //private Thread mSpeechThread;
 
     // WiFiP2p
     private WifiP2pManager mManager;
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     public final static int SOCKET_TIMEOUT = 500;
     private String mOwnerIP;
 
+    private int mSocketsOpened = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Load any application preferences. If prefs do not exist, set them to defaults
@@ -324,13 +324,14 @@ public class MainActivity extends AppCompatActivity
     // Interface passes back a device list when the peer list changes, or discovery is successful
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
-        // Set device list and update the peer list
         mDeviceList = peers;
-        // register this to handle the callback when connection info is available.
-        //mManager.requestConnectionInfo(mChannel, this);
     }
 
 
+    /** called when a connection is made to this device
+     *
+     * @param info
+     */
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
         // make this the group owner and start the server to listen
@@ -340,15 +341,15 @@ public class MainActivity extends AppCompatActivity
         WifiP2pConfig config = new WifiP2pConfig();
         config.groupOwnerIntent = 15;
         if (info.groupFormed && info.isGroupOwner) {
+            Log.i("Wifi", "onConnectionInfo is starting server...");
             new FileServerAsyncTask(this).execute();
         } else if (info.groupFormed){
-            Log.i("Wifi", "not group owner" );
         }
     }
 
+
     /**
-     * A simple server socket that accepts connection and writes some data on
-     * the stream.
+     * A simple server socket that accepts a connection
      */
     public static class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
         private Context context;
@@ -363,18 +364,17 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected String doInBackground(Void... params) {
             try {
+                // Create a server socket and wait for incoming message
                 ServerSocket serverSocket = new ServerSocket(MainActivity.PORT);
                 serverSocket.setReuseAddress(true);
-                Log.d("Wifi", "Server: Socket opened");
                 Socket client = serverSocket.accept();
-                // read msg fom client
                 ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
                 String command = objectInputStream.readObject().toString();
-                Log.d("Wifi", "Server: connection done");
                 serverSocket.close();
                 return command;
             } catch (IOException e) {
-                Log.e("Wifi", e.getMessage());
+                Log.e("Wifi", "IO message " + e.getMessage());
+                e.printStackTrace();
                 return null;
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -389,8 +389,11 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(String result) {
             if (result != null) {
                 // show the fragment
+                Log.d("Wifi", "Server: done");
                 Toast.makeText(context, result, Toast.LENGTH_LONG).show();
                 ((MainActivity)context).displayView(result);
+                // now that we're done, create a new server socket
+                new FileServerAsyncTask(context).execute();
             }
         }
         /*
@@ -399,7 +402,7 @@ public class MainActivity extends AppCompatActivity
          */
         @Override
         protected void onPreExecute() {
-            Log.i("WifiServer", "started");
+            Log.i("Wifi", "Server: started");
         }
     }
 }
