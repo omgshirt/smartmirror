@@ -10,11 +10,12 @@ import java.util.Locale;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class TTSHelper {
+public class TTSHelper{
     private Context mContext;
 
     private static TextToSpeech mTextToSpeech = null;
     private static boolean mIsSpeaking = false;
+    private static boolean mTtsInitialized = false;
     private static TextToSpeech.OnInitListener mTextToSpeechListener;
     private static String mTextToSpeak;
 
@@ -28,13 +29,13 @@ public class TTSHelper {
                     mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
-                            Log.i("UTTERANCE_PROGRESS", "onStart called");
+                            //Log.i("UTTERANCE_PROGRESS", "onStart called");
                             mIsSpeaking = true;
                         }
 
                         @Override
                         public void onDone(String utteranceId) {
-                            Log.i("UTTERANCE_PROGRESS", "onDone called");
+                            //Log.i("UTTERANCE_PROGRESS", "onDone called");
                             stop();
                         }
 
@@ -43,6 +44,7 @@ public class TTSHelper {
                             mIsSpeaking = false;
                         }
                     });
+                    mTtsInitialized = true;
                     speak();
                 }
             }
@@ -62,12 +64,13 @@ public class TTSHelper {
     }
 
     /**
-     * Initialize a TTS engine if necessary, then speak the text
+     * Initialize a TTS engine if necessary, then speak the text.
+     * This will bypass the Preferences setting for speech frequency.
      * @param text string to say
      */
     public void start(final String text){
         mTextToSpeak = text;
-        if (mTextToSpeech == null) {
+        if (mTextToSpeech == null || !mTtsInitialized) {
             try {
                 mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
             } catch (Exception e) {
@@ -105,6 +108,7 @@ public class TTSHelper {
             mTextToSpeech.shutdown();
             mIsSpeaking = false;
             mTextToSpeech = null;
+            mTtsInitialized = false;
         }
     }
 
@@ -112,7 +116,6 @@ public class TTSHelper {
      * Plays silence for the given duration. Adds to speech queue.
      * @param duration duration in MS
      */
-
     public void pause(int duration) {
         mTextToSpeech.playSilence(duration, TextToSpeech.QUEUE_ADD, null);
     }

@@ -82,7 +82,7 @@ public class SportsFragment extends Fragment {
     private void renderSports(JSONObject json){
         try {
 
-            Log.i("NYT_API", json.toString());
+            //Log.i("NYT_API", json.toString());
             JSONObject response = json.getJSONObject("response");
             JSONObject docs = response.getJSONArray("docs").getJSONObject(0);
             String snippet = docs.getString("snippet");
