@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_calendar:
                 fragment = new CalendarFragment();
+                Activity f = new CalendarActivity();
                 title = CALENDAR;
                 break;
             case R.id.nav_light:
