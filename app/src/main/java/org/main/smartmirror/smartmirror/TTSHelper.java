@@ -31,17 +31,20 @@ public class TTSHelper{
                         public void onStart(String utteranceId) {
                             //Log.i("UTTERANCE_PROGRESS", "onStart called");
                             mIsSpeaking = true;
+                            ((MainActivity)mContext).stopSpeechRecognition(); // stop recognition
                         }
 
                         @Override
                         public void onDone(String utteranceId) {
                             //Log.i("UTTERANCE_PROGRESS", "onDone called");
                             stop();
+                            ((MainActivity)mContext).startSpeechRecognition();
                         }
 
                         @Override
                         public void onError(String utteranceId) {
                             mIsSpeaking = false;
+                            ((MainActivity)mContext).startSpeechRecognition();
                         }
                     });
                     mTtsInitialized = true;

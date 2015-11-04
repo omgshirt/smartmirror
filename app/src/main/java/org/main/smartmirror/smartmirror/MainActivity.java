@@ -292,6 +292,20 @@ public class MainActivity extends AppCompatActivity
         mSpeechThread.start();
     }
 
+    /**
+     * Start the speech recognizer
+     */
+    public void startSpeechRecognition(){
+        // do stuff
+    }
+
+    /**
+     * Stops the current speech recognition object
+     */
+    public void stopSpeechRecognition(){
+        //mSpeechRecognizer.stopListening();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -348,65 +362,6 @@ public class MainActivity extends AppCompatActivity
             Log.i("Wifi", "onConnectionInfo is starting server...");
             new FileServerAsyncTask(this).execute();
         } else if (info.groupFormed){
-        }
-    }
-
-
-    /**
-     * A simple server socket that accepts a connection
-     */
-    public static class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
-        private Context context;
-
-        /**
-         * @param context
-         */
-        public FileServerAsyncTask(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            try {
-                // Create a server socket and wait for incoming message
-                ServerSocket serverSocket = new ServerSocket(MainActivity.PORT);
-                serverSocket.setReuseAddress(true);
-                Socket client = serverSocket.accept();
-                ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
-                String command = objectInputStream.readObject().toString();
-                serverSocket.close();
-                return command;
-            } catch (IOException e) {
-                Log.e("Wifi", "IO message " + e.getMessage());
-                e.printStackTrace();
-                return null;
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(String result) {
-            if (result != null) {
-                // show the fragment
-                Log.d("Wifi", "Server: done");
-                Toast.makeText(context, result, Toast.LENGTH_LONG).show();
-                ((MainActivity)context).displayView(result);
-                // now that we're done, create a new server socket
-                new FileServerAsyncTask(context).execute();
-            }
-        }
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-            Log.i("Wifi", "Server: started");
         }
     }
 }
