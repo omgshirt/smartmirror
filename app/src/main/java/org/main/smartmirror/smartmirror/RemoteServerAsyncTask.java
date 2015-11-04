@@ -17,13 +17,13 @@ import java.net.Socket;
 /**
  * A simple server socket that accepts a connection
  */
-public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
+public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
     private Context context;
 
     /**
      * @param context
      */
-    public FileServerAsyncTask(Context context) {
+    public RemoteServerAsyncTask(Context context) {
         this.context = context;
     }
 
@@ -59,7 +59,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
             Toast.makeText(context, result, Toast.LENGTH_LONG).show();
             ((MainActivity)context).displayView(result);
             // now that we're done, create a new server socket
-            new FileServerAsyncTask(context).execute();
+            new RemoteServerAsyncTask(context).execute();
         }
     }
     /*

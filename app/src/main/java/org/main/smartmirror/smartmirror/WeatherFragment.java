@@ -141,7 +141,7 @@ public class WeatherFragment extends Fragment {
 
     private void renderWeather(JSONObject json){
         try {
-            Log.i("WEATHER_API", json.toString());
+            //Log.i("WEATHER_API", json.toString());
 
             JSONObject weather = json.getJSONArray("weather").getJSONObject(0);
             JSONObject main = json.getJSONObject("main");

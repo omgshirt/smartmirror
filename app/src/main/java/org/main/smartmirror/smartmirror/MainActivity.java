@@ -5,14 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -29,13 +25,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.BaseAdapter;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -68,8 +59,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Load any application preferences. If prefs do not exist, set them to defaults
         mContext = getApplicationContext();
+        // Load any application preferences. If prefs do not exist, set them to defaults
+        mPreferences = Preferences.getInstance();
 
         // check for permission to write system settings on API 23 and greater.
         // Get authorization on >= 23
@@ -80,13 +72,10 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        mPreferences = Preferences.getInstance();
-
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
 
         // Initialize WiFiP2P services
-
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -96,7 +85,6 @@ public class MainActivity extends AppCompatActivity
         mChannel = mManager.initialize(this, getMainLooper(), null);
 
         discoverPeers();
-
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -138,7 +126,6 @@ public class MainActivity extends AppCompatActivity
         mPreferences.setAppBrightness(this);
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(mWifiReceiver, mIntentFilter);
-
     }
 
     @Override
@@ -219,10 +206,12 @@ public class MainActivity extends AppCompatActivity
                 title= SETTINGS;
                 break;
         }
-        if(fragment != null && !isFinishing() ){
+        if(fragment != null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
-            ft.commit();
+            if (!isFinishing() ) {
+                ft.commit();
+            }
         }
 
         if(getSupportActionBar() != null){
@@ -316,7 +305,6 @@ public class MainActivity extends AppCompatActivity
                 Settings.System.SCREEN_BRIGHTNESS_MODE,
                 Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
         mPreferences.destroy();
-        Log.i("destroy", "onDestroy() call");
     }
 
     public static Context getContextForApplication() {
@@ -328,13 +316,11 @@ public class MainActivity extends AppCompatActivity
     private void discoverPeers() {
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
-            public void onSuccess() {
-                Log.i("discoverPeers", "successful");
-            }
+            public void onSuccess() {  Log.i("Wifi", "Peer discovery successful"); }
 
             @Override
             public void onFailure(int reasonCode) {
-                Log.i("discoverPeers", "failed: " + reasonCode);
+                Log.i("Wifi", "discoverPeers failed: " + reasonCode);
             }
         });
     }
@@ -343,6 +329,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
         mDeviceList = peers;
+        Log.i("Wifi", mDeviceList.toString());
     }
 
 
@@ -354,13 +341,13 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
         // make this the group owner and start the server to listen
         Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
-        Log.i("ConnectionInfo", info.toString());
+        Log.i("Wifi", "Connection info: " + info.toString());
         mInfo = info;
         WifiP2pConfig config = new WifiP2pConfig();
         config.groupOwnerIntent = 15;
         if (info.groupFormed && info.isGroupOwner) {
             Log.i("Wifi", "onConnectionInfo is starting server...");
-            new FileServerAsyncTask(this).execute();
+            new RemoteServerAsyncTask(this).execute();
         } else if (info.groupFormed){
         }
     }
