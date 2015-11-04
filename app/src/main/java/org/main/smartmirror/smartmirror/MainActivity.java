@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.Settings;
 import android.speech.RecognitionListener;
@@ -39,6 +40,27 @@ public class MainActivity extends AppCompatActivity
     private Thread mSpeechThread;
     private SpeechRecognizer mSpeechRecognizer;
     private SpeechRecognitionListener mRecognitionListener;
+    private boolean mIsSpeaking;
+
+    //5 second timer
+    private CountDownTimer mCountDown = new CountDownTimer(12000, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+            Log.d("Millis",": " + (millisUntilFinished/1000));
+            Log.d("misSpeaking", " " + mIsSpeaking);
+        }
+
+        @Override
+        public void onFinish() {
+            if(mIsSpeaking == true){
+                mCountDown.start();
+            }
+            else{
+                launchSpeech();
+            }
+        }
+    };
+
 
 
     @Override
@@ -56,7 +78,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         mPreferences = Preferences.getInstance();
-        
+
         mTextToSpeech = new TTSHelper(this);
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
         mRecognitionListener = new SpeechRecognitionListener();
@@ -93,14 +115,7 @@ public class MainActivity extends AppCompatActivity
 
         // start with weather displayed
         displayView(R.id.nav_weather);
-        // add a delay
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                launchSpeech();
-            }
-        }, 8000);
+        mCountDown.start();
     }
 
     @Override
@@ -219,7 +234,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
                     displayView(R.id.nav_settings);
-                }                    
+                }
             }
         }
     }
@@ -241,8 +256,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 try {
-                    mTextToSpeech.SpeakText(phrase);
+                    mTextToSpeech.speakText(phrase);
+                    mIsSpeaking=true;
                     Thread.sleep(2000);
+                    mIsSpeaking=false;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -261,17 +278,17 @@ public class MainActivity extends AppCompatActivity
         mPreferences.destroy();
         mSpeechRecognizer.destroy();
         mRecognitionListener=null;
+        mCountDown.cancel();
         super.onDestroy();
     }
 
     public static Context getContextForApplication() {
         return mContext;
     }
-
+    //TODO Make this a separate app
     public class SpeechRecognitionListener implements RecognitionListener {
 
         private String mSpokenCommand;
-        private Handler mHandler = new Handler();
 
         @Override
         public void onError(int error) {
@@ -283,16 +300,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onResults(Bundle results) {
             ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            if(matches != null)
+            if(matches != null) {
                 setSpokenCommand(matches.get(0));
-            voiceResult(getSpokenCommand());
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    launchSpeech();
-                }
-            }, 15000);
-
+                voiceResult(getSpokenCommand());
+            }
+            mCountDown.start();
         }
 
         @Override

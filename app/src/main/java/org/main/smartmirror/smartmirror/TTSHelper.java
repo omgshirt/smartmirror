@@ -70,8 +70,4 @@ public class TTSHelper {
             Start(text);
         }
     }
-
-    public void SpeakText(String text){
-        Start(text);
-    }
 }
