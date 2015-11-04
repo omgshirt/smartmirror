@@ -64,12 +64,12 @@ public class MainActivity extends AppCompatActivity
     public final static int SOCKET_TIMEOUT = 500;
     private String mOwnerIP;
 
-    private int mSocketsOpened = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         // Load any application preferences. If prefs do not exist, set them to defaults
         mContext = getApplicationContext();
-        super.onCreate(savedInstanceState);
 
         // check for permission to write system settings on API 23 and greater.
         // Get authorization on >= 23
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity
         mTTSHelper = new TTSHelper(this);
 
         // Initialize WiFiP2P services
+
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity
         mChannel = mManager.initialize(this, getMainLooper(), null);
 
         discoverPeers();
+
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -143,6 +145,7 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         unregisterReceiver(mWifiReceiver);
+
     }
 
     @Override
@@ -216,10 +219,10 @@ public class MainActivity extends AppCompatActivity
                 title= SETTINGS;
                 break;
         }
-        if(fragment != null){
+        if(fragment != null && !isFinishing() ){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
-            ft.commitAllowingStateLoss();
+            ft.commit();
         }
 
         if(getSupportActionBar() != null){
@@ -291,6 +294,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if (mTTSHelper != null) {
             mTTSHelper.destroy();
         }
@@ -298,7 +302,7 @@ public class MainActivity extends AppCompatActivity
                 Settings.System.SCREEN_BRIGHTNESS_MODE,
                 Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
         mPreferences.destroy();
-        super.onDestroy();
+        Log.i("destroy", "onDestroy() call");
     }
 
     public static Context getContextForApplication() {
