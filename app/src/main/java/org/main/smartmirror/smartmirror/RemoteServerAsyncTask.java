@@ -18,13 +18,13 @@ import java.net.Socket;
  * A simple server socket that accepts a connection
  */
 public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
-    private Context context;
+    private Context mContext;
 
     /**
      * @param context
      */
     public RemoteServerAsyncTask(Context context) {
-        this.context = context;
+        mContext = context;
     }
 
     @Override
@@ -55,11 +55,11 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String result) {
         if (result != null) {
             // show the fragment
-            Log.d("Wifi", "Server: done");
-            Toast.makeText(context, result, Toast.LENGTH_LONG).show();
-            ((MainActivity)context).displayView(result);
+            //Log.d("Wifi", "Server: done");
+            Toast.makeText(mContext, result, Toast.LENGTH_SHORT).show();
+            ((MainActivity)mContext).displayView(result);
             // now that we're done, create a new server socket
-            new RemoteServerAsyncTask(context).execute();
+            new RemoteServerAsyncTask(mContext).execute();
         }
     }
     /*
@@ -68,6 +68,6 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
      */
     @Override
     protected void onPreExecute() {
-        Log.i("Wifi", "Server: started");
+        //Log.i("Wifi", "Server: started");
     }
 }

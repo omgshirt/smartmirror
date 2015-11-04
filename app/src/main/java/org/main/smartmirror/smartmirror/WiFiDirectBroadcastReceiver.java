@@ -50,7 +50,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             // callback on PeerListListener.onPeersAvailable()
 
             if (mManager != null) {
-                mManager.requestPeers(mChannel, mActivity);
+                Log.i("Wifi", "Requesting peer list...");
+                mManager.requestPeers(mChannel, mPeerListListener);
             }
 
             Log.i("Wifi","Wifi p2p peers have changed");
@@ -69,7 +70,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 mManager.requestConnectionInfo(mChannel, mActivity);
             } else {
                 Toast.makeText(mActivity, "Cannot Connect to Remote" ,Toast.LENGTH_LONG).show();
-                mManager.requestPeers(mChannel, mActivity);
+                mActivity.discoverPeers();
             }
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {

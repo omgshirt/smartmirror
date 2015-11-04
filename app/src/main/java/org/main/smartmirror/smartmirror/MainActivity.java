@@ -179,7 +179,6 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         if (mTTSHelper != null) mTTSHelper.stop();      // shut down any pending TTS
-
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -207,6 +206,7 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
         if(fragment != null){
+            Log.i("Fragments", "Displaying " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             if (!isFinishing() ) {
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity
 
 
     // calls the P2pManager to refresh peer list
-    private void discoverPeers() {
+    public void discoverPeers() {
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {  Log.i("Wifi", "Peer discovery successful"); }
@@ -329,7 +329,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
         mDeviceList = peers;
-        Log.i("Wifi", mDeviceList.toString());
     }
 
 
