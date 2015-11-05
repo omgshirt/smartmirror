@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // start with weather displayed
-        displayView(R.id.nav_weather);
+        displayView(WEATHER);
         mCountDown.start();
     }
 
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            displayView(id);
+            displayView(item.toString());
         }
 
         return super.onOptionsItemSelected(item);
@@ -159,38 +159,37 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        displayView(item.getItemId());
+        displayView(item.toString());
         return true;
     }
 
-    public void displayView(int viewId){
+    public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         if (mTextToSpeech != null) mTextToSpeech.Stop();      // shut down any pending TTS
 
-        switch (viewId) {
-            case R.id.nav_news:
+        switch (viewName) {
+            case NEWS:
                 fragment = new NewsFragment();
                 title = NEWS;
                 break;
-            case R.id.nav_calendar:
+            case CALENDAR:
                 fragment = new CalendarFragment();
                 title = CALENDAR;
                 break;
-            case R.id.nav_light:
+            case LIGHT:
                 fragment = new LightFragment();
                 title = LIGHT;
                 break;
-            case R.id.nav_weather:
+            case WEATHER:
                 fragment = new WeatherFragment();
                 title = WEATHER;
                 break;
-            case R.id.nav_sports:
+            case SPORTS:
                 fragment = new SportsFragment();
                 title = SPORTS;
                 break;
-            case R.id.action_settings:
-            case R.id.nav_settings:
+            case SETTINGS:
                 fragment = new SettingsFragment();
                 title= SETTINGS;
                 break;
@@ -218,22 +217,22 @@ public class MainActivity extends AppCompatActivity
             if (voiceInput.contains("show")) {
                 if (voiceInput.contains(NEWS.toLowerCase())) {
                     startVoice(NEWS);
-                    displayView(R.id.nav_news);
+                    displayView(NEWS);
                 } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
                     startVoice(CALENDAR);
-                    displayView(R.id.nav_calendar);
+                    displayView(CALENDAR);
                 } else if (voiceInput.contains(WEATHER.toLowerCase())) {
                     startVoice(WEATHER);
-                    displayView(R.id.nav_weather);
+                    displayView(WEATHER);
                 } else if (voiceInput.contains(SPORTS.toLowerCase())) {
                     startVoice(SPORTS);
-                    displayView(R.id.nav_sports);
+                    displayView(SPORTS);
                 } else if (voiceInput.contains(LIGHT.toLowerCase())) {
                     startVoice(LIGHT);
-                    displayView(R.id.nav_light);
+                    displayView(LIGHT);
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
-                    displayView(R.id.nav_settings);
+                    displayView(SETTINGS);
                 }
             }
         }
