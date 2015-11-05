@@ -301,9 +301,6 @@ public class MainActivity extends AppCompatActivity
         if (mTTSHelper != null) {
             mTTSHelper.destroy();
         }
-        Settings.System.putInt(getContentResolver(),
-                Settings.System.SCREEN_BRIGHTNESS_MODE,
-                Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
         mPreferences.destroy();
     }
 

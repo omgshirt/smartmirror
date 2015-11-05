@@ -41,10 +41,10 @@ public class Preferences {
 
     // Constants for screen brightness (0-255)
     public static final int BRIGHTNESS_VERYLOW = 10;
-    public static final int BRIGHTNESS_LOW = 60;
-    public static final int BRIGHTNESS_MEDIUM = 120;
-    public static final int BRIGHTNESS_HIGH = 160;
-    public static final int BRIGHTNESS_VERYHIGH = 250;
+    public static final int BRIGHTNESS_LOW = 50;
+    public static final int BRIGHTNESS_MEDIUM = 100;
+    public static final int BRIGHTNESS_HIGH = 150;
+    public static final int BRIGHTNESS_VERYHIGH = 225;
     public static final int BRIGHTNESS_DEFAULT = BRIGHTNESS_MEDIUM;
 
     public static final float VOLUME_DEFAULT = 0.8f;        // not used currently
@@ -261,5 +261,4 @@ public class Preferences {
         edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
         edit.apply();
     }
-
 }
