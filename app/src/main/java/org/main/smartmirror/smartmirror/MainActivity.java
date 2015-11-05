@@ -238,7 +238,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
+    /**
+     * launches the speech recognition intent with the custon listener
+     */
     public void launchSpeech(){
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -284,7 +286,7 @@ public class MainActivity extends AppCompatActivity
     public static Context getContextForApplication() {
         return mContext;
     }
-    //TODO Make this a separate app
+    //TODO Make this a separate java class
     public class SpeechRecognitionListener implements RecognitionListener {
 
         private String mSpokenCommand;
