@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity
             "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
     /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
     private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
-    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=Foreign&sort=newest&api-key=";
-    private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=";
+    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
+    private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
     private String mNewsDesk;
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
@@ -209,7 +209,8 @@ public class MainActivity extends AppCompatActivity
                     }
                     else {
                         i++;
-                        Log.i("news desk: ", Arrays.toString(urlArr));
+                        //Log.i("news desk: ", Arrays.toString(urlArr));
+                        Log.i("I heard: ", voiceInput);
                     }
                 }
                 if (voiceInput.contains(mNewsDesk.toLowerCase())) {
