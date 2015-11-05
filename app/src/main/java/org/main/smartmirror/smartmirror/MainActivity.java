@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     private final String SPORTS = "Sports";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
+    private final String HELP= "Help";
     private TTSHelper mTextToSpeach;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
@@ -163,9 +164,13 @@ public class MainActivity extends AppCompatActivity
                 title = SPORTS;
                 break;
             case R.id.action_settings:
-            case R.id.nav_settings:
                 fragment = new SettingsFragment();
                 title= SETTINGS;
+                break;
+
+            case R.id.nav_help:
+                fragment=new HelperFragment();
+                title=HELP;
                 break;
         }
         if(fragment != null){
@@ -210,7 +215,12 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
                     displayView(R.id.nav_settings);
-                }                    
+                }
+                else if  (voiceInput.contains(HELP.toLowerCase()))
+                {
+                    startVoice(HELP);
+                    displayView(R.id.nav_help);
+                }
             }
         }
     }

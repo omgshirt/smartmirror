@@ -48,4 +48,17 @@
     <!-- Sports Strings -->
     <string name="sports_error">Error with Sports Data</string>
 
+
+
+    <!--Help Array-->
+
+    <string-array name="help_array">
+        <item>If you want to go to Sports say  show Sports</item>
+        <item>If you want to go to News  say show News  </item>
+        <item>If you want to go to Weather say show Weather</item>
+        <item>If you want to go to Setting say show Settings</item>
+        <item>If you want to go to Calendar say show Calendar</item>
+        <item>If you want to go to Light settings say show Light</item>
+    </string-array>
+
 </resources>
