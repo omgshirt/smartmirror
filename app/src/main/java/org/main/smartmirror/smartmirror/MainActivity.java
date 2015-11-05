@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private int RESULT_SPEECH = 1;
-    private Thread mSpeechThread;
     /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
             "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
     /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
@@ -231,6 +230,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
+    //TODO make this more robust and add a new keyword
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
