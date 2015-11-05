@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="nyt_news_desk">
+        <item>Sports</item>
+        <item>Foreign</item>
+        <item>Technology</item>
+    </string-array>
+</resources>

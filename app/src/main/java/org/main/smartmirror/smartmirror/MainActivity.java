@@ -15,12 +15,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -37,11 +39,14 @@ public class MainActivity extends AppCompatActivity
     private Thread mSpeechThread;
     /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
             "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
-    private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
-    private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";
-    private String mForeignURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=Foreign&sort=newest&api-key=";
+    /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
+    private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
+    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=Foreign&sort=newest&api-key=";
+    private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=";
+    private String mPostURL = "&sort=newest&api-key=";
+    private String mNewsDesk;
+    private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Load any application preferences. If prefs do not exist, set them to defaults
         mContext = getApplicationContext();
@@ -147,7 +152,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_news:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
-                bundle.putString("url", mForeignURL );
+                bundle.putString("url", mDefaultURL );
                 fragment.setArguments(bundle);
                 title = NEWS;
                 break;
@@ -192,9 +197,23 @@ public class MainActivity extends AppCompatActivity
             voiceInput = matches.get(0);
         }
         if(voiceInput != null) {
-            if (voiceInput.contains("show")) {
-                if (voiceInput.contains(NEWS.toLowerCase())) {
-                    startVoice(NEWS);
+            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+                int i = 0;
+                while(i < urlArr.length) {
+                    if (voiceInput.contains(urlArr[i].toLowerCase())) {
+                        mNewsDesk = urlArr[i];
+                        mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                        mDefaultURL = mNYTURL;
+                        Log.i("voice news desk: ", urlArr[i]);
+                        break;
+                    }
+                    else {
+                        i++;
+                        Log.i("news desk: ", Arrays.toString(urlArr));
+                    }
+                }
+                if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+                    startVoice(mNewsDesk);
                     displayView(R.id.nav_news);
                 } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
                     startVoice(CALENDAR);
@@ -208,10 +227,11 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
                     displayView(R.id.nav_settings);
-                }                    
-            }
+                }
         }
     }
+
+
 
     public void StartVoiceRecognitionActivity(View v) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
