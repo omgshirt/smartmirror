@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,11 +9,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 //fetch news from New York Times
@@ -23,6 +30,10 @@ import org.json.JSONObject;
 public class NewsFragment extends Fragment {
 
     private TextView mTxtHeadline;
+    private TextView mTxtHeadline2;
+    private TextView mTxtHeadline3;
+    private TextView mTxtHeadline4;
+    private TextView mTxtHeadline5;
 
     Handler mHandler = new Handler();
 
@@ -37,6 +48,10 @@ public class NewsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
+        mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
+        mTxtHeadline3 = (TextView)view.findViewById(R.id.headline3);
+        mTxtHeadline4 = (TextView)view.findViewById(R.id.headline4);
+        mTxtHeadline5 = (TextView)view.findViewById(R.id.headline5);
 
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
@@ -48,7 +63,10 @@ public class NewsFragment extends Fragment {
         String newsURL = this.getArguments().getString("url");
         newsURL += apiKey;
         updateNews(newsURL);
+
+
         return view;
+
     }
 
 
@@ -80,18 +98,33 @@ public class NewsFragment extends Fragment {
 
     private void renderNews(JSONObject json){
         try {
+            String newsFeed[] = new String[10];
 
-            Log.i("NYT_API", json.toString());
-            JSONObject response = json.getJSONObject("response");
-            JSONObject docs = response.getJSONArray("docs").getJSONObject(0);
-            String snippet = docs.getString("snippet");
-            JSONObject headline = docs.getJSONObject("headline");
+            JSONObject response = null;
+            JSONObject docs = null;
+            String snippet = null;
+            JSONObject headline = null;
 
+            int i = 0;
+            int numFeeds = 5;
+            while (i < numFeeds) {
+                Log.i("NYT_API", json.toString());
+                response = json.getJSONObject("response");
+                docs = response.getJSONArray("docs").getJSONObject(i);
+                snippet = docs.getString("snippet");
+                headline = docs.getJSONObject("headline");
 
+                newsFeed[i] = snippet;
+                Log.i("news string : ", newsFeed[i]);
+                i++;
+            }
 
-            mTxtHeadline.setText(headline.getString("main") + "\n" + snippet);
-
-
+            //mTxtHeadline.setText(headline.getString("main") + "\n" + snippet);
+            mTxtHeadline.setText("\n" + newsFeed[0]);
+            mTxtHeadline2.setText("\n" + newsFeed[1]);
+            mTxtHeadline3.setText("\n" + newsFeed[2]);
+            mTxtHeadline4.setText("\n" + newsFeed[3]);
+            mTxtHeadline5.setText("\n" + newsFeed[4]);
 
         }catch(Exception e){
             Log.e("SPORTS ERROR", e.toString());
