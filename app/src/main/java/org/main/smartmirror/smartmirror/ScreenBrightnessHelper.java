@@ -15,7 +15,6 @@ public class ScreenBrightnessHelper {
     
     public void setScreenBrightness(Activity activity, int brightness) {
         // set the system brightness and the window's brightness
-        Settings.System.putInt(activity.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightness);
         WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
         lp.screenBrightness = brightness / (float)255;
         activity.getWindow().setAttributes(lp);

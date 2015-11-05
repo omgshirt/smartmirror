@@ -49,9 +49,7 @@
     <!-- Sports Strings -->
     <string name="sports_error">Error with Sports Data</string>
 
-
-
-
+    <!-- WiFi P2P strings -->
+    <string name="wifi_not_enabled">Wifi Not Enabled</string>
 
 </resources>
-

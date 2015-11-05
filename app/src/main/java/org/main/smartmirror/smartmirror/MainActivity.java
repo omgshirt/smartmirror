@@ -1,8 +1,14 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -25,14 +31,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
 
     private final String NEWS = "News";
     private final String CALENDAR = "Calendar";
     private final String WEATHER = "Weather";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
-    private TTSHelper mTextToSpeach;
+    private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private int RESULT_SPEECH = 1;
@@ -47,9 +54,24 @@ public class MainActivity extends AppCompatActivity
     private String mNewsDesk;
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
+    // WiFiP2p
+    private WifiP2pManager mManager;
+    private WifiP2pManager.Channel mChannel;
+    private WifiP2pDeviceList mDeviceList;
+    private WifiP2pInfo mInfo;
+    private BroadcastReceiver mWifiReceiver;
+    private IntentFilter mIntentFilter;
+    public final static int PORT = 8888;
+    public final static int SOCKET_TIMEOUT = 500;
+    private String mOwnerIP;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Load any application preferences. If prefs do not exist, set them to defaults
+        super.onCreate(savedInstanceState);
+
         mContext = getApplicationContext();
+        // Load any application preferences. If prefs do not exist, set them to defaults
+        mPreferences = Preferences.getInstance();
 
         // check for permission to write system settings on API 23 and greater.
         // Get authorization on >= 23
@@ -60,10 +82,20 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        mPreferences = Preferences.getInstance();
-        
-        mTextToSpeach = new TTSHelper(this);
-        super.onCreate(savedInstanceState);
+        // initialize TTS
+        mTTSHelper = new TTSHelper(this);
+
+        // Initialize WiFiP2P services
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+
+        discoverPeers();
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -82,26 +114,35 @@ public class MainActivity extends AppCompatActivity
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
                 //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+                //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
+                //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         decorView.setSystemUiVisibility(uiOptions);
 
         try {
             getSupportActionBar().hide();
-        } catch (Exception e) {
-
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
 
         // start with weather displayed
-        displayView(R.id.nav_weather);
+        displayView(WEATHER);
     }
 
     @Override
     public void onResume(){
         super.onResume();
         mPreferences.setAppBrightness(this);
+        mWifiReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+        registerReceiver(mWifiReceiver, mIntentFilter);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        unregisterReceiver(mWifiReceiver);
+
     }
 
     @Override
@@ -129,7 +170,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            displayView(id);
+            displayView(item.toString());
         }
 
         return super.onOptionsItemSelected(item);
@@ -139,45 +180,53 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        displayView(item.getItemId());
+        Log.i("item selected", item.toString());
+        displayView(item.toString());
         return true;
     }
 
-    public void displayView(int viewId){
+    public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTextToSpeach != null) mTextToSpeach.Stop();      // shut down any pending TTS
-
-        switch (viewId) {
-            case R.id.nav_news:
+        if (mTTSHelper != null) mTTSHelper.stop();      // shut down any pending TTS
+        switch (viewName) {
+            case NEWS:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("url", mDefaultURL );
                 fragment.setArguments(bundle);
                 title = NEWS;
                 break;
-            case R.id.nav_calendar:
+            case CALENDAR:
                 fragment = new CalendarFragment();
                 title = CALENDAR;
                 break;
-            case R.id.nav_light:
+            case LIGHT:
                 fragment = new LightFragment();
                 title = LIGHT;
                 break;
-            case R.id.nav_weather:
+            case WEATHER:
                 fragment = new WeatherFragment();
                 title = WEATHER;
                 break;
             case R.id.action_settings:
             case R.id.nav_settings:
+            case SPORTS:
+                fragment = new SportsFragment();
+                title = SPORTS;
+                break;
+            case SETTINGS:
                 fragment = new SettingsFragment();
                 title= SETTINGS;
                 break;
         }
         if(fragment != null){
+            Log.i("Fragments", "Displaying " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
-            ft.commit();
+            if (!isFinishing() ) {
+                ft.commit();
+            }
         }
 
         if(getSupportActionBar() != null){
@@ -216,19 +265,27 @@ public class MainActivity extends AppCompatActivity
                 if (voiceInput.contains(mNewsDesk.toLowerCase())) {
                     startVoice(mNewsDesk);
                     displayView(R.id.nav_news);
+            if (voiceInput.contains("show")) {
+                if (voiceInput.contains(NEWS.toLowerCase())) {
+                    startVoice(NEWS);
+                    displayView(NEWS);
                 } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
                     startVoice(CALENDAR);
-                    displayView(R.id.nav_calendar);
+                    displayView(CALENDAR);
                 } else if (voiceInput.contains(WEATHER.toLowerCase())) {
                     startVoice(WEATHER);
-                    displayView(R.id.nav_weather);
+                    displayView(WEATHER);
+                } else if (voiceInput.contains(SPORTS.toLowerCase())) {
+                    startVoice(SPORTS);
+                    displayView(SPORTS);
                 } else if (voiceInput.contains(LIGHT.toLowerCase())) {
                     startVoice(LIGHT);
-                    displayView(R.id.nav_light);
+                    displayView(LIGHT);
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
-                    displayView(R.id.nav_settings);
-                }
+                    displayView(SETTINGS);
+                }                    
+            }
         }
     }
 
@@ -246,15 +303,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startVoice(final String phrase){
-        if (mTextToSpeach != null) {
-            mTextToSpeach.Stop();
-        }
-        mSpeechThread = new Thread(new Runnable() {
+        Thread mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mTextToSpeach.SpeakText(phrase);
-                    Thread.sleep(2000);
+                    mTTSHelper.speakText(phrase);
+                    //Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -263,19 +317,70 @@ public class MainActivity extends AppCompatActivity
         mSpeechThread.start();
     }
 
+    /**
+     * Start the speech recognizer
+     */
+    public void startSpeechRecognition(){
+        // do stuff
+    }
+
+    /**
+     * Stops the current speech recognition object
+     */
+    public void stopSpeechRecognition(){
+        //mSpeechRecognizer.stopListening();
+    }
+
+    @Override
     protected void onDestroy() {
-        if (mTextToSpeach != null) {
-            mTextToSpeach.Stop();
-        }
-        Settings.System.putInt(getContentResolver(),
-                Settings.System.SCREEN_BRIGHTNESS_MODE,
-                Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
-        mPreferences.destroy();
         super.onDestroy();
+        if (mTTSHelper != null) {
+            mTTSHelper.destroy();
+        }
+        mPreferences.destroy();
     }
 
     public static Context getContextForApplication() {
         return mContext;
     }
 
+
+    // calls the P2pManager to refresh peer list
+    public void discoverPeers() {
+        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {  Log.i("Wifi", "Peer discovery successful"); }
+
+            @Override
+            public void onFailure(int reasonCode) {
+                Log.i("Wifi", "discoverPeers failed: " + reasonCode);
+            }
+        });
+    }
+
+    // Interface passes back a device list when the peer list changes, or discovery is successful
+    @Override
+    public void onPeersAvailable(WifiP2pDeviceList peers) {
+        mDeviceList = peers;
+    }
+
+
+    /** called when a connection is made to this device
+     *
+     * @param info
+     */
+    @Override
+    public void onConnectionInfoAvailable(final WifiP2pInfo info) {
+        // make this the group owner and start the server to listen
+        Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
+        Log.i("Wifi", "Connection info: " + info.toString());
+        mInfo = info;
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.groupOwnerIntent = 15;
+        if (info.groupFormed && info.isGroupOwner) {
+            Log.i("Wifi", "onConnectionInfo is starting server...");
+            new RemoteServerAsyncTask(this).execute();
+        } else if (info.groupFormed){
+        }
+    }
 }
