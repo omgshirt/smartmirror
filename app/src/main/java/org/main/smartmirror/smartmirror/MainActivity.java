@@ -44,11 +44,11 @@ public class MainActivity extends AppCompatActivity
     private Preferences mPreferences;
     private int RESULT_SPEECH = 1;
     private Thread mSpeechThread;
-    /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
+    /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
             "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
     /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
     private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
-    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
+    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
     private String mNewsDesk;
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity
             case NEWS:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
-                bundle.putString("url", mDefaultURL );
+                bundle.putString("url", mDefaultURL);
                 fragment.setArguments(bundle);
                 title = NEWS;
                 break;
@@ -208,12 +208,6 @@ public class MainActivity extends AppCompatActivity
             case WEATHER:
                 fragment = new WeatherFragment();
                 title = WEATHER;
-                break;
-            case R.id.action_settings:
-            case R.id.nav_settings:
-            case SPORTS:
-                fragment = new SportsFragment();
-                title = SPORTS;
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
@@ -264,10 +258,6 @@ public class MainActivity extends AppCompatActivity
                 }
                 if (voiceInput.contains(mNewsDesk.toLowerCase())) {
                     startVoice(mNewsDesk);
-                    displayView(R.id.nav_news);
-            if (voiceInput.contains("show")) {
-                if (voiceInput.contains(NEWS.toLowerCase())) {
-                    startVoice(NEWS);
                     displayView(NEWS);
                 } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
                     startVoice(CALENDAR);
@@ -275,17 +265,14 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(WEATHER.toLowerCase())) {
                     startVoice(WEATHER);
                     displayView(WEATHER);
-                } else if (voiceInput.contains(SPORTS.toLowerCase())) {
-                    startVoice(SPORTS);
-                    displayView(SPORTS);
                 } else if (voiceInput.contains(LIGHT.toLowerCase())) {
                     startVoice(LIGHT);
                     displayView(LIGHT);
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
                     displayView(SETTINGS);
-                }                    
-            }
+                }
+
         }
     }
 

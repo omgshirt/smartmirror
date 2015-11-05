@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,7 +22,7 @@ import org.json.JSONObject;
 
 public class NewsFragment extends Fragment {
 
-    private TextView txtHeadline;
+    private TextView mTxtHeadline;
 
     Handler mHandler = new Handler();
 
@@ -35,7 +36,7 @@ public class NewsFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
-        txtHeadline = (TextView)view.findViewById(R.id.headline);
+        mTxtHeadline = (TextView)view.findViewById(R.id.headline);
 
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
@@ -44,15 +45,15 @@ public class NewsFragment extends Fragment {
         }
         String apiKey = getString(R.string.nyt_api_key);
 
-        String sportsURL = this.getArguments().getString("url");
-        sportsURL += apiKey;
-        updateSports(sportsURL);
+        String newsURL = this.getArguments().getString("url");
+        newsURL += apiKey;
+        updateNews(newsURL);
         return view;
     }
 
 
-    // Get sports headlines from api and display
-    private void updateSports(final String query){
+    // Get news headlines from api and display
+    private void updateNews(final String query){
         new Thread(){
             public void run(){
                 final JSONObject json = FetchURL.getJSON(query);
@@ -67,7 +68,7 @@ public class NewsFragment extends Fragment {
                 } else {
                     mHandler.post(new Runnable(){
                         public void run(){
-                            renderSports(json);
+                            renderNews(json);
                         }
                     });
                 }
@@ -77,7 +78,7 @@ public class NewsFragment extends Fragment {
     }
 
 
-    private void renderSports(JSONObject json){
+    private void renderNews(JSONObject json){
         try {
 
             Log.i("NYT_API", json.toString());
@@ -86,7 +87,10 @@ public class NewsFragment extends Fragment {
             String snippet = docs.getString("snippet");
             JSONObject headline = docs.getJSONObject("headline");
 
-            txtHeadline.setText(headline.getString("main") + "\n" + snippet);
+
+
+            mTxtHeadline.setText(headline.getString("main") + "\n" + snippet);
+
 
 
         }catch(Exception e){
