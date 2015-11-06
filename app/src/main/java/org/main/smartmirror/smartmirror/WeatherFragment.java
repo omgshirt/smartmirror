@@ -12,7 +12,6 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.Date;
 import java.util.Random;
@@ -111,7 +110,7 @@ public class WeatherFragment extends Fragment {
         }
 
         if ( !text.equals("") ) {
-            ((MainActivity) getActivity()).startVoice(text);
+            ((MainActivity) getActivity()).startTTS(text);
         }
     }
 

@@ -28,7 +28,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance();
 
         // check for permission to write system settings on API 23 and greater.
-        // Get authorization on >= 23
+        // TODO: We don't need this currently as WRITE_SETTINGS isn't necessary
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(!Settings.System.canWrite( getApplicationContext() )) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
@@ -187,7 +186,7 @@ public class MainActivity extends AppCompatActivity
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTTSHelper != null) mTTSHelper.stop();      // shut down any pending TTS
+        stopTTS();                                      // shut down any pending TTS
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -241,67 +240,79 @@ public class MainActivity extends AppCompatActivity
         }
         if(voiceInput != null) {
             String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
-                int i = 0;
-                while(i < urlArr.length) {
-                    if (voiceInput.contains(urlArr[i].toLowerCase())) {
-                        mNewsDesk = urlArr[i];
-                        mNYTURL = mPreURL + mNewsDesk + mPostURL;
-                        mDefaultURL = mNYTURL;
-                        Log.i("voice news desk: ", urlArr[i]);
-                        break;
-                    }
-                    else {
-                        i++;
-                        //Log.i("news desk: ", Arrays.toString(urlArr));
-                        Log.i("I heard: ", voiceInput);
-                    }
+            int i = 0;
+            while(i < urlArr.length) {
+                if (voiceInput.contains(urlArr[i].toLowerCase())) {
+                    mNewsDesk = urlArr[i];
+                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                    mDefaultURL = mNYTURL;
+                    Log.i("voice news desk: ", urlArr[i]);
+                    break;
                 }
-                if (voiceInput.contains(mNewsDesk.toLowerCase())) {
-                    startVoice(mNewsDesk);
-                    displayView(NEWS);
-                } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
-                    startVoice(CALENDAR);
-                    displayView(CALENDAR);
-                } else if (voiceInput.contains(WEATHER.toLowerCase())) {
-                    startVoice(WEATHER);
-                    displayView(WEATHER);
-                } else if (voiceInput.contains(LIGHT.toLowerCase())) {
-                    startVoice(LIGHT);
-                    displayView(LIGHT);
-                } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
-                    startVoice(SETTINGS);
-                    displayView(SETTINGS);
+                else {
+                    i++;
+                    //Log.i("news desk: ", Arrays.toString(urlArr));
+                    Log.i("I heard: ", voiceInput);
                 }
-
+            }
+            if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+                startTTS(mNewsDesk);
+                displayView(NEWS);
+            } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
+                startTTS(CALENDAR);
+                displayView(CALENDAR);
+            } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+                startTTS(WEATHER);
+                displayView(WEATHER);
+            } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+                startTTS(LIGHT);
+                displayView(LIGHT);
+            } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+                startTTS(SETTINGS);
+                displayView(SETTINGS);
+            }
         }
     }
-
-
 
     public void StartVoiceRecognitionActivity(View v) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+        stopTTS();
         try {
             startActivityForResult(intent, RESULT_SPEECH);
+
         } catch (ActivityNotFoundException a) {
             Toast tstNoSupport = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
             tstNoSupport.show();
         }
     }
 
-    public void startVoice(final String phrase){
+    /**
+     * Start text to speech
+     * @param phrase the phrase to speak
+     */
+    public void startTTS(final String phrase){
         Thread mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
-                    //Thread.sleep(2000);
+                    Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
         mSpeechThread.start();
+    }
+
+    /**
+     * Stop Text to Speech
+     */
+    public void stopTTS() {
+        if (mTTSHelper != null) {
+            mTTSHelper.destroy();
+        }
     }
 
     /**
@@ -321,9 +332,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mTTSHelper != null) {
-            mTTSHelper.destroy();
-        }
+        stopTTS();
         mPreferences.destroy();
     }
 
