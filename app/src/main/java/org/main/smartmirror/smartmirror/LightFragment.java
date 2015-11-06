@@ -24,17 +24,8 @@ public class LightFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.light_fragment, container, false);
-
         int brightness = Preferences.getInstance().getLightBrightness();
-        try {
-            Settings.System.putInt(getActivity().getContentResolver(),
-                    Settings.System.SCREEN_BRIGHTNESS_MODE,
-                    Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-            Settings.System.getInt(getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-            setWindowBrightness(brightness);
-        } catch (Settings.SettingNotFoundException e) {
-            Log.e("Error", "System brightness not found");
-        }
+        setWindowBrightness(brightness);
         return view;
     }
 
