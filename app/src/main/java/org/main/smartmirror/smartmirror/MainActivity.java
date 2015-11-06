@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -36,13 +37,21 @@ public class MainActivity extends AppCompatActivity
     private final String NEWS = "News";
     private final String CALENDAR = "Calendar";
     private final String WEATHER = "Weather";
-    private final String SPORTS = "Sports";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
     private int RESULT_SPEECH = 1;
+    /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
+            "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
+    /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
+    private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
+    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
+    private String mPostURL = "&sort=newest&api-key=";
+    private String mNewsDesk;
+    private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     // WiFiP2p
     private WifiP2pManager mManager;
@@ -182,6 +191,9 @@ public class MainActivity extends AppCompatActivity
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("url", mDefaultURL);
+                fragment.setArguments(bundle);
                 title = NEWS;
                 break;
             case CALENDAR:
@@ -195,10 +207,6 @@ public class MainActivity extends AppCompatActivity
             case WEATHER:
                 fragment = new WeatherFragment();
                 title = WEATHER;
-                break;
-            case SPORTS:
-                fragment = new SportsFragment();
-                title = SPORTS;
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
@@ -222,6 +230,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
+    //TODO make this more robust and add a new keyword
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
@@ -231,9 +240,24 @@ public class MainActivity extends AppCompatActivity
             voiceInput = matches.get(0);
         }
         if(voiceInput != null) {
-            if (voiceInput.contains("show")) {
-                if (voiceInput.contains(NEWS.toLowerCase())) {
-                    startVoice(NEWS);
+            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+                int i = 0;
+                while(i < urlArr.length) {
+                    if (voiceInput.contains(urlArr[i].toLowerCase())) {
+                        mNewsDesk = urlArr[i];
+                        mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                        mDefaultURL = mNYTURL;
+                        Log.i("voice news desk: ", urlArr[i]);
+                        break;
+                    }
+                    else {
+                        i++;
+                        //Log.i("news desk: ", Arrays.toString(urlArr));
+                        Log.i("I heard: ", voiceInput);
+                    }
+                }
+                if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+                    startVoice(mNewsDesk);
                     displayView(NEWS);
                 } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
                     startVoice(CALENDAR);
@@ -241,19 +265,18 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(WEATHER.toLowerCase())) {
                     startVoice(WEATHER);
                     displayView(WEATHER);
-                } else if (voiceInput.contains(SPORTS.toLowerCase())) {
-                    startVoice(SPORTS);
-                    displayView(SPORTS);
                 } else if (voiceInput.contains(LIGHT.toLowerCase())) {
                     startVoice(LIGHT);
                     displayView(LIGHT);
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
                     displayView(SETTINGS);
-                }                    
-            }
+                }
+
         }
     }
+
+
 
     public void StartVoiceRecognitionActivity(View v) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
