@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
     private String mNewsDesk;
+    private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     // WiFiP2p
@@ -232,25 +233,25 @@ public class MainActivity extends AppCompatActivity
 
     //TODO make this more robust and add a new keyword
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         String voiceInput = null;
-        if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
+        if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK) {
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             voiceInput = matches.get(0);
         }
-        if(voiceInput != null) {
-            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+        if (voiceInput != null) {
+            try {
+                String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
                 int i = 0;
-                while(i < urlArr.length) {
+                while (i < urlArr.length) {
                     if (voiceInput.contains(urlArr[i].toLowerCase())) {
                         mNewsDesk = urlArr[i];
                         mNYTURL = mPreURL + mNewsDesk + mPostURL;
                         mDefaultURL = mNYTURL;
                         Log.i("voice news desk: ", urlArr[i]);
                         break;
-                    }
-                    else {
+                    } else {
                         i++;
                         //Log.i("news desk: ", Arrays.toString(urlArr));
                         Log.i("I heard: ", voiceInput);
@@ -271,8 +272,17 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
                     displayView(SETTINGS);
+                } else if(voiceInput.contains(NEWS.toLowerCase())) {
+                    startVoice(NEWS);
+                    mDefaultURL = mNewsDefault;
+                    displayView(NEWS);
                 }
 
+            }catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Didn't catch that",
+                        Toast.LENGTH_LONG).show();
+                startVoice("Speak proper English or bugger off you yank!");
+            }
         }
     }
 
