@@ -55,6 +55,12 @@ public class NewsFragment extends Fragment {
         mTxtHeadline4 = (TextView)view.findViewById(R.id.headline4);
         mTxtHeadline5 = (TextView)view.findViewById(R.id.headline5);
 
+        mTxtHeadline.setText("");
+        mTxtHeadline2.setText("");
+        mTxtHeadline3.setText("");
+        mTxtHeadline4.setText("");
+        mTxtHeadline5.setText("");
+
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
