@@ -276,6 +276,7 @@ public class MainActivity extends AppCompatActivity
             }catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Didn't catch that",
                         Toast.LENGTH_LONG).show();
+                startVoice("Didn't catch that");
             }
         }
     }
