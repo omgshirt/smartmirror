@@ -72,13 +72,15 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance();
 
         // check for permission to write system settings on API 23 and greater.
-        // TODO: We don't need this currently as WRITE_SETTINGS isn't necessary
+        // We don't need this currently as WRITE_SETTINGS isn't necessary
+        /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(!Settings.System.canWrite( getApplicationContext() )) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                 startActivityForResult(intent, 1);
             }
         }
+        */
 
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
@@ -288,7 +290,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Start text to speech
+     * Say a phrase using text to speech
      * @param phrase the phrase to speak
      */
     public void startTTS(final String phrase){
@@ -311,7 +313,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void stopTTS() {
         if (mTTSHelper != null) {
-            mTTSHelper.destroy();
+            mTTSHelper.stop();
         }
     }
 
@@ -332,7 +334,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopTTS();
+        mTTSHelper.destroy();
         mPreferences.destroy();
     }
 
