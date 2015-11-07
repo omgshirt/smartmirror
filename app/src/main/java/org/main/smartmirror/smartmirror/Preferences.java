@@ -31,6 +31,7 @@ public class Preferences {
     public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
     public static final String PREFS_CAMERA_ENABLED = "MIRROR_PREFS_CAMERA_ENABLED";
     public static final String PREFS_WAKEON_SOUND = "MIRROR_PREFS_WAKEON_SOUND";
+    public static final String PREFS_REMOTE_ENABLED = "MIRROR_PREFS_REMOTE_ENABLED";
 
     // chance for TTS to happen (0-1)
     public static final float SPEECH_NEVER = 0;
@@ -40,10 +41,10 @@ public class Preferences {
 
     // Constants for screen brightness (0-255)
     public static final int BRIGHTNESS_VERYLOW = 10;
-    public static final int BRIGHTNESS_LOW = 60;
-    public static final int BRIGHTNESS_MEDIUM = 120;
-    public static final int BRIGHTNESS_HIGH = 160;
-    public static final int BRIGHTNESS_VERYHIGH = 250;
+    public static final int BRIGHTNESS_LOW = 50;
+    public static final int BRIGHTNESS_MEDIUM = 100;
+    public static final int BRIGHTNESS_HIGH = 150;
+    public static final int BRIGHTNESS_VERYHIGH = 225;
     public static final int BRIGHTNESS_DEFAULT = BRIGHTNESS_MEDIUM;
 
     public static final float VOLUME_DEFAULT = 0.8f;        // not used currently
@@ -53,6 +54,7 @@ public class Preferences {
     public static final String MPH = "mph";
     public static final String KPH = "kph";
 
+    private boolean mRemoteEnabled = true;
     private int mDisplayUnits = IMPERIAL;    // control which unit scale to use for temperature (0,1)
     private float mVolume;                  // control volume for TTS and other sounds (0-1)
     private float mSpeechFrequency;         // control how often TTS voice responses occur (0-1)
@@ -71,11 +73,11 @@ public class Preferences {
         mVolume = mSharedPreferences.getFloat(PREFS_VOL, VOLUME_DEFAULT);
         mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
         mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_DEFAULT);
+        mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);
     }
 
     // Clean up any refs that might hang around to prevent leaks.
     public void destroy(){
-
         mPreferences = null;
         mSharedPreferences = null;
     }
@@ -247,5 +249,16 @@ public class Preferences {
 
     public int getAppBrightness () {
         return mAppBrightness;
+    }
+
+    public boolean isRemoteEnabled() {
+        return  mRemoteEnabled;
+    }
+
+    public void setRemoteEnabled(boolean isEnabled) {
+        mRemoteEnabled = isEnabled;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
+        edit.apply();
     }
 }

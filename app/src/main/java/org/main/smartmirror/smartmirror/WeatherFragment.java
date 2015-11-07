@@ -99,6 +99,7 @@ public class WeatherFragment extends Fragment {
                 text = "the current humidity is " + mCurrentHumidity + " percent";
                 break;
             case 4:
+                if (mCurrentWind == 0) { saySomethingAboutWeather(); }
                 String speedUnits;
                 if( mPreferences.getWindDisplayFormat().equals(Preferences.KPH) )  {
                     speedUnits = "kilometers per hour";
@@ -140,7 +141,7 @@ public class WeatherFragment extends Fragment {
 
     private void renderWeather(JSONObject json){
         try {
-            Log.i("WEATHER_API", json.toString());
+            //Log.i("WEATHER_API", json.toString());
 
             JSONObject weather = json.getJSONArray("weather").getJSONObject(0);
             JSONObject main = json.getJSONObject("main");
@@ -169,12 +170,12 @@ public class WeatherFragment extends Fragment {
 
             // Set the dailyHigh and dailyLow
             mTempMax = (int)main.getDouble("temp_max");
-            String maxIcon = getActivity().getString(R.string.weather_arrow_up);
-            txtDailyHigh.setText(maxIcon + mTempMax);
+            String maxIcon = getActivity().getString(R.string.weather_arrow_up) + mTempMax;
+            txtDailyHigh.setText(maxIcon);
 
             mTempMin = (int)main.getDouble("temp_min");
-            String minIcon = getActivity().getString(R.string.weather_arrow_down);
-            txtDailyLow.setText(minIcon + mTempMin);
+            String minIcon = getActivity().getString(R.string.weather_arrow_down) + mTempMin;
+            txtDailyLow.setText(minIcon);
 
             // TODO: set up hourly weather forecasts
             saySomethingAboutWeather();

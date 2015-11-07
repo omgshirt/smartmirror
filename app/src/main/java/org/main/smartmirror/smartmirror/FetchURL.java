@@ -6,7 +6,6 @@ package org.main.smartmirror.smartmirror;
 //uri structure: http://api.nytimes.com/svc/search/v2/articlesearch.response-format?[q=search term&fq=filter-field:(filter-term)&additional-params=values]&api-key=####
 
 
-import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -42,8 +41,4 @@ public class FetchURL {
             return null;
         }
     }
-
-
-
-
 }

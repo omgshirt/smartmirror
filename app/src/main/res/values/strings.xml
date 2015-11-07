@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SmartMirror</string>
     <string name="open_weather_map_api_key">74ab1bfc0374c634c12dedf9c12b1c03</string>
@@ -47,5 +48,8 @@
     <string name="settings_vhigh">Very High</string>
     <!-- Sports Strings -->
     <string name="sports_error">Error with Sports Data</string>
+
+    <!-- WiFi P2P strings -->
+    <string name="wifi_not_enabled">Wifi Not Enabled</string>
 
 </resources>
