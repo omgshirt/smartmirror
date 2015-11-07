@@ -254,9 +254,10 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         i++;
                         //Log.i("news desk: ", Arrays.toString(urlArr));
-                        Log.i("I heard: ", voiceInput);
+                        //Log.i("I heard: ", voiceInput);
                     }
                 }
+                Log.i("I heard: ", voiceInput);
                 if (voiceInput.contains(mNewsDesk.toLowerCase())) {
                     startVoice(mNewsDesk);
                     displayView(NEWS);
@@ -281,7 +282,7 @@ public class MainActivity extends AppCompatActivity
             }catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Didn't catch that",
                         Toast.LENGTH_LONG).show();
-                startVoice("Speak proper English or bugger off you yank!");
+                startVoice("Speak proper English or bugger off you bloody yank");
             }
         }
     }
