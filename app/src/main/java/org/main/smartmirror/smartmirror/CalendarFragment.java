@@ -62,37 +62,43 @@ public class CalendarFragment extends Fragment {
     private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY };
     public static int totalNumEvents = 0;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        //super.onCreate(savedInstanceState);
-        activityLayout = new LinearLayout(getActivity());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        activityLayout.setLayoutParams(lp);
-        activityLayout.setOrientation(LinearLayout.VERTICAL);
-        activityLayout.setPadding(16, 16, 16, 16);
-        TextView x = new TextView(getActivity());
-        x.setText("My Events");
-        ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        activityLayout.addView(x);
-        mOutputText = new TextView(getActivity());
-        mOutputText.setLayoutParams(tlp);
-        mOutputText.setPadding(16, 16, 16, 16);
-        mOutputText.setVerticalScrollBarEnabled(true);
-        mOutputText.setMovementMethod(new ScrollingMovementMethod());
-        activityLayout.addView(mOutputText);
-        mProgress = new ProgressDialog(getActivity());
-        mProgress.setMessage("Calling Google Calendar API ...");
-        SharedPreferences settings = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                this.getActivity().getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
-
+        super.onCreate(savedInstanceState);
+        //Initialzie layout andp arameters
+            activityLayout = new LinearLayout(getActivity());
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            activityLayout.setLayoutParams(lp);
+            activityLayout.setOrientation(LinearLayout.VERTICAL);
+            activityLayout.setPadding(16, 16, 16, 16);
+        //Add title
+            TextView x = new TextView(getActivity());
+            x.setText("My Events");
+            ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            activityLayout.addView(x);
+            mOutputText = new TextView(getActivity());
+            mOutputText.setLayoutParams(tlp);
+            mOutputText.setPadding(16, 16, 16, 16);
+            mOutputText.setVerticalScrollBarEnabled(true);
+            mOutputText.setMovementMethod(new ScrollingMovementMethod());
+            activityLayout.addView(mOutputText);
+            mProgress = new ProgressDialog(getActivity());
+            mProgress.setMessage("Calling Google Calendar API ...");
+            SharedPreferences settings = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
+            mCredential = GoogleAccountCredential.usingOAuth2(
+                    this.getActivity().getApplicationContext(), Arrays.asList(SCOPES))
+                    .setBackOff(new ExponentialBackOff())
+                    .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
         return activityLayout;
     }
 
@@ -104,6 +110,7 @@ public class CalendarFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (isGooglePlayServicesAvailable()) {
+            Log.e("OnResumePause", "OnResume in Calendar Fragment");
             refreshResults();
         } else {
             mOutputText.setText("Google Play Services required: " +
@@ -121,7 +128,10 @@ public class CalendarFragment extends Fragment {
     public void onPause() {
         Log.e("DEBUG", "OnPause of CalendarFragment");
         super.onPause();
+        //This line below fixed my issue of fragment displaying duplicate views everytime onpause and onresume was called
+        activityLayout = new LinearLayout(getActivity());
     }
+
 
     /**
      * Called when an activity launched here (specifically, AccountPicker
@@ -179,7 +189,6 @@ public class CalendarFragment extends Fragment {
             chooseAccount();
         } else {
             if (isDeviceOnline()) {
-                mOutputText.setText("t1");
                 new MakeRequestTask(mCredential).execute();
             } else {
                 mOutputText.setText("No network connection available.");
@@ -311,16 +320,17 @@ public class CalendarFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            mOutputText.setText("");
             mProgress.show();
         }
 
+        //Add event text views
         @Override
         protected void onPostExecute(List<String> output) {
             mProgress.hide();
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
             } else {
+                Log.e("onPostExecute", "in onpost ");
                 totalNumEvents = output.size();
                 output.add(0, "Data retrieved using the Google Calendar API:");
                 for(int i = 0; i < output.size(); i++){
