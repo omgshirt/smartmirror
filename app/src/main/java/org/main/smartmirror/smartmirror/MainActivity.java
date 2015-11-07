@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
     private String mNewsDesk;
+    private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     // WiFiP2p
@@ -271,12 +272,16 @@ public class MainActivity extends AppCompatActivity
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
                     displayView(SETTINGS);
+                } else if(voiceInput.contains(NEWS.toLowerCase())) {
+                    startVoice(NEWS);
+                    mDefaultURL = mNewsDefault;
+                    displayView(NEWS);
                 }
 
             }catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Didn't catch that",
                         Toast.LENGTH_LONG).show();
-                startVoice("Didn't catch that");
+                startVoice("Speak proper English or bugger off you yank!");
             }
         }
     }
