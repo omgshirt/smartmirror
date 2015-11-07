@@ -2,15 +2,21 @@ package org.main.smartmirror.smartmirror;
 
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
@@ -64,6 +70,32 @@ public class MainActivity extends AppCompatActivity
     public final static int PORT = 8888;
     public final static int SOCKET_TIMEOUT = 500;
     private String mOwnerIP;
+
+    //service stuff
+    private int mBind;
+    private Messenger mMessenger;
+    //service connection
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMessenger = new Messenger(service);
+            Message msgMessage = new Message();
+            if(!mTTSHelper.isSpeaking())
+                msgMessage.what=VoiceService.START;
+            else
+                msgMessage.what=VoiceService.STOP;
+            try {
+                mMessenger.send(msgMessage);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mMessenger=null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +160,7 @@ public class MainActivity extends AppCompatActivity
 
         // start with weather displayed
         displayView(WEATHER);
+        launchService();
     }
 
     @Override
@@ -143,6 +176,12 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         unregisterReceiver(mWifiReceiver);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, VoiceService.class), mServiceConnection, mBind);
     }
 
     @Override
@@ -289,7 +328,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
-    public void StartVoiceRecognitionActivity(View v) {
+    public void startVoiceRecognitionActivity(View v) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
         try {
@@ -329,6 +368,13 @@ public class MainActivity extends AppCompatActivity
         //mSpeechRecognizer.stopListening();
     }
 
+    private void launchService(){
+        Context ctx = getContextForApplication();
+        Intent intent = new Intent(ctx, VoiceService.class);
+        ctx.startService(intent);
+        mBind=1;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -336,6 +382,10 @@ public class MainActivity extends AppCompatActivity
             mTTSHelper.destroy();
         }
         mPreferences.destroy();
+        if(mMessenger != null) {
+            unbindService(mServiceConnection);
+            mManager = null;
+        }
     }
 
     public static Context getContextForApplication() {
