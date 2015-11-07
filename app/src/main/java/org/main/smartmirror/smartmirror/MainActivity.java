@@ -210,17 +210,17 @@ public class MainActivity extends AppCompatActivity
                 fragment = new WeatherFragment();
                 title = WEATHER;
                 break;
-            case R.id.nav_sports:
+           /* case R.id.nav_sports:
                 fragment = new SportsFragment();
                 title = SPORTS;
                 break;
-            case R.id.action_settings:
+            */
             case SETTINGS:
                 fragment = new SettingsFragment();
                 title= SETTINGS;
                 break;
 
-            case R.id.nav_help:
+            case HELP:
                 fragment=new HelperFragment();
                 title=HELP;
                 break;
@@ -282,19 +282,22 @@ public class MainActivity extends AppCompatActivity
                     displayView(LIGHT);
                 } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
                     startVoice(SETTINGS);
-                    displayView(R.id.nav_settings);
+                    displayView(SETTINGS);
                 }
                 else if  (voiceInput.contains(HELP.toLowerCase()))
                 {
                     startVoice(HELP);
-                    displayView(R.id.nav_help);
+                    displayView(HELP);
                 }
             }
                     displayView(SETTINGS);
                 }
 
-        }
-    }
+
+
+
+
+
 
 
 
