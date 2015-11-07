@@ -232,25 +232,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         String voiceInput = null;
-        if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
+        if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK) {
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             voiceInput = matches.get(0);
         }
-        if(voiceInput != null) {
-            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+        if (voiceInput != null) {
+            try {
+                String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
                 int i = 0;
-                while(i < urlArr.length) {
+                while (i < urlArr.length) {
                     if (voiceInput.contains(urlArr[i].toLowerCase())) {
                         mNewsDesk = urlArr[i];
                         mNYTURL = mPreURL + mNewsDesk + mPostURL;
                         mDefaultURL = mNYTURL;
                         Log.i("voice news desk: ", urlArr[i]);
                         break;
-                    }
-                    else {
+                    } else {
                         i++;
                         //Log.i("news desk: ", Arrays.toString(urlArr));
                         Log.i("I heard: ", voiceInput);
@@ -273,6 +273,10 @@ public class MainActivity extends AppCompatActivity
                     displayView(SETTINGS);
                 }
 
+            }catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Didn't catch that",
+                        Toast.LENGTH_LONG).show();
+            }
         }
     }
 
