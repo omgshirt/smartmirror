@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -99,6 +101,7 @@ public class NewsFragment extends Fragment {
     private void renderNews(JSONObject json){
         try {
             String newsFeed[] = new String[10];
+            String hl[] = new String[10];
 
             JSONObject response = null;
             JSONObject docs = null;
@@ -113,6 +116,8 @@ public class NewsFragment extends Fragment {
                 docs = response.getJSONArray("docs").getJSONObject(i);
                 snippet = docs.getString("snippet");
                 headline = docs.getJSONObject("headline");
+                hl[i] = headline.getString("main");
+
 
                 newsFeed[i] = snippet;
                 Log.i("news string : ", newsFeed[i]);
@@ -120,11 +125,29 @@ public class NewsFragment extends Fragment {
             }
 
             //mTxtHeadline.setText(headline.getString("main") + "\n" + snippet);
-            mTxtHeadline.setText("\n" + newsFeed[0]);
-            mTxtHeadline2.setText("\n" + newsFeed[1]);
-            mTxtHeadline3.setText("\n" + newsFeed[2]);
-            mTxtHeadline4.setText("\n" + newsFeed[3]);
-            mTxtHeadline5.setText("\n" + newsFeed[4]);
+
+            /*mTxtHeadline.setText(hl[0] + "\n" + newsFeed[0] + "\n");
+            mTxtHeadline2.setText(hl[1] + "\n" + newsFeed[1] + "\n");
+            mTxtHeadline3.setText(hl[2] + "\n" + newsFeed[2] + "\n");
+            mTxtHeadline4.setText(hl[3] + "\n" + newsFeed[3] + "\n");
+            mTxtHeadline5.setText(hl[4] + "\n" + newsFeed[4] + "\n");*/
+
+            //mytextview.setText(Html.fromHtml(sourceString)); //format
+
+            String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + newsFeed[0] + "<br>";
+            mTxtHeadline.setText(Html.fromHtml(txt0));
+
+            String txt1 = "<b>" + hl[1] + "</b> " + "<br>" + newsFeed[1] + "<br>";
+            mTxtHeadline2.setText(Html.fromHtml(txt1));
+
+            String txt2 = "<b>" + hl[2] + "</b> " + "<br>" + newsFeed[2] + "<br>";
+            mTxtHeadline3.setText(Html.fromHtml(txt2));
+
+            String txt3 = "<b>" + hl[3] + "</b> " + "<br>" + newsFeed[3] + "<br>";
+            mTxtHeadline4.setText(Html.fromHtml(txt3));
+
+            String txt4 = "<b>" + hl[4] + "</b> " + "<br>" + newsFeed[4] + "<br>";
+            mTxtHeadline5.setText(Html.fromHtml(txt4));
 
         }catch(Exception e){
             Log.e("SPORTS ERROR", e.toString());
