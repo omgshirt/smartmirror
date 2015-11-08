@@ -71,7 +71,7 @@ public class CalendarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        //Initialzie layout andp arameters
+        //Initialzie layout and parameters
             activityLayout = new LinearLayout(getActivity());
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
