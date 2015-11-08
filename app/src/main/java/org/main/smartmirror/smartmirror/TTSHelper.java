@@ -29,18 +29,18 @@ public class TTSHelper{
                     mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
-                            ((MainActivity)mContext).setFlag(true);
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
 
                         @Override
                         public void onDone(String utteranceId){
-                            ((MainActivity)mContext).setFlag(false);
+                            ((MainActivity)mContext).startSpeechRecognition();
                             stop();
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-                            ((MainActivity)mContext).setFlag(false);
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
                     });
                     mTtsInitialized = true;

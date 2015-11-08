@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 /**
- * Created by Master N on 10/17/2015.
+ * Fragment that displays the events in one's calendar
  */
 public class CalendarFragment extends Fragment {
     @Override

@@ -18,6 +18,9 @@ import java.util.Date;
 import java.util.Random;
 
 
+/**
+ * Fragment that displays the weather information
+ */
 public class WeatherFragment extends Fragment {
 
     Typeface weatherFont;
