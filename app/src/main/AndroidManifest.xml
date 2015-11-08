@@ -7,8 +7,6 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-
-
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
@@ -28,7 +26,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".VoiceService">
-        </service>
     </application>
 </manifest>

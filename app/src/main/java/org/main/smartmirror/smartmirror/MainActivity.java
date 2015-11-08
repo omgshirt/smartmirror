@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -18,7 +19,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -71,37 +74,17 @@ public class MainActivity extends AppCompatActivity
     public final static int SOCKET_TIMEOUT = 500;
     private String mOwnerIP;
 
-    //service stuff
-    private int mBind;
-    private Messenger mMessenger;
-    //service connection
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mMessenger = new Messenger(service);
-            Message msgMessage = new Message();
-            if(!mTTSHelper.isSpeaking())
-                msgMessage.what=VoiceService.START;
-            else
-                msgMessage.what=VoiceService.STOP;
-            try {
-                mMessenger.send(msgMessage);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mMessenger=null;
-        }
-    };
+    //Speech
+    private SpeechRecognizer mSpeechRecognizer;
+    private SpeechListener mSpeechListener;
+    private Intent mSpeechRecognitionIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mContext = getApplicationContext();
+        mSpeechListener = new SpeechListener(this);
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance();
 
@@ -116,6 +99,9 @@ public class MainActivity extends AppCompatActivity
 
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
+
+        // Initialize voice
+        launchVoice();
 
         // Initialize WiFiP2P services
         mIntentFilter = new IntentFilter();
@@ -159,8 +145,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // start with weather displayed
-        displayView(WEATHER);
-        launchService();
+        displayView(WEATHER);;
     }
 
     @Override
@@ -176,12 +161,6 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         unregisterReceiver(mWifiReceiver);
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        bindService(new Intent(this, VoiceService.class), mServiceConnection, mBind);
     }
 
     @Override
@@ -270,6 +249,51 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
+    public void speechResult(String voiceInput) {
+        try {
+            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+            int i = 0;
+            while (i < urlArr.length) {
+                if (voiceInput.contains(urlArr[i].toLowerCase())) {
+                    mNewsDesk = urlArr[i];
+                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                    mDefaultURL = mNYTURL;
+                    Log.i("voice news desk: ", urlArr[i]);
+                    break;
+                } else {
+                    i++;
+                    //Log.i("news desk: ", Arrays.toString(urlArr));
+                    //Log.i("I heard: ", voiceInput);
+                }
+            }
+            Log.i("I heard: ", voiceInput);
+            if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+                startVoice(mNewsDesk);
+                displayView(NEWS);
+            } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
+                startVoice(CALENDAR);
+                displayView(CALENDAR);
+            } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+                startVoice(WEATHER);
+                displayView(WEATHER);
+            } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+                startVoice(LIGHT);
+                displayView(LIGHT);
+            } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+                startVoice(SETTINGS);
+                displayView(SETTINGS);
+            } else if (voiceInput.contains(NEWS.toLowerCase())) {
+                startVoice(NEWS);
+                mDefaultURL = mNewsDefault;
+                displayView(NEWS);
+            }
+        }catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Didn't catch that",
+                    Toast.LENGTH_LONG).show();
+            startVoice("Speak proper English or bugger off you bloody yank");
+        }
+    }
+
     //TODO make this more robust and add a new keyword
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -327,6 +351,13 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    public void launchVoice(){
+        mSpeechRecognitionIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        mSpeechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContextForApplication());
+        mSpeechRecognizer.setRecognitionListener(mSpeechListener);
+//        mSpeechRecognizer.startListening(mSpeechRecognitionIntent);
+    }
 
     public void startVoiceRecognitionActivity(View v) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -358,21 +389,14 @@ public class MainActivity extends AppCompatActivity
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
-        // do stuff
+        mSpeechRecognizer.startListening(mSpeechRecognitionIntent);
     }
 
     /**
      * Stops the current speech recognition object
      */
     public void stopSpeechRecognition(){
-        //mSpeechRecognizer.stopListening();
-    }
-
-    private void launchService(){
-        Context ctx = getContextForApplication();
-        Intent intent = new Intent(ctx, VoiceService.class);
-        ctx.startService(intent);
-        mBind=1;
+        mSpeechRecognizer.stopListening();
     }
 
     @Override
@@ -382,10 +406,7 @@ public class MainActivity extends AppCompatActivity
             mTTSHelper.destroy();
         }
         mPreferences.destroy();
-        if(mMessenger != null) {
-            unbindService(mServiceConnection);
-            mManager = null;
-        }
+        mSpeechRecognizer.stopListening();
     }
 
     public static Context getContextForApplication() {
