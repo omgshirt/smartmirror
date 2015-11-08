@@ -69,7 +69,20 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        // TODO: set Sys Vol radio
+        float vol = mPreferences.getSystemVolume();
+        if (vol == Preferences.VOL_OFF) {
+            grpSysVolume.check(R.id.sys_vol_off);
+        } else if (vol == Preferences.VOL_VLOW) {
+            grpSysVolume.check(R.id.sys_vol_vlow);
+        } else if (vol == Preferences.VOL_LOW) {
+            grpSysVolume.check(R.id.sys_vol_low);
+        } else if (vol == Preferences.VOL_MEDIUM) {
+            grpSysVolume.check(R.id.sys_vol_medium);
+        } else if (vol == Preferences.VOL_HIGH) {
+            grpSysVolume.check(R.id.sys_vol_high);
+        } else if (vol == Preferences.VOL_VHIGH) {
+            grpSysVolume.check(R.id.sys_vol_vhigh);
+        }
 
         grpMusVolume = (RadioGroup) view.findViewById(R.id.mus_vol_group);
         grpMusVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -98,9 +111,22 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        // TODO: Set Music vol radio
+        vol = mPreferences.getMusicVolume();
+        if (vol == Preferences.VOL_OFF) {
+            grpMusVolume.check(R.id.mus_vol_off);
+        } else if (vol == Preferences.VOL_VLOW) {
+            grpMusVolume.check(R.id.mus_vol_vlow);
+        } else if (vol == Preferences.VOL_LOW) {
+            grpMusVolume.check(R.id.mus_vol_low);
+        } else if (vol == Preferences.VOL_MEDIUM) {
+            grpMusVolume.check(R.id.mus_vol_medium);
+        } else if (vol == Preferences.VOL_HIGH) {
+            grpMusVolume.check(R.id.mus_vol_high);
+        } else if (vol == Preferences.VOL_VHIGH) {
+            grpMusVolume.check(R.id.mus_vol_vhigh);
+        }
 
-        // Speech Frequency radio group
+            // Speech Frequency radio group
         grpSpeechFreqGroup = (RadioGroup) view.findViewById(R.id.speech_frequency_group);
         grpSpeechFreqGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override

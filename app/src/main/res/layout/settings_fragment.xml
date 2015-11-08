@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="15dp"
-    android:orientation="vertical"
     tools:context="org.main.smartmirror.smartmirror.SettingsFragment">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    android:orientation="vertical">
     <!-- Application Brightness -->
     <TextView
         android:layout_width="match_parent"
@@ -16,10 +19,11 @@
         android:id="@+id/brightness_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
         <RadioButton
             android:id="@+id/brightness_vlow"
             android:text="@string/settings_vlow"
+            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <RadioButton
@@ -59,10 +63,11 @@
         android:id="@+id/light_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
         <RadioButton
             android:id="@+id/light_vlow"
             android:text="@string/settings_vlow"
+            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <RadioButton
@@ -101,15 +106,17 @@
         android:id="@+id/sys_vol_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
         <RadioButton
             android:id="@+id/sys_vol_off"
             android:text="@string/settings_off"
+            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <RadioButton
             android:id="@+id/sys_vol_vlow"
             android:text="@string/settings_vlow"
+            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <RadioButton
@@ -148,15 +155,17 @@
         android:id="@+id/mus_vol_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
         <RadioButton
             android:id="@+id/mus_vol_off"
             android:text="@string/settings_off"
+            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <RadioButton
             android:id="@+id/mus_vol_vlow"
             android:text="@string/settings_vlow"
+            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <RadioButton
@@ -195,7 +204,7 @@
         android:id="@+id/speech_frequency_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
         <RadioButton
             android:id="@+id/speech_never"
             android:text="@string/settings_speech_never"
@@ -232,3 +241,4 @@
         android:textOn="Metric"
         android:textOff="Imperial" />
 </LinearLayout>
+</ScrollView>
