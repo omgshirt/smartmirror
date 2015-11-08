@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity
     private SpeechRecognizer mSpeechRecognizer;
     private SpeechListener mSpeechListener;
     private Intent mSpeechRecognitionIntent;
+    private boolean mIsSpeaking = true; // default
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +100,6 @@ public class MainActivity extends AppCompatActivity
 
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
-
-        // Initialize voice
-        launchVoice();
 
         // Initialize WiFiP2P services
         mIntentFilter = new IntentFilter();
@@ -145,7 +143,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         // start with weather displayed
-        displayView(WEATHER);;
+        displayView(WEATHER);
+        launchVoice();
     }
 
     @Override
@@ -356,7 +355,7 @@ public class MainActivity extends AppCompatActivity
         mSpeechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContextForApplication());
         mSpeechRecognizer.setRecognitionListener(mSpeechListener);
-//        mSpeechRecognizer.startListening(mSpeechRecognitionIntent);
+        mSpeechRecognizer.startListening(mSpeechRecognitionIntent);
     }
 
     public void startVoiceRecognitionActivity(View v) {
@@ -376,6 +375,7 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
+                    launchVoice();
                     //Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -397,6 +397,14 @@ public class MainActivity extends AppCompatActivity
      */
     public void stopSpeechRecognition(){
         mSpeechRecognizer.stopListening();
+    }
+
+    public void setFlag(boolean flag){
+        mIsSpeaking = flag;
+    }
+
+    public boolean getSpeakingStatus(){
+        return mIsSpeaking;
     }
 
     @Override

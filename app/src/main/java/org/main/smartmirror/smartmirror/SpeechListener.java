@@ -6,23 +6,28 @@ import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
-
-import java.nio.charset.CoderMalfunctionError;
 import java.util.ArrayList;
 
 public class SpeechListener implements RecognitionListener {
     private Context mContext;
-    private CountDownTimer mCountDownTimer = new CountDownTimer(5000,1000) {
+    private CountDownTimer mCountDownTimer = new CountDownTimer(10000,1000) {
         @Override
         public void onTick(long millisUntilFinished) {
-            //do nothing
+            Log.i("TIME:", "" + (millisUntilFinished/1000));
         }
 
         @Override
         public void onFinish() {
-            // counter stub
+            if(((MainActivity)mContext).getSpeakingStatus())
+                mCountDownTimer.start();
+            else {
+                mCountDownTimer.cancel();
+                ((MainActivity) mContext).launchVoice();
+            }
         }
     };
+
+
 
     public SpeechListener(Context ctx) {
         mContext=ctx;
@@ -30,7 +35,7 @@ public class SpeechListener implements RecognitionListener {
 
     @Override
     public void onReadyForSpeech(Bundle params) {
-
+        mCountDownTimer.start();
     }
 
     @Override
@@ -50,14 +55,12 @@ public class SpeechListener implements RecognitionListener {
 
     @Override
     public void onEndOfSpeech() {
-//        ((MainActivity)mContext).launchVoice();
+
     }
 
     @Override
     public void onError(int error) {
-        if(error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT || error == SpeechRecognizer.ERROR_NO_MATCH){
-//            ((MainActivity)mContext).launchVoice();
-        }
+
     }
 
     @Override
@@ -67,7 +70,7 @@ public class SpeechListener implements RecognitionListener {
             ((MainActivity) mContext).speechResult(speech.get(0));
             Log.i("BLAH", "" + speech.get(0));
         }
-//        ((MainActivity) mContext).launchVoice();
+        mCountDownTimer.start();
     }
 
     @Override

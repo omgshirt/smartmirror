@@ -29,22 +29,18 @@ public class TTSHelper{
                     mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
-                            //Log.i("UTTERANCE_PROGRESS", "onStart called");
-                            mIsSpeaking = true;
-                            ((MainActivity)mContext).stopSpeechRecognition(); // stop recognition
+                            ((MainActivity)mContext).setFlag(true);
                         }
 
                         @Override
-                        public void onDone(String utteranceId) {
-                            //Log.i("UTTERANCE_PROGRESS", "onDone called");
+                        public void onDone(String utteranceId){
+                            ((MainActivity)mContext).setFlag(false);
                             stop();
-                            ((MainActivity)mContext).startSpeechRecognition();
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-                            mIsSpeaking = false;
-                            ((MainActivity)mContext).startSpeechRecognition();
+                            ((MainActivity)mContext).setFlag(false);
                         }
                     });
                     mTtsInitialized = true;
@@ -90,9 +86,9 @@ public class TTSHelper{
         mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
     }
 
-    public boolean isSpeaking() {
+    /*public boolean isSpeaking() {
         return mIsSpeaking;
-    }
+    }*/
 
     public void stop(){
         if (mTextToSpeech != null) {
