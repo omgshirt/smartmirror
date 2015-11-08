@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 public class VoiceService extends Service {
 
+    private final boolean DEBUG=true;
     private ArrayList<Messenger> mClients = new ArrayList<>();
     private Messenger mMessenger = new Messenger( new IHandler());
     private String mSpokenCommand;
@@ -24,6 +25,8 @@ public class VoiceService extends Service {
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
+    static final int REGISTER_SERV=3;
+    static final int UNREGISTER_SERV=4;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -33,6 +36,7 @@ public class VoiceService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mSpeechRecognizer.destroy();
     }
 
     @Override
@@ -68,7 +72,7 @@ public class VoiceService extends Service {
      */
     public void startVoice(){
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-us");
         mSpeechRecognizer.startListening(intent);
     }
 
@@ -79,43 +83,20 @@ public class VoiceService extends Service {
         mSpeechRecognizer.stopListening();
     }
 
-    // Handles the messages from Main to this service
-    public class IHandler extends Handler {
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch(msg.what){
-                case START_SPEECH:
-                    mClients.add(msg.replyTo);
-                    startVoice();
-                    break;
-                case STOP_SPEECH:
-                    mClients.remove(msg.replyTo);
-                    stopVoice();
-                    break;
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    }
-
     /**
      * Sends a message back to the Activity that started this service
      */
     public void sendMessage(){
-        for(int i=mClients.size()-1; i>0; i--){
+            Bundle bundle = new Bundle();
+            bundle.putString("result", getSpokenCommand());
+            Message msg = Message.obtain(null, RESULT_SPEECH);
+            msg.setData(bundle);
             try {
-                Bundle bundle = new Bundle();
-                bundle.putString("result", getSpokenCommand());
-                Message msg = Message.obtain(null, RESULT_SPEECH);
-                msg.setData(bundle);
-                mClients.get(i).send(msg);
+                mClients.get(0).send(msg);
             } catch (RemoteException e) {
-                mClients.remove(i);
+                mClients.remove(msg);
                 e.printStackTrace();
             }
-        }
     }
 
     /**
@@ -149,7 +130,7 @@ public class VoiceService extends Service {
 
         @Override
         public void onError(int error) {
-            startVoice();
+
         }
 
         /**
@@ -161,7 +142,8 @@ public class VoiceService extends Service {
         public void onResults(Bundle results) {
             ArrayList<String> arlstMessage = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             if(arlstMessage.get(0) != null){
-                Log.i("SERV: ", arlstMessage.get(0));
+                if(DEBUG)
+                    Log.i("LIS", arlstMessage.get(0));
                 setSpokenCommand(arlstMessage.get(0));
                 sendMessage();
             }
@@ -175,6 +157,27 @@ public class VoiceService extends Service {
         @Override
         public void onEvent(int eventType, Bundle params) {
 
+        }
+    }
+
+    // Handles the messages from Main to this service
+    public class IHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch(msg.what){
+                case START_SPEECH:
+                    mClients.add(msg.replyTo);
+                    startVoice();
+                    break;
+                case STOP_SPEECH:
+                    mClients.remove(msg.replyTo);
+                    stopVoice();
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
         }
     }
 }

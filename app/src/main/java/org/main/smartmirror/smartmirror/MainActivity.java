@@ -86,11 +86,29 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = new Messenger(service);
+
+            // not sure if I need this keep me
+            /*try {
+                Message msg = Message.obtain(null, VoiceService.REGISTER_SERV);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }*/
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mService = null;
+
+            // not sure if I need this keep me
+            /*try {
+                Message msg = Message.obtain(null, VoiceService.UNREGISTER_SERV);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }*/
         }
     };
 
@@ -102,7 +120,7 @@ public class MainActivity extends AppCompatActivity
                 case VoiceService.RESULT_SPEECH:
                     String result = msg.getData().getString("result");
                     if(DEBUG)
-                        Log.i("MAIN :", result);
+                        Log.i("MAIN", result);
                     speechResult(result);
                     break;
                 default:
@@ -374,7 +392,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void stopSpeechRecognition(){
         try {
-            Message msg = Message.obtain(null, VoiceService.START_SPEECH);
+            Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
         } catch (RemoteException e) {
