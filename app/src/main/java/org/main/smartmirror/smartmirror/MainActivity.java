@@ -182,7 +182,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        Log.i("item selected", item.toString());
         displayView(item.toString());
         return true;
     }
@@ -251,7 +250,7 @@ public class MainActivity extends AppCompatActivity
                         mNewsDesk = urlArr[i];
                         mNYTURL = mPreURL + mNewsDesk + mPostURL;
                         mDefaultURL = mNYTURL;
-                        Log.i("voice news desk: ", urlArr[i]);
+                        //Log.i("voice news desk: ", urlArr[i]);
                         break;
                     } else {
                         i++;
