@@ -91,6 +91,99 @@
             android:layout_height="wrap_content"/>
     </RadioGroup>
 
+    <!-- system volume setting -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_system_vol"
+        android:textSize="20sp"/>
+    <RadioGroup
+        android:id="@+id/sys_vol_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/sys_vol_off"
+            android:text="@string/settings_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/sys_vol_vlow"
+            android:text="@string/settings_vlow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/sys_vol_low"
+            android:text="@string/settings_low"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/sys_vol_medium"
+            android:text="@string/settings_medium"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/sys_vol_high"
+            android:text="@string/settings_high"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/sys_vol_vhigh"
+            android:text="@string/settings_vhigh"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RadioGroup>
+
+    <!-- music volume -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_music_vol"
+        android:textSize="20sp"/>
+    <RadioGroup
+        android:id="@+id/mus_vol_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/mus_vol_off"
+            android:text="@string/settings_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/mus_vol_vlow"
+            android:text="@string/settings_vlow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/mus_vol_low"
+            android:text="@string/settings_low"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/mus_vol_medium"
+            android:text="@string/settings_medium"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/mus_vol_high"
+            android:text="@string/settings_high"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/mus_vol_vhigh"
+            android:text="@string/settings_vhigh"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RadioGroup>
 
     <!-- speech frequency settings -->
     <TextView

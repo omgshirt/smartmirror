@@ -24,7 +24,8 @@ public class TTSHelper{
         mTextToSpeechListener = new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                if (status== TextToSpeech.SUCCESS) {
+                if (status == TextToSpeech.SUCCESS) {
+                    Log.i("TTS", "TTS initialized");
                     mTextToSpeech.setLanguage(Locale.UK);
                     mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
@@ -52,6 +53,7 @@ public class TTSHelper{
                 }
             }
         };
+        mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
     }
 
     /** Check preferences for speech frequency. If successful, say the text
@@ -73,7 +75,13 @@ public class TTSHelper{
      */
     public void start(final String text){
         mTextToSpeak = text;
-        if (mTextToSpeech == null || !mTtsInitialized) {
+        if (!mTtsInitialized) {
+            Log.i("TextToSpeech", "not initialized");
+            return;
+        }
+
+        if (mTextToSpeech == null) {
+            Log.i("TextToSpeech", "not initialized");
             try {
                 mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
             } catch (Exception e) {

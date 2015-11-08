@@ -117,16 +117,15 @@ public class NewsFragment extends Fragment {
             int i = 0;
             int numFeeds = 5;
             while (i < numFeeds) {
-                Log.i("NYT_API", json.toString());
+                //Log.i("NYT_API", json.toString());
                 response = json.getJSONObject("response");
                 docs = response.getJSONArray("docs").getJSONObject(i);
                 snippet = docs.getString("snippet");
                 headline = docs.getJSONObject("headline");
                 hl[i] = headline.getString("main");
 
-
                 newsFeed[i] = snippet;
-                Log.i("news string : ", newsFeed[i]);
+                //Log.i("news string : ", newsFeed[i]);
                 i++;
             }
 
