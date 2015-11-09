@@ -30,7 +30,7 @@ public class TTSHelper{
                     mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
-//                            ((MainActivity)mContext).stopSpeechRecognition();
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
 
                         @Override
@@ -41,7 +41,7 @@ public class TTSHelper{
 
                         @Override
                         public void onError(String utteranceId) {
-//                            ((MainActivity)mContext).stopSpeechRecognition();
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
                     });
                     mTtsInitialized = true;

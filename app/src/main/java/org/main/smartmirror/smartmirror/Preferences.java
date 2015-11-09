@@ -33,6 +33,7 @@ public class Preferences {
     public static final String PREFS_WAKEON_SOUND = "MIRROR_PREFS_WAKEON_SOUND";
     public static final String PREFS_REMOTE_ENABLED = "MIRROR_PREFS_REMOTE_ENABLED";
     public static final String PREFS_MUSIC_VOL = "MIRROR_PREFS_MUSIC_VOL";
+    public static final String PREFS_DICTIONARY_INIT= "MIRROR_PREFS_DICTIONARY_INIT";
 
     // chance for TTS to happen (0-1)
     public static final float SPEECH_NEVER = 0;
@@ -69,6 +70,7 @@ public class Preferences {
     private String mTimeFormat = "h:mm a";          // Default string for time display
     private int mLightBrightness;                   // Night light brightness
     private int mAppBrightness;                     // general screen brightness
+    private boolean mSpeechDictionary;
 
     private Preferences() {
         Context appContext = MainActivity.getContextForApplication();
@@ -82,6 +84,7 @@ public class Preferences {
         mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
         mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);
         mWeatherUnits = mSharedPreferences.getInt(PREFS_WEATHER_UNIT, ENGLISH);
+        mSpeechDictionary = mSharedPreferences.getBoolean(PREFS_DICTIONARY_INIT, false); // default off
     }
 
     // Clean up any refs that might hang around to prevent leaks.
@@ -282,6 +285,17 @@ public class Preferences {
         mRemoteEnabled = isEnabled;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
+        edit.apply();
+    }
+
+    public boolean isDictionaryInitialized() {
+        return  mSpeechDictionary;
+    }
+
+    public void setDictionaryInisialized(boolean isInit) {
+        mSpeechDictionary = isInit;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putBoolean(PREFS_DICTIONARY_INIT, mSpeechDictionary);
         edit.apply();
     }
 }
