@@ -20,6 +20,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: Add checks in CalendarUtil.java to check for all day events. Currently shows next days' all day event for current day
 
 public class CalendarFragment extends Fragment {
 

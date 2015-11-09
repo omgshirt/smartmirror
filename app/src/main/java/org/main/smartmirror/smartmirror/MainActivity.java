@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity
     private final String WEATHER = "Weather";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
+    private final String CAMERA = "Camera";
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
@@ -212,6 +213,10 @@ public class MainActivity extends AppCompatActivity
             case SETTINGS:
                 fragment = new SettingsFragment();
                 title= SETTINGS;
+                break;
+            case CAMERA:
+                fragment = new CameraFragment();
+                title = CAMERA;
                 break;
         }
         if(fragment != null){
