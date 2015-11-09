@@ -12,9 +12,12 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
-
 import java.util.ArrayList;
 
+/**
+ * Service that runs the Speech Recognition. In charge of receiving and
+ * sending information (IPC)
+ */
 public class VoiceService extends Service {
 
     private final boolean DEBUG=true;
@@ -25,8 +28,11 @@ public class VoiceService extends Service {
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
+    //not sure if I need these keep me
+    /*
     static final int REGISTER_SERV=3;
     static final int UNREGISTER_SERV=4;
+    */
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

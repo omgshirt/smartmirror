@@ -144,6 +144,10 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                 startActivityForResult(intent, 1);
             }
+            if(!Settings.System.canWrite(getApplicationContext() )) {
+                Intent intent = new Intent(Settings.ACTION_VOICE_INPUT_SETTINGS);
+                startActivityForResult(intent, 1);
+            }
         }
 
         // initialize TTS
@@ -350,7 +354,7 @@ public class MainActivity extends AppCompatActivity
                 mDefaultURL = mNewsDefault;
                 displayView(NEWS);
             } else if(voiceInput.contains(OFF.toLowerCase())){
-            displayView(OFF);
+                displayView(OFF);
             }
         }catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Didn't catch that",
