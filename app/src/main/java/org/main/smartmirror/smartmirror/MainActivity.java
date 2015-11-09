@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
 
         // check for permission to write system settings on API 23 and greater.
         // Get authorization on >= 23
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(!Settings.System.canWrite( getApplicationContext() )) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                 startActivityForResult(intent, 1);
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(Settings.ACTION_VOICE_INPUT_SETTINGS);
                 startActivityForResult(intent, 1);
             }
-        }
+        }*/
 
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTTSHelper != null) mTTSHelper.stop();      // shut down any pending TTS
+        stopTTS();                                      // shut down any pending TTS
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -362,19 +362,33 @@ public class MainActivity extends AppCompatActivity
             startVoice("Speak proper English or bugger off you bloody yank");
         }
     }
-
-    public void startVoice(final String phrase){
+    
+    /**
+     * Say a phrase using text to speech
+     * @param phrase the phrase to speak
+     */
+    public void startTTS(final String phrase){
         Thread mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
+                    Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
         mSpeechThread.start();
+    }
+
+    /**
+     * Stop Text to Speech
+     */
+    public void stopTTS() {
+        if (mTTSHelper != null) {
+            mTTSHelper.stop();
+        }
     }
 
     /**
@@ -407,9 +421,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mTTSHelper != null) {
-            mTTSHelper.destroy();
-        }
+        mTTSHelper.destroy();
         mPreferences.destroy();
         unbindService(mConnection);
         mIsBound=false;
@@ -432,13 +444,13 @@ public class MainActivity extends AppCompatActivity
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                if(DEBUG)
+                if (DEBUG)
                     Log.i("Wifi", "Peer discovery successful");
             }
 
             @Override
             public void onFailure(int reasonCode) {
-                if(DEBUG)
+                if (DEBUG)
                     Log.i("Wifi", "discoverPeers failed: " + reasonCode);
             }
         });
