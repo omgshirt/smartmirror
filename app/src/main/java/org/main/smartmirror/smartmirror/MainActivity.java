@@ -395,7 +395,6 @@ public class MainActivity extends AppCompatActivity
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
