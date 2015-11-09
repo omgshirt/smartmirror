@@ -146,8 +146,8 @@ public class MainActivity extends AppCompatActivity
                 title = NEWS;
                 break;
             case R.id.nav_calendar:
-                //fragment = new CalendarFragment();
-                fragment = new CalendarModule();
+                //fragment = new OldCalendarFragment();
+                fragment = new CalendarFragment();
                 title = CALENDAR;
                 break;
             case R.id.nav_light:
