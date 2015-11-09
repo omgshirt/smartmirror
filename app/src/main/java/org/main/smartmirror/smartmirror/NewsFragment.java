@@ -1,7 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.ListFragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -10,19 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 
 //fetch news from New York Times
 //article search api key:89899870d1024b962dc582806e3e9c34:3:73303333
@@ -117,16 +105,15 @@ public class NewsFragment extends Fragment {
             int i = 0;
             int numFeeds = 5;
             while (i < numFeeds) {
-                Log.i("NYT_API", json.toString());
+                //Log.i("NYT_API", json.toString());
                 response = json.getJSONObject("response");
                 docs = response.getJSONArray("docs").getJSONObject(i);
                 snippet = docs.getString("snippet");
                 headline = docs.getJSONObject("headline");
                 hl[i] = headline.getString("main");
 
-
                 newsFeed[i] = snippet;
-                Log.i("news string : ", newsFeed[i]);
+                //Log.i("news string : ", newsFeed[i]);
                 i++;
             }
 

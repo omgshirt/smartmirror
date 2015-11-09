@@ -1,8 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-/**
- * Created by Master N on 11/7/2015.
- */
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -27,8 +24,9 @@ import java.util.List;
 
 public class CalendarUtil extends Activity {
 
-    //public static ListView listView = new ListView(null);
-
+    /*
+    public static ListView listView = new ListView(null);
+    */
     private static final String TAG = CalendarUtil.class.getSimpleName();
     private static final String DEBUG_TAG = "MyActivity";
     public static final String[] EVENT_PROJECTION = new String[] {
@@ -93,7 +91,9 @@ public class CalendarUtil extends Activity {
         ContentUris.appendId(builder, startMillis);
         ContentUris.appendId(builder, endMillis);
 
-        //cursor =  cr.query(builder.build(), EVENT_PROJECTION, selection, selectionArgs, null);
+        /*
+        cursor =  cr.query(builder.build(), EVENT_PROJECTION, selection, selectionArgs, null);
+        */
         cursor =  cr.query(builder.build(), null, null, null, null);
         cursor.moveToFirst();
 
@@ -164,17 +164,21 @@ public class CalendarUtil extends Activity {
         // fetching calendars name
         String CNames[] = new String[cursor.getCount()];
 
-        // fetching calendars id
+//        fetching calendars id
         nameOfEvent.clear();
-        //startDates.clear();
-       // endDates.clear();
-        //descriptions.clear();
+        /*
+        startDates.clear();
+        endDates.clear();
+        descriptions.clear();
+        */
         for (int i = 0; i < CNames.length; i++) {
 
             nameOfEvent.add(cursor.getString(1));
-           // startDates.add(String.valueOf(cursor.getLong(3)));
-            //endDates.add(String.valueOf(cursor.getLong(4)));
-            //descriptions.add(cursor.getString(2));
+            /*
+            startDates.add(String.valueOf(cursor.getLong(3)));
+            endDates.add(String.valueOf(cursor.getLong(4)));
+            descriptions.add(cursor.getString(2));
+            */
             CNames[i] = cursor.getString(1);
             cursor.moveToNext();
 
@@ -196,9 +200,9 @@ public class CalendarUtil extends Activity {
 
         String cursorContent = DatabaseUtils.dumpCursorToString(cursor);
 
-//        if (cursor != null) {
-//            cursor.close();
-//        }
+        if (cursor != null) {
+            cursor.close();
+        }
 
 
 
