@@ -335,22 +335,22 @@ public class MainActivity extends AppCompatActivity
             if(DEBUG)
                 Log.i("I heard: ", voiceInput);
             if (voiceInput.contains(mNewsDesk.toLowerCase())) {
-                startVoice(mNewsDesk);
+                startTTS(mNewsDesk);
                 displayView(NEWS);
             } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
-                startVoice(CALENDAR);
+                startTTS(CALENDAR);
                 displayView(CALENDAR);
             } else if (voiceInput.contains(WEATHER.toLowerCase())) {
-                startVoice(WEATHER);
+                startTTS(WEATHER);
                 displayView(WEATHER);
             } else if (voiceInput.contains(LIGHT.toLowerCase())) {
-                startVoice(LIGHT);
+                startTTS(LIGHT);
                 displayView(LIGHT);
             } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
-                startVoice(SETTINGS);
+                startTTS(SETTINGS);
                 displayView(SETTINGS);
             } else if (voiceInput.contains(NEWS.toLowerCase())) {
-                startVoice(NEWS);
+                startTTS(NEWS);
                 mDefaultURL = mNewsDefault;
                 displayView(NEWS);
             } else if(voiceInput.contains(OFF.toLowerCase())){
@@ -359,7 +359,7 @@ public class MainActivity extends AppCompatActivity
         }catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Didn't catch that",
                     Toast.LENGTH_LONG).show();
-            startVoice("Speak proper English or bugger off you bloody yank");
+            startTTS("Speak proper English or bugger off you bloody yank");
         }
     }
     
