@@ -8,8 +8,6 @@
             android:title="Light"/>
         <item android:id="@+id/nav_news" android:icon="@android:drawable/ic_menu_gallery"
             android:title="News"/>
-        <item android:id="@+id/nav_sports" android:icon="@android:drawable/ic_menu_gallery"
-            android:title="Sports"/>
         <item android:id="@+id/nav_weather" android:icon="@android:drawable/ic_menu_gallery"
             android:title="Weather"/>
         <item android:id="@+id/nav_settings" android:icon="@android:drawable/ic_menu_gallery"
