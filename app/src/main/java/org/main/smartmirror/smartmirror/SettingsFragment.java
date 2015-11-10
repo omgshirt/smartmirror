@@ -17,6 +17,8 @@ public class SettingsFragment extends Fragment {
     private RadioGroup grpSpeechFreqGroup;
     private RadioGroup grpAppBrightness;
     private RadioGroup grpLightBrightness;
+    private RadioGroup grpSysVolume;
+    private RadioGroup grpMusVolume;
 
     public static SettingsFragment newInstance() {
         SettingsFragment fragment = new SettingsFragment();
@@ -40,7 +42,91 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings_fragment, container, false);
 
-        // Speech Frequency radio group
+        grpSysVolume = (RadioGroup) view.findViewById(R.id.sys_vol_group);
+        grpSysVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch(checkedId){
+                    case R.id.sys_vol_off:
+                        mPreferences.setSystemVolume(Preferences.VOL_OFF);
+                        break;
+                    case R.id.sys_vol_vlow:
+                        mPreferences.setSystemVolume(Preferences.VOL_VLOW);
+                        break;
+                    case R.id.sys_vol_low:
+                        mPreferences.setSystemVolume(Preferences.VOL_LOW);
+                        break;
+                    case R.id.sys_vol_medium:
+                        mPreferences.setSystemVolume(Preferences.VOL_MEDIUM);
+                        break;
+                    case R.id.sys_vol_high:
+                        mPreferences.setSystemVolume(Preferences.VOL_HIGH);
+                        break;
+                    case R.id.sys_vol_vhigh:
+                        mPreferences.setSystemVolume(Preferences.VOL_VHIGH);
+                        break;
+                }
+            }
+        });
+
+        float vol = mPreferences.getSystemVolume();
+        if (vol == Preferences.VOL_OFF) {
+            grpSysVolume.check(R.id.sys_vol_off);
+        } else if (vol == Preferences.VOL_VLOW) {
+            grpSysVolume.check(R.id.sys_vol_vlow);
+        } else if (vol == Preferences.VOL_LOW) {
+            grpSysVolume.check(R.id.sys_vol_low);
+        } else if (vol == Preferences.VOL_MEDIUM) {
+            grpSysVolume.check(R.id.sys_vol_medium);
+        } else if (vol == Preferences.VOL_HIGH) {
+            grpSysVolume.check(R.id.sys_vol_high);
+        } else if (vol == Preferences.VOL_VHIGH) {
+            grpSysVolume.check(R.id.sys_vol_vhigh);
+        }
+
+        grpMusVolume = (RadioGroup) view.findViewById(R.id.mus_vol_group);
+        grpMusVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch(checkedId){
+                    case R.id.mus_vol_off:
+                        mPreferences.setMusicVolume(Preferences.VOL_OFF);
+                        break;
+                    case R.id.mus_vol_vlow:
+                        mPreferences.setMusicVolume(Preferences.VOL_VLOW);
+                        break;
+                    case R.id.mus_vol_low:
+                        mPreferences.setMusicVolume(Preferences.VOL_LOW);
+                        break;
+                    case R.id.mus_vol_medium:
+                        mPreferences.setMusicVolume(Preferences.VOL_MEDIUM);
+                        break;
+                    case R.id.mus_vol_high:
+                        mPreferences.setMusicVolume(Preferences.VOL_HIGH);
+                        break;
+                    case R.id.mus_vol_vhigh:
+                        mPreferences.setMusicVolume(Preferences.VOL_VHIGH);
+                        break;
+                }
+            }
+        });
+
+        vol = mPreferences.getMusicVolume();
+        if (vol == Preferences.VOL_OFF) {
+            grpMusVolume.check(R.id.mus_vol_off);
+        } else if (vol == Preferences.VOL_VLOW) {
+            grpMusVolume.check(R.id.mus_vol_vlow);
+        } else if (vol == Preferences.VOL_LOW) {
+            grpMusVolume.check(R.id.mus_vol_low);
+        } else if (vol == Preferences.VOL_MEDIUM) {
+            grpMusVolume.check(R.id.mus_vol_medium);
+        } else if (vol == Preferences.VOL_HIGH) {
+            grpMusVolume.check(R.id.mus_vol_high);
+        } else if (vol == Preferences.VOL_VHIGH) {
+            grpMusVolume.check(R.id.mus_vol_vhigh);
+        }
+
+            // Speech Frequency radio group
         grpSpeechFreqGroup = (RadioGroup) view.findViewById(R.id.speech_frequency_group);
         grpSpeechFreqGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -81,7 +167,7 @@ public class SettingsFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch(checkedId) {
                     case R.id.brightness_vlow:
-                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_VERYLOW);
+                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_VLOW);
                         break;
                     case R.id.brightness_low:
                         mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_LOW);
@@ -93,7 +179,7 @@ public class SettingsFragment extends Fragment {
                         mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_HIGH);
                         break;
                     case R.id.brightness_vhigh:
-                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_VERYHIGH);
+                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_VHIGH);
                         break;
                 }
             }
@@ -101,7 +187,7 @@ public class SettingsFragment extends Fragment {
 
         int appBrightness = mPreferences.getAppBrightness();
         switch (appBrightness){
-            case Preferences.BRIGHTNESS_VERYLOW:
+            case Preferences.BRIGHTNESS_VLOW:
                 grpAppBrightness.check(R.id.brightness_vlow);
                 break;
             case Preferences.BRIGHTNESS_LOW:
@@ -113,7 +199,7 @@ public class SettingsFragment extends Fragment {
             case Preferences.BRIGHTNESS_HIGH:
                 grpAppBrightness.check(R.id.brightness_high);
                 break;
-            case Preferences.BRIGHTNESS_VERYHIGH:
+            case Preferences.BRIGHTNESS_VHIGH:
                 grpAppBrightness.check(R.id.brightness_vhigh);
                 break;
         }
@@ -125,7 +211,7 @@ public class SettingsFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch(checkedId) {
                     case R.id.light_vlow:
-                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_VERYLOW);
+                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_VLOW);
                         break;
                     case R.id.light_low:
                         mPreferences.setLightBrightness(Preferences.BRIGHTNESS_LOW);
@@ -137,7 +223,7 @@ public class SettingsFragment extends Fragment {
                         mPreferences.setLightBrightness(Preferences.BRIGHTNESS_HIGH);
                         break;
                     case R.id.light_vhigh:
-                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_VERYHIGH);
+                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_VHIGH);
                         break;
                 }
             }
@@ -145,7 +231,7 @@ public class SettingsFragment extends Fragment {
 
         int lightBrightness = mPreferences.getLightBrightness();
         switch (lightBrightness){
-            case Preferences.BRIGHTNESS_VERYLOW:
+            case Preferences.BRIGHTNESS_VLOW:
                 grpLightBrightness.check(R.id.light_vlow);
                 break;
             case Preferences.BRIGHTNESS_LOW:
@@ -157,7 +243,7 @@ public class SettingsFragment extends Fragment {
             case Preferences.BRIGHTNESS_HIGH:
                 grpLightBrightness.check(R.id.light_high);
                 break;
-            case Preferences.BRIGHTNESS_VERYHIGH:
+            case Preferences.BRIGHTNESS_VHIGH:
                 grpLightBrightness.check(R.id.light_vhigh);
                 break;
         }

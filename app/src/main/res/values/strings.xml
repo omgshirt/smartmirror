@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SmartMirror</string>
     <string name="open_weather_map_api_key">74ab1bfc0374c634c12dedf9c12b1c03</string>
@@ -9,8 +10,16 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_voice__recognition">Voice_Recognition</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Module name (used to create Navigation Bar menu) -->
+    <string name="title_calendar">Calendar</string>
+    <string name="title_camera">Camera</string>
+    <string name="title_facebook">Facebook</string>
+    <string name="title_light">Light</string>
+    <string name="title_news">News</string>
+    <string name="title_music">Music</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_traffic">Traffic</string>
+    <string name="title_weather">Weather</string>
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
@@ -32,19 +41,23 @@
     <string name="weather_arrow_down">\uf044</string>
     <string name="weather_wind_strong">\uf050</string>
 
-
     <!-- Settings strings -->
     <string name="settings_weather_units">Weather Units</string>
+    <string name="settings_system_vol">System Volume</string>
+    <string name="settings_music_vol">Music Volume</string>
     <string name="settings_speech_never">Never</string>
     <string name="settings_speech_rare">Rarely</string>
     <string name="settings_speech_often">Often</string>
     <string name="settings_speech_always">Always</string>
 
+    <string name="settings_off">Off</string>
     <string name="settings_vlow">Very Low</string>
     <string name="settings_low">Low</string>
     <string name="settings_medium">Medium</string>
     <string name="settings_high">High</string>
     <string name="settings_vhigh">Very High</string>
+    <string name="settings_max">Max</string>
+
     <!-- Sports Strings -->
     <string name="sports_error">Error with Sports Data</string>
 

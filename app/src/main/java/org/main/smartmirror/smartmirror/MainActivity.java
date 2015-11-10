@@ -1,18 +1,25 @@
 package org.main.smartmirror.smartmirror;
 
-import android.content.ActivityNotFoundException;
+import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.PowerManager;
+import android.os.RemoteException;
 import android.provider.Settings;
-import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -25,35 +32,111 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
-
-import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
 
-    private final String NEWS = "News";
+    private final boolean DEBUG = true;
+    private final boolean WAKELOCK_ENABLED = true;
+
+    private final String TAG = "SmartMirror";       // general tag for logs, etc
     private final String CALENDAR = "Calendar";
-    private final String WEATHER = "Weather";
-    private final String SPORTS = "Sports";
+    private final String CAMERA = "Camera";
+    private final String FACEBOOK = "Facebook";
     private final String LIGHT = "Light";
+    private final String NEWS = "News";
+    private final String MUSIC = "Music";
     private final String SETTINGS = "Settings";
+    private final String SLEEP = "Sleep";
+    private final String TRAFFIC = "Traffic";
+    private final String OFF = "Off";
+    private final String ON = "On";
+    private final String WAKE = "Wake";
+    private final String WEATHER = "Weather";
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
-    private int RESULT_SPEECH = 1;
+    /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
+            "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
+    /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
+    private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
+    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
+    private String mPostURL = "&sort=newest&api-key=";
+    private String mNewsDesk;
+    private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
+
+    private PowerManager.WakeLock mWakeLock;
+    private static boolean mirrorIsSleeping;
 
     // WiFiP2p
-    private WifiP2pManager mManager;
-    private WifiP2pManager.Channel mChannel;
-    private WifiP2pDeviceList mDeviceList;
-    private WifiP2pInfo mInfo;
+    private WifiP2pManager mWifiManager;
+    private WifiP2pManager.Channel mWifiChannel;
+    private WifiP2pDeviceList mWifiDeviceList;
+    private WifiP2pInfo mWifiInfo;
     private BroadcastReceiver mWifiReceiver;
-    private IntentFilter mIntentFilter;
+    private IntentFilter mWifiIntentFilter;
     public final static int PORT = 8888;
     public final static int SOCKET_TIMEOUT = 500;
-    private String mOwnerIP;
+
+    //Speech
+    private Messenger mMessenger = new Messenger(new IHandler());
+    private boolean mIsBound;
+    private Messenger mService;
+
+    // used to establish a service connection
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = new Messenger(service);
+
+            // not sure if I need this keep me
+            /*try {
+                Message msg = Message.obtain(null, VoiceService.REGISTER_SERV);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }*/
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+
+            // not sure if I need this keep me
+            /*try {
+                Message msg = Message.obtain(null, VoiceService.UNREGISTER_SERV);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }*/
+        }
+    };
+
+    // handles the messages from Service to this
+    public class IHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            switch(msg.what){
+                case VoiceService.RESULT_SPEECH:
+                    String result = msg.getData().getString("result");
+                    if(DEBUG)
+                        Log.i("MAIN", result);
+                    speechResult(result);
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +147,7 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance();
 
         // check for permission to write system settings on API 23 and greater.
-        // Get authorization on >= 23
+        // Leaving this in case we need the WRITE_SETTINGS permission later on.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(!Settings.System.canWrite( getApplicationContext() )) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
@@ -76,13 +159,13 @@ public class MainActivity extends AppCompatActivity
         mTTSHelper = new TTSHelper(this);
 
         // Initialize WiFiP2P services
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mWifiIntentFilter = new IntentFilter();
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
 
         discoverPeers();
 
@@ -120,20 +203,84 @@ public class MainActivity extends AppCompatActivity
         displayView(WEATHER);
     }
 
+    public static Context getContextForApplication() {
+        return mContext;
+    }
+
+    // -------------------------  LIFECYCLE CALLBACKS ----------------------------
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
+        mIsBound=true;
+    }
+
     @Override
     public void onResume(){
         super.onResume();
+        mirrorIsSleeping = false;
         mPreferences.setAppBrightness(this);
-        mWifiReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
-        registerReceiver(mWifiReceiver, mIntentFilter);
+        mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
+        registerReceiver(mWifiReceiver, mWifiIntentFilter);
     }
 
     @Override
     public void onPause(){
         super.onPause();
+        mirrorIsSleeping = true;
         unregisterReceiver(mWifiReceiver);
-
+        Log.i(TAG, "onPause");
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTTSHelper.destroy();
+        mPreferences.destroy();
+        unbindService(mConnection);
+        mIsBound=false;
+        Log.i(TAG, "onDestroy");
+    }
+
+    // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
+
+    protected void wakeScreen() {
+        Log.i(TAG, "waking...");
+
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
+        kl.disableKeyguard();
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
+                | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
+        mWakeLock.acquire();
+        mWakeLock.release();
+        if(mWakeLock.isHeld()) {
+            Log.i(TAG, "wake lock held. should be released");
+        }
+    }
+
+    protected void sleepScreen() {
+        Log.i(TAG, "sleeping...");
+        // TODO: need to figure out how to make the screen sleep. Not critical as it will timeout based on system settings
+        /*
+        if(mWakeLock != null) {
+            if (mWakeLock.isHeld())
+                mWakeLock.release();
+            mWakeLock = null;
+        }
+        */
+    }
+
+    // -------------------------- DRAWER AND INTERFACE ---------------------------------
 
     @Override
     public void onBackPressed() {
@@ -170,18 +317,34 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        Log.i("item selected", item.toString());
+        if(DEBUG)
+            Log.i("item selected", item.toString());
         displayView(item.toString());
         return true;
     }
 
+    /**
+     * Handles which fragment will be displayed to the user
+     * @param viewName the name of the view to be displayed
+     */
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTTSHelper != null) mTTSHelper.stop();      // shut down any pending TTS
+        stopTTS();
+        // There should be a better way to handle the callbacks when the mirror is waking...
+        if (mirrorIsSleeping || viewName.equals(WAKE) || viewName.equals(ON) )
+        {
+            wakeScreen();
+        }
+
+        if (mirrorIsSleeping) return;       // if it happens to be awake now, do stuff
+
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("url", mDefaultURL);
+                fragment.setArguments(bundle);
                 title = NEWS;
                 break;
             case CALENDAR:
@@ -196,17 +359,20 @@ public class MainActivity extends AppCompatActivity
                 fragment = new WeatherFragment();
                 title = WEATHER;
                 break;
-            case SPORTS:
-                fragment = new SportsFragment();
-                title = SPORTS;
-                break;
             case SETTINGS:
                 fragment = new SettingsFragment();
                 title= SETTINGS;
                 break;
+            case SLEEP:
+            case OFF:
+                title = SLEEP;
+                sleepScreen();
+                break;
         }
+
         if(fragment != null){
-            Log.i("Fragments", "Displaying " + viewName);
+            if(DEBUG)
+                Log.i("Fragments", "Displaying " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             if (!isFinishing() ) {
@@ -222,57 +388,75 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        String voiceInput = null;
-        if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
-            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            voiceInput = matches.get(0);
-        }
-        if(voiceInput != null) {
-            if (voiceInput.contains("show")) {
-                if (voiceInput.contains(NEWS.toLowerCase())) {
-                    startVoice(NEWS);
-                    displayView(NEWS);
-                } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
-                    startVoice(CALENDAR);
-                    displayView(CALENDAR);
-                } else if (voiceInput.contains(WEATHER.toLowerCase())) {
-                    startVoice(WEATHER);
-                    displayView(WEATHER);
-                } else if (voiceInput.contains(SPORTS.toLowerCase())) {
-                    startVoice(SPORTS);
-                    displayView(SPORTS);
-                } else if (voiceInput.contains(LIGHT.toLowerCase())) {
-                    startVoice(LIGHT);
-                    displayView(LIGHT);
-                } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
-                    startVoice(SETTINGS);
-                    displayView(SETTINGS);
-                }                    
-            }
-        }
-    }
 
-    public void StartVoiceRecognitionActivity(View v) {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+    // ----------------------- SPEECH AND OTHER --------------------------
+
+    /**
+     * Handles the result of the speech input
+     * @param voiceInput the command the user gave
+     */
+    public void speechResult(String voiceInput) {
         try {
-            startActivityForResult(intent, RESULT_SPEECH);
-        } catch (ActivityNotFoundException a) {
-            Toast tstNoSupport = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
-            tstNoSupport.show();
+            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+            int i = 0;
+            while (i < urlArr.length) {
+                if (voiceInput.contains(urlArr[i].toLowerCase())) {
+                    mNewsDesk = urlArr[i];
+                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                    mDefaultURL = mNYTURL;
+                    if(DEBUG)
+                        Log.i("voice news desk: ", urlArr[i]);
+                    break;
+                } else {
+                    i++;
+                    if(DEBUG) {
+                        Log.i("news desk: ", Arrays.toString(urlArr));
+                        Log.i("I heard: ", voiceInput);
+                    }
+                }
+            }
+            if(DEBUG)
+                Log.i("I heard: ", voiceInput);
+            if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+                startTTS(mNewsDesk);
+                displayView(NEWS);
+            } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
+                startTTS(CALENDAR);
+                displayView(CALENDAR);
+            } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+                startTTS(WEATHER);
+                displayView(WEATHER);
+            } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+                startTTS(LIGHT);
+                displayView(LIGHT);
+            } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+                startTTS(SETTINGS);
+                displayView(SETTINGS);
+            } else if (voiceInput.contains(NEWS.toLowerCase())) {
+                startTTS(NEWS);
+                mDefaultURL = mNewsDefault;
+                displayView(NEWS);
+            } else if(voiceInput.contains(OFF.toLowerCase())){
+                displayView(OFF);
+            }
+        }catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Didn't catch that",
+                    Toast.LENGTH_LONG).show();
+            startTTS("Speak proper English or bugger off you bloody yank");
         }
     }
-
-    public void startVoice(final String phrase){
+    
+    /**
+     * Say a phrase using text to speech
+     * @param phrase the phrase to speak
+     */
+    public void startTTS(final String phrase){
         Thread mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
-                    //Thread.sleep(2000);
+                    Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -282,42 +466,56 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Stop Text to Speech
+     */
+    public void stopTTS() {
+        if (mTTSHelper != null) {
+            mTTSHelper.stop();
+        }
+    }
+
+    /**
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
-        // do stuff
+        try {
+            Message msg = Message.obtain(null, VoiceService.START_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Stops the current speech recognition object
      */
     public void stopSpeechRecognition(){
-        //mSpeechRecognizer.stopListening();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mTTSHelper != null) {
-            mTTSHelper.destroy();
+        try {
+            Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
-        mPreferences.destroy();
     }
 
-    public static Context getContextForApplication() {
-        return mContext;
-    }
+    // -------------------------- WIFI P2P METHODS ----------------------------------
 
 
     // calls the P2pManager to refresh peer list
     public void discoverPeers() {
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+        mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
             @Override
-            public void onSuccess() {  Log.i("Wifi", "Peer discovery successful"); }
+            public void onSuccess() {
+                if (DEBUG)
+                    Log.i("Wifi", "Peer discovery successful");
+            }
 
             @Override
             public void onFailure(int reasonCode) {
-                Log.i("Wifi", "discoverPeers failed: " + reasonCode);
+                if (DEBUG)
+                    Log.i("Wifi", "discoverPeers failed: " + reasonCode);
             }
         });
     }
@@ -325,7 +523,7 @@ public class MainActivity extends AppCompatActivity
     // Interface passes back a device list when the peer list changes, or discovery is successful
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
-        mDeviceList = peers;
+        mWifiDeviceList = peers;
     }
 
 
@@ -337,12 +535,14 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
         // make this the group owner and start the server to listen
         Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
-        Log.i("Wifi", "Connection info: " + info.toString());
-        mInfo = info;
+        if(DEBUG)
+            Log.i("Wifi", "Connection info: " + info.toString());
+        mWifiInfo = info;
         WifiP2pConfig config = new WifiP2pConfig();
         config.groupOwnerIntent = 15;
         if (info.groupFormed && info.isGroupOwner) {
-            Log.i("Wifi", "onConnectionInfo is starting server...");
+            if(DEBUG)
+                Log.i("Wifi", "onConnectionInfo is starting server...");
             new RemoteServerAsyncTask(this).execute();
         } else if (info.groupFormed){
         }
