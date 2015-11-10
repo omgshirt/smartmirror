@@ -31,6 +31,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
@@ -47,10 +55,6 @@ public class MainActivity extends AppCompatActivity
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
-    /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
-            "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
-    /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
-    private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
     private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
@@ -187,6 +191,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+
         // start with weather displayed
         displayView(WEATHER);
     }
@@ -197,12 +202,15 @@ public class MainActivity extends AppCompatActivity
         mPreferences.setAppBrightness(this);
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(mWifiReceiver, mIntentFilter);
+        //AppEventsLogger.activateApp(this); //logs installs and app activate app events //facebook
     }
 
     @Override
     public void onPause(){
         super.onPause();
         unregisterReceiver(mWifiReceiver);
+
+        //AppEventsLogger.deactivateApp(this); //logs app deactivate app event //facebook
     }
 
     @Override
@@ -327,10 +335,7 @@ public class MainActivity extends AppCompatActivity
             }
             if(DEBUG)
                 Log.i("I heard: ", voiceInput);
-            if (voiceInput.contains(mNewsDesk.toLowerCase())) {
-                startTTS(mNewsDesk);
-                displayView(NEWS);
-            } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
+            if (voiceInput.contains(CALENDAR.toLowerCase())) {
                 startTTS(CALENDAR);
                 displayView(CALENDAR);
             } else if (voiceInput.contains(WEATHER.toLowerCase())) {
@@ -348,11 +353,14 @@ public class MainActivity extends AppCompatActivity
                 displayView(NEWS);
             } else if(voiceInput.contains(OFF.toLowerCase())){
                 displayView(OFF);
+            } else if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+                startTTS(mNewsDesk);
+                displayView(NEWS);
             }
         }catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Didn't catch that",
                     Toast.LENGTH_LONG).show();
-            startTTS("Speak proper English or bugger off you bloody yank");
+            startTTS("Didn't catch that");
         }
     }
     
