@@ -1,7 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
 import android.app.KeyguardManager;
-import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
