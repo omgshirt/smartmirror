@@ -1,18 +1,23 @@
 package org.main.smartmirror.smartmirror;
 
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.provider.Settings;
-import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -26,25 +31,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
 
+    private final boolean DEBUG=true;
     private final String NEWS = "News";
     private final String CALENDAR = "Calendar";
     private final String WEATHER = "Weather";
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
-    private final String HELP= "Help";
-    private TTSHelper mTextToSpeach;
+    private final String OFF="Off";
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
-    private int RESULT_SPEECH = 1;
     /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
             "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
     /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
     private String mNewsDesk;
+    private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     // WiFiP2p
@@ -66,6 +69,59 @@ public class MainActivity extends AppCompatActivity
     public final static int SOCKET_TIMEOUT = 500;
     private String mOwnerIP;
 
+    //Speech
+    private Messenger mMessenger = new Messenger(new IHandler());
+    private boolean mIsBound;
+    private Messenger mService;
+
+    // used to establish a service connection
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = new Messenger(service);
+
+            // not sure if I need this keep me
+            /*try {
+                Message msg = Message.obtain(null, VoiceService.REGISTER_SERV);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }*/
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+
+            // not sure if I need this keep me
+            /*try {
+                Message msg = Message.obtain(null, VoiceService.UNREGISTER_SERV);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }*/
+        }
+    };
+
+    // handles the messages from Service to this
+    public class IHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            switch(msg.what){
+                case VoiceService.RESULT_SPEECH:
+                    String result = msg.getData().getString("result");
+                    if(DEBUG)
+                        Log.i("MAIN", result);
+                    speechResult(result);
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,12 +132,16 @@ public class MainActivity extends AppCompatActivity
 
         // check for permission to write system settings on API 23 and greater.
         // Get authorization on >= 23
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(!Settings.System.canWrite( getApplicationContext() )) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                 startActivityForResult(intent, 1);
             }
-        }
+            if(!Settings.System.canWrite(getApplicationContext() )) {
+                Intent intent = new Intent(Settings.ACTION_VOICE_INPUT_SETTINGS);
+                startActivityForResult(intent, 1);
+            }
+        }*/
 
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
@@ -143,7 +203,6 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         unregisterReceiver(mWifiReceiver);
-
     }
 
     @Override
@@ -181,15 +240,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        Log.i("item selected", item.toString());
+        if(DEBUG)
+            Log.i("item selected", item.toString());
         displayView(item.toString());
         return true;
     }
 
+    /**
+     * Handles which fragment will be displayed to the user
+     * @param viewName the name of the view to be displayed
+     */
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        if (mTTSHelper != null) mTTSHelper.stop();      // shut down any pending TTS
+        stopTTS();                                      // shut down any pending TTS
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -210,23 +274,18 @@ public class MainActivity extends AppCompatActivity
                 fragment = new WeatherFragment();
                 title = WEATHER;
                 break;
-           /* case R.id.nav_sports:
-                fragment = new SportsFragment();
-                title = SPORTS;
-                break;
-            */
             case SETTINGS:
                 fragment = new SettingsFragment();
                 title= SETTINGS;
                 break;
-
-            case HELP:
-                fragment=new HelperFragment();
-                title=HELP;
+            case OFF:
+                fragment = new OffFragment();
+                title = OFF;
                 break;
         }
         if(fragment != null){
-            Log.i("Fragments", "Displaying " + viewName);
+            if(DEBUG)
+                Log.i("Fragments", "Displaying " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             if (!isFinishing() ) {
@@ -242,83 +301,72 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    //TODO make this more robust and add a new keyword
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        String voiceInput = null;
-        if (requestCode == RESULT_SPEECH && resultCode == RESULT_OK){
-            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            voiceInput = matches.get(0);
-        }
-        if(voiceInput != null) {
+    /**
+     * Handles the result of the speech input
+     * @param voiceInput the command the user gave
+     */
+    public void speechResult(String voiceInput) {
+        try {
             String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
-                int i = 0;
-                while(i < urlArr.length) {
-                    if (voiceInput.contains(urlArr[i].toLowerCase())) {
-                        mNewsDesk = urlArr[i];
-                        mNYTURL = mPreURL + mNewsDesk + mPostURL;
-                        mDefaultURL = mNYTURL;
+            int i = 0;
+            while (i < urlArr.length) {
+                if (voiceInput.contains(urlArr[i].toLowerCase())) {
+                    mNewsDesk = urlArr[i];
+                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                    mDefaultURL = mNYTURL;
+                    if(DEBUG)
                         Log.i("voice news desk: ", urlArr[i]);
-                        break;
-                    }
-                    else {
-                        i++;
-                        //Log.i("news desk: ", Arrays.toString(urlArr));
+                    break;
+                } else {
+                    i++;
+                    if(DEBUG) {
+                        Log.i("news desk: ", Arrays.toString(urlArr));
                         Log.i("I heard: ", voiceInput);
                     }
                 }
-                if (voiceInput.contains(mNewsDesk.toLowerCase())) {
-                    startVoice(mNewsDesk);
-                    displayView(NEWS);
-                } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
-                    startVoice(CALENDAR);
-                    displayView(CALENDAR);
-                } else if (voiceInput.contains(WEATHER.toLowerCase())) {
-                    startVoice(WEATHER);
-                    displayView(WEATHER);
-                } else if (voiceInput.contains(LIGHT.toLowerCase())) {
-                    startVoice(LIGHT);
-                    displayView(LIGHT);
-                } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
-                    startVoice(SETTINGS);
-                    displayView(SETTINGS);
-                }
-                else if  (voiceInput.contains(HELP.toLowerCase()))
-                {
-                    startVoice(HELP);
-                    displayView(HELP);
-                }
             }
-                    displayView(SETTINGS);
-                }
-
-
-
-
-
-
-
-
-
-    public void StartVoiceRecognitionActivity(View v) {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
-        try {
-            startActivityForResult(intent, RESULT_SPEECH);
-        } catch (ActivityNotFoundException a) {
-            Toast tstNoSupport = Toast.makeText(getApplicationContext(), "Your device doesn't support Speech to Text", Toast.LENGTH_SHORT);
-            tstNoSupport.show();
+            if(DEBUG)
+                Log.i("I heard: ", voiceInput);
+            if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+                startTTS(mNewsDesk);
+                displayView(NEWS);
+            } else if (voiceInput.contains(CALENDAR.toLowerCase())) {
+                startTTS(CALENDAR);
+                displayView(CALENDAR);
+            } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+                startTTS(WEATHER);
+                displayView(WEATHER);
+            } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+                startTTS(LIGHT);
+                displayView(LIGHT);
+            } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+                startTTS(SETTINGS);
+                displayView(SETTINGS);
+            } else if (voiceInput.contains(NEWS.toLowerCase())) {
+                startTTS(NEWS);
+                mDefaultURL = mNewsDefault;
+                displayView(NEWS);
+            } else if(voiceInput.contains(OFF.toLowerCase())){
+                displayView(OFF);
+            }
+        }catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Didn't catch that",
+                    Toast.LENGTH_LONG).show();
+            startTTS("Speak proper English or bugger off you bloody yank");
         }
     }
-
-    public void startVoice(final String phrase){
+    
+    /**
+     * Say a phrase using text to speech
+     * @param phrase the phrase to speak
+     */
+    public void startTTS(final String phrase){
         Thread mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
-                    //Thread.sleep(2000);
+                    Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -328,26 +376,54 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Stop Text to Speech
+     */
+    public void stopTTS() {
+        if (mTTSHelper != null) {
+            mTTSHelper.stop();
+        }
+    }
+
+    /**
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
-        // do stuff
+        try {
+            Message msg = Message.obtain(null, VoiceService.START_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Stops the current speech recognition object
      */
     public void stopSpeechRecognition(){
-        //mSpeechRecognizer.stopListening();
+        try {
+            Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mTTSHelper != null) {
-            mTTSHelper.destroy();
-        }
+        mTTSHelper.destroy();
         mPreferences.destroy();
+        unbindService(mConnection);
+        mIsBound=false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
+        mIsBound=true;
     }
 
     public static Context getContextForApplication() {
@@ -359,11 +435,15 @@ public class MainActivity extends AppCompatActivity
     public void discoverPeers() {
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
-            public void onSuccess() {  Log.i("Wifi", "Peer discovery successful"); }
+            public void onSuccess() {
+                if (DEBUG)
+                    Log.i("Wifi", "Peer discovery successful");
+            }
 
             @Override
             public void onFailure(int reasonCode) {
-                Log.i("Wifi", "discoverPeers failed: " + reasonCode);
+                if (DEBUG)
+                    Log.i("Wifi", "discoverPeers failed: " + reasonCode);
             }
         });
     }
@@ -383,12 +463,14 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
         // make this the group owner and start the server to listen
         Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
-        Log.i("Wifi", "Connection info: " + info.toString());
+        if(DEBUG)
+            Log.i("Wifi", "Connection info: " + info.toString());
         mInfo = info;
         WifiP2pConfig config = new WifiP2pConfig();
         config.groupOwnerIntent = 15;
         if (info.groupFormed && info.isGroupOwner) {
-            Log.i("Wifi", "onConnectionInfo is starting server...");
+            if(DEBUG)
+                Log.i("Wifi", "onConnectionInfo is starting server...");
             new RemoteServerAsyncTask(this).execute();
         } else if (info.groupFormed){
         }

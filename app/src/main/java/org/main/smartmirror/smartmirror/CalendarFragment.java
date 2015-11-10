@@ -1,24 +1,32 @@
 package org.main.smartmirror.smartmirror;
-import android.content.Context;
-import android.support.v4.app.Fragment;
+
 import android.os.Bundle;
-import android.support.v7.internal.view.ContextThemeWrapper;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import java.util.ArrayList;
 
 /**
- * Created by Master N on 10/17/2015.
+ * Fragment that displays the calendar evnts
  */
 public class CalendarFragment extends Fragment {
+
+    public TextView mOutputText;
+    private LinearLayout activityLayout;
+    private ListView listView;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Button btnEvents = new Button(getActivity());
-        btnEvents.setText("Events Today");
-
-
-        return btnEvents;
-
+        View rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
+        listView = (ListView)rootView.findViewById(R.id.listViewNames);
+        ArrayList eventNames;
+        eventNames = CalendarUtil.readCalendarEvent(getActivity(),listView );
+        System.out.println(eventNames);
+        return rootView;
     }
+
 }

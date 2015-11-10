@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.main.smartmirror.smartmirror.LightFragment"
-    style="@style/AppTheme">
-
+    android:background="@color/white"
+    tools:context="org.main.smartmirror.smartmirror.LightFragment">
 </FrameLayout>

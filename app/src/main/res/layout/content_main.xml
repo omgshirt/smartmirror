@@ -10,19 +10,9 @@
     tools:showIn="@layout/app_bar_main"
     tools:context=".MainActivity">
 
-    <Button
-        android:gravity="top"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:onClick="StartVoiceRecognitionActivity"
-        android:text="SPEAK"
-        style="@style/AppTheme"
-        android:background="@color/Black" />
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/content_frame"
-        style="@style/AppTheme"
-        >
+        android:id="@+id/content_frame">
     </FrameLayout>
 </LinearLayout>
