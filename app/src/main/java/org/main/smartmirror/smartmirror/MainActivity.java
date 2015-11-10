@@ -73,9 +73,7 @@ public class MainActivity extends AppCompatActivity
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     private PowerManager.WakeLock mWakeLock;
-    private PowerManager mPowerManager;
     private static boolean mirrorIsSleeping;
-    private int defaultScreenTimeout;
 
     // WiFiP2p
     private WifiP2pManager mWifiManager;
@@ -147,11 +145,6 @@ public class MainActivity extends AppCompatActivity
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance();
-
-        // power and screen timing
-        mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        defaultScreenTimeout= android.provider.Settings.
-                System.getInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT,-1);
 
         // check for permission to write system settings on API 23 and greater.
         // Leaving this in case we need the WRITE_SETTINGS permission later on.
@@ -260,7 +253,6 @@ public class MainActivity extends AppCompatActivity
 
     protected void wakeScreen() {
         Log.i(TAG, "waking...");
-        mirrorIsSleeping = false;
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
@@ -271,16 +263,21 @@ public class MainActivity extends AppCompatActivity
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire();
         mWakeLock.release();
+        if(mWakeLock.isHeld()) {
+            Log.i(TAG, "wake lock held. should be released");
+        }
     }
 
     protected void sleepScreen() {
         Log.i(TAG, "sleeping...");
         // TODO: need to figure out how to make the screen sleep. Not critical as it will timeout based on system settings
+        /*
         if(mWakeLock != null) {
             if (mWakeLock.isHeld())
                 mWakeLock.release();
             mWakeLock = null;
         }
+        */
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -338,8 +335,9 @@ public class MainActivity extends AppCompatActivity
         if (mirrorIsSleeping || viewName.equals(WAKE) || viewName.equals(ON) )
         {
             wakeScreen();
-            return;
         }
+
+        if (mirrorIsSleeping) return;       // if it happens to be awake now, do stuff
 
         switch (viewName) {
             case NEWS:
