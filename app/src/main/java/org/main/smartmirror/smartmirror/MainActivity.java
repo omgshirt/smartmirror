@@ -1,5 +1,7 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +18,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
@@ -30,6 +33,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 import java.util.Arrays;
 
@@ -37,13 +42,23 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
 
-    private final boolean DEBUG=true;
-    private final String NEWS = "News";
+    private final boolean DEBUG = true;
+    private final boolean WAKELOCK_ENABLED = true;
+
+    private final String TAG = "SmartMirror";       // general tag for logs, etc
     private final String CALENDAR = "Calendar";
-    private final String WEATHER = "Weather";
+    private final String CAMERA = "Camera";
+    private final String FACEBOOK = "Facebook";
     private final String LIGHT = "Light";
+    private final String NEWS = "News";
+    private final String MUSIC = "Music";
     private final String SETTINGS = "Settings";
-    private final String OFF="Off";
+    private final String SLEEP = "Sleep";
+    private final String TRAFFIC = "Traffic";
+    private final String OFF = "Off";
+    private final String ON = "On";
+    private final String WAKE = "Wake";
+    private final String WEATHER = "Weather";
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
@@ -58,16 +73,20 @@ public class MainActivity extends AppCompatActivity
     private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
+    private PowerManager.WakeLock mWakeLock;
+    private PowerManager mPowerManager;
+    private static boolean mirrorIsSleeping;
+    private int defaultScreenTimeout;
+
     // WiFiP2p
-    private WifiP2pManager mManager;
-    private WifiP2pManager.Channel mChannel;
-    private WifiP2pDeviceList mDeviceList;
-    private WifiP2pInfo mInfo;
+    private WifiP2pManager mWifiManager;
+    private WifiP2pManager.Channel mWifiChannel;
+    private WifiP2pDeviceList mWifiDeviceList;
+    private WifiP2pInfo mWifiInfo;
     private BroadcastReceiver mWifiReceiver;
-    private IntentFilter mIntentFilter;
+    private IntentFilter mWifiIntentFilter;
     public final static int PORT = 8888;
     public final static int SOCKET_TIMEOUT = 500;
-    private String mOwnerIP;
 
     //Speech
     private Messenger mMessenger = new Messenger(new IHandler());
@@ -130,30 +149,31 @@ public class MainActivity extends AppCompatActivity
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance();
 
+        // power and screen timing
+        mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        defaultScreenTimeout= android.provider.Settings.
+                System.getInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT,-1);
+
         // check for permission to write system settings on API 23 and greater.
-        // Get authorization on >= 23
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        // Leaving this in case we need the WRITE_SETTINGS permission later on.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(!Settings.System.canWrite( getApplicationContext() )) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                 startActivityForResult(intent, 1);
             }
-            if(!Settings.System.canWrite(getApplicationContext() )) {
-                Intent intent = new Intent(Settings.ACTION_VOICE_INPUT_SETTINGS);
-                startActivityForResult(intent, 1);
-            }
-        }*/
+        }
 
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
 
         // Initialize WiFiP2P services
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mWifiIntentFilter = new IntentFilter();
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
 
         discoverPeers();
 
@@ -191,19 +211,80 @@ public class MainActivity extends AppCompatActivity
         displayView(WEATHER);
     }
 
+    public static Context getContextForApplication() {
+        return mContext;
+    }
+
+    // -------------------------  LIFECYCLE CALLBACKS ----------------------------
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
+        mIsBound=true;
+    }
+
     @Override
     public void onResume(){
         super.onResume();
+        mirrorIsSleeping = false;
         mPreferences.setAppBrightness(this);
-        mWifiReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
-        registerReceiver(mWifiReceiver, mIntentFilter);
+        mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
+        registerReceiver(mWifiReceiver, mWifiIntentFilter);
     }
 
     @Override
     public void onPause(){
         super.onPause();
+        mirrorIsSleeping = true;
         unregisterReceiver(mWifiReceiver);
+        Log.i(TAG, "onPause");
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTTSHelper.destroy();
+        mPreferences.destroy();
+        unbindService(mConnection);
+        mIsBound=false;
+        Log.i(TAG, "onDestroy");
+    }
+
+    // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
+
+    protected void wakeScreen() {
+        Log.i(TAG, "waking...");
+        mirrorIsSleeping = false;
+
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
+        kl.disableKeyguard();
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
+                | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
+        mWakeLock.acquire();
+        mWakeLock.release();
+    }
+
+    protected void sleepScreen() {
+        Log.i(TAG, "sleeping...");
+        // TODO: need to figure out how to make the screen sleep. Not critical as it will timeout based on system settings
+        if(mWakeLock != null) {
+            if (mWakeLock.isHeld())
+                mWakeLock.release();
+            mWakeLock = null;
+        }
+    }
+
+    // -------------------------- DRAWER AND INTERFACE ---------------------------------
 
     @Override
     public void onBackPressed() {
@@ -253,7 +334,14 @@ public class MainActivity extends AppCompatActivity
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        stopTTS();                                      // shut down any pending TTS
+        stopTTS();
+        // There should be a better way to handle the callbacks when the mirror is waking...
+        if (mirrorIsSleeping || viewName.equals(WAKE) || viewName.equals(ON) )
+        {
+            wakeScreen();
+            return;
+        }
+
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -278,11 +366,13 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 title= SETTINGS;
                 break;
+            case SLEEP:
             case OFF:
-                fragment = new OffFragment();
-                title = OFF;
+                title = SLEEP;
+                sleepScreen();
                 break;
         }
+
         if(fragment != null){
             if(DEBUG)
                 Log.i("Fragments", "Displaying " + viewName);
@@ -300,6 +390,9 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
+
+
+    // ----------------------- SPEECH AND OTHER --------------------------
 
     /**
      * Handles the result of the speech input
@@ -410,30 +503,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mTTSHelper.destroy();
-        mPreferences.destroy();
-        unbindService(mConnection);
-        mIsBound=false;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
-        mIsBound=true;
-    }
-
-    public static Context getContextForApplication() {
-        return mContext;
-    }
+    // -------------------------- WIFI P2P METHODS ----------------------------------
 
 
     // calls the P2pManager to refresh peer list
     public void discoverPeers() {
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+        mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 if (DEBUG)
@@ -451,7 +526,7 @@ public class MainActivity extends AppCompatActivity
     // Interface passes back a device list when the peer list changes, or discovery is successful
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
-        mDeviceList = peers;
+        mWifiDeviceList = peers;
     }
 
 
@@ -465,7 +540,7 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
         if(DEBUG)
             Log.i("Wifi", "Connection info: " + info.toString());
-        mInfo = info;
+        mWifiInfo = info;
         WifiP2pConfig config = new WifiP2pConfig();
         config.groupOwnerIntent = 15;
         if (info.groupFormed && info.isGroupOwner) {
