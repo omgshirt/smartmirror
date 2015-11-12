@@ -76,8 +76,8 @@ public class Preferences {
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
         mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
-        mMusicVolume = mSharedPreferences.getFloat(PREFS_MUSIC_VOL, VOL_MEDIUM);
-        mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_MEDIUM);
+        mMusicVolume = mSharedPreferences.getFloat(PREFS_MUSIC_VOL, VOL_VLOW);
+        mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_VLOW);
         mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
         mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
         mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);

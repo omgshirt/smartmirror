@@ -55,7 +55,7 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String result) {
         if (result != null) {
             // show the fragment
-            //Log.d("Wifi", "Server: done");
+            Log.d("Remote", "Command:" + result);
             //Toast.makeText(mContext, result, Toast.LENGTH_SHORT).show();
             ((MainActivity)mContext).displayView(result);
             // now that we're done, create a new server socket
