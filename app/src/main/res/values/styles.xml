@@ -12,6 +12,8 @@
         <item name="android:radioButtonStyle">@style/MyRadioButtonStyle</item>
     </style>
 
+
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

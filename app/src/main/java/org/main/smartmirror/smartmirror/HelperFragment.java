@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Arrays;
-
 /**
  * Created by Jesus on 11/5/2015.
  */
@@ -34,14 +32,14 @@ public class HelperFragment extends Fragment
         return txtFragmentLabel;
     }
 
-   public String stringSpace(String[] string)
-   {
-       String str="";
-       for(int i=0;i<string.length;i++)
-       {
-           str+=string[i]+"\n";
-       }
-       return str;
+    public String stringSpace(String[] string)
+    {
+        String str="";
+        for(int i=0;i<string.length;i++)
+        {
+            str+=string[i]+"\n";
+        }
+        return str;
    }
 
 }

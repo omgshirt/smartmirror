@@ -10,17 +10,16 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.provider.Settings;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -31,6 +30,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
     private final String OFF="Off";
+    private final String HELP="Help";
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
@@ -73,6 +74,10 @@ public class MainActivity extends AppCompatActivity
     private Messenger mMessenger = new Messenger(new IHandler());
     private boolean mIsBound;
     private Messenger mService;
+
+
+    FragmentManager frag=getSupportFragmentManager();
+    HelperDialog helperDialog;
 
     // used to establish a service connection
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -250,10 +255,14 @@ public class MainActivity extends AppCompatActivity
      * Handles which fragment will be displayed to the user
      * @param viewName the name of the view to be displayed
      */
-    public void displayView(String viewName){
+    public void displayView(String viewName) {
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        stopTTS();                                      // shut down any pending TTS
+        stopTTS();
+
+        // shut down any pending TTS
+
+
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -261,45 +270,65 @@ public class MainActivity extends AppCompatActivity
                 bundle.putString("url", mDefaultURL);
                 fragment.setArguments(bundle);
                 title = NEWS;
+                HelperDialog helper_fragment = HelperDialog.newInstance(1);
+                helper_fragment.show(frag, "help fragment");
                 break;
             case CALENDAR:
                 fragment = new CalendarFragment();
                 title = CALENDAR;
+                helper_fragment = HelperDialog.newInstance(2);
+                helper_fragment.show(frag, "help fragment");
                 break;
             case LIGHT:
                 fragment = new LightFragment();
                 title = LIGHT;
+                helper_fragment = HelperDialog.newInstance(3);
+                helper_fragment.show(frag, "help fragment");
                 break;
             case WEATHER:
                 fragment = new WeatherFragment();
                 title = WEATHER;
+                helper_fragment = HelperDialog.newInstance(4);
+                helper_fragment.show(frag, "help fragment");
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
-                title= SETTINGS;
+                title = SETTINGS;
+                helper_fragment = HelperDialog.newInstance(5);
+                helper_fragment.show(frag, "help fragment");
                 break;
             case OFF:
                 fragment = new OffFragment();
                 title = OFF;
+                helper_fragment = HelperDialog.newInstance(6);
+                helper_fragment.show(frag, "help fragment");
+                break;
+
+            case HELP:
+
+                helper_fragment = HelperDialog.newInstance(0);
+                helper_fragment.show(frag, "help fragment");
                 break;
         }
-        if(fragment != null){
-            if(DEBUG)
-                Log.i("Fragments", "Displaying " + viewName);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment);
-            if (!isFinishing() ) {
-                ft.commit();
+
+            if (fragment != null) {
+                if (DEBUG)
+                    Log.i("Fragments", "Displaying " + viewName);
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                if (!isFinishing()) {
+                    ft.commit();
+                }
             }
+
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(title);
+            }
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
         }
 
-        if(getSupportActionBar() != null){
-            getSupportActionBar().setTitle(title);
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-    }
 
     /**
      * Handles the result of the speech input
@@ -348,6 +377,11 @@ public class MainActivity extends AppCompatActivity
                 displayView(NEWS);
             } else if(voiceInput.contains(OFF.toLowerCase())){
                 displayView(OFF);
+            }
+            else if(voiceInput.contains(HELP.toLowerCase()))
+            {
+                startTTS(HELP);
+                displayView(HELP);
             }
         }catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Didn't catch that",

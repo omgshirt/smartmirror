@@ -20,6 +20,8 @@
             android:title="@string/title_traffic"/>
         <item android:id="@+id/nav_weather" android:icon="@android:drawable/ic_menu_gallery"
         android:title="@string/title_weather"/>
+        <item android:id="@+id/nav_help" android:icon="@android:drawable/ic_menu_gallery"
+            android:title="Help"/>
     </group>
 
 </menu>
