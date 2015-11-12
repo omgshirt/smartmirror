@@ -56,8 +56,7 @@ public class WeatherFragment extends Fragment {
         }
         mPreferences = Preferences.getInstance();
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
-        updateWeatherData(mCityCode, mPreferences.getDisplayUnitsAsString());
-
+        updateWeatherData(mCityCode, mPreferences.getWeatherUnits());
     }
 
     @Override
@@ -103,7 +102,7 @@ public class WeatherFragment extends Fragment {
             case 4:
                 if (mCurrentWind == 0) { saySomethingAboutWeather(); }
                 String speedUnits;
-                if( mPreferences.getWeatherUnits() == Preferences.METRIC )  {
+                if( mPreferences.getWeatherUnits().equals(Preferences.METRIC))  {
                     speedUnits = "kilometers per hour";
                 } else {
                     speedUnits = "miles per hour";
@@ -168,7 +167,7 @@ public class WeatherFragment extends Fragment {
             // set Wind Speed
             mCurrentWind = (int) wind.getDouble("speed");
             String windFormat;
-            if (mPreferences.getWeatherUnits() == Preferences.METRIC) {
+            if (mPreferences.getWeatherUnits().equals(Preferences.METRIC) ) {
                 windFormat = "KPH";
             } else {
                 windFormat = "MPH";

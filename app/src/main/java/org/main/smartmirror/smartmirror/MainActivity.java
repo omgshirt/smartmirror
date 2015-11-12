@@ -41,10 +41,12 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
 
+    // Globals, prefs, debug flags
     private final boolean DEBUG = true;
-    private final boolean WAKELOCK_ENABLED = true;
+    private final String TAG = "SmartMirror";           // general tag for logs
+    private static Context mContext;                    // Hold the app context
+    private Preferences mPreferences;
 
-    private final String TAG = "SmartMirror";       // general tag for logs, etc
     private final String CALENDAR = "Calendar";
     private final String CAMERA = "Camera";
     private final String FACEBOOK = "Facebook";
@@ -58,9 +60,7 @@ public class MainActivity extends AppCompatActivity
     private final String ON = "On";
     private final String WAKE = "Wake";
     private final String WEATHER = "Weather";
-    private TTSHelper mTTSHelper;
-    private static Context mContext; // Hold the app context
-    private Preferences mPreferences;
+
     /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
             "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
     /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
@@ -72,8 +72,12 @@ public class MainActivity extends AppCompatActivity
     private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
+    // Sleep state & wakelocks
+    private final int WAKELOCK_TIMEOUT = 1000;       // how long to hold the wakelock once acquired
     private PowerManager.WakeLock mWakeLock;
     private static boolean mirrorIsSleeping;
+    // fragment that is waiting to be displayed once the activity has resumed from sleep
+    private String mPendingFragment = null;
 
     // WiFiP2p
     private WifiP2pManager mWifiManager;
@@ -82,10 +86,14 @@ public class MainActivity extends AppCompatActivity
     private WifiP2pInfo mWifiInfo;
     private BroadcastReceiver mWifiReceiver;
     private IntentFilter mWifiIntentFilter;
+    private RemoteServerAsyncTask mServerTask;
     public final static int PORT = 8888;
     public final static int SOCKET_TIMEOUT = 500;
 
-    //Speech
+    // TTS
+    private TTSHelper mTTSHelper;
+
+    // Speech recognition
     private Messenger mMessenger = new Messenger(new IHandler());
     private boolean mIsBound;
     private Messenger mService;
@@ -212,14 +220,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "onStart");
         bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mIsBound=true;
+
+        mirrorIsSleeping = false;
+        // if there's a fragment pending to display, show it
+        if (mPendingFragment != null) {
+            displayView(mPendingFragment);
+            mPendingFragment = null;
+        }
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        mirrorIsSleeping = false;
+        Log.i(TAG, "onResume");
         mPreferences.setAppBrightness(this);
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
@@ -228,14 +244,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPause(){
         super.onPause();
-        mirrorIsSleeping = true;
-        unregisterReceiver(mWifiReceiver);
         Log.i(TAG, "onPause");
+        unregisterReceiver(mWifiReceiver);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        mirrorIsSleeping = true;
         Log.i(TAG, "onStop");
     }
 
@@ -252,8 +268,7 @@ public class MainActivity extends AppCompatActivity
     // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
 
     protected void wakeScreen() {
-        Log.i(TAG, "waking...");
-
+        Log.i(TAG, "wakeScreen() called");
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
         kl.disableKeyguard();
@@ -261,23 +276,13 @@ public class MainActivity extends AppCompatActivity
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
-        mWakeLock.acquire();
-        mWakeLock.release();
-        if(mWakeLock.isHeld()) {
-            Log.i(TAG, "wake lock held. should be released");
-        }
+        mWakeLock.acquire(WAKELOCK_TIMEOUT);
     }
 
     protected void sleepScreen() {
-        Log.i(TAG, "sleeping...");
+        Log.i(TAG, "sleepScreen()...");
         // TODO: need to figure out how to make the screen sleep. Not critical as it will timeout based on system settings
-        /*
-        if(mWakeLock != null) {
-            if (mWakeLock.isHeld())
-                mWakeLock.release();
-            mWakeLock = null;
-        }
-        */
+
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -331,13 +336,13 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         stopTTS();
-        // There should be a better way to handle the callbacks when the mirror is waking...
-        if (mirrorIsSleeping || viewName.equals(WAKE) || viewName.equals(ON) )
-        {
+        // If sleeping, save the pendingFragment, this will be displayed once onStart() is called.
+        if (mirrorIsSleeping) {
+            mPendingFragment = viewName;
+            Log.i(TAG, "mPendingFragment:" + mPendingFragment);
             wakeScreen();
+            return;
         }
-
-        if (mirrorIsSleeping) return;       // if it happens to be awake now, do stuff
 
         switch (viewName) {
             case NEWS:
@@ -375,7 +380,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i("Fragments", "Displaying " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
-            if (!isFinishing() ) {
+            if (!isFinishing() && !mirrorIsSleeping ) {
                 ft.commit();
             }
         }
@@ -389,7 +394,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    // ----------------------- SPEECH AND OTHER --------------------------
+    // ----------------------- SPEECH RECOGNITION --------------------------
 
     /**
      * Handles the result of the speech input
@@ -445,7 +450,35 @@ public class MainActivity extends AppCompatActivity
             startTTS("Speak proper English or bugger off you bloody yank");
         }
     }
-    
+
+    /**
+     * Start the speech recognizer
+     */
+    public void startSpeechRecognition(){
+        try {
+            Message msg = Message.obtain(null, VoiceService.START_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Stops the current speech recognition object
+     */
+    public void stopSpeechRecognition(){
+        try {
+            Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // --------------------------------- Text to Speech (TTS) ---------------------------------
+
     /**
      * Say a phrase using text to speech
      * @param phrase the phrase to speak
@@ -474,36 +507,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Start the speech recognizer
-     */
-    public void startSpeechRecognition(){
-        try {
-            Message msg = Message.obtain(null, VoiceService.START_SPEECH);
-            msg.replyTo = mMessenger;
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Stops the current speech recognition object
-     */
-    public void stopSpeechRecognition(){
-        try {
-            Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
-            msg.replyTo = mMessenger;
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // -------------------------- WIFI P2P METHODS ----------------------------------
+    // ------------------------------  WIFI P2P  ----------------------------------
 
 
     // calls the P2pManager to refresh peer list
+    // TODO: set up a service to call this method every 30-60(?) seconds to prevent connection sleeping
     public void discoverPeers() {
         mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -533,8 +541,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-        // make this the group owner and start the server to listen
-        Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
+        // make this the group owner and start the server to listen for commands
         if(DEBUG)
             Log.i("Wifi", "Connection info: " + info.toString());
         mWifiInfo = info;
@@ -543,8 +550,30 @@ public class MainActivity extends AppCompatActivity
         if (info.groupFormed && info.isGroupOwner) {
             if(DEBUG)
                 Log.i("Wifi", "onConnectionInfo is starting server...");
-            new RemoteServerAsyncTask(this).execute();
+            Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
+            startRemoteServer();
         } else if (info.groupFormed){
+            Log.i("Wifi", "group exists, mirror is not owner");
         }
+    }
+
+    /**
+     * Enables or disables WifiP2P connections to the mirror. This should not be called directly,
+     * but through Preferences.setRemoteEnabled()
+     * @param isEnabled service state: enabled or disabled
+     */
+    public void setRemoteStatus(boolean isEnabled) {
+        if (isEnabled) {
+            // if there's a connection established, ignore
+            // otherwise, start peer discovery.
+            discoverPeers();
+        } else {
+            // if a connection exists, cancel and refuse further
+        }
+    }
+
+    public void startRemoteServer() {
+        mServerTask = new RemoteServerAsyncTask(this);
+        mServerTask.execute();
     }
 }
