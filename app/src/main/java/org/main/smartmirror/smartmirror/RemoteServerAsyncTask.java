@@ -18,12 +18,12 @@ import java.net.Socket;
  * A simple server socket that accepts a connection
  */
 public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
-    private Context mContext;
+    private MainActivity mContext;
 
     /**
      * @param context
      */
-    public RemoteServerAsyncTask(Context context) {
+    public RemoteServerAsyncTask(MainActivity context) {
         mContext = context;
     }
 
@@ -54,13 +54,16 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         if (result != null) {
-            // show the fragment
-            //Log.d("Wifi", "Server: done");
-            Toast.makeText(mContext, result, Toast.LENGTH_SHORT).show();
-            ((MainActivity)mContext).displayView(result);
-            // now that we're done, create a new server socket
-            new RemoteServerAsyncTask(mContext).execute();
+            //Toast.makeText(mContext, result, Toast.LENGTH_SHORT).show();
+            mContext.startRemoteServer();
+            Preferences preferences = Preferences.getInstance();
+            // Don't issue commands if remote disabled. Poor way of handling this, I know...
+            if (preferences.isRemoteEnabled()) {
+                mContext.displayView(result);
+                Log.d("Remote", "Command: " + result);
+            }
         }
+        //Log.i("Wifi", "Server stopped");
     }
     /*
      * (non-Javadoc)
