@@ -61,6 +61,7 @@ public class CalendarUtil extends Activity {
         if (cur != null) {
             cur.close();
         }
+
     }
 
 

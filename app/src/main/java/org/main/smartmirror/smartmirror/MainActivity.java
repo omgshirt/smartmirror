@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity
 
     // Globals, prefs, debug flags
     private final boolean DEBUG = true;
-    private final String TAG = "SmartMirror";       // general tag for logs
-    private static Context mContext; // Hold the app context
+    private final String TAG = "SmartMirror";           // general tag for logs
+    private static Context mContext;                    // Hold the app context
     private Preferences mPreferences;
 
     private final String CALENDAR = "Calendar";
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity
     private WifiP2pInfo mWifiInfo;
     private BroadcastReceiver mWifiReceiver;
     private IntentFilter mWifiIntentFilter;
+    private RemoteServerAsyncTask mServerTask;
     public final static int PORT = 8888;
     public final static int SOCKET_TIMEOUT = 500;
 
@@ -267,7 +268,7 @@ public class MainActivity extends AppCompatActivity
     // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
 
     protected void wakeScreen() {
-        Log.i(TAG, "wakeScreen() starting...");
+        Log.i(TAG, "wakeScreen() called");
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
         kl.disableKeyguard();
@@ -276,20 +277,12 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
-
-        Log.i(TAG, "wakeScreen() done");
     }
 
     protected void sleepScreen() {
         Log.i(TAG, "sleepScreen()...");
         // TODO: need to figure out how to make the screen sleep. Not critical as it will timeout based on system settings
-        /*
-        if(mWakeLock != null) {
-            if (mWakeLock.isHeld())
-                mWakeLock.release();
-            mWakeLock = null;
-        }
-        */
+
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -343,9 +336,10 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         stopTTS();
-        // If sleeping, save the pendingFragment, this will be displayed once onResume() completes
+        // If sleeping, save the pendingFragment, this will be displayed once onStart() is called.
         if (mirrorIsSleeping) {
             mPendingFragment = viewName;
+            Log.i(TAG, "mPendingFragment:" + mPendingFragment);
             wakeScreen();
             return;
         }
@@ -517,6 +511,7 @@ public class MainActivity extends AppCompatActivity
 
 
     // calls the P2pManager to refresh peer list
+    // TODO: set up a service to call this method every 30-60(?) seconds to prevent connection sleeping
     public void discoverPeers() {
         mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -546,8 +541,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-        // make this the group owner and start the server to listen
-        Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
+        // make this the group owner and start the server to listen for commands
         if(DEBUG)
             Log.i("Wifi", "Connection info: " + info.toString());
         mWifiInfo = info;
@@ -556,8 +550,30 @@ public class MainActivity extends AppCompatActivity
         if (info.groupFormed && info.isGroupOwner) {
             if(DEBUG)
                 Log.i("Wifi", "onConnectionInfo is starting server...");
-            new RemoteServerAsyncTask(this).execute();
+            Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
+            startRemoteServer();
         } else if (info.groupFormed){
+            Log.i("Wifi", "group exists, mirror is not owner");
         }
+    }
+
+    /**
+     * Enables or disables WifiP2P connections to the mirror. This should not be called directly,
+     * but through Preferences.setRemoteEnabled()
+     * @param isEnabled service state: enabled or disabled
+     */
+    public void setRemoteStatus(boolean isEnabled) {
+        if (isEnabled) {
+            // if there's a connection established, ignore
+            // otherwise, start peer discovery.
+            discoverPeers();
+        } else {
+            // if a connection exists, cancel and refuse further
+        }
+    }
+
+    public void startRemoteServer() {
+        mServerTask = new RemoteServerAsyncTask(this);
+        mServerTask.execute();
     }
 }
