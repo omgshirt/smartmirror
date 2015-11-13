@@ -218,9 +218,6 @@ public class MainActivity extends AppCompatActivity
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-
-        // start with weather displayed
-        displayView(WEATHER);
     }
 
     public static Context getContextForApplication() {
@@ -240,6 +237,9 @@ public class MainActivity extends AppCompatActivity
         if (mCurrentFragment != null) {
             displayView(mCurrentFragment);
             mCurrentFragment = null;
+        } else {
+            // start with weather displayed
+            displayView(WEATHER);
         }
     }
 
@@ -351,7 +351,6 @@ public class MainActivity extends AppCompatActivity
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        stopTTS();
         // If sleeping, save viewName and wake screen.
         // displayView will be called again from onStart() with the fragment to show
         if (mirrorSleepState == SLEEPING) {
@@ -402,11 +401,7 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-        // Any command besides SLEEP or WAKE sets the state to AWAKE
-        if ( !(viewName.equals(SLEEP) || viewName.equals(WAKE)) ) {
-            mirrorSleepState = AWAKE;
-            mCurrentFragment = viewName;
-        }
+        stopTTS();
 
         if(fragment != null){
             if(DEBUG)
@@ -415,12 +410,18 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.content_frame, fragment);
             if (!isFinishing()) {
                 ft.commit();
+                // Any command besides SLEEP or WAKE now sets the state to AWAKE
+                if ( !(viewName.equals(SLEEP) || viewName.equals(WAKE)) ) {
+                    mirrorSleepState = AWAKE;
+                    mCurrentFragment = viewName;
+                }
+                Log.i(TAG, "mCurrentFragment:" + mCurrentFragment);
             } else {
                 Log.i("Fragments", "commit skipped. isFinishing() returned true");
             }
         }
 
-        if(getSupportActionBar() != null){
+        if (getSupportActionBar() != null){
             getSupportActionBar().setTitle(title);
         }
 
