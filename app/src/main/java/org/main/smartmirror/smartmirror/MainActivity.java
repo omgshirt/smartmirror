@@ -45,28 +45,31 @@ public class MainActivity extends AppCompatActivity
 
     // Globals, prefs, debug flags
     private final boolean DEBUG = true;
-    private final String TAG = "SmartMirror";           // general tag for logs
-    private static Context mContext;                    // Hold the app context
+
+    private static Context mContext;
     private Preferences mPreferences;
 
-    private final String CALENDAR = "Calendar";
-    private final String CAMERA = "Camera";
-    private final String FACEBOOK = "Facebook";
-    private final String LIGHT = "Light";
-    private final String NEWS = "News";
-    private final String MUSIC = "Music";
-    private final String SETTINGS = "Settings";
-    private final String SLEEP = "Sleep";
-    private final String TRAFFIC = "Traffic";
-    private final String OFF = "Off";
-    private final String ON = "On";
-    private final String WAKE = "Wake";
-    private final String WEATHER = "Weather";
+    // Constants
+    public static final String TAG = "SmartMirror";
+    public static final String CALENDAR = "Calendar";
+    public static final String CAMERA = "Camera";
+    public static final String FACEBOOK = "Facebook";
+    public static final String LIGHT = "Light";
+    public static final String NEWS = "News";
+    public static final String MUSIC = "Music";
+    public static final String SETTINGS = "Settings";
+    public static final String SLEEP = "Sleep";
+    public static final String TRAFFIC = "Traffic";
+    public static final String TWITTER = "Twitter";
+    public static final String OFF = "Off";
+    public static final String ON = "On";
+    public static final String WAKE = "Wake";
+    public static final String WEATHER = "Weather";
+    public static final int SLEEPING = 0;
+    public static final int LIGHT_SLEEP = 1;
+    public static final int AWAKE = 2;
 
-    private final int SLEEPING = 0;
-    private final int LIGHT_SLEEP = 1;
-    private final int AWAKE = 2;
-    private int mirrorSleepState;
+
 
     /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
             "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
@@ -80,12 +83,12 @@ public class MainActivity extends AppCompatActivity
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     // Sleep state & wakelocks
-    private final int WAKELOCK_TIMEOUT = 1000;       // how long to hold the wakelock once acquired
-    private PowerManager.WakeLock mWakeLock;
-    private static boolean mirrorIsSleeping;
-    // fragment that is waiting to be displayed once the activity has resumed from sleep
-    private String mPendingFragment = null;
+    // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
+    private int mirrorSleepState;
     private String mCurrentFragment = null;
+    private final int WAKELOCK_TIMEOUT = 1000;
+    private PowerManager.WakeLock mWakeLock;
+
 
     // WiFiP2p
     private WifiP2pManager mWifiManager;
@@ -183,9 +186,9 @@ public class MainActivity extends AppCompatActivity
         mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
-
         discoverPeers();
 
+        // Set up view and nav drawer
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -232,8 +235,6 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "onStart");
         bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mIsBound=true;
-
-        //mirrorIsSleeping = false;
         mirrorSleepState = AWAKE;
         // if there's a fragment pending to display, show it
         if (mCurrentFragment != null) {
@@ -279,6 +280,7 @@ public class MainActivity extends AppCompatActivity
         mPreferences.destroy();
         if (wifiHeartbeat != null) {
             wifiHeartbeat.cancel(true);
+            wifiHeartbeat = null;
         }
         unbindService(mConnection);
         mIsBound=false;
@@ -297,11 +299,6 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
-    }
-
-    protected void sleepScreen() {
-        Log.i(TAG, "sleepScreen()...");
-        // show a blank fragment and set the pending fragment.
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -355,24 +352,16 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         stopTTS();
-        // If sleeping, save viewName and display later, this will be committed once onStart() is called.
-        if (mirrorSleepState == SLEEPING && !viewName.equals(SLEEP) ) {
-            mCurrentFragment = viewName;
-            Log.i(TAG, "mCurrentFragment:" + mCurrentFragment);
-            wakeScreen();
+        // If sleeping, save viewName and wake screen.
+        // displayView will be called again from onStart() with the fragment to show
+        if (mirrorSleepState == SLEEPING) {
+            if (!viewName.equals(SLEEP)) {
+                mCurrentFragment = viewName;
+                mirrorSleepState = AWAKE;
+                wakeScreen();
+            }
             return;
         }
-
-        // if we're pressing sleep from the awake state
-        if (mirrorSleepState == AWAKE && viewName.equals(SLEEP)) {
-            fragment = new OffFragment();
-            mirrorSleepState = LIGHT_SLEEP;
-            title = SLEEP;
-        } else {
-            mirrorSleepState = AWAKE;
-        }
-        Log.i(TAG, "viewName:" + viewName);
-        Log.i(TAG, "sleep state:" + mirrorSleepState);
 
         switch (viewName) {
             case NEWS:
@@ -399,7 +388,24 @@ public class MainActivity extends AppCompatActivity
                 title= SETTINGS;
                 break;
             case WAKE:
-                 break;
+                if (mirrorSleepState == LIGHT_SLEEP) {
+                    mirrorSleepState = AWAKE;
+                    displayView(mCurrentFragment);
+                }
+                return;
+            case SLEEP:
+                if (mirrorSleepState == AWAKE) {
+                    fragment = new OffFragment();
+                    mirrorSleepState = LIGHT_SLEEP;
+                    title = SLEEP;
+                } else { return; }
+                break;
+        }
+
+        // Any command besides SLEEP or WAKE sets the state to AWAKE
+        if ( !(viewName.equals(SLEEP) || viewName.equals(WAKE)) ) {
+            mirrorSleepState = AWAKE;
+            mCurrentFragment = viewName;
         }
 
         if(fragment != null){
@@ -408,8 +414,9 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             if (!isFinishing()) {
-                mCurrentFragment = viewName;
                 ft.commit();
+            } else {
+                Log.i("Fragments", "commit skipped. isFinishing() returned true");
             }
         }
 
@@ -421,6 +428,14 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
+    /**
+     * Gets the fragment currently being viewed. If the mirror in SLEEP or LIGHT_SLEEP,
+     * this will return the value of the previously-displayed fragment.
+     * @return String fragment name
+     */
+    protected String getCurrentFragment() {
+        return mCurrentFragment;
+    }
 
     // ----------------------- SPEECH RECOGNITION --------------------------
 
@@ -578,7 +593,6 @@ public class MainActivity extends AppCompatActivity
         if (info.groupFormed && info.isGroupOwner) {
             if(DEBUG)
                 Log.i("Wifi", "onConnectionInfo is starting server...");
-            Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
             startRemoteServer();
         } else if (info.groupFormed){
             Log.i("Wifi", "group exists, mirror is not owner");
@@ -606,6 +620,7 @@ public class MainActivity extends AppCompatActivity
         mServerTask.execute();
     }
 
+    // OnStop, start a thread that keeps the wifip2p connection alive by pinging every 60 seconds
     private void startWifiHeartbeat() {
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
                 Executors.newScheduledThreadPool(1);
@@ -617,11 +632,11 @@ public class MainActivity extends AppCompatActivity
                 Log.i("Wifi", "Heartbeat: discoverPeers()" );
             }
         };
-        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 30, 30,
+        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 60, 60,
                 TimeUnit.SECONDS);
-        // TODO: Put this in a class to hang on to the variables? How will it call refresh on mainActivity?
     }
 
+    // Stop the heartbeat thread
     public void stopWifiHeartbeat() {
         if (wifiHeartbeat != null) {
             wifiHeartbeat.cancel(true);
