@@ -32,10 +32,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Toast;
 import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -61,6 +63,11 @@ public class MainActivity extends AppCompatActivity
     private final String WAKE = "Wake";
     private final String WEATHER = "Weather";
 
+    private final int SLEEPING = 0;
+    private final int LIGHT_SLEEP = 1;
+    private final int AWAKE = 2;
+    private int mirrorSleepState;
+
     /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
             "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
     /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
@@ -78,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     private static boolean mirrorIsSleeping;
     // fragment that is waiting to be displayed once the activity has resumed from sleep
     private String mPendingFragment = null;
+    private String mCurrentFragment = null;
 
     // WiFiP2p
     private WifiP2pManager mWifiManager;
@@ -89,6 +97,7 @@ public class MainActivity extends AppCompatActivity
     private RemoteServerAsyncTask mServerTask;
     public final static int PORT = 8888;
     public final static int SOCKET_TIMEOUT = 500;
+    private ScheduledFuture<?> wifiHeartbeat;
 
     // TTS
     private TTSHelper mTTSHelper;
@@ -224,12 +233,19 @@ public class MainActivity extends AppCompatActivity
         bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mIsBound=true;
 
-        mirrorIsSleeping = false;
+        //mirrorIsSleeping = false;
+        mirrorSleepState = AWAKE;
         // if there's a fragment pending to display, show it
-        if (mPendingFragment != null) {
-            displayView(mPendingFragment);
-            mPendingFragment = null;
+        if (mCurrentFragment != null) {
+            displayView(mCurrentFragment);
+            mCurrentFragment = null;
         }
+    }
+
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        stopWifiHeartbeat();
     }
 
     @Override
@@ -245,13 +261,14 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
+        startWifiHeartbeat();
         unregisterReceiver(mWifiReceiver);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mirrorIsSleeping = true;
+        mirrorSleepState = SLEEPING;
         Log.i(TAG, "onStop");
     }
 
@@ -260,6 +277,9 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         mTTSHelper.destroy();
         mPreferences.destroy();
+        if (wifiHeartbeat != null) {
+            wifiHeartbeat.cancel(true);
+        }
         unbindService(mConnection);
         mIsBound=false;
         Log.i(TAG, "onDestroy");
@@ -281,8 +301,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void sleepScreen() {
         Log.i(TAG, "sleepScreen()...");
-        // TODO: need to figure out how to make the screen sleep. Not critical as it will timeout based on system settings
-
+        // show a blank fragment and set the pending fragment.
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -336,13 +355,24 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         stopTTS();
-        // If sleeping, save the pendingFragment, this will be displayed once onStart() is called.
-        if (mirrorIsSleeping) {
-            mPendingFragment = viewName;
-            Log.i(TAG, "mPendingFragment:" + mPendingFragment);
+        // If sleeping, save viewName and display later, this will be committed once onStart() is called.
+        if (mirrorSleepState == SLEEPING && !viewName.equals(SLEEP) ) {
+            mCurrentFragment = viewName;
+            Log.i(TAG, "mCurrentFragment:" + mCurrentFragment);
             wakeScreen();
             return;
         }
+
+        // if we're pressing sleep from the awake state
+        if (mirrorSleepState == AWAKE && viewName.equals(SLEEP)) {
+            fragment = new OffFragment();
+            mirrorSleepState = LIGHT_SLEEP;
+            title = SLEEP;
+        } else {
+            mirrorSleepState = AWAKE;
+        }
+        Log.i(TAG, "viewName:" + viewName);
+        Log.i(TAG, "sleep state:" + mirrorSleepState);
 
         switch (viewName) {
             case NEWS:
@@ -368,11 +398,8 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 title= SETTINGS;
                 break;
-            case SLEEP:
-            case OFF:
-                title = SLEEP;
-                sleepScreen();
-                break;
+            case WAKE:
+                 break;
         }
 
         if(fragment != null){
@@ -380,7 +407,8 @@ public class MainActivity extends AppCompatActivity
                 Log.i("Fragments", "Displaying " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
-            if (!isFinishing() && !mirrorIsSleeping ) {
+            if (!isFinishing()) {
+                mCurrentFragment = viewName;
                 ft.commit();
             }
         }
@@ -438,8 +466,8 @@ public class MainActivity extends AppCompatActivity
                 startTTS(NEWS);
                 mDefaultURL = mNewsDefault;
                 displayView(NEWS);
-            } else if(voiceInput.contains(OFF.toLowerCase())){
-                displayView(OFF);
+            } else if(voiceInput.contains(OFF.toLowerCase()) || voiceInput.contains(SLEEP.toLowerCase())){
+                displayView(SLEEP);
             } else if (voiceInput.contains(mNewsDesk.toLowerCase())) {
                 startTTS(mNewsDesk);
                 displayView(NEWS);
@@ -572,8 +600,31 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // Start a server socket: this will listen to commands from the remote control
     public void startRemoteServer() {
         mServerTask = new RemoteServerAsyncTask(this);
         mServerTask.execute();
+    }
+
+    private void startWifiHeartbeat() {
+        ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
+                Executors.newScheduledThreadPool(1);
+
+        final Runnable heartbeatTask = new Runnable() {
+            @Override
+            public void run() {
+                discoverPeers();
+                Log.i("Wifi", "Heartbeat: discoverPeers()" );
+            }
+        };
+        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 30, 30,
+                TimeUnit.SECONDS);
+        // TODO: Put this in a class to hang on to the variables? How will it call refresh on mainActivity?
+    }
+
+    public void stopWifiHeartbeat() {
+        if (wifiHeartbeat != null) {
+            wifiHeartbeat.cancel(true);
+        }
     }
 }
