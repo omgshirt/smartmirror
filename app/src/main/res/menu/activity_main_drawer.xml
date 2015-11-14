@@ -8,6 +8,8 @@
             android:title="@string/title_camera"/>
         <item android:id="@+id/nav_facebook" android:icon="@android:drawable/ic_menu_slideshow"
             android:title="@string/title_facebook"/>
+        <item android:id="@+id/nav_twitter" android:icon="@android:drawable/ic_menu_gallery"
+            android:title="@string/title_twitter"/>
         <item android:id="@+id/nav_light" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_light"/>
         <item android:id="@+id/nav_news" android:icon="@android:drawable/ic_menu_gallery"
@@ -20,6 +22,7 @@
             android:title="@string/title_traffic"/>
         <item android:id="@+id/nav_weather" android:icon="@android:drawable/ic_menu_gallery"
         android:title="@string/title_weather"/>
+
     </group>
 
 </menu>

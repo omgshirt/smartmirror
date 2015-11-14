@@ -19,6 +19,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -33,11 +34,19 @@ import android.view.View;
 import android.widget.Toast;
 
 
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
+    private static final String TWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
+
 
     private final boolean DEBUG=true;
     private final String NEWS = "News";
@@ -46,6 +55,7 @@ public class MainActivity extends AppCompatActivity
     private final String LIGHT = "Light";
     private final String SETTINGS = "Settings";
     private final String OFF="Off";
+    private final String TWITTER = "Twitter";
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
@@ -123,6 +133,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
 
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
@@ -174,9 +186,9 @@ public class MainActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_FULLSCREEN;
-                //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
-                //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
-                //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
+        //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
+        //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
+        //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         decorView.setSystemUiVisibility(uiOptions);
 
         try {
@@ -284,6 +296,10 @@ public class MainActivity extends AppCompatActivity
                 fragment = new OffFragment();
                 title = OFF;
                 break;
+            case TWITTER:
+                fragment = new TwitterFragment();
+                title = TWITTER;
+                break;
         }
         if(fragment != null){
             if(DEBUG)
@@ -357,7 +373,7 @@ public class MainActivity extends AppCompatActivity
             startTTS("Didn't catch that");
         }
     }
-    
+
     /**
      * Say a phrase using text to speech
      * @param phrase the phrase to speak
