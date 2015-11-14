@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * Fragment that displays the calendar evnts
  */
 //TODO: Add checks in CalendarUtil.java to check for all day events. Currently shows next days' all day event for current day
-
+//TODO: Pull from one calendar
 public class CalendarFragment extends Fragment {
 
     public TextView mOutputText;
