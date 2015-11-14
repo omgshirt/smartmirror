@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 
@@ -19,6 +21,10 @@ public class SettingsFragment extends Fragment {
     private RadioGroup grpLightBrightness;
     private RadioGroup grpSysVolume;
     private RadioGroup grpMusVolume;
+    private Switch swtVoiceEnabled;
+    private Switch swtRemoteEnabled;
+    private Switch swtCameraEnabled;
+    private Switch swtWeatherEnglish;
 
     public static SettingsFragment newInstance() {
         SettingsFragment fragment = new SettingsFragment();
@@ -248,8 +254,94 @@ public class SettingsFragment extends Fragment {
                 break;
         }
 
-        // TODO: handle weather display units (C / F) (kph / mph)
+        // Voice Enabled Switch
+        swtVoiceEnabled = (Switch) view.findViewById(R.id.switch_voice_enabled);
+        swtVoiceEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mPreferences.setVoiceEnabled(true);
+                } else {
+                    mPreferences.setVoiceEnabled(false);
+                }
+                setVoiceSwitchText();
+            }
+        });
+        swtVoiceEnabled.setChecked(mPreferences.isVoiceEnabled());
+        setVoiceSwitchText();
+
+        // Camera Enabled Switch
+        swtCameraEnabled = (Switch) view.findViewById(R.id.switch_camera_enabled);
+        swtCameraEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mPreferences.setCameraEnabled(true);
+                } else {
+                    mPreferences.setCameraEnabled(false);
+                }
+                setCameraSwitchText();
+            }
+        });
+        swtCameraEnabled.setChecked(mPreferences.isCameraEnabled());
+        setCameraSwitchText();
+
+        // Remote Enabled Switch
+        swtRemoteEnabled = (Switch) view.findViewById(R.id.switch_remote_enabled);
+        swtRemoteEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mPreferences.setRemoteEnabled(getActivity(), true);
+                } else {
+                    mPreferences.setRemoteEnabled(getActivity(), false);
+                }
+                setRemoteSwitchText();
+            }
+        });
+        swtRemoteEnabled.setChecked(mPreferences.isRemoteEnabled());
+        setRemoteSwitchText();
+
+        swtWeatherEnglish = (Switch) view.findViewById(R.id.switch_weather_english);
+        swtWeatherEnglish.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mPreferences.setWeatherUnits(Preferences.ENGLISH);
+                } else {
+                    mPreferences.setWeatherUnits(Preferences.METRIC);
+                }
+                setWeatherSwitchText();
+            }
+        });
+        boolean isEnglish = ( mPreferences.getWeatherUnits().equals(Preferences.ENGLISH) ) ;
+        swtWeatherEnglish.setChecked(isEnglish);
+        setWeatherSwitchText();
 
         return view;
+    }
+
+    private void setVoiceSwitchText() {
+        setSwitchText(swtVoiceEnabled, "Voice Recognition: On", "Voice Recognition: Off" );
+    }
+
+    private void setWeatherSwitchText() {
+        setSwitchText(swtWeatherEnglish, "Weather Units: English", "Weather Units: Metric" );
+    }
+
+    private void setRemoteSwitchText(){
+        setSwitchText(swtRemoteEnabled, "Remote Control: On", "Remote Control: Off" );
+    }
+
+    private void setCameraSwitchText(){
+        setSwitchText(swtCameraEnabled, "Camera: On", "Camera: Off" );
+    }
+
+    private void setSwitchText(Switch switchWidget, String isCheckedText, String notCheckedText) {
+        if (switchWidget.isChecked()) {
+            switchWidget.setText(isCheckedText);
+        } else {
+            switchWidget.setText(notCheckedText);
+        }
     }
 }

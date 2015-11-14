@@ -44,7 +44,7 @@ public class CalendarUtil extends Activity {
     private static final int PROJECTION_BEGIN_INDEX = 1;
     private static final int PROJECTION_TITLE_INDEX = 2;
 
-    public static void runQuery(Context context){
+    public static void runQuery(Context context) {
         Cursor cur = null;
         ContentResolver cr = context.getContentResolver();
         Uri uri = CalendarContract.Calendars.CONTENT_URI;
@@ -54,9 +54,14 @@ public class CalendarUtil extends Activity {
 // Submit the query and get a Cursor object back.
         try {
             cur = cr.query(uri, EVENT_PROJECTION, selection, null, null);
-        }catch (SecurityException e){
+        } catch (SecurityException e) {
             e.printStackTrace();
         }
+
+        if (cur != null) {
+            cur.close();
+        }
+
     }
 
 
@@ -187,6 +192,7 @@ public class CalendarUtil extends Activity {
             // Set The Adapter
             listView.setAdapter(arrayAdapter);
         }
+        cursor.close();
         return nameOfEvent;
     }
 
