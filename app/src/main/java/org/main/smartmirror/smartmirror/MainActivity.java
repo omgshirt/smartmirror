@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -492,5 +493,13 @@ public class MainActivity extends AppCompatActivity
             new RemoteServerAsyncTask(this).execute();
         } else if (info.groupFormed){
         }
+    }
+
+    //new york times branding
+    public void toNYT(View v) {
+        String url = "http://developer.nytimes.com/";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 }
