@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".FacebookActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"
@@ -28,6 +28,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.facebook.FacebookActivity"
+            android:configChanges=
+                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name" />
         <service android:name=".VoiceService"></service>
         <meta-data
             android:name="com.google.android.gms.version"
@@ -35,9 +40,9 @@
          <meta-data
             android:name="io.fabric.ApiKey"
             android:value="1845667fbf9d1ae63f10e4f7c8e386eaf3255b3f" />
-       <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="1845667fbf9d1ae63f10e4f7c8e386eaf3255b3f" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
     </application>
 </manifest>

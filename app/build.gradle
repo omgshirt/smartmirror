@@ -55,5 +55,6 @@ dependencies {
     compile('com.twitter.sdk.android:twitter:1.10.0@aar') {
         transitive = true;
     }
+    compile 'com.facebook.android:facebook-android-sdk:4.7.0'
 
 }

@@ -3,10 +3,14 @@
     <string name="app_name">SmartMirror</string>
     <string name="open_weather_map_api_key">74ab1bfc0374c634c12dedf9c12b1c03</string>
     <string name="nyt_api_key">89899870d1024b962dc582806e3e9c34:3:73303333</string>
+
     <string name="twitter_api_key">mQ51h9ZbAz9Xk2AZtsUBJAGlx</string>
     <string name="twitter_secret">uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt</string>
     <string name="twitter_access_token">4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG</string>
+
     <string name="facebook_app_id">913606198722814</string>
+
+    <string name="twitter_error">Error with Twitter Data</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
