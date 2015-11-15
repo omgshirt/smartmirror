@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity
     private static Context mContext;                    // Hold the app context
     private Preferences mPreferences;
 
+    // Global Constants
     private final String CALENDAR = "Calendar";
     private final String CAMERA = "Camera";
     private final String FACEBOOK = "Facebook";
@@ -61,10 +62,7 @@ public class MainActivity extends AppCompatActivity
     private final String WAKE = "Wake";
     private final String WEATHER = "Weather";
 
-    /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
-            "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
-    /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
-    private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
+    // News
     private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
@@ -429,6 +427,9 @@ public class MainActivity extends AppCompatActivity
             if (voiceInput.contains(CALENDAR.toLowerCase())) {
                 startTTS(CALENDAR);
                 displayView(CALENDAR);
+            }else if(voiceInput.contains(CAMERA.toLowerCase())){
+                startTTS(CAMERA);
+                displayView(CAMERA);
             } else if (voiceInput.contains(WEATHER.toLowerCase())) {
                 startTTS(WEATHER);
                 displayView(WEATHER);
