@@ -406,7 +406,6 @@ public class MainActivity extends AppCompatActivity
                 fragment = new CameraFragment();
                 title = CAMERA;
                 break;
-            case SLEEP:
             case OFF:
                 fragment = new OffFragment();
                 title = OFF;

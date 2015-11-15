@@ -86,10 +86,11 @@
         <item>Light</item>
         <item> Weather</item>
         <item> Settings</item>
-        <item> OFF</item>
+        <item> Off</item>
         <item> Traffic</item>
         <item>Weather</item>
         <item> Help</item>
+        <item>Camera</item>
     </string-array>
 
     <string name="Hello_Blank_Fragment">Hello Blank Fragment</string>
