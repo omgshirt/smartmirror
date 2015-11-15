@@ -19,11 +19,11 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -34,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -44,16 +45,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
 
-    private final boolean DEBUG=true;
-    private final String NEWS = "News";
-    private final String CALENDAR = "Calendar";
-    private final String WEATHER = "Weather";
-    private final String LIGHT = "Light";
-    private final String SETTINGS = "Settings";
-    private final String OFF="Off";
-    private final String HELP="Help";
-    private TTSHelper mTTSHelper;
-    private static Context mContext; // Hold the app context
+
     // Globals, prefs, debug flags
     private final boolean DEBUG = true;
 
@@ -76,10 +68,10 @@ public class MainActivity extends AppCompatActivity
     public static final String ON = "On";
     public static final String WAKE = "Wake";
     public static final String WEATHER = "Weather";
+    public static final String HELP = "Help";
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
-
 
 
     /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
@@ -121,9 +113,15 @@ public class MainActivity extends AppCompatActivity
     private boolean mIsBound;
     private Messenger mService;
 
-
-    FragmentManager frag=getSupportFragmentManager();
+    //Dialogue
+    FragmentManager frag = getSupportFragmentManager();
     HelperDialog helperDialog;
+    Boolean news;
+    Boolean calendar;
+    Boolean weather;
+    Boolean settings;
+    Boolean help;
+    Boolean off;
 
     // used to establish a service connection
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -157,13 +155,13 @@ public class MainActivity extends AppCompatActivity
     };
 
     // handles the messages from Service to this
-    public class IHandler extends Handler{
+    public class IHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what){
+            switch (msg.what) {
                 case VoiceService.RESULT_SPEECH:
                     String result = msg.getData().getString("result");
-                    if(DEBUG)
+                    if (DEBUG)
                         Log.i("MAIN", result);
                     speechResult(result);
                     break;
@@ -184,7 +182,7 @@ public class MainActivity extends AppCompatActivity
         // check for permission to write system settings on API 23 and greater.
         // Leaving this in case we need the WRITE_SETTINGS permission later on.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(!Settings.System.canWrite( getApplicationContext() )) {
+            if (!Settings.System.canWrite(getApplicationContext())) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                 startActivityForResult(intent, 1);
             }
@@ -223,9 +221,9 @@ public class MainActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_FULLSCREEN;
-                //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
-                //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
-                //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
+        //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
+        //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
+        //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         decorView.setSystemUiVisibility(uiOptions);
 
         try {
@@ -246,7 +244,7 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
         Log.i(TAG, "onStart");
         bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
-        mIsBound=true;
+        mIsBound = true;
         mirrorSleepState = AWAKE;
         // if there's a fragment pending to display, show it
         if (mCurrentFragment != null) {
@@ -259,13 +257,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onRestart(){
+    protected void onRestart() {
         super.onRestart();
         stopWifiHeartbeat();
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         Log.i(TAG, "onResume");
         mPreferences.setAppBrightness(this);
@@ -274,7 +272,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         Log.i(TAG, "onPause");
         startWifiHeartbeat();
@@ -298,7 +296,7 @@ public class MainActivity extends AppCompatActivity
             wifiHeartbeat = null;
         }
         unbindService(mConnection);
-        mIsBound=false;
+        mIsBound = false;
         Log.i(TAG, "onDestroy");
     }
 
@@ -353,7 +351,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        if(DEBUG)
+        if (DEBUG)
             Log.i("item selected", item.toString());
         displayView(item.toString());
         return true;
@@ -361,6 +359,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Handles which fragment will be displayed to the user
+     *
      * @param viewName the name of the view to be displayed
      */
     public void displayView(String viewName) {
@@ -389,38 +388,27 @@ public class MainActivity extends AppCompatActivity
                 bundle.putString("url", mDefaultURL);
                 fragment.setArguments(bundle);
                 title = NEWS;
-                HelperDialog helper_fragment = HelperDialog.newInstance(1);
-                helper_fragment.show(frag, "help fragment");
                 break;
             case CALENDAR:
                 fragment = new CalendarFragment();
                 title = CALENDAR;
-                helper_fragment = HelperDialog.newInstance(2);
-                helper_fragment.show(frag, "help fragment");
                 break;
             case LIGHT:
                 fragment = new LightFragment();
                 title = LIGHT;
-                helper_fragment = HelperDialog.newInstance(3);
-                helper_fragment.show(frag, "help fragment");
                 break;
             case WEATHER:
                 fragment = new WeatherFragment();
                 title = WEATHER;
-                helper_fragment = HelperDialog.newInstance(4);
-                helper_fragment.show(frag, "help fragment");
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
                 title = SETTINGS;
-                helper_fragment = HelperDialog.newInstance(5);
-                helper_fragment.show(frag, "help fragment");
                 break;
             case OFF:
                 fragment = new OffFragment();
                 title = OFF;
-                helper_fragment = HelperDialog.newInstance(6);
-                helper_fragment.show(frag, "help fragment");
+                break;
             case WAKE:
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
@@ -432,27 +420,31 @@ public class MainActivity extends AppCompatActivity
                     fragment = new OffFragment();
                     mirrorSleepState = LIGHT_SLEEP;
                     title = SLEEP;
-                } else { return; }
+                } else {
+                    return;
+                }
                 break;
 
             case HELP:
-
-                helper_fragment = HelperDialog.newInstance(0);
-                helper_fragment.show(frag, "help fragment");
+                helperDialog=HelperDialog.newInstance(getCurrentFragment());
+                helperDialog.show(frag,"HelperDialogue");
+                title=HELP;
                 break;
+
+
         }
 
         stopTTS();
 
-        if(fragment != null){
-            if(DEBUG)
+        if (fragment != null) {
+            if (DEBUG)
                 Log.i("Fragments", "Displaying " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             if (!isFinishing()) {
                 ft.commit();
                 // Any command besides SLEEP or WAKE now sets the state to AWAKE
-                if ( !(viewName.equals(SLEEP) || viewName.equals(WAKE)) ) {
+                if (!(viewName.equals(SLEEP) || viewName.equals(WAKE))) {
                     mirrorSleepState = AWAKE;
                     mCurrentFragment = viewName;
                 }
@@ -460,30 +452,34 @@ public class MainActivity extends AppCompatActivity
             } else {
                 Log.i("Fragments", "commit skipped. isFinishing() returned true");
 
-            if (fragment != null) {
-                if (DEBUG)
-                    Log.i("Fragments", "Displaying " + viewName);
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, fragment);
-                if (!isFinishing()) {
-                    ft.commit();
+                if (fragment != null) {
+                    if (DEBUG)
+                        Log.i("Fragments", "Displaying " + viewName);
+                    ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, fragment);
+                    if (!isFinishing()) {
+                        ft.commit();
+                    }
+                }
+
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(title);
+                }
+
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(title);
                 }
             }
-
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(title);
-            }
-
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setTitle(title);
         }
+    }
 
 
     /**
      * Gets the fragment currently being viewed. If the mirror in SLEEP or LIGHT_SLEEP,
      * this will return the value of the previously-displayed fragment.
+     *
      * @return String fragment name
      */
     protected String getCurrentFragment() {
@@ -494,6 +490,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Handles the result of the speech input
+     *
      * @param voiceInput the command the user gave
      */
     public void speechResult(String voiceInput) {
@@ -505,18 +502,18 @@ public class MainActivity extends AppCompatActivity
                     mNewsDesk = urlArr[i];
                     mNYTURL = mPreURL + mNewsDesk + mPostURL;
                     mDefaultURL = mNYTURL;
-                    if(DEBUG)
+                    if (DEBUG)
                         Log.i("voice news desk: ", urlArr[i]);
                     break;
                 } else {
                     i++;
-                    if(DEBUG) {
+                    if (DEBUG) {
                         Log.i("news desk: ", Arrays.toString(urlArr));
                         Log.i("I heard: ", voiceInput);
                     }
                 }
             }
-            if(DEBUG)
+            if (DEBUG)
                 Log.i("I heard: ", voiceInput);
             if (voiceInput.contains(CALENDAR.toLowerCase())) {
                 startTTS(CALENDAR);
@@ -534,20 +531,23 @@ public class MainActivity extends AppCompatActivity
                 startTTS(NEWS);
                 mDefaultURL = mNewsDefault;
                 displayView(NEWS);
-            } else if(voiceInput.contains(OFF.toLowerCase())){
+            } else if (voiceInput.contains(OFF.toLowerCase())) {
                 displayView(OFF);
-            }
-            else if(voiceInput.contains(HELP.toLowerCase()))
-            {
+            } else if (voiceInput.contains(HELP.toLowerCase())) {
                 startTTS(HELP);
                 displayView(HELP);
-            } else if(voiceInput.contains(OFF.toLowerCase()) || voiceInput.contains(SLEEP.toLowerCase())){
+            } else if (voiceInput.contains(OFF.toLowerCase()) || voiceInput.contains(SLEEP.toLowerCase())) {
                 displayView(SLEEP);
             } else if (voiceInput.contains(mNewsDesk.toLowerCase())) {
                 startTTS(mNewsDesk);
                 displayView(NEWS);
             }
-        }catch (Exception e) {
+            else if (voiceInput.contains(HELP.toLowerCase()))
+            {
+                startTTS(HELP);
+                displayView(HELP);
+            }
+        } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Didn't catch that",
                     Toast.LENGTH_LONG).show();
             startTTS("Didn't catch that");
@@ -557,7 +557,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Start the speech recognizer
      */
-    public void startSpeechRecognition(){
+    public void startSpeechRecognition() {
         try {
             Message msg = Message.obtain(null, VoiceService.START_SPEECH);
             msg.replyTo = mMessenger;
@@ -570,7 +570,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Stops the current speech recognition object
      */
-    public void stopSpeechRecognition(){
+    public void stopSpeechRecognition() {
         try {
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
             msg.replyTo = mMessenger;
@@ -584,9 +584,10 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Say a phrase using text to speech
+     *
      * @param phrase the phrase to speak
      */
-    public void startTTS(final String phrase){
+    public void startTTS(final String phrase) {
         Thread mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -638,23 +639,24 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    /** called when a connection is made to this device
+    /**
+     * called when a connection is made to this device
      *
      * @param info
      */
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
         // make this the group owner and start the server to listen for commands
-        if(DEBUG)
+        if (DEBUG)
             Log.i("Wifi", "Connection info: " + info.toString());
         mWifiInfo = info;
         WifiP2pConfig config = new WifiP2pConfig();
         config.groupOwnerIntent = 15;
         if (info.groupFormed && info.isGroupOwner) {
-            if(DEBUG)
+            if (DEBUG)
                 Log.i("Wifi", "onConnectionInfo is starting server...");
             startRemoteServer();
-        } else if (info.groupFormed){
+        } else if (info.groupFormed) {
             Log.i("Wifi", "group exists, mirror is not owner");
         }
     }
@@ -662,6 +664,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Enables or disables WifiP2P connections to the mirror. This should not be called directly,
      * but through Preferences.setRemoteEnabled()
+     *
      * @param isEnabled service state: enabled or disabled
      */
     public void setRemoteStatus(boolean isEnabled) {
@@ -689,7 +692,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 discoverPeers();
-                Log.i("Wifi", "Heartbeat: discoverPeers()" );
+                Log.i("Wifi", "Heartbeat: discoverPeers()");
             }
         };
         wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 60, 60,
@@ -703,3 +706,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 }
+
+
+
+
