@@ -34,7 +34,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -44,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
-
 
     // Globals, prefs, debug flags
     private final boolean DEBUG = true;
@@ -73,11 +71,7 @@ public class MainActivity extends AppCompatActivity
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
-
-    /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
-            "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
-    /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
-    private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
+    // News
     private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
@@ -91,6 +85,9 @@ public class MainActivity extends AppCompatActivity
     private String mCurrentFragment = null;
     private final int WAKELOCK_TIMEOUT = 1000;
     private PowerManager.WakeLock mWakeLock;
+    private static boolean mirrorIsSleeping;
+    // fragment that is waiting to be displayed once the activity has resumed from sleep
+    private String mPendingFragment = null;
 
 
     // WiFiP2p
@@ -405,6 +402,11 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 title = SETTINGS;
                 break;
+            case CAMERA:
+                fragment = new CameraFragment();
+                title = CAMERA;
+                break;
+            case SLEEP:
             case OFF:
                 fragment = new OffFragment();
                 title = OFF;
@@ -518,6 +520,9 @@ public class MainActivity extends AppCompatActivity
             if (voiceInput.contains(CALENDAR.toLowerCase())) {
                 startTTS(CALENDAR);
                 displayView(CALENDAR);
+            }else if(voiceInput.contains(CAMERA.toLowerCase())){
+                startTTS(CAMERA);
+                displayView(CAMERA);
             } else if (voiceInput.contains(WEATHER.toLowerCase())) {
                 startTTS(WEATHER);
                 displayView(WEATHER);
