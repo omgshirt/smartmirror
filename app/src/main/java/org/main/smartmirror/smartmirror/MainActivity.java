@@ -366,7 +366,11 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
-                title= SETTINGS;
+                title = SETTINGS;
+                break;
+            case CAMERA:
+                fragment = new CameraFragment();
+                title = CAMERA;
                 break;
             case SLEEP:
             case OFF:
