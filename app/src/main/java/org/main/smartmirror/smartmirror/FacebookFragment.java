@@ -39,7 +39,7 @@ public class FacebookFragment extends Fragment {
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
 
         btnLoginButton = (LoginButton) view.findViewById(R.id.fb_login_button);
-        btnLoginButton.setReadPermissions("user_friends");
+        btnLoginButton.setReadPermissions("user_friends, user_posts");
 
         btnLoginButton.setFragment(this);
 
@@ -47,17 +47,18 @@ public class FacebookFragment extends Fragment {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.i("status: ", "SUCCESS!");
-                /*new GraphRequest(
+                new GraphRequest(
                         AccessToken.getCurrentAccessToken(),
-                        "/{user-id}",
+                        "/me/feed",
+                        //"/{user_id}/notifications",
                         null,
                         HttpMethod.GET,
                         new GraphRequest.Callback() {
                             public void onCompleted(GraphResponse response) {
-                                Log.i("name ", "user-id callback success");
+                                Log.i("resonse ", response.toString());
                             }
                         }
-                ).executeAsync();*/
+                ).executeAsync();
 
                 mAccessToken = AccessToken.getCurrentAccessToken();
                 GraphRequest request = GraphRequest.newMeRequest(
@@ -65,7 +66,6 @@ public class FacebookFragment extends Fragment {
                         new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(JSONObject object, GraphResponse response) {
-                                //object = response.getJSONObject("id");
                                 Log.i("graph response ", response.toString());
                             }
                         });
@@ -73,6 +73,7 @@ public class FacebookFragment extends Fragment {
                 parameters.putString("fields", "id,name,link");
                 request.setParameters(parameters);
                 request.executeAsync();
+                //https://graph.facebook.com/page-username/posts?access_token=sometoken
 
 
             }
