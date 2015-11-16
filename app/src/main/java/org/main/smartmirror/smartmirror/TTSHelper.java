@@ -114,7 +114,7 @@ public class TTSHelper{
      *
      */
     public void destroy() {
-        if(mTextToSpeech !=null){
+        if(mTextToSpeech != null){
             mTextToSpeech.stop();
             mTextToSpeech.shutdown();
             mIsSpeaking = false;

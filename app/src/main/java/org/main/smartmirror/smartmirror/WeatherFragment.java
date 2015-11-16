@@ -90,11 +90,9 @@ public class WeatherFragment extends Fragment implements LocationListener {
         latitude = "34";
         longitude = "-118";
         String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
-        String weatherUnit;
+        String weatherUnit = "si";
         if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
             weatherUnit = "us";
-        } else {
-            weatherUnit = "si";
         }
         updateWeatherData(String.format(darkSkyRequest, darkSkyKey, latitude, longitude, weatherUnit));
     }
@@ -300,7 +298,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 i++;
             }
             if (title.length() > 0) {
-                ((MainActivity) getActivity()).startTTS(title.toString());
+                //((MainActivity) getActivity()).startTTS(title.toString());
                 txtAlerts.setText(title.toString());
             }
 
