@@ -16,6 +16,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,106 +25,9 @@ import java.util.List;
 
 public class CalendarUtil extends Activity {
 
-    /*
-    public static ListView listView = new ListView(null);
-    */
-    private static final String TAG = CalendarUtil.class.getSimpleName();
-    private static final String DEBUG_TAG = "MyActivity";
-    public static final String[] EVENT_PROJECTION = new String[] {
-            CalendarContract.Calendars._ID,
-            CalendarContract.Calendars.ACCOUNT_NAME,
-            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
-            CalendarContract.Instances.EVENT_ID,      // 0
-            CalendarContract.Instances.BEGIN,         // 1
-            CalendarContract.Instances.TITLE          // 2
-    };
-
-    private static final int PROJECTION_ID_INDEX = 0;
-    private static final int PROJECTION_ACCOUNT_NAME_INDEX = 1;
-    private static final int PROJECTION_DISPLAY_NAME_INDEX = 2;
-    private static final int PROJECTION_BEGIN_INDEX = 1;
-    private static final int PROJECTION_TITLE_INDEX = 2;
-
-    public static void runQuery(Context context){
-        Cursor cur = null;
-        ContentResolver cr = context.getContentResolver();
-        Uri uri = CalendarContract.Calendars.CONTENT_URI;
-        String selection = "((" + CalendarContract.Calendars.ACCOUNT_NAME + " = ?) AND ("
-                + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?) AND ("
-                + CalendarContract.Calendars.OWNER_ACCOUNT + " = ?))";
-// Submit the query and get a Cursor object back.
-        try {
-            cur = cr.query(uri, EVENT_PROJECTION, selection, null, null);
-        }catch (SecurityException e){
-            e.printStackTrace();
-        }
-    }
-
-
-    public static void printCalendars(Context context) {
-        runGenericQuery(context, "Calendars", CalendarContract.Calendars.CONTENT_URI);
-    }
-
-    public static void printEvents(Context context) {
-        runGenericQuery(context, "Events", CalendarContract.Events.CONTENT_URI);
-    }
-
-
-    public static void printEventInstances(Context context) {
-         //Specify the date range you want to search for recurring
-         //event instances
-        Calendar beginTime = Calendar.getInstance();
-
-        beginTime.set(2015, Calendar.NOVEMBER, 9);
-        long startMillis = beginTime.getTimeInMillis();
-        Calendar endTime = Calendar.getInstance();
-        endTime.set(2015, Calendar.NOVEMBER, 10);
-        long endMillis = endTime.getTimeInMillis();
-
-        Cursor cursor = null;
-        ContentResolver cr = context.getContentResolver();
-
-        String selection = CalendarContract.Instances.EVENT_ID + " = ?";
-        String[] selectionArgs = new String[] {"207"};
-
-        // Construct the query with the desired date range.
-        Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
-        ContentUris.appendId(builder, startMillis);
-        ContentUris.appendId(builder, endMillis);
-
-        /*
-        cursor =  cr.query(builder.build(), EVENT_PROJECTION, selection, selectionArgs, null);
-        */
-        cursor =  cr.query(builder.build(), null, null, null, null);
-        cursor.moveToFirst();
-
-
-        String cursorContent = DatabaseUtils.dumpCursorToString(cursor);
-        while(cursor.moveToNext()){
-            String title = null;
-            long eventID = 0;
-            long beginVal = 0;
-
-            eventID = cursor.getLong(PROJECTION_ID_INDEX);
-            beginVal = cursor.getLong(PROJECTION_BEGIN_INDEX);
-            title = cursor.getString(PROJECTION_TITLE_INDEX);
-            System.out.println("In while loop: " + "Event ID:  " + eventID);
-
-            Log.i(DEBUG_TAG, "Event:   " + eventID);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(beginVal);
-            DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-            Log.i(DEBUG_TAG, "Date:  " + formatter.format(calendar.getTime()));
-        }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-        Log.i(TAG, "-------Instances cursorContent: \n" + cursorContent);
-    }
-
     public static  ArrayList<String> readCalendarEvent(Context context, ListView listView) {
+
+
         //Refer to link below for smymbol format:
         //http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
         ArrayList nameOfEvent = new ArrayList();
@@ -139,22 +43,17 @@ public class CalendarUtil extends Activity {
         DateFormat sdfmin = new SimpleDateFormat("mm");
         int min = Integer.valueOf(sdfmin.format(beginTime.getTime()));
 
-        beginTime.set(2015, month, day, hour, min);
+        beginTime.set(year, month, day, hour, min);
         long startMillis = beginTime.getTimeInMillis();
         long endMillis = startMillis + 36000000 ;
-
         Cursor cursor = null;
         ContentResolver cr = context.getContentResolver();
-        Uri uri = CalendarContract.Calendars.CONTENT_URI;
-        String selection = "((" + CalendarContract.Calendars.ACCOUNT_NAME + " = ?) AND ("
-                + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?) AND ("
-                + CalendarContract.Calendars.OWNER_ACCOUNT + " = ?))";
-        String[] selectionArgs = new String[] {"x@gmail.com", "com.google",
-                "x@gmail.com"};
 
+        //For event information
         Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
         ContentUris.appendId(builder, startMillis);
         ContentUris.appendId(builder, endMillis);
+
 
         cursor = cr.query(builder.build(),
                 new String[]{"calendar_id", "title", "description",
@@ -164,50 +63,102 @@ public class CalendarUtil extends Activity {
         // fetching calendars name
         String CNames[] = new String[cursor.getCount()];
 
-//        fetching calendars id
-        nameOfEvent.clear();
-        /*
-        startDates.clear();
-        endDates.clear();
-        descriptions.clear();
-        */
-        for (int i = 0; i < CNames.length; i++) {
 
-            nameOfEvent.add(cursor.getString(1));
+
+        //For Calendar account names (email accounts)
+        Cursor cursorNames = null;
+        ContentResolver crNames = context.getContentResolver();
+
+        Uri.Builder builderNames = CalendarContract.Calendars.CONTENT_URI.buildUpon();
+        ContentUris.appendId(builderNames, startMillis);
+        ContentUris.appendId(builderNames, endMillis);
+        cursorNames = crNames.query(builder.build(),
+                new String[]{"calendar_displayName"}, null,
+                null, null);
+
+        cursorNames.moveToFirst();
+        //System.out.println("Name of Calendars: " + cursorNames.getString(0));
+        //cursorNames.moveToNext();
+        //System.out.println("Name of Calendars: " + cursorNames.getString(0));
+
+        String CalNames[] = new String[cursorNames.getCount()];
+
+        //fetching calendars id
+        nameOfEvent.clear();
+
+        //startDates.clear();
+        //endDates.clear();
+        //descriptions.clear();
+
+        //TODO: THIS IS WHERE WE CHOOSE NUMBER OF CALENDARS TO DISPLAY. TRY TO DISPLAY ALL CALENDAR EVENTS WITHOUT DUPLICATES
+        if(cursor.getCount()==0){
+            nameOfEvent.add("No Events");
+            ArrayAdapter<String> arrayAdapter =
+                    new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nameOfEvent);
+            // Set The Adapter
+            listView.setAdapter(arrayAdapter);
+        }
+        else {
+            for (int i = 0; i < CNames.length; i++) {
+
+                //FOR TESTING PURPOSES
+                //Column Data
+                System.out.println("Cursor 0: " + cursor.getString(0));
+                System.out.println("Cursor 1: " + cursor.getString(1));
+                System.out.println("Cursor 2: " + cursor.getString(2));
+                System.out.println("Cursor 3: " + cursor.getString(3));
+                System.out.println("Cursor 4: " + cursor.getString(4));
+                System.out.println("Cursor 5: " + cursor.getString(5));
+                //Columns
+                System.out.println("Cursor 0: " + cursor.getColumnName(0));
+                System.out.println("Cursor 1: " + cursor.getColumnName(1));
+                System.out.println("Cursor 2: " + cursor.getColumnName(2));
+                System.out.println("Cursor 3: " + cursor.getColumnName(3));
+                System.out.println("Cursor 4: " + cursor.getColumnName(4));
+                System.out.println("Cursor 5: " + cursor.getColumnName(5));
+
+                //ID of Calendar
+                if(cursorNames.getString(0)!=null) {
+                    nameOfEvent.add("Calendar: " + cursorNames.getString(0));
+                }
+                //Name of event
+                if(cursor.getString(1)!=null) {
+                    nameOfEvent.add("Event Name: " + cursor.getString(1));
+                }
+                //Location of event
+                if(cursor.getString(5)!=null) {
+                    nameOfEvent.add("Location: " + cursor.getString(5));
+                }
+                //Description of Event
+                if(cursor.getString(2)!=null) {
+                    nameOfEvent.add("Description: " + cursor.getString(2));
+                }
+                //Start Time
+                if(cursor.getString(3) !=null) {
+                    java.util.Date startT = new java.util.Date(cursor.getLong(3));
+                    nameOfEvent.add("Start Time: " + startT);
+                }
+                //End Time
+                if(cursor.getString(4)!=null) {
+                    java.util.Date endT = new java.util.Date(cursor.getLong(4));
+                    nameOfEvent.add("End Time: " + endT);
+                    System.out.println("END TIME TEST: " + endT);
+                }
+
             /*
             startDates.add(String.valueOf(cursor.getLong(3)));
             endDates.add(String.valueOf(cursor.getLong(4)));
             descriptions.add(cursor.getString(2));
             */
-            CNames[i] = cursor.getString(1);
-            cursor.moveToNext();
+                cursor.moveToNext();
+                cursorNames.moveToNext();
 
-            ArrayAdapter<String> arrayAdapter =
-                    new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1,nameOfEvent );
-            // Set The Adapter
-            listView.setAdapter(arrayAdapter);
+                ArrayAdapter<String> arrayAdapter =
+                        new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nameOfEvent);
+                // Set The Adapter
+                listView.setAdapter(arrayAdapter);
+            }
         }
         return nameOfEvent;
     }
-
-    private static Cursor runGenericQuery(Context context, String queryName, Uri queryUri) {
-        // Run query
-        Cursor cursor;
-        ContentResolver cr = context.getContentResolver();
-
-        // Submit the query and get a Cursor object back.
-        cursor = cr.query(queryUri, null, null, null, null);
-
-        String cursorContent = DatabaseUtils.dumpCursorToString(cursor);
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-
-
-        Log.i(TAG, "------- " + queryName + " cursorContent: \n" + cursorContent);
-        return cursor;
-    }
-
 }
