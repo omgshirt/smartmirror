@@ -16,11 +16,11 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 
+
 public class FacebookFragment extends Fragment {
 
     LoginButton btnLoginButton;
     CallbackManager mCBManager;
-
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -51,14 +51,14 @@ public class FacebookFragment extends Fragment {
             }
         });
 
-
         return view;
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mCBManager.onActivityResult(requestCode, resultCode, data);
     }
+
+
 }

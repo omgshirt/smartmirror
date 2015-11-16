@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.twitter.sdk.android.core.*;
@@ -14,7 +15,14 @@ import com.twitter.sdk.android.core.identity.*;
 
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.tweetui.TweetUtils;
+import com.twitter.sdk.android.tweetui.TweetView;
 
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -24,6 +32,8 @@ public class TwitterFragment extends Fragment {
     private static final String mTWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
 
     public TwitterFragment() {}
+    //TwitterAuthClient authClient;
+    TwitterAuthConfig authConfig;
 
     private TwitterLoginButton loginButton;
 
@@ -31,10 +41,24 @@ public class TwitterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(mTWITTER_KEY, mTWITTER_SECRET);
+
+        authConfig = new TwitterAuthConfig(mTWITTER_KEY, mTWITTER_SECRET);
         Fabric.with(super.getActivity(), new Twitter(authConfig));
 
         View view = inflater.inflate(R.layout.twitter_login_fragment, container, false);
+
+/*        authClient = new TwitterAuthClient();
+        authClient.authorize(getActivity(), new Callback<TwitterSession>() {
+            @Override
+            public void success(Result<TwitterSession> twitterSessionResult) {
+                Log.i("status: ", "SUCCESS!");
+            }
+
+            @Override
+            public void failure(TwitterException e) {
+                Log.i("status: ", "ERROR!");
+            }
+        });*/
 
         loginButton = (TwitterLoginButton) view.findViewById(R.id.twitter_login_button);
 
