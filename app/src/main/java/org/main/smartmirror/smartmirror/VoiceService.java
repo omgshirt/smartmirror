@@ -1,45 +1,42 @@
 package org.main.smartmirror.smartmirror;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import edu.cmu.pocketsphinx.Assets;
-import edu.cmu.pocketsphinx.Hypothesis;
-import edu.cmu.pocketsphinx.RecognitionListener;
-import edu.cmu.pocketsphinx.SpeechRecognizer;
-
-import static android.widget.Toast.makeText;
-import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
 /**
  * Service that runs the Speech Recognition. In charge of receiving and
  * sending information (IPC)
  */
-public class VoiceService extends Service implements RecognitionListener {
+public class VoiceService extends Service {
 
     private final boolean DEBUG=true;
     private ArrayList<Messenger> mClients = new ArrayList<>();
     private Messenger mMessenger = new Messenger( new IHandler());
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
+    private AudioManager mAudioManager;
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
-    private String mCommands="4379";
+    static final int END_OF_SPEECH=3;
+    //not sure if I need these keep me
+    /*
+    static final int REGISTER_SERV=3;
+    static final int UNREGISTER_SERV=4;
+    */
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -49,7 +46,7 @@ public class VoiceService extends Service implements RecognitionListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mSpeechRecognizer.shutdown();
+        mSpeechRecognizer.destroy();
     }
 
     @Override
@@ -60,7 +57,9 @@ public class VoiceService extends Service implements RecognitionListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        initializeDictionary();
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        mSpeechRecognizer.setRecognitionListener(new SpeechListener());
     }
 
     /**
@@ -83,23 +82,28 @@ public class VoiceService extends Service implements RecognitionListener {
      * Starts voice capture, invoked by the calling Activity
      */
     public void startVoice(){
-        mSpeechRecognizer.startListening(mCommands);
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-us");
+        mSpeechRecognizer.startListening(intent);
     }
 
     /**
      * Stops voice recognition, invoked by the calling Activity
      */
     public void stopVoice(){
-        mSpeechRecognizer.stop();
+        mSpeechRecognizer.stopListening();
     }
 
     /**
      * Sends a message back to the Activity that started this service
      */
-    public void sendMessage(){
-            Bundle bundle = new Bundle();
+    public void sendMessage(int which){
+        Bundle bundle = new Bundle();
+        Message msg;
+        switch(which) {
+            case RESULT_SPEECH:
             bundle.putString("result", getSpokenCommand());
-            Message msg = Message.obtain(null, RESULT_SPEECH);
+            msg = Message.obtain(null, RESULT_SPEECH);
             msg.setData(bundle);
             try {
                 mClients.get(0).send(msg);
@@ -107,102 +111,81 @@ public class VoiceService extends Service implements RecognitionListener {
                 mClients.remove(msg);
                 e.printStackTrace();
             }
-    }
+                break;
+            case END_OF_SPEECH:
+                bundle.putString("visualoff", getSpokenCommand());
+                msg = Message.obtain(null, END_OF_SPEECH);
+                msg.setData(bundle);
+                try {
+                    mClients.get(0).send(msg);
+                } catch (RemoteException e) {
+                    mClients.remove(msg);
+                    e.printStackTrace();
+                }
+                break;
 
-    /**
-     * In partial result we get quick updates about current hypothesis. In
-     * keyword spotting mode we can react here, in other modes we need to wait
-     * for final result in onResult.
-     */
-    @Override
-    public void onPartialResult(Hypothesis hypothesis) {
-        if (hypothesis == null)
-            return;
-        else {
-            String text = hypothesis.getHypstr();
-            Log.i("OPR", text);
-            setSpokenCommand(text);
-            stopVoice();
         }
     }
 
     /**
-     * This callback is called when we stop the recognizer.
+     * The speech listener that we'll use to capture the user's input
      */
-    @Override
-    public void onResult(Hypothesis hypothesis) {
-        sendMessage();
-    }
+    public class SpeechListener implements RecognitionListener{
+        @Override
+        public void onReadyForSpeech(Bundle params) {
 
-    @Override
-    public void onBeginningOfSpeech() {
-    }
-
-    /**
-     * We stop recognizer here to get a final result
-     */
-    @Override
-    public void onEndOfSpeech() {
-        stopVoice();
-    }
-
-    @Override
-    public void onError(Exception error) {
-        Log.i("ERR", error.getMessage());
-    }
-
-    @Override
-    public void onTimeout() {
-//        mSpeechRecognizer.removeListener(this);
-    }
-
-    public void initializeDictionary() {
-        new AsyncTask<Void, Void, Exception>() {
-            @Override
-            protected Exception doInBackground(Void... params) {
-                try {
-                    Assets assets = new Assets(VoiceService.this);
-                    File assetDir = assets.syncAssets();
-                    setupRecognizer(assetDir);
-                } catch (IOException e) {
-                    return e;
-                }
-                return null;
-            }
+        }
 
         @Override
-        protected void onPostExecute(Exception result) {
-            if (result != null) {
-                Toast.makeText(VoiceService.this, "" + result, Toast.LENGTH_SHORT).show();
+        public void onBeginningOfSpeech() {
+
+        }
+
+        @Override
+        public void onRmsChanged(float rmsdB) {
+
+        }
+
+        @Override
+        public void onBufferReceived(byte[] buffer) {
+
+        }
+
+        @Override
+        public void onEndOfSpeech() {
+
+        }
+
+        @Override
+        public void onError(int error) {
+
+        }
+
+        /**
+         * Captures the user's input and sends the message back to the activity that started
+         * the service
+         * @param results the results of the voice
+         */
+        @Override
+        public void onResults(Bundle results) {
+            ArrayList<String> arlstMessage = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+            if(arlstMessage.get(0) != null){
+                if(DEBUG)
+                    Log.i("LIS", arlstMessage.get(0));
+                setSpokenCommand(arlstMessage.get(0));
+                sendMessage(RESULT_SPEECH);
             }
         }
-    }.execute();
-    }
 
-    private void setupRecognizer(File assetsDir) throws IOException {
-        // The recognizer can be configured to perform multiple searches
-        // of different kind and switch between them
+        @Override
+        public void onPartialResults(Bundle partialResults) {
 
-        mSpeechRecognizer = defaultSetup()
-                .setAcousticModel(new File(assetsDir, "en-us-ptm"))
-                .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
+        }
 
-                        // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setKeywordThreshold(1e-45f)
+        @Override
+        public void onEvent(int eventType, Bundle params) {
 
-                        // Use context-independent phonetic search, context-dependent is too slow for mobile
-                .setBoolean("-allphone_ci", true)
-
-                .getRecognizer();
-        mSpeechRecognizer.addListener(this);
-
-        /** In your application you might not need to add all those searches.
-         * They are added here for demonstration. You can leave just one.
-         */
-
-        // Create grammar-based search for selection between demos
-        File commandList = new File(assetsDir, "4971.dic");
-        mSpeechRecognizer.addKeywordSearch(mCommands, commandList);
+        }
     }
 
     // Handles the messages from Main to this service

@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('pocketsphinx-android-5prealpha-nolib.jar'))

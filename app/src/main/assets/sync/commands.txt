@@ -1,6 +1,0 @@
-news
-weather
-settings
-sleep
-off
-calendar
