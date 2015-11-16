@@ -123,7 +123,6 @@ public class VoiceService extends Service {
                     e.printStackTrace();
                 }
                 break;
-
         }
     }
 
@@ -158,7 +157,8 @@ public class VoiceService extends Service {
 
         @Override
         public void onError(int error) {
-
+            if(error == SpeechRecognizer.ERROR_NO_MATCH || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT)
+                startVoice();
         }
 
         /**
