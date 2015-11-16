@@ -236,9 +236,8 @@ public class MainActivity extends AppCompatActivity
         // if there's a fragment pending to display, show it
         if (mCurrentFragment != null) {
             displayView(mCurrentFragment);
-            mCurrentFragment = null;
         } else {
-            // start with weather displayed
+            // on first run mCurrentFragment isn't set: start with weather displayed
             displayView(WEATHER);
         }
     }
@@ -459,8 +458,8 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     i++;
                     if(DEBUG) {
-                        Log.i("news desk: ", Arrays.toString(urlArr));
-                        Log.i("I heard: ", voiceInput);
+                        //Log.i("news desk: ", Arrays.toString(urlArr));
+                        //Log.i("I heard: ", voiceInput);
                     }
                 }
             }
@@ -533,7 +532,7 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
-                    Thread.sleep(2000);
+                    //Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -555,7 +554,6 @@ public class MainActivity extends AppCompatActivity
 
 
     // calls the P2pManager to refresh peer list
-    // TODO: set up a service to call this method every 30-60(?) seconds to prevent connection sleeping
     public void discoverPeers() {
         mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
             @Override

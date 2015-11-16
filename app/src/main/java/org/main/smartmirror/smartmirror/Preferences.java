@@ -172,8 +172,20 @@ public class Preferences {
         return mWeatherUnits;
     }
 
+    /**
+     * Converts fahrenheit temps to the appropriate unit, rounded to the nearest degree
+     * @param temp temp in degrees F
+     * @return converted temp
+     */
+    public int convertTemperature(double temp) {
+        if (mWeatherUnits.equals(METRIC)) {
+            temp = (temp - 32) * 5 / 9;
+        }
+        return (int)Math.round(temp);
+    }
+
     // returns the unicode string for deg C or deg F based on the WeatherIcons font set
-    public String getTempUnits() {
+    public String getTempString() {
         String units;
         Context appContext = MainActivity.getContextForApplication();
         if ( mWeatherUnits.equals(ENGLISH) )  {
@@ -183,6 +195,18 @@ public class Preferences {
             units = appContext.getResources().getString(R.string.weather_deg_c);
         }
         return units;
+    }
+
+    /**
+     * Converts mph into the appropriate unit, rounded to the nearest unit per hour
+     * @param speed in mph
+     * @return speed in converted units
+     */
+    public int convertWindSpeed(double speed) {
+        if (mWeatherUnits.equals(METRIC)) {
+            speed *= 1.609;
+        }
+        return (int)Math.round(speed);
     }
 
 
@@ -202,7 +226,7 @@ public class Preferences {
         return mDateFormat;
     }
 
-    /** set string used to format time dis
+    /** Format time display for clock
      *
      * @param format string for displaying time in SimpleDateFormat
      */
