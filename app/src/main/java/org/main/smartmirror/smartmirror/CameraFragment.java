@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -43,114 +44,46 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-//TODO: use this link: http://www.linux.com/learn/tutorials/726597-how-to-call-the-camera-in-android-part-2-capture-and-store-photos
+//use this link: http://www.linux.com/learn/tutorials/726597-how-to-call-the-camera-in-android-part-2-capture-and-store-photos
 public class CameraFragment extends Fragment implements TextureView.SurfaceTextureListener {
-    //other camera variables
+
     int TAKE_PHOTO_CODE = 0;
-    public static int count = 0;
-    //original camera variables
     private static Camera mCamera;
     private TextureView mTextureView;
 
-    //Second camera variables
-    final int CAMERA_CAPTURE = 1;
-    //captured picture uri
-    private Uri picUri;
-    final int PIC_CROP = 2;
 
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == TAKE_PHOTO_CODE && resultCode == getActivity().RESULT_OK) {
-            Log.d("CameraDemo", "Pic saved");
-        }
-//        Log.i("On Activity Result", "onActivityResult entered: ");
-//        if (requestCode == CAMERA_CAPTURE && resultCode == getActivity().RESULT_OK) {
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//            ImageView img = (ImageView)getActivity().findViewById(R.id.picture);
-//            img.setImageBitmap(imageBitmap);
-//
-//        }
-//        if (resultCode == getActivity().RESULT_OK) {
-//            if(requestCode == CAMERA_CAPTURE){
-//                picUri = data.getData();
-//                //performCrop();
-//            } //user is returning from cropping the image
-//            else if(requestCode == PIC_CROP){
-//                //get the returned data
-//                Bundle extras = data.getExtras();
-//                //get the cropped bitmap
-//                Bitmap thePic = extras.getParcelable("data");
-//                //retrieve a reference to the ImageView
-//                ImageView picView = (ImageView)getActivity().findViewById(R.id.picture);
-//                //display the returned cropped image
-//                picView.setImageBitmap(thePic);
-//            }
-//        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //Works without view below
+
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
 
         mTextureView = (TextureView) view.findViewById(R.id.cameraView);
         mTextureView.setSurfaceTextureListener(this);
-        final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/picFolderTest/";
-        File newdir = new File(dir);
-        newdir.mkdirs();
+         final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/smartMirrorPics/";
+         final File newdir = new File(dir);
+        if(!newdir.exists()) {
+            newdir.mkdirs();
+            Log.i("Checking Dir: ", " if directory doesnt exist and create directory if so");
+        }else {
+            Log.i("Checking Dir: ", " apparently directory exists");
+            newdir.mkdirs();
+        }
 
-            Button capture = (Button) view.findViewById(R.id.takepicture);
+            final Button capture = (Button) view.findViewById(R.id.takepicture);
             capture.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    //takePhoto();
+                    capture.setEnabled(false);
+                    takePhoto();
 
-                    //else{
-//                    mCamera.set
-//                    takePhoto();
-//                }
-                    //Codeblock works sort of
-//                mCamera.release();
-//
-//                // here,counter will be incremented each time,and the picture taken by camera will be stored as 1.jpg,2.jpg and likewise.
-//                count++;
-//                String file = dir + count + ".jpg";
-//                File newfile = new File(file);
-//                try {
-//                    newfile.createNewFile();
-//                } catch (IOException e) {
-//                }
-//
-//                Uri outputFileUri = Uri.fromFile(newfile);
-//
-//                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-//
-//                startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
-
-//                try {
-//                    //use standard intent to capture an image
-//                    Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    //we will handle the returned data in onActivityResult
-//                    startActivityForResult(captureIntent, CAMERA_CAPTURE);
-//
-//                   // mCamera.startPreview();
-//
-//                } catch (ActivityNotFoundException anfe) {
-//                    //display an error message
-//                    String errorMessage = "Whoops - your device doesn't support capturing images!";
-//                    Toast toast = Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_SHORT);
-//                    toast.show();
-//                }
+                    //https://rajareddypolam.wordpress.com/2013/01/29/android-saving-file-to-external-storage/
+                    getActivity().sendBroadcast(new Intent(
+                            Intent.ACTION_MEDIA_MOUNTED,
+                            Uri.parse("file://" + Environment.getExternalStorageDirectory())));
                 }
             });
 
-
-        //getActivity().setContentView(mTextureView);
-        //Line below works
-        //return super.onCreateView(inflater, container, savedInstanceState);
         return view;
     }
 
@@ -160,6 +93,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         mTextureView=null;
         Camera.PictureCallback pictureCB = new Camera.PictureCallback() {
             public void onPictureTaken(byte[] data, Camera cam) {
+
                 File picFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
                 if (picFile == null) {
                     Log.e("CANT CREATE takePhoto", "Couldn't create media file; check storage permissions?");
@@ -168,8 +102,10 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
                 try {
                     FileOutputStream fos = new FileOutputStream(picFile);
+                    Log.e("writing data?", "creating file?");
                     fos.write(data);
                     fos.close();
+
                 } catch (FileNotFoundException e) {
                     Log.e("NOT FOUND takePhoto", "File not found: " + e.getMessage());
                     e.getStackTrace();
@@ -184,8 +120,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
     private File getOutputMediaFile(int type) {
-        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/picFolderTest/");
-        //final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/picFolderTest/";
+        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/smartMirrorPics/");
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
                 Log.e("getoutputmedialfile", "Failed to create storage directory.");
@@ -195,40 +130,20 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         String timeStamp =
                 new SimpleDateFormat("yyyMMdd_HHmmss", Locale.UK).format(new Date());
         if (type == MEDIA_TYPE_IMAGE) {
+            Log.i("OUTPUT FILE", "TESTING PICTURE");
+            final Button cap = (Button) getActivity().findViewById(R.id.takepicture);
+            cap.setEnabled(true);
             return new File(dir.getPath() + File.separator + "IMG_"
                     + timeStamp + ".jpg");
+
         } else {
             return null;
         }
     }
 
-//    public void captureImage(View v) throws IOException {
-//        mCamera.takePicture(null, null, jpegCallback);
-//    }
-//
-//    public void refreshCamera() {
-//        if (surfaceHolder.getSurface() == null) {
-//            return;
-//        }
-//
-//        try {
-//            mCamera.stopPreview();
-//        }
-//
-//        catch (Exception e) {
-//        }
-//
-//        try {
-//            mCamera.setPreviewDisplay(surfaceHolder);
-//            mCamera.startPreview();
-//        }
-//        catch (Exception e) {
-//        }
-//    }
-
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        int result = 0;
+        //int result = 0;
         int cameraId = 0;
         Camera.CameraInfo info = new Camera.CameraInfo();
 
@@ -237,10 +152,12 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
                 break;
         }
-        mCamera = Camera.open(cameraId);//ERROR
+
+        mCamera = Camera.open(cameraId);
+
         Matrix transform = new Matrix();
         Camera.Parameters param = mCamera.getParameters();
-        param.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        param.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
         Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
 
         int rotation = getActivity().getWindowManager().getDefaultDisplay()
@@ -277,19 +194,12 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 transform.setScale(-1, 1, previewSize.width / 2, 0);
                 break;
         }
-
-
         try {
             mCamera.setPreviewTexture(surface);
         } catch (IOException t) {
         }
-
         mTextureView.setTransform(null);//"null" used to be "transform". Use transform only for front-facing camera.
-        //Log.i("onSurfaceTextureAvailable", "Transform: " + transform.toString());
-
         mCamera.startPreview();
-        //mCamera.autoFocus(cb);
-
     }
 
     @Override
@@ -297,93 +207,41 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         // Ignored, the Camera does all the work for us
     }
 
-
-
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-//        mCamera.stopPreview();
-//        //mCamera.setPreviewCallback(null);
-//        mCamera.release();
-//        mCamera=null;
-//            mCamera.stopPreview();
-//            mCamera.release();
         if(this.mCamera != null){
             mCamera.stopPreview();
-            // the next two lines lead to the error after switching back to the app and taking a picure
             mCamera.release();
             this.mCamera = null;
         }
-
-
         return true;
     }
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-
     }
-
-
-
-//    class SavePhotoTask extends AsyncTask<byte[], String, String> {
-//        @Override
-//        protected String doInBackground(byte[]... data) {
-//            File picFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-//            if (picFile == null) {
-//                //Log.e(TAG, "Error creating media file; are storage permissions correct?");
-//                return null;
-//            }
-//
-//            byte[0]photoData = data[0];
-//            try {
-//                FileOutputStream fos = new FileOutputStream(picFile);
-//                fos.write(photoData);
-//                fos.close();
-//            } catch (FileNotFoundException e) {
-//                //Log.e(TAG, "File not found: " + e.getMessage());
-//                e.getStackTrace();
-//            } catch (IOException e) {
-//                // Log.e(TAG, "I/O error with file: " + e.getMessage());
-//                e.getStackTrace();
-//            }
-//            return null;
-//        }
-//    }
-
 
     @Override
     public void onPause() {
-//        if (mCamera != null) {
-//            mCamera.stopPreview();
-//            mCamera.release();
-//            mCamera = null;
-//            Log.d("ONPAUSE", "releaseCamera -- done");
-//        }
-//        mTextureView=null;
-//        super.onPause();
         super.onPause();
         try {
-            // release the camera immediately on pause event
-            // releaseCamera();
-            mCamera.stopPreview();
             mCamera.setPreviewCallback(null);
+            mTextureView=null;
+            mTextureView.setSurfaceTextureListener(null);
             mCamera.release();
             mCamera = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
     public void onResume() {
-        //Camera.open();
         super.onResume();
         if (mCamera != null) {
             mTextureView = (TextureView)getActivity().findViewById(R.id.cameraView);
             mTextureView.setSurfaceTextureListener(this);
-
+            //mCamera.open();
             mCamera.startPreview();
             Log.d("ONRESUME", "openCamera -- done");
         }
@@ -398,5 +256,21 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 //            mCamera.release();
 //        }
 //        super.onDestroy();
+//    }
+
+    //    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        Log.i("In ACTRESULT: ", "TESTING SAVE");
+//        if (requestCode == TAKE_PHOTO_CODE && resultCode == getActivity().RESULT_OK) {
+//            Log.d("CameraDemo", "Pic saved");
+//                Bundle extras = data.getExtras();
+//                //get the cropped bitmap
+//                Bitmap thePic = extras.getParcelable("data");
+//                //retrieve a reference to the ImageView
+//                ImageView picView = (ImageView)getActivity().findViewById(R.id.picture);
+//                //display the returned cropped image
+//                picView.setImageBitmap(thePic);
+//        }
 //    }
 }
