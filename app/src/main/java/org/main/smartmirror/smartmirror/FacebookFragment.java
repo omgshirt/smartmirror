@@ -8,19 +8,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONObject;
+
+import java.util.Arrays;
 
 
 public class FacebookFragment extends Fragment {
 
     LoginButton btnLoginButton;
     CallbackManager mCBManager;
+    AccessToken mAccessToken;
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -38,6 +47,34 @@ public class FacebookFragment extends Fragment {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.i("status: ", "SUCCESS!");
+                /*new GraphRequest(
+                        AccessToken.getCurrentAccessToken(),
+                        "/{user-id}",
+                        null,
+                        HttpMethod.GET,
+                        new GraphRequest.Callback() {
+                            public void onCompleted(GraphResponse response) {
+                                Log.i("name ", "user-id callback success");
+                            }
+                        }
+                ).executeAsync();*/
+
+                mAccessToken = AccessToken.getCurrentAccessToken();
+                GraphRequest request = GraphRequest.newMeRequest(
+                        mAccessToken,
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                //object = response.getJSONObject("id");
+                                Log.i("graph response ", response.toString());
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,link");
+                request.setParameters(parameters);
+                request.executeAsync();
+
+
             }
 
             @Override
@@ -59,6 +96,5 @@ public class FacebookFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         mCBManager.onActivityResult(requestCode, resultCode, data);
     }
-
 
 }
