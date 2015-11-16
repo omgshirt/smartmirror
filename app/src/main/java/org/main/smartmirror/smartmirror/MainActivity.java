@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity
     private final String SETTINGS = "Settings";
     private final String OFF="Off";
     private final String TWITTER = "Twitter";
+    private final String FACEBOOK = "Facebook";
     private TTSHelper mTTSHelper;
     private static Context mContext; // Hold the app context
     private Preferences mPreferences;
@@ -300,6 +301,10 @@ public class MainActivity extends AppCompatActivity
             case TWITTER:
                 fragment = new TwitterFragment();
                 title = TWITTER;
+                break;
+            case FACEBOOK:
+                fragment = new FacebookFragment();
+                title = FACEBOOK;
                 break;
         }
         if(fragment != null){

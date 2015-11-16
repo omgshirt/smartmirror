@@ -33,18 +33,17 @@ public class FacebookActivity extends Activity{
         mLoginButton.registerCallback(mCallBackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // App code
                 Log.i("result: ", "SUCCESS!");
             }
 
             @Override
             public void onCancel() {
-                // App code
+
             }
 
             @Override
             public void onError(FacebookException exception) {
-                // App code
+
             }
         });
 
