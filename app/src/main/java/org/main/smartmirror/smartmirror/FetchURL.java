@@ -31,6 +31,7 @@ public class FetchURL {
             while((tmp=reader.readLine())!=null)
                 json.append(tmp).append("\n");
             reader.close();
+            connection.disconnect();
 
             JSONObject data = new JSONObject(json.toString());
 
