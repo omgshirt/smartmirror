@@ -54,13 +54,12 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         if (result != null) {
-            //Toast.makeText(mContext, result, Toast.LENGTH_SHORT).show();
             mContext.startRemoteServer();
             Preferences preferences = Preferences.getInstance();
             // Don't issue commands if remote disabled. Poor way of handling this, I know...
             if (preferences.isRemoteEnabled()) {
                 mContext.displayView(result);
-                Log.d("Remote", "Command: " + result);
+                //Log.d("Remote", "Command: " + result);
             }
         }
         //Log.i("Wifi", "Server stopped");
