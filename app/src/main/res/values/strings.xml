@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">SmartMirror</string>
     <string name="open_weather_map_api_key">74ab1bfc0374c634c12dedf9c12b1c03</string>
+    <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
     <string name="nyt_api_key">89899870d1024b962dc582806e3e9c34:3:73303333</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -25,12 +26,15 @@
     <string name="place_not_found">Cannot Find Location</string>
 
     <string name="weather_sunny">\uf00d</string>
+    <string name="weather_cloudy_day">\uf002</string>
     <string name="weather_clear_night">\uf02e</string>
+    <string name="weather_partly_cloudy_night">\uf083</string>
     <string name="weather_thunder">\uf01e</string>
     <string name="weather_drizzle">\uf00d</string>
     <string name="weather_foggy">\uf014</string>
     <string name="weather_cloudy">\uf041</string>
     <string name="weather_snowy">\uf01b</string>
+    <string name="weather_sleet">\uf0b5</string>
     <string name="weather_rainy">\uf019</string>
 
     <string name="weather_humidity">\uf07a</string>
