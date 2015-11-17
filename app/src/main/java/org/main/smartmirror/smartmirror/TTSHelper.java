@@ -32,7 +32,7 @@ public class TTSHelper{
                         @Override
                         public void onStart(String utteranceId) {
                             mIsSpeaking = true;
-                            ((MainActivity)mContext).stopSpeechRecognition();
+//                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
 
                         @Override
