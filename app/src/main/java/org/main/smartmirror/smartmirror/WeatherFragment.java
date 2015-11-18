@@ -179,19 +179,20 @@ public class WeatherFragment extends Fragment implements LocationListener {
 
         if (forecasts == null) return;
 
-        String text = " The current temperature is " + mCurrentTemp + " degrees. " +
+        String text = " Current temperature is " + mCurrentTemp + " degrees. " +
                     " High today " + forecasts[0].maxTemp + ", " +
-                    " low " + forecasts[0].minTemp + ". " +
-                    "Current humidity is " + mCurrentHumidity + " percent ";
+                    " low " + forecasts[0].minTemp + ". "
+                    // "Current humidity " + mCurrentHumidity + " percent. "
+                    ;
 
-        if (mCurrentWind > 0) {
+        if (mCurrentWind > 1) {
             String speedUnits;
             if( mPreferences.getWeatherUnits().equals(Preferences.METRIC))  {
                 speedUnits = "kilometers per hour";
             } else {
                 speedUnits = "miles per hour";
             }
-            text += " with winds of " + mCurrentWind + "  " + speedUnits;
+            text += " Wind speed " + mCurrentWind + "  " + speedUnits;
         }
 
         if ( !text.equals("") ) {
