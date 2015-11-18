@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity
 
     //Dialogue
     FragmentManager frag = getSupportFragmentManager();
-    HelperDialog helperDialog;
+    Helper_Fragment helperFragment;
     Boolean news;
     Boolean calendar;
     Boolean weather;
@@ -427,8 +427,8 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case HELP:
-                helperDialog=HelperDialog.newInstance(getCurrentFragment());
-                helperDialog.show(frag,"HelperDialogue");
+                helperFragment = Helper_Fragment.newInstance(getCurrentFragment());
+                helperFragment.show(frag,"HelperDialogue");
                 title=HELP;
                 break;
 
