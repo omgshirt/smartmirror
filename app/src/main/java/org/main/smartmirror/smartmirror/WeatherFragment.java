@@ -1,6 +1,9 @@
 package org.main.smartmirror.smartmirror;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -9,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +33,10 @@ import java.util.Random;
 
 /**
  * Fragment that displays the weather information
+ *
+ * Commands :
+ *              "forecast" speaks the 3-day forecast
+ *              "conditions" speaks the current conditions
  */
 public class WeatherFragment extends Fragment implements LocationListener {
 
@@ -46,7 +54,6 @@ public class WeatherFragment extends Fragment implements LocationListener {
     private TextView txtAlerts;
     private TextView txtWeatherAlert;
 
-    //private String mCityCode = "5341114";                 // openweatherapi id for the city to find
     private static String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
     private String latitude = "0";
     private String longitude = "0";
@@ -70,7 +77,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         forecasts = new DailyForecast[3];
 
-        // TODO: Find current lat and long position
+        // TODO: Find current lat and long positions. This should be within its own class so other frags can use it.
+        // maybe store this value in preferences?
         LocationManager locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
         if (getActivity().checkCallingOrSelfPermission(LocationManager.GPS_PROVIDER) == PackageManager.PERMISSION_GRANTED) {
@@ -87,8 +95,11 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 e.printStackTrace();
             }
         }
+
+        // some static locations for now
         latitude = "34";
         longitude = "-118";
+
         String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
         String weatherUnit;
         if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
@@ -124,32 +135,63 @@ public class WeatherFragment extends Fragment implements LocationListener {
         return view;
     }
 
-    private void saySomethingAboutWeather() {
-        Random rand = new Random();
-        String text = "";
-        switch (rand.nextInt(5)) {
-            case 0:
-                text = "the current temperature is " + mCurrentTemp + " degrees";
-                break;
-            case 1:
-                text = "the high today is " + forecasts[0].maxTemp + " degrees";
-                break;
-            case 2:
-                text = "the low today is " + forecasts[0].minTemp + " degrees";
-                break;
-            case 3:
-                text = "the current humidity is " + mCurrentHumidity + " percent";
-                break;
-            case 4:
-                if (mCurrentWind == 0) { saySomethingAboutWeather(); }
-                String speedUnits;
-                if( mPreferences.getWeatherUnits().equals(Preferences.METRIC))  {
-                    speedUnits = "kilometers per hour";
-                } else {
-                    speedUnits = "miles per hour";
-                }
-                text = "the current wind speed is " + mCurrentWind + "  " + speedUnits;
-                break;
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("Weather", "Got message: " + message);
+            switch (message) {
+                case MainActivity.FORECAST:
+                    speakWeatherForecast();
+                    break;
+                case MainActivity.CONDITIONS:
+                    speakCurrentConditions();
+                    break;
+            }
+        }
+    };
+
+    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     *  voice recognition, the remote control, etc.
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
+    }
+
+    // when this goes out of view, halt listening
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    // ----------------------- TTS Feedback -------------------------
+
+    private void speakCurrentConditions() {
+
+        if (forecasts == null) return;
+
+        String text = " The current temperature is " + mCurrentTemp + " degrees. " +
+                    " High today " + forecasts[0].maxTemp + ", " +
+                    " low " + forecasts[0].minTemp + ". " +
+                    "Current humidity is " + mCurrentHumidity + " percent ";
+
+        if (mCurrentWind > 0) {
+            String speedUnits;
+            if( mPreferences.getWeatherUnits().equals(Preferences.METRIC))  {
+                speedUnits = "kilometers per hour";
+            } else {
+                speedUnits = "miles per hour";
+            }
+            text += " with winds of " + mCurrentWind + "  " + speedUnits;
         }
 
         if ( !text.equals("") ) {
@@ -159,6 +201,9 @@ public class WeatherFragment extends Fragment implements LocationListener {
 
     // compile and say weather forecast for the next 3 days
     private void speakWeatherForecast(){
+
+        if (forecasts == null) return;
+
         String today = "Today " + forecasts[0].summary + " high of " + forecasts[0].maxTemp +
                 " degrees, low tonight " + forecasts[0].minTemp;
 
@@ -204,11 +249,9 @@ public class WeatherFragment extends Fragment implements LocationListener {
 
     private void renderWeather(JSONObject json){
         try {
-            // hourlyArray holds the next 24 hours of forecasts
+            // hourlyArray holds the next 24 hours of forecasts. Get index 0 for current temp data.
             JSONObject hourly = json.getJSONObject("hourly");
             JSONArray hourlyArray = hourly.getJSONArray("data");
-
-            //getContext().getResources().getIdentifier()
             JSONObject currentHour = hourlyArray.getJSONObject(0);
 
             // set current temp
@@ -218,18 +261,22 @@ public class WeatherFragment extends Fragment implements LocationListener {
 
             // set humidity
             mCurrentHumidity = (int) Math.round((currentHour.getDouble("humidity") * 100));
-            String humidityText = "Humidity: " + mCurrentHumidity + "%";
+            String humidityText = "Humidity " + mCurrentHumidity + "%";
             txtCurrentHumidity.setText(humidityText);
 
-            // set Wind Speed
+            // set Wind Speed & Direction
             mCurrentWind = (int)Math.round(currentHour.getDouble("windSpeed"));
             String windFormat;
             if (mPreferences.getWeatherUnits().equals(Preferences.METRIC) ) {
-                windFormat = "KPH";
+                windFormat = "kph";
             } else {
-                windFormat = "MPH";
+                windFormat = "mph";
             }
-            String windSpeed = "Wind: " + mCurrentWind + " " + windFormat;
+            String windBearing = "";
+            if (currentHour.has("windBearing")) {
+                windBearing = getDirectionFromBearing(currentHour.getInt("windBearing"));
+            }
+            String windSpeed = "Wind " + windBearing + " " + mCurrentWind + " " + windFormat;
             txtCurrentWind.setText(windSpeed);
 
 
@@ -266,46 +313,47 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 LinearLayout forecastLayout = (LinearLayout) getActivity().findViewById(layoutId);
                 JSONObject forecast = hourlyArray.getJSONObject(i*2);
 
-
+                TextView timeForecast = (TextView)forecastLayout.findViewById(R.id.forecast_time);
                 Date date = new Date(forecast.getLong("time") * 1000);
                 SimpleDateFormat sdf = new SimpleDateFormat("ha", Locale.US);
                 String time = sdf.format(date);
-                String icon = forecast.getString("icon");
-                int temp = (int)Math.round(forecast.getDouble("temperature"));
-
-                TextView timeForecast = (TextView)forecastLayout.findViewById(R.id.forecast_time);
                 timeForecast.setText(time);
-                timeForecast.setTextSize(20);
+                timeForecast.setTextSize(15);
 
                 TextView tempForecast = (TextView)forecastLayout.findViewById(R.id.forecast_temp);
+                int temp = (int)Math.round(forecast.getDouble("temperature"));
                 tempForecast.setText( temp + getResources().getString(R.string.weather_deg) );
                 tempForecast.setTypeface(weatherFont);
-                tempForecast.setTextSize(20);
+                tempForecast.setTextSize(15);
 
                 TextView iconForecast = (TextView)forecastLayout.findViewById(R.id.forecast_image);
+                String icon = forecast.getString("icon");
                 setWeatherIcon(iconForecast, icon, forecasts[0].sunrise, forecasts[0].sunset);
-                iconForecast.setTextSize(20);
-                // TODO: add chance of rain to hourly forecasts
+                iconForecast.setTextSize(15);
+
+                TextView rainForecast = (TextView) forecastLayout.findViewById(R.id.forecast_rain);
+                String chanceOfRain = Integer.toString( (int)(forecast.getDouble("precipProbability") * 100)) + "%";
+                rainForecast.setText(chanceOfRain);
             }
 
             // check for weather alerts. Display and speak if they exist
-            JSONArray alerts = json.getJSONArray("alerts");
-            int i = 0;
-            StringBuilder title = new StringBuilder();
-            while (i < alerts.length()) {
-                // Alert descriptions can get really long. Ignoring for now.
-                //String description = alerts.getJSONObject(i).getString("description");
-                title.append(alerts.getJSONObject(i).getString("title") + "\n");
-                txtWeatherAlert.setVisibility(View.VISIBLE);
-                i++;
+            if (json.has("alerts")) {
+                JSONArray alerts = json.getJSONArray("alerts");
+                StringBuilder title = new StringBuilder();
+                int i = 0;
+                while (i < alerts.length()) {
+                    // Alert descriptions can get really long. Ignoring for now.
+                    //String description = alerts.getJSONObject(i).getString("description");
+                    title.append(alerts.getJSONObject(i).getString("title") + "\n");
+                    txtWeatherAlert.setVisibility(View.VISIBLE);
+                    i++;
+                }
+                if (title.length() > 0) {
+                    ((MainActivity) getActivity()).startTTS(title.toString());
+                    txtAlerts.setText(title.toString());
+                }
             }
-            if (title.length() > 0) {
-                ((MainActivity) getActivity()).startTTS(title.toString());
-                txtAlerts.setText(title.toString());
-            }
-
-            //saySomethingAboutWeather();
-            speakWeatherForecast();
+            speakCurrentConditions();
         }catch(Exception e){
             e.printStackTrace();
             Log.e("SimpleWeather", "One or more fields not found in the JSON data");
@@ -387,5 +435,16 @@ public class WeatherFragment extends Fragment implements LocationListener {
         public long sunset;
         public double precipProbability;
         public long forecastTime;
+    }
+
+    /**
+     * Given a wind bearing, returns the direction
+     * @return String direction as abbreviation (NE, E, W...)
+     */
+    public String getDirectionFromBearing(int bearing){
+        if (bearing < 0 || bearing > 360) return "error";
+        String[] directions = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+        int index = (int) ((bearing + 22.5) / 45);
+        return directions[ index ];
     }
 }
