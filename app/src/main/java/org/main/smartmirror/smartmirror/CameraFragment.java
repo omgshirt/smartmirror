@@ -4,55 +4,52 @@ package org.main.smartmirror.smartmirror;
  * Created by Master N on 11/6/2015.
  */
 
-//FROM: http://stackoverflow.com/questions/20878232/android-using-settransform-for-flipping-the-live-textureview/20883662#20883662
-//Additional help from: http://developer.android.com/reference/android/view/TextureView.html
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.logging.Handler;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-//use this link: http://www.linux.com/learn/tutorials/726597-how-to-call-the-camera-in-android-part-2-capture-and-store-photos
+
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.http.FileContent;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
+
 public class CameraFragment extends Fragment implements TextureView.SurfaceTextureListener {
 
-    int TAKE_PHOTO_CODE = 0;
+    static final int REQUEST_ACCOUNT_PICKER = 1;
+    static final int REQUEST_AUTHORIZATION = 2;
+    static final int CAPTURE_IMAGE = 3;
+    private static Drive service;
+    private GoogleAccountCredential credential;
     private static Camera mCamera;
     private TextureView mTextureView;
-
-
-
+    public static File picOutFile;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,51 +58,39 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         mTextureView = (TextureView) view.findViewById(R.id.cameraView);
         mTextureView.setSurfaceTextureListener(this);
-         final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/smartMirrorPics/";
-         final File newdir = new File(dir);
-        if(!newdir.exists()) {
-            newdir.mkdirs();
-            Log.i("Checking Dir: ", " if directory doesnt exist and create directory if so");
-        }else {
-            Log.i("Checking Dir: ", " apparently directory exists");
-            newdir.mkdirs();
-        }
 
-            final Button capture = (Button) view.findViewById(R.id.takepicture);
-            capture.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    capture.setEnabled(false);
-                    takePhoto();
+        credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
+        startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
 
-                    //https://rajareddypolam.wordpress.com/2013/01/29/android-saving-file-to-external-storage/
-                    getActivity().sendBroadcast(new Intent(
-                            Intent.ACTION_MEDIA_MOUNTED,
-                            Uri.parse("file://" + Environment.getExternalStorageDirectory())));
-                }
-            });
-
+        final Button capture = (Button) view.findViewById(R.id.takepicture);
+        capture.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                capture.setEnabled(false);
+                takePhoto();
+            }
+        });
         return view;
     }
 
     protected static final int MEDIA_TYPE_IMAGE = 0;
 
     private void takePhoto() {
-        mTextureView=null;
+        mTextureView = null;
         Camera.PictureCallback pictureCB = new Camera.PictureCallback() {
             public void onPictureTaken(byte[] data, Camera cam) {
 
                 File picFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+                picOutFile = picFile;
                 if (picFile == null) {
-                    Log.e("CANT CREATE takePhoto", "Couldn't create media file; check storage permissions?");
+                    Log.e("takePhoto", "picFile is null");
                     return;
                 }
-
                 try {
                     FileOutputStream fos = new FileOutputStream(picFile);
-                    Log.e("writing data?", "creating file?");
+                    Log.e("takePhoto", "creating file");
                     fos.write(data);
+                    saveFileToDrive();
                     fos.close();
-
                 } catch (FileNotFoundException e) {
                     Log.e("NOT FOUND takePhoto", "File not found: " + e.getMessage());
                     e.getStackTrace();
@@ -121,21 +106,13 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     private File getOutputMediaFile(int type) {
         File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/smartMirrorPics/");
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                Log.e("getoutputmedialfile", "Failed to create storage directory.");
-                return null;
-            }
-        }
         String timeStamp =
                 new SimpleDateFormat("yyyMMdd_HHmmss", Locale.UK).format(new Date());
         if (type == MEDIA_TYPE_IMAGE) {
-            Log.i("OUTPUT FILE", "TESTING PICTURE");
             final Button cap = (Button) getActivity().findViewById(R.id.takepicture);
             cap.setEnabled(true);
             return new File(dir.getPath() + File.separator + "IMG_"
                     + timeStamp + ".jpg");
-
         } else {
             return null;
         }
@@ -143,7 +120,6 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        //int result = 0;
         int cameraId = 0;
         Camera.CameraInfo info = new Camera.CameraInfo();
 
@@ -152,18 +128,13 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
                 break;
         }
-
         mCamera = Camera.open(cameraId);
-
         Matrix transform = new Matrix();
         Camera.Parameters param = mCamera.getParameters();
         param.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
         Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
-
         int rotation = getActivity().getWindowManager().getDefaultDisplay()
                 .getRotation();
-
-        // Log.i("onSurfaceTextureAvailable", " CameraOrientation(" + cameraId + ")" + info.orientation + " " + previewSize.width + "x" + previewSize.height + " Rotation=" + rotation);
 
         switch (rotation) {
             case Surface.ROTATION_0:
@@ -204,12 +175,12 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        // Ignored, the Camera does all the work for us
+        //Camera takes care of this. Must keep this method for class
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        if(this.mCamera != null){
+        if (this.mCamera != null) {
             mCamera.stopPreview();
             mCamera.release();
             this.mCamera = null;
@@ -226,7 +197,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         super.onPause();
         try {
             mCamera.setPreviewCallback(null);
-            mTextureView=null;
+            mTextureView = null;
             mTextureView.setSurfaceTextureListener(null);
             mCamera.release();
             mCamera = null;
@@ -239,38 +210,68 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     public void onResume() {
         super.onResume();
         if (mCamera != null) {
-            mTextureView = (TextureView)getActivity().findViewById(R.id.cameraView);
+            mTextureView = (TextureView) getActivity().findViewById(R.id.cameraView);
             mTextureView.setSurfaceTextureListener(this);
-            //mCamera.open();
             mCamera.startPreview();
-            Log.d("ONRESUME", "openCamera -- done");
+            Log.d("onResume", "opening camera view");
         }
-        mTextureView = (TextureView)getActivity().findViewById(R.id.cameraView);
+        mTextureView = (TextureView) getActivity().findViewById(R.id.cameraView);
         mTextureView.setSurfaceTextureListener(this);
-        Log.d("ONRESUME2", "openCamera22222 -- done");
+        Log.d("onResume2", "opening camera view");
     }
 
-//    @Override
-//    public void onDestroy() {
-//        if (mCamera != null) {
-//            mCamera.release();
-//        }
-//        super.onDestroy();
-//    }
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        switch (requestCode) {
+            case REQUEST_ACCOUNT_PICKER:
+                if (resultCode == getActivity().RESULT_OK && data != null && data.getExtras() != null) {
+                    String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        credential.setSelectedAccountName(accountName);
+                        service = getDriveService(credential);
+                    }
+                }
+                break;
+            case REQUEST_AUTHORIZATION:
+                if (resultCode == Activity.RESULT_OK) {
+                } else {
+                    startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+                }
+                break;
+            case CAPTURE_IMAGE:
+                if (resultCode == Activity.RESULT_OK) {
+                    takePhoto();
+                }
+        }
+    }
 
-    //    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        Log.i("In ACTRESULT: ", "TESTING SAVE");
-//        if (requestCode == TAKE_PHOTO_CODE && resultCode == getActivity().RESULT_OK) {
-//            Log.d("CameraDemo", "Pic saved");
-//                Bundle extras = data.getExtras();
-//                //get the cropped bitmap
-//                Bitmap thePic = extras.getParcelable("data");
-//                //retrieve a reference to the ImageView
-//                ImageView picView = (ImageView)getActivity().findViewById(R.id.picture);
-//                //display the returned cropped image
-//                picView.setImageBitmap(thePic);
-//        }
-//    }
+    private void saveFileToDrive() {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // File's binary content
+                    java.io.File fileContent = new java.io.File(picOutFile.getPath());
+                    FileContent mediaContent = new FileContent("image/jpeg", fileContent);
+
+                    // File's metadata.
+                    com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
+                    body.setTitle(fileContent.getName());
+                    body.setMimeType("image/jpeg");
+
+                    com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
+                } catch (UserRecoverableAuthIOException e) {
+                    startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    private Drive getDriveService(GoogleAccountCredential credential) {
+        return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
+                .build();
+    }
 }
