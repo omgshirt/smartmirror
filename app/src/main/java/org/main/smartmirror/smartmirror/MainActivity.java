@@ -75,12 +75,7 @@ public class MainActivity extends AppCompatActivity
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
-
-
-    /*private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
-            "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
-    /*private String mSportsURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=sports&sort=newest&api-key=";
-    private String mTechURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=technology&sort=newest&api-key=";*/
+    // News
     private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
@@ -369,7 +364,6 @@ public class MainActivity extends AppCompatActivity
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-
         // If sleeping, save viewName and wake screen.
         // displayView will be called again from onStart() with the fragment to show
         if (mirrorSleepState == SLEEPING) {
@@ -403,7 +397,11 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
-                title= SETTINGS;
+                title = SETTINGS;
+                break;
+            case CAMERA:
+                fragment = new CameraFragment();
+                title = CAMERA;
                 break;
             case WAKE:
                 if (mirrorSleepState == LIGHT_SLEEP) {
@@ -496,6 +494,9 @@ public class MainActivity extends AppCompatActivity
             if (voiceInput.contains(CALENDAR)) {
                 startTTS(CALENDAR);
                 displayView(CALENDAR);
+            }else if (voiceInput.contains(CAMERA.toLowerCase())){
+                startTTS(CAMERA);
+                displayView(CAMERA);
             } else if (voiceInput.contains(WEATHER)) {
                 startTTS(WEATHER);
                 displayView(WEATHER);
