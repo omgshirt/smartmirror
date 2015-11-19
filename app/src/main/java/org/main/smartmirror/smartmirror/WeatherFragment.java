@@ -446,6 +446,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
         if (bearing < 0 || bearing > 360) return "error";
         String[] directions = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
         int index = (int) ((bearing + 22.5) / 45);
+        index %= 8;
         return directions[ index ];
     }
 }
