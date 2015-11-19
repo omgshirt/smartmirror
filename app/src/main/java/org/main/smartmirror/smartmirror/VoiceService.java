@@ -58,6 +58,9 @@ public class VoiceService extends Service implements RecognitionListener{
         return mMessenger.getBinder();
     }
 
+    /**
+     * Set up all the things
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -94,7 +97,8 @@ public class VoiceService extends Service implements RecognitionListener{
      * Stops voice recognition, invoked by the calling Activity
      */
     public void stopVoice(){
-        mSpeechRecognizer.stop();
+//        if(mSpeechRecognizer != null)
+            mSpeechRecognizer.stop();
     }
 
     /**
@@ -127,6 +131,8 @@ public class VoiceService extends Service implements RecognitionListener{
             switchSearch(SMARTMIRROR_SEARCH);
 //            setSpokenCommand(text);
         }
+        else
+            Log.i("OPR", text);
     }
 
     /**
@@ -134,7 +140,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        Log.i("OR", hypothesis.getHypstr());
+        Log.i("onResult", hypothesis.getHypstr());
         setSpokenCommand(hypothesis.getHypstr());
         sendMessage();
     }
@@ -152,6 +158,10 @@ public class VoiceService extends Service implements RecognitionListener{
 //        stopVoice();
     }
 
+    /**
+     * Method that handles the Error
+     * @param error the error
+     */
     @Override
     public void onError(Exception error) {
         Log.i("ERR", error.getMessage());
@@ -162,6 +172,9 @@ public class VoiceService extends Service implements RecognitionListener{
 //        mSpeechRecognizer.removeListener(this);
     }
 
+    /**
+     * Method that handles the initializeation of the dictionary
+     */
     public void initializeDictionary() {
         new AsyncTask<Void, Void, Exception>() {
             @Override
@@ -182,12 +195,17 @@ public class VoiceService extends Service implements RecognitionListener{
                     Toast.makeText(VoiceService.this, "" + result, Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    switchSearch(KWS_SEARCH);
+//                    switchSearch(KWS_SEARCH);
                 }
             }
         }.execute();
     }
 
+    /**
+     * Method that sets up the recognizer
+     * @param assetsDir the asset directory on the device
+     * @throws IOException
+     */
     private void setupRecognizer(File assetsDir) throws IOException {
         // The recognizer can be configured to perform multiple searches
         // of different kind and switch between them
@@ -217,6 +235,10 @@ public class VoiceService extends Service implements RecognitionListener{
 
     }
 
+    /**
+     * Method that switches the search based on the keyphrase said
+     * @param searchName the keyword that we just said
+     */
     public void switchSearch(String searchName){
         stopVoice();
         if(searchName.equals(KWS_SEARCH))
@@ -228,7 +250,10 @@ public class VoiceService extends Service implements RecognitionListener{
         Log.i("SWITCH", caption);
     }
 
-    // Handles the messages from Main to this service
+    /**
+     * Class that handles the messages from the binding activity to this service
+     * switches between starting and stopping voice capture
+     */
     public class IHandler extends Handler {
 
         @Override
