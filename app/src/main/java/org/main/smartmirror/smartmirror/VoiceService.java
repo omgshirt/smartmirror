@@ -130,11 +130,12 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        sendMessage();
+
     }
 
     @Override
     public void onBeginningOfSpeech() {
+
     }
 
     /**
@@ -142,6 +143,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
+        sendMessage();
         stopVoice();
     }
 
