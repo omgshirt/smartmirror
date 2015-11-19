@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -21,6 +22,7 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -34,6 +36,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -50,6 +55,11 @@ public class MainActivity extends AppCompatActivity
 
     private static Context mContext;
     private Preferences mPreferences;
+    
+    //twitter keys
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
+    private static final String TWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
 
     // Constants
     public static final String TAG = "SmartMirror";
@@ -162,6 +172,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
 
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
@@ -418,6 +430,14 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
                 break;
+            case TWITTER:
+                fragment = new TwitterFragment();
+                title = TWITTER;
+                break;
+            case FACEBOOK:
+                fragment = new FacebookFragment();
+                title = FACEBOOK;
+                break;
             default:
                 // The command isn't one of the view swap instructions,
                 // so broadcast the viewName (our input) to any listening fragments.
@@ -494,7 +514,7 @@ public class MainActivity extends AppCompatActivity
             if (voiceInput.contains(CALENDAR)) {
                 startTTS(CALENDAR);
                 displayView(CALENDAR);
-            }else if (voiceInput.contains(CAMERA.toLowerCase())){
+            }else if (voiceInput.contains(CAMERA)){
                 startTTS(CAMERA);
                 displayView(CAMERA);
             } else if (voiceInput.contains(WEATHER)) {
@@ -512,6 +532,9 @@ public class MainActivity extends AppCompatActivity
                 displayView(NEWS);
             } else if(voiceInput.contains(OFF) || voiceInput.contains(SLEEP)){
                 displayView(SLEEP);
+            } else if (voiceInput.contains(FACEBOOK)) {
+                startTTS(FACEBOOK);
+                displayView(FACEBOOK);    
             } else if (voiceInput.contains(mNewsDesk)) {
                 startTTS(mNewsDesk);
                 displayView(NEWS);
@@ -669,5 +692,13 @@ public class MainActivity extends AppCompatActivity
         if (wifiHeartbeat != null) {
             wifiHeartbeat.cancel(true);
         }
+    }
+
+    //new york times branding
+    public void toNYT(View v) {
+        String url = "http://developer.nytimes.com/";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 }
