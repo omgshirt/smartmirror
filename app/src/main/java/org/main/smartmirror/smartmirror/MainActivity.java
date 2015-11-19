@@ -532,9 +532,12 @@ public class MainActivity extends AppCompatActivity
                 displayView(NEWS);
             } else if(voiceInput.contains(OFF) || voiceInput.contains(SLEEP)){
                 displayView(SLEEP);
-            } else if (voiceInput.contains(FACEBOOK)) {
+            } else if (voiceInput.toLowerCase().contains(FACEBOOK)) {
                 startTTS(FACEBOOK);
-                displayView(FACEBOOK);    
+                displayView(FACEBOOK);
+            } else if (voiceInput.toLowerCase().contains(TWITTER)) {
+                startTTS(TWITTER);
+                displayView(TWITTER);
             } else if (voiceInput.contains(mNewsDesk)) {
                 startTTS(mNewsDesk);
                 displayView(NEWS);
