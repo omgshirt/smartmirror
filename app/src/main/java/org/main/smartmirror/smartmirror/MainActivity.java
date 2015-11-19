@@ -349,6 +349,9 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             }
+
+
+
             if(DEBUG)
                 Log.i("I heard: ", voiceInput);
             if (voiceInput.contains(CALENDAR.toLowerCase())) {
@@ -369,10 +372,14 @@ public class MainActivity extends AppCompatActivity
                 displayView(NEWS);
             } else if(voiceInput.contains(OFF.toLowerCase())){
                 displayView(OFF);
-            } else if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+            } else if (voiceInput.contains(FACEBOOK.toLowerCase())) {
+                startTTS(FACEBOOK);
+                displayView(FACEBOOK);
+            }else if (voiceInput.contains(mNewsDesk.toLowerCase())) {
                 startTTS(mNewsDesk);
                 displayView(NEWS);
             }
+
         }catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Didn't catch that",
                     Toast.LENGTH_LONG).show();
