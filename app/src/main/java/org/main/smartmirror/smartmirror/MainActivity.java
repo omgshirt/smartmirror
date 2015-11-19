@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     public static final String WAKE = "Wake";
     public static final String WEATHER = "Weather";
     public static final String HELP = "Help";
+    public static final String QUOTE="Quote";
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
@@ -432,6 +433,11 @@ public class MainActivity extends AppCompatActivity
                 title=HELP;
                 break;
 
+            case QUOTE:
+              fragment=new QuoteFragment();
+                title = QUOTE;
+                break;
+
 
         }
 
@@ -550,6 +556,12 @@ public class MainActivity extends AppCompatActivity
             {
                 startTTS(HELP);
                 displayView(HELP);
+            }
+
+            else if (voiceInput.contains(QUOTE.toLowerCase()))
+            {
+                startTTS(QUOTE);
+                displayView(QUOTE);
             }
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Didn't catch that",

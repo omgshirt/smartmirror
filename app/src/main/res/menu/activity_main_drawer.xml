@@ -22,6 +22,11 @@
         android:title="@string/title_weather"/>
         <item android:id="@+id/nav_help" android:icon="@android:drawable/ic_menu_gallery"
             android:title="Help"/>
+        <item android:id="@+id/nav_quote" android:icon="@android:drawable/ic_menu_gallery"
+            android:title="Quote"/>
+
+
+
     </group>
 
 </menu>
