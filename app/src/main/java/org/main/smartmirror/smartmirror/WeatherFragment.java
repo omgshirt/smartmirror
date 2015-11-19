@@ -289,21 +289,22 @@ public class WeatherFragment extends Fragment implements LocationListener {
             }
 
             // check for weather alerts. Display and speak if they exist
-            JSONArray alerts = json.getJSONArray("alerts");
-            int i = 0;
-            StringBuilder title = new StringBuilder();
-            while (i < alerts.length()) {
-                // Alert descriptions can get really long. Ignoring for now.
-                //String description = alerts.getJSONObject(i).getString("description");
-                title.append(alerts.getJSONObject(i).getString("title") + "\n");
-                txtWeatherAlert.setVisibility(View.VISIBLE);
-                i++;
+            if(json.has("alerts")) {
+                JSONArray alerts = json.getJSONArray("alerts");
+                int i = 0;
+                StringBuilder title = new StringBuilder();
+                while (i < alerts.length()) {
+                    // Alert descriptions can get really long. Ignoring for now.
+                    //String description = alerts.getJSONObject(i).getString("description");
+                    title.append(alerts.getJSONObject(i).getString("title") + "\n");
+                    txtWeatherAlert.setVisibility(View.VISIBLE);
+                    i++;
+                }
+                if (title.length() > 0) {
+                    ((MainActivity) getActivity()).startTTS(title.toString());
+                    txtAlerts.setText(title.toString());
+                }
             }
-            if (title.length() > 0) {
-                ((MainActivity) getActivity()).startTTS(title.toString());
-                txtAlerts.setText(title.toString());
-            }
-
             //saySomethingAboutWeather();
             speakWeatherForecast();
         }catch(Exception e){

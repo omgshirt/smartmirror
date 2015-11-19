@@ -34,6 +34,7 @@ public class VoiceService extends Service implements RecognitionListener{
     private Messenger mMessenger = new Messenger( new IHandler());
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
+    private HashMap<String,Integer> captions;
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
@@ -60,6 +61,9 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onCreate() {
         super.onCreate();
+        captions = new HashMap<String, Integer>();
+        captions.put(KWS_SEARCH, R.string.kws_caption);
+        captions.put(SMARTMIRROR_SEARCH, R.string.smartmirror_caption);
         initializeDictionary();
     }
 
@@ -121,7 +125,7 @@ public class VoiceService extends Service implements RecognitionListener{
         String text = hypothesis.getHypstr();
         if(text.equals(KEYPHRASE)) {
             switchSearch(SMARTMIRROR_SEARCH);
-            setSpokenCommand(text);
+//            setSpokenCommand(text);
         }
     }
 
@@ -130,7 +134,9 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-
+        Log.i("OR", hypothesis.getHypstr());
+        setSpokenCommand(hypothesis.getHypstr());
+        sendMessage();
     }
 
     @Override
@@ -143,8 +149,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
-        sendMessage();
-        stopVoice();
+//        stopVoice();
     }
 
     @Override
@@ -175,6 +180,9 @@ public class VoiceService extends Service implements RecognitionListener{
             protected void onPostExecute(Exception result) {
                 if (result != null) {
                     Toast.makeText(VoiceService.this, "" + result, Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    switchSearch(KWS_SEARCH);
                 }
             }
         }.execute();
@@ -215,6 +223,9 @@ public class VoiceService extends Service implements RecognitionListener{
             mSpeechRecognizer.startListening(searchName);
         else
             mSpeechRecognizer.startListening(searchName, 1000);
+
+        String caption = getResources().getString(captions.get(searchName));
+        Log.i("SWITCH", caption);
     }
 
     // Handles the messages from Main to this service
