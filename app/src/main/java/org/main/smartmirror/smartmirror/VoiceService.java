@@ -90,7 +90,7 @@ public class VoiceService extends Service implements RecognitionListener{
      * Starts voice capture, invoked by the calling Activity
      */
     public void startVoice(){
-        mSpeechRecognizer.startListening(KWS_SEARCH);
+        mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
     }
 
     /**
@@ -127,12 +127,7 @@ public class VoiceService extends Service implements RecognitionListener{
         if (hypothesis == null)
             return;
         String text = hypothesis.getHypstr();
-        if(text.equals(KEYPHRASE)) {
-            switchSearch(SMARTMIRROR_SEARCH);
-//            setSpokenCommand(text);
-        }
-        else
-            Log.i("OPR", text);
+        Log.i("OPR", text);
     }
 
     /**
@@ -140,9 +135,11 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        Log.i("onResult", hypothesis.getHypstr());
-        setSpokenCommand(hypothesis.getHypstr());
-        sendMessage();
+        if(hypothesis != null) {
+            Log.i("onResult", hypothesis.getHypstr());
+            setSpokenCommand(hypothesis.getHypstr());
+            sendMessage();
+        }
     }
 
     @Override
@@ -155,7 +152,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
-//        stopVoice();
+        stopVoice();
     }
 
     /**
@@ -227,7 +224,7 @@ public class VoiceService extends Service implements RecognitionListener{
          * They are added here for demonstration. You can leave just one.
          */
 
-        mSpeechRecognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
+//        mSpeechRecognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
 
         // Create grammar-based search for selection between demos
         File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");

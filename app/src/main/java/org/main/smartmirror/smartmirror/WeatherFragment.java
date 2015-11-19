@@ -305,8 +305,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
                     txtAlerts.setText(title.toString());
                 }
             }
-            //saySomethingAboutWeather();
-            speakWeatherForecast();
+            saySomethingAboutWeather();
+//            speakWeatherForecast();
         }catch(Exception e){
             e.printStackTrace();
             Log.e("SimpleWeather", "One or more fields not found in the JSON data");

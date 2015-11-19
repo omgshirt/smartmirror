@@ -44,7 +44,7 @@ public class TTSHelper{
 
                         @Override
                         public void onError(String utteranceId) {
-                            ((MainActivity)mContext).stopSpeechRecognition();
+//                            ((MainActivity)mContext).stopSpeechRecognition();
                             mIsSpeaking = false;
                         }
                     });
