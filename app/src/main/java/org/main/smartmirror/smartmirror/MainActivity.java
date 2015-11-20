@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -21,8 +22,10 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -33,7 +36,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -48,23 +55,32 @@ public class MainActivity extends AppCompatActivity
 
     private static Context mContext;
     private Preferences mPreferences;
+    
+    //twitter keys
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
+    private static final String TWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
 
     // Constants
     public static final String TAG = "SmartMirror";
-    public static final String CALENDAR = "Calendar";
-    public static final String CAMERA = "Camera";
-    public static final String FACEBOOK = "Facebook";
-    public static final String LIGHT = "Light";
-    public static final String NEWS = "News";
-    public static final String MUSIC = "Music";
-    public static final String SETTINGS = "Settings";
-    public static final String SLEEP = "Sleep";
-    public static final String TRAFFIC = "Traffic";
-    public static final String TWITTER = "Twitter";
-    public static final String OFF = "Off";
-    public static final String ON = "On";
-    public static final String WAKE = "Wake";
-    public static final String WEATHER = "Weather";
+
+    public static final String CALENDAR = "calendar";
+    public static final String CAMERA = "camera";
+    public static final String FACEBOOK = "facebook";
+    public static final String CONDITIONS = "conditions";
+    public static final String FORECAST = "forecast";
+    public static final String LIGHT = "light";
+    public static final String MUSIC = "music";
+    public static final String NEWS = "news";
+    public static final String OFF = "off";
+    public static final String ON = "on";
+    public static final String SETTINGS = "settings";
+    public static final String SLEEP = "sleep";
+    public static final String TRAFFIC = "traffic";
+    public static final String TWITTER = "twitter";
+    public static final String WAKE = "wake";
+    public static final String WEATHER = "weather";
+
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
@@ -156,6 +172,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
 
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
@@ -281,6 +299,19 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "onDestroy");
     }
 
+    // ------------------------- Handle Inputs / Broadcasts --------------------------
+
+    /**
+     * Broadcast a message on intentName
+     * @param intentName intent name
+     * @param msg String message to send
+     */
+    private void broadcastMessage(String intentName, String msg) {
+        Intent intent = new Intent(intentName);
+        intent.putExtra("message", msg);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
     // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
 
     protected void wakeScreen() {
@@ -322,7 +353,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            displayView(item.toString());
+            displayView(item.toString().toLowerCase(Locale.US));
         }
 
         return super.onOptionsItemSelected(item);
@@ -334,7 +365,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         if(DEBUG)
             Log.i("item selected", item.toString());
-        displayView(item.toString());
+        displayView(item.toString().toLowerCase(Locale.US));
         return true;
     }
 
@@ -395,17 +426,34 @@ public class MainActivity extends AppCompatActivity
                     fragment = new OffFragment();
                     mirrorSleepState = LIGHT_SLEEP;
                     title = SLEEP;
-                } else { return; }
+                } else {
+                    return;
+                }
+                break;
+            case TWITTER:
+                fragment = new TwitterFragment();
+                title = TWITTER;
+                break;
+            case FACEBOOK:
+                fragment = new FacebookFragment();
+                title = FACEBOOK;
+                break;
+            default:
+                // The command isn't one of the view swap instructions,
+                // so broadcast the viewName (our input) to any listening fragments.
+                broadcastMessage("inputAction", viewName);
                 break;
         }
 
-        stopTTS();
-
         if(fragment != null){
+
+            stopTTS();
+
             if(DEBUG)
                 Log.i("Fragments", "Displaying " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
+
             if (!isFinishing()) {
                 ft.commit();
                 // Any command besides SLEEP or WAKE now sets the state to AWAKE
@@ -413,7 +461,6 @@ public class MainActivity extends AppCompatActivity
                     mirrorSleepState = AWAKE;
                     mCurrentFragment = viewName;
                 }
-                Log.i(TAG, "mCurrentFragment:" + mCurrentFragment);
             } else {
                 Log.i("Fragments", "commit skipped. isFinishing() returned true");
             }
@@ -447,7 +494,7 @@ public class MainActivity extends AppCompatActivity
             String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
             int i = 0;
             while (i < urlArr.length) {
-                if (voiceInput.contains(urlArr[i].toLowerCase())) {
+                if (voiceInput.contains(urlArr[i])) {
                     mNewsDesk = urlArr[i];
                     mNYTURL = mPreURL + mNewsDesk + mPostURL;
                     mDefaultURL = mNYTURL;
@@ -464,28 +511,34 @@ public class MainActivity extends AppCompatActivity
             }
             if(DEBUG)
                 Log.i("I heard: ", voiceInput);
-            if (voiceInput.contains(CALENDAR.toLowerCase())) {
+            if (voiceInput.contains(CALENDAR)) {
                 startTTS(CALENDAR);
                 displayView(CALENDAR);
-            }else if(voiceInput.contains(CAMERA.toLowerCase())){
+            }else if (voiceInput.contains(CAMERA)){
                 startTTS(CAMERA);
                 displayView(CAMERA);
-            } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+            } else if (voiceInput.contains(WEATHER)) {
                 startTTS(WEATHER);
                 displayView(WEATHER);
-            } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+            } else if (voiceInput.contains(LIGHT)) {
                 startTTS(LIGHT);
                 displayView(LIGHT);
-            } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+            } else if (voiceInput.contains(SETTINGS)) {
                 startTTS(SETTINGS);
                 displayView(SETTINGS);
-            } else if (voiceInput.contains(NEWS.toLowerCase())) {
+            } else if (voiceInput.contains(NEWS)) {
                 startTTS(NEWS);
                 mDefaultURL = mNewsDefault;
                 displayView(NEWS);
-            } else if(voiceInput.contains(OFF.toLowerCase()) || voiceInput.contains(SLEEP.toLowerCase())){
+            } else if(voiceInput.contains(OFF) || voiceInput.contains(SLEEP)){
                 displayView(SLEEP);
-            } else if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+            } else if (voiceInput.toLowerCase().contains(FACEBOOK)) {
+                startTTS(FACEBOOK);
+                displayView(FACEBOOK);
+            } else if (voiceInput.toLowerCase().contains(TWITTER)) {
+                startTTS(TWITTER);
+                displayView(TWITTER);
+            } else if (voiceInput.contains(mNewsDesk)) {
                 startTTS(mNewsDesk);
                 displayView(NEWS);
             }
@@ -642,5 +695,13 @@ public class MainActivity extends AppCompatActivity
         if (wifiHeartbeat != null) {
             wifiHeartbeat.cancel(true);
         }
+    }
+
+    //new york times branding
+    public void toNYT(View v) {
+        String url = "http://developer.nytimes.com/";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 }
