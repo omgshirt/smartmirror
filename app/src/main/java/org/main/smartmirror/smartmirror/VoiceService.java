@@ -38,8 +38,6 @@ public class VoiceService extends Service implements RecognitionListener{
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
-    private String KEYPHRASE="mirror";
-    private String KWS_SEARCH="wake";
     private String SMARTMIRROR_SEARCH="mirror";
 
     @Override
@@ -53,6 +51,11 @@ public class VoiceService extends Service implements RecognitionListener{
         mSpeechRecognizer.shutdown();
     }
 
+    /**
+     * Method that returns a binder for the calling Activity to bind and access this service
+     * @param intent the current inten
+     * @return the binder
+     */
     @Override
     public IBinder onBind(Intent intent) {
         return mMessenger.getBinder();
@@ -123,8 +126,6 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
-        /*if (hypothesis == null)
-            return;*/
         if (hypothesis != null)
             Log.i("VR", "onPartialResult: " + hypothesis.getHypstr());
     }
@@ -142,6 +143,9 @@ public class VoiceService extends Service implements RecognitionListener{
         startVoice();
     }
 
+    /**
+     * Method that executes when we first begin speaking
+     */
     @Override
     public void onBeginningOfSpeech() {
         //Log.i("VR", "onBeginningOfSpeech");
@@ -167,11 +171,11 @@ public class VoiceService extends Service implements RecognitionListener{
 
     @Override
     public void onTimeout() {
-//        mSpeechRecognizer.removeListener(this);
+
     }
 
     /**
-     * Method that handles the initializeation of the dictionary
+     * Method that handles the initialization of the dictionary
      */
     public void initializeDictionary() {
         new AsyncTask<Void, Void, Exception>() {
@@ -194,7 +198,6 @@ public class VoiceService extends Service implements RecognitionListener{
                 }
                 else {
                     mSpeechInitialized = true;
-                    //                    switchSearch(KWS_SEARCH);
                 }
             }
         }.execute();
@@ -214,7 +217,7 @@ public class VoiceService extends Service implements RecognitionListener{
                 .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
 
                         // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setKeywordThreshold(1e-20f)
+                .setKeywordThreshold(1e-10f)
 
                         // Use context-independent phonetic search, context-dependent is too slow for mobile
                 .setBoolean("-allphone_ci", true)
@@ -226,24 +229,10 @@ public class VoiceService extends Service implements RecognitionListener{
          * They are added here for demonstration. You can leave just one.
          */
 
-//        mSpeechRecognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
-
         // Create grammar-based search for selection between demos
         File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
         mSpeechRecognizer.addKeywordSearch(SMARTMIRROR_SEARCH, smartMirrorcommandList);
 
-    }
-
-    /**
-     * Method that switches the search based on the keyphrase said
-     * @param searchName the keyword that we just said
-     */
-    public void switchSearch(String searchName){
-        stopVoice();
-        if(searchName.equals(KWS_SEARCH))
-            mSpeechRecognizer.startListening(searchName);
-        else
-            mSpeechRecognizer.startListening(searchName, 1000);
     }
 
     /**

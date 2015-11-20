@@ -1,52 +1,52 @@
-calendar /1e-8/
-camera /1e-5/
-facebook /1e-5/
-forecast /1e-5/
-help /1e-5/
-light /1e-5/
-news /1e-2/
-music /1e-5/
-options /1e-5/
-settings /1e-5/
-sports /1e-5/
-technology /1e-20/
-twitter /1e-5/
-weather /1e-5/
-hangman /1e-5/
-traffic /1e-5/
-brightness very low /1e-10/
-brightness low /1e-10/
-brightness medium /1e-10/
-brightness high /1e-10/
-brightness very high /1e-10/
-camera on /1e-5/
-camera off /1e-5/
-light very low /1e-10/
-light low /1e-8/
-light medium /1e-8/
-light high /1e-8/
-light very high /1e-10/
-listen on /1e-8/
-listen off /1e-8/
-music very low /1e-10/
-music low /1e-10/
-music medium /1e-10/
-music high /1e-10/
-music very high /1e-10/
-remote on /1e-10/
-remote off /1e-10/
-speech never /1e-10/
-speech rare /1e-10/
-speech often /1e-10/
-speech always /1e-10/
-start listening /1e-10/
-stop listening /1e-10/
-volume very low /1e-10/
-volume low /1e-10/
-volume medium /1e-10/
-volume high /1e-10/
-volume very high /1e-10/
-voice recognition off /1e-10/
-voice recognition on /1e-10/
-weather metric /1e-10/
-weather english /1e-10/
+calendar /1e-3/
+camera /1e-3/
+facebook /1e-2/
+forecast /1e-2/
+help /1e-1/
+light /1e-1/
+news /1e-1/
+music /1e-2/
+options /1e-3/
+settings /1e-4/
+sports /1e-1/
+technology /1e-4/
+twitter /1e-2/
+weather /1e-2/
+hangman /1e-2/
+traffic /1e-2/
+brightness very low /1e-5/
+brightness low /1e-3/
+brightness medium /1e-5/
+brightness high /1e-3/
+brightness very high /1e-5/
+camera on /1e-4/
+camera off /1e-4/
+light very low /1e-4/
+light low /1e-3/
+light medium /1e-4/
+light high /1e-2/
+light very high /1e-4/
+listen on /1e-2/
+listen off /1e-2/
+music very low /1e-5/
+music low /1e-3/
+music medium /1e-3/
+music high /1e-3/
+music very high /1e-5/
+remote on /1e-3/
+remote off /1e-3/
+speech never /1e-3/
+speech rare /1e-2/
+speech often /1e-3/
+speech always /1e-3/
+start listening /1e-4/
+stop listening /1e-4/
+volume very low /1e-5/
+volume low /1e-3/
+volume medium /1e-5/
+volume high /1e-3/
+volume very high /1e-5/
+voice recognition off /1e-6/
+voice recognition on /1e-6/
+weather metric /1e-4/
+weather english /1e-4/
