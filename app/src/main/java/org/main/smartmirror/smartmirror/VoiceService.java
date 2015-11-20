@@ -34,7 +34,7 @@ public class VoiceService extends Service implements RecognitionListener{
     private Messenger mMessenger = new Messenger( new IHandler());
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
-    private HashMap<String,Integer> captions;
+    private boolean mSpeechInitialized;
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
@@ -64,9 +64,7 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onCreate() {
         super.onCreate();
-        captions = new HashMap<String, Integer>();
-        captions.put(KWS_SEARCH, R.string.kws_caption);
-        captions.put(SMARTMIRROR_SEARCH, R.string.smartmirror_caption);
+        mSpeechInitialized = false;
         initializeDictionary();
     }
 
@@ -90,7 +88,7 @@ public class VoiceService extends Service implements RecognitionListener{
      * Starts voice capture, invoked by the calling Activity
      */
     public void startVoice(){
-//        if(mSpeechRecognizer != null)
+        if(mSpeechInitialized)
             mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
     }
 
@@ -98,7 +96,7 @@ public class VoiceService extends Service implements RecognitionListener{
      * Stops voice recognition, invoked by the calling Activity
      */
     public void stopVoice(){
-//        if(mSpeechRecognizer != null)
+        if (mSpeechInitialized)
             mSpeechRecognizer.stop();
     }
 
@@ -127,6 +125,8 @@ public class VoiceService extends Service implements RecognitionListener{
     public void onPartialResult(Hypothesis hypothesis) {
         /*if (hypothesis == null)
             return;*/
+        if (hypothesis != null)
+            Log.i("VR", "onPartialResult: " + hypothesis.getHypstr());
     }
 
     /**
@@ -135,15 +135,16 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onResult(Hypothesis hypothesis) {
         if(hypothesis != null) {
-            Log.i("onResult", hypothesis.getHypstr());
+            Log.i("VR", "onResult: " + hypothesis.getHypstr());
             setSpokenCommand(hypothesis.getHypstr());
             sendMessage();
         }
+        startVoice();
     }
 
     @Override
     public void onBeginningOfSpeech() {
-
+        Log.i("VR", "onBeginningOfSpeech");
     }
 
     /**
@@ -151,6 +152,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
+        Log.i("VR", "onEndOfSpeech()");
         stopVoice();
     }
 
@@ -191,7 +193,8 @@ public class VoiceService extends Service implements RecognitionListener{
                     Toast.makeText(VoiceService.this, "" + result, Toast.LENGTH_SHORT).show();
                 }
                 else {
-//                    switchSearch(KWS_SEARCH);
+                    mSpeechInitialized = true;
+                    //                    switchSearch(KWS_SEARCH);
                 }
             }
         }.execute();
@@ -241,9 +244,6 @@ public class VoiceService extends Service implements RecognitionListener{
             mSpeechRecognizer.startListening(searchName);
         else
             mSpeechRecognizer.startListening(searchName, 1000);
-
-        String caption = getResources().getString(captions.get(searchName));
-        Log.i("SWITCH", caption);
     }
 
     /**
