@@ -144,7 +144,7 @@ public class VoiceService extends Service implements RecognitionListener{
 
     @Override
     public void onBeginningOfSpeech() {
-        Log.i("VR", "onBeginningOfSpeech");
+        //Log.i("VR", "onBeginningOfSpeech");
     }
 
     /**
@@ -152,7 +152,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
-        Log.i("VR", "onEndOfSpeech()");
+        //Log.i("VR", "onEndOfSpeech()");
         stopVoice();
     }
 
