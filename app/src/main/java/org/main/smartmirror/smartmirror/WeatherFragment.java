@@ -301,7 +301,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
                     i++;
                 }
                 if (title.length() > 0) {
-                    ((MainActivity) getActivity()).startTTS(title.toString());
+//                    ((MainActivity) getActivity()).startTTS(title.toString());
                     txtAlerts.setText(title.toString());
                 }
             }

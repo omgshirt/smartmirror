@@ -32,19 +32,19 @@ public class TTSHelper{
                         @Override
                         public void onStart(String utteranceId) {
                             mIsSpeaking = true;
-//                            ((MainActivity)mContext).stopSpeechRecognition();
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
 
                         @Override
                         public void onDone(String utteranceId){
                             ((MainActivity)mContext).startSpeechRecognition();
                             mIsSpeaking = false;
-                            //stop();  // stop() discards other phrases in queue...
+                            stop();  // stop() discards other phrases in queue...
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-//                            ((MainActivity)mContext).stopSpeechRecognition();
+                            ((MainActivity)mContext).stopSpeechRecognition();
                             mIsSpeaking = false;
                         }
                     });

@@ -90,7 +90,8 @@ public class VoiceService extends Service implements RecognitionListener{
      * Starts voice capture, invoked by the calling Activity
      */
     public void startVoice(){
-        mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
+//        if(mSpeechRecognizer != null)
+            mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
     }
 
     /**
@@ -124,10 +125,8 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
-        if (hypothesis == null)
-            return;
-        String text = hypothesis.getHypstr();
-        Log.i("OPR", text);
+        /*if (hypothesis == null)
+            return;*/
     }
 
     /**
@@ -212,7 +211,7 @@ public class VoiceService extends Service implements RecognitionListener{
                 .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
 
                         // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setKeywordThreshold(1e-10f)
+                .setKeywordThreshold(1e-20f)
 
                         // Use context-independent phonetic search, context-dependent is too slow for mobile
                 .setBoolean("-allphone_ci", true)
