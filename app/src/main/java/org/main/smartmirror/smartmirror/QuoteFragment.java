@@ -19,8 +19,9 @@ import java.util.Random;
  */
 public class QuoteFragment extends Fragment {
 
-
+   String[] parts;
     InputStream input;
+    TextView mquote;
 
     @Nullable
     @Override
@@ -41,11 +42,11 @@ public class QuoteFragment extends Fragment {
             // byte buffer into a string
             String text = new String(buffer);
             //break the string to parts by lines
-            String[] parts = text.split("\n");
+              parts = text.split("\n");
             // read the string into a table object
 
 
-            TextView mquote = (TextView) view.findViewById(R.id.quote_settings_content);
+            mquote = (TextView) view.findViewById(R.id.quote_settings_content);
             TextView mtitle= (TextView) view.findViewById(R.id.quote_settings_title);
 
 
@@ -58,9 +59,53 @@ public class QuoteFragment extends Fragment {
             mtitle.setTypeface(custom_font);
 
 
-            Random quoteRandomizer = new Random();
-            int random_number = quoteRandomizer.nextInt(176);
-            mquote.setText(parts[random_number].replaceAll("[0-9]",""));
+
+
+
+
+
+
+
+
+
+            //Runnable thread portion
+
+
+            Runnable quote_runnable=new Runnable() {
+                @Override
+
+
+
+                public void run()
+
+                {
+
+
+                    try {
+                        while (true) {
+
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Random quoteRandomizer = new Random();
+                                                                int random_number = quoteRandomizer.nextInt(176);
+                                                                mquote.setText(parts[random_number].replaceAll("[0-9]", ""));
+                                                            }
+                                                        });
+
+
+
+                                    Thread.sleep(5000L);
+                        }
+                    } catch (InterruptedException iex) {}
+
+
+
+                }
+            };
+               Thread quote_thread=new Thread(quote_runnable);
+            quote_thread.start();
 
 
 
