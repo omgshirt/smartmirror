@@ -43,6 +43,9 @@ public class WeatherFragment extends Fragment implements LocationListener {
     Typeface weatherFont;
     Preferences mPreferences;
 
+    public final static String CONDITIONS = "conditions";
+    public final static String FORECAST = "forecast";
+
     private TextView txtWeatherIcon;
     private TextClock clkTextClock;
     private TextClock clkDateClock;
@@ -146,10 +149,10 @@ public class WeatherFragment extends Fragment implements LocationListener {
             String message = intent.getStringExtra("message");
             Log.d("Weather", "Got message:\"" + message +"\"");
             switch (message) {
-                case MainActivity.FORECAST:
+                case FORECAST:
                     speakWeatherForecast();
                     break;
-                case MainActivity.CONDITIONS:
+                case CONDITIONS:
                     speakCurrentConditions();
                     break;
             }

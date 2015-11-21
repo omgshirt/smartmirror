@@ -64,11 +64,12 @@ public class MainActivity extends AppCompatActivity
     // Constants
     public static final String TAG = "SmartMirror";
 
+    public static final String BACK = "back";
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
+    public static final String CLOSE = "close";
     public static final String FACEBOOK = "facebook";
-    public static final String CONDITIONS = "conditions";
-    public static final String FORECAST = "forecast";
+    public static final String HIDE = "hide";
     public static final String LIGHT = "light";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
@@ -396,22 +397,23 @@ public class MainActivity extends AppCompatActivity
                 fragment = new CalendarFragment();
                 title = CALENDAR;
                 break;
+            case CAMERA:
+                fragment = new CameraFragment();
+                title = CAMERA;
+                break;
+            case FACEBOOK:
+                fragment = new FacebookFragment();
+                title = FACEBOOK;
+                break;
             case LIGHT:
                 fragment = new LightFragment();
                 title = LIGHT;
-                break;
-            case WEATHER:
-                fragment = new WeatherFragment();
-                title = WEATHER;
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
                 title = SETTINGS;
                 break;
-            case CAMERA:
-                fragment = new CameraFragment();
-                title = CAMERA;
-                break;
+            case ON:
             case WAKE:
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
@@ -422,22 +424,23 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
                 break;
-            case TWITTER:
-                fragment = new TwitterFragment();
-                title = TWITTER;
-                break;
-            case FACEBOOK:
-                fragment = new FacebookFragment();
-                title = FACEBOOK;
-                break;
+            case OFF:
             case SLEEP:
                 fragment = new OffFragment();
                 mirrorSleepState = LIGHT_SLEEP;
                 title = SLEEP;
                 break;
+            case TWITTER:
+                fragment = new TwitterFragment();
+                title = TWITTER;
+                break;
+            case WEATHER:
+                fragment = new WeatherFragment();
+                title = WEATHER;
+                break;
             default:
                 // The command isn't one of the view swap instructions,
-                // so broadcast the viewName (our input) to any listening fragments.
+                // so broadcast the viewName (our input) to any listeners.
                 broadcastMessage("inputAction", viewName);
                 break;
         }
