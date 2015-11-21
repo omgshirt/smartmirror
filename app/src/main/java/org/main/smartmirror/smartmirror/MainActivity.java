@@ -379,12 +379,10 @@ public class MainActivity extends AppCompatActivity
         String title = getString(R.string.app_name);
         // If sleeping, save viewName and wake screen. Otherwise ignore command.
         // displayView will be called again from onStart() with the fragment to show
-        Log.i("displayView", "status: " + mirrorSleepState + "  command: " + viewName);
+        Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
             if (!viewName.equals(WAKE)) return;
         }
-
-        startTTS(viewName);
 
         switch (viewName) {
             case NEWS:
@@ -444,10 +442,10 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
+        startTTS(viewName);
+
         // If we're changing fragments, stop speech, set the wake state, and do the transaction
         if(fragment != null){
-            stopTTS();
-
             if(DEBUG)
                 Log.i("displayView", "Displaying: " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -485,9 +483,12 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Handles the result of the speech input
-     * @param voiceInput the command the user gave
+     * @param input the command the user gave
      */
-    public void speechResult(String voiceInput) {
+    public void speechResult(String input) {
+
+        String voiceInput = input.trim();
+
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {

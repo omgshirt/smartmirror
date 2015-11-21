@@ -144,7 +144,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("Weather", "Got message: " + message);
+            Log.d("Weather", "Got message:\"" + message +"\"");
             switch (message) {
                 case MainActivity.FORECAST:
                     speakWeatherForecast();

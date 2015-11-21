@@ -48,7 +48,8 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mSpeechRecognizer.shutdown();
+        if (mSpeechRecognizer != null)
+            mSpeechRecognizer.shutdown();
     }
 
     /**

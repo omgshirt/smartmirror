@@ -2,18 +2,24 @@ calendar /1e-3/
 camera /1e-3/
 facebook /1e-2/
 forecast /1e-2/
+hangman /1e-2/
 help /1e-1/
-light /1e-1/
-news /1e-1/
+light /1e5/
+news /1e5/
 music /1e-2/
 options /1e-3/
+off /1e5/
+on /1e5/
+quotes /1e-2/
 settings /1e-4/
+sleep /1e20/
 sports /1e-1/
 technology /1e-4/
-twitter /1e-2/
-weather /1e-2/
-hangman /1e-2/
 traffic /1e-2/
+twitter /1e-2/
+wake /1e1/
+wakeup /1e-3/
+weather /1e-2/
 brightness very low /1e-5/
 brightness low /1e-3/
 brightness medium /1e-5/
