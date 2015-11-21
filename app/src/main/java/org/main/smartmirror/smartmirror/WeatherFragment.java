@@ -62,7 +62,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
     private int mCurrentTemp = 0;
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
-    private DailyForecast forecasts[];              // summary of data for 3 days (starting today)
+    private DailyForecast forecasts[];              // summary of data for 3 days (including today)
 
     Handler mHandler = new Handler();
 
@@ -350,7 +350,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
                     i++;
                 }
                 if (title.length() > 0) {
-                    ((MainActivity) getActivity()).startTTS(title.toString());
+                    //(((MainActivity) getActivity()).startTTS(title.toString());
                     txtAlerts.setText(title.toString());
                 }
             }

@@ -103,7 +103,7 @@ public class TTSHelper{
     }
 
     public void stop(){
-        if (mTextToSpeech != null) {
+        if (mTextToSpeech != null && mTtsInitialized) {
             mTextToSpeech.stop();
             mIsSpeaking = false;
         }

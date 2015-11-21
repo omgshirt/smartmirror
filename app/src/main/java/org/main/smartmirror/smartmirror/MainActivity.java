@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     // Constants
     public static final String TAG = "SmartMirror";
 
+    // TODO: can we turn these into a hashmap stored in XML?
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
@@ -312,6 +313,7 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
+        mirrorSleepState = AWAKE;
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -364,16 +366,14 @@ public class MainActivity extends AppCompatActivity
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        // If sleeping, save viewName and wake screen.
+        // If sleeping, save viewName and wake screen. Otherwise ignore command.
         // displayView will be called again from onStart() with the fragment to show
-        if (mirrorSleepState == SLEEPING) {
-            if (!viewName.equals(SLEEP)) {
-                mCurrentFragment = viewName;
-                mirrorSleepState = AWAKE;
-                wakeScreen();
-            }
-            return;
+        Log.i("displayView", "status: " + mirrorSleepState + "  command: " + viewName);
+        if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
+            if (!viewName.equals(WAKE)) return;
         }
+
+        startTTS(viewName);
 
         switch (viewName) {
             case NEWS:
@@ -407,16 +407,16 @@ public class MainActivity extends AppCompatActivity
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
-                }
-                return;
-            case SLEEP:
-                if (mirrorSleepState == AWAKE) {
-                    fragment = new OffFragment();
-                    mirrorSleepState = LIGHT_SLEEP;
-                    title = SLEEP;
                 } else {
+                    mirrorSleepState = AWAKE;
+                    wakeScreen();
                     return;
                 }
+                break;
+            case SLEEP:
+                fragment = new OffFragment();
+                mirrorSleepState = LIGHT_SLEEP;
+                title = SLEEP;
                 break;
             default:
                 // The command isn't one of the view swap instructions,
@@ -425,24 +425,23 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
+        // If we're changing fragments, stop speech, set the wake state, and do the transaction
         if(fragment != null){
-
             stopTTS();
 
             if(DEBUG)
-                Log.i("Fragments", "Displaying " + viewName);
+                Log.i("displayView", "Displaying: " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
 
             if (!isFinishing()) {
                 ft.commit();
-                // Any command besides SLEEP or WAKE now sets the state to AWAKE
-                if ( !(viewName.equals(SLEEP) || viewName.equals(WAKE)) ) {
-                    mirrorSleepState = AWAKE;
+                // Any command != SLEEP sets stores value as last visible frag
+                if ( !viewName.equals(SLEEP) ) {
                     mCurrentFragment = viewName;
                 }
             } else {
-                Log.i("Fragments", "commit skipped. isFinishing() returned true");
+                Log.e("Fragments", "commit skipped. isFinishing() returned true");
             }
         }
 
@@ -470,6 +469,21 @@ public class MainActivity extends AppCompatActivity
      * @param voiceInput the command the user gave
      */
     public void speechResult(String voiceInput) {
+        // if voice is disabled, ignore everything except "start listening" command
+        if (!mPreferences.isVoiceEnabled()) {
+            if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
+                broadcastMessage("inputAction", voiceInput);
+            }
+            return;
+        }
+
+        displayView(voiceInput);
+
+        /*
+            BYPASSING THIS BLOCK FOR NOW - WE WONT NEED THIS SWITCH CASE
+
+
+        // Process voiceInput to make it fit with accepted commands
         try {
             String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
             int i = 0;
@@ -517,10 +531,11 @@ public class MainActivity extends AppCompatActivity
                 displayView(NEWS);
             }
         }catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Didn't catch that",
+                        Toast.makeText(getApplicationContext(), "Didn't catch that",
                     Toast.LENGTH_LONG).show();
             startTTS("Didn't catch that");
         }
+        */
     }
 
     /**
@@ -639,6 +654,7 @@ public class MainActivity extends AppCompatActivity
             discoverPeers();
         } else {
             // if a connection exists, cancel and refuse further
+            mServerTask.cancel(true);
         }
     }
 

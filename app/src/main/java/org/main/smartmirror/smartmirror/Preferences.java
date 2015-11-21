@@ -1,9 +1,14 @@
 package org.main.smartmirror.smartmirror;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 
 /**
@@ -44,22 +49,69 @@ public class Preferences {
     public static final float SPEECH_ALWAYS = 1;
 
     // Constants for screen brightness (0-255)
-    public static final int BRIGHTNESS_VLOW= 10;
-    public static final int BRIGHTNESS_LOW = 50;
-    public static final int BRIGHTNESS_MEDIUM = 100;
-    public static final int BRIGHTNESS_HIGH = 150;
+    public static final int BRIGHTNESS_VLOW = 10;
+    public static final int BRIGHTNESS_LOW = 40;
+    public static final int BRIGHTNESS_MEDIUM = 80;
+    public static final int BRIGHTNESS_HIGH = 130;
     public static final int BRIGHTNESS_VHIGH = 225;
 
     // constants for volumes
     public static final float VOL_OFF = 0f;
-    public static final float VOL_VLOW = .2f;
-    public static final float VOL_LOW = .4f;
-    public static final float VOL_MEDIUM = .6f;
-    public static final float VOL_HIGH = .8f;
+    public static final float VOL_VLOW = .1f;
+    public static final float VOL_LOW = .3f;
+    public static final float VOL_MEDIUM = .5f;
+    public static final float VOL_HIGH = .7f;
     public static final float VOL_VHIGH = 1.0f;
 
+    // strings
+    public static final String CMD_CAMERA_ON = "camera on";
+    public static final String CMD_CAMERA_OFF = "camera off";
+
+    public static final String CMD_LIGHT_VLOW = "light very low";
+    public static final String CMD_LIGHT_LOW = "light low";
+    public static final String CMD_LIGHT_MEDIUM = "light medium";
+    public static final String CMD_LIGHT_HIGH = "light high";
+    public static final String CMD_LIGHT_VHIGH= "light very high";
+
+    public static final String CMD_MUSIC_OFF = "music off";
+    public static final String CMD_MUSIC_VLOW = "music very low";
+    public static final String CMD_MUSIC_LOW = "music low";
+    public static final String CMD_MUSIC_MEDIUM = "music medium";
+    public static final String CMD_MUSIC_HIGH = "music high";
+    public static final String CMD_MUSIC_VHIGH= "music very high";
+
+    public static final String CMD_REMOTE_ON = "remote on";
+    public static final String CMD_REMOTE_OFF = "remote off";
+
+    public static final String CMD_SCREEN_VLOW = "screen very low";
+    public static final String CMD_SCREEN_LOW = "screen low";
+    public static final String CMD_SCREEN_MEDIUM = "screen medium";
+    public static final String CMD_SCREEN_HIGH = "screen high";
+    public static final String CMD_SCREEN_VHIGH= "screen very high";
+
+    public static final String CMD_SPEECH_NEVER = "speech never";
+    public static final String CMD_SPEECH_RARE = "speech rare";
+    public static final String CMD_SPEECH_OFTEN = "speech often";
+    public static final String CMD_SPEECH_ALWAYS = "speech always";
+
+    public static final String CMD_VOICE_OFF = "stop listening";
+    public static final String CMD_VOICE_ON = "start listening";
+
+    public static final String CMD_VOLUME_OFF = "volume off";
+    public static final String CMD_VOLUME_VLOW = "volume very low";
+    public static final String CMD_VOLUME_LOW = "volume low";
+    public static final String CMD_VOLUME_MEDIUM = "volume medium";
+    public static final String CMD_VOLUME_HIGH = "volume high";
+    public static final String CMD_VOLUME_VHIGH= "volume very high";
+
+    public static final String CMD_WEATHER_ENGLISH = "weather english";
+    public static final String CMD_WEATHER_METRIC = "weather metric";
+
+    public static final String OFF = "off";
+    public static final String ON = "on";
     public static final String ENGLISH = "imperial";
     public static final String METRIC = "metric";
+
     public static final String MPH = "mph";
     public static final String KPH = "kph";
 
@@ -79,6 +131,140 @@ public class Preferences {
     private String mWeatherUnits;                      // Weather display format (English / metric)
 
 
+    // Handle any messages sent from MainActivity
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("Preferences", "Got message: " + message);
+            handleSettingsCommand(context, message);
+        }
+    };
+
+    private void handleSettingsCommand(Context context, String command) {
+        switch (command) {
+            //camera
+            case CMD_CAMERA_OFF:
+                setCameraEnabled(false);
+                break;
+            case CMD_CAMERA_ON:
+                setCameraEnabled(true);
+                break;
+
+            // Light
+            case CMD_LIGHT_VLOW:
+                setLightBrightness(BRIGHTNESS_VLOW);
+                break;
+            case CMD_LIGHT_LOW:
+                setLightBrightness(BRIGHTNESS_LOW);
+                break;
+            case CMD_LIGHT_MEDIUM:
+                setLightBrightness(BRIGHTNESS_MEDIUM);
+                break;
+            case CMD_LIGHT_HIGH:
+                setLightBrightness(BRIGHTNESS_HIGH);
+                break;
+            case CMD_LIGHT_VHIGH:
+                setLightBrightness(BRIGHTNESS_VHIGH);
+                break;
+
+            // Music
+            case CMD_MUSIC_OFF:
+                setMusicVolume(VOL_OFF);
+                break;
+            case CMD_MUSIC_VLOW:
+                setMusicVolume(VOL_VLOW);
+                break;
+            case CMD_MUSIC_LOW:
+                setMusicVolume(VOL_LOW);
+                break;
+            case CMD_MUSIC_MEDIUM:
+                setMusicVolume(VOL_MEDIUM);
+                break;
+            case CMD_MUSIC_HIGH:
+                setMusicVolume(VOL_HIGH);
+                break;
+            case CMD_MUSIC_VHIGH:
+                setMusicVolume(VOL_VHIGH);
+                break;
+
+            // Remote
+            case CMD_REMOTE_OFF:
+                // TODO: FIX THIS
+                break;
+            case CMD_REMOTE_ON:
+                break;
+
+            // screen brightness
+                // TODO: fix how this works, too
+            case CMD_SCREEN_VLOW:
+                break;
+            case CMD_SCREEN_LOW:
+                break;
+            case CMD_SCREEN_MEDIUM:
+                break;
+            case CMD_SCREEN_HIGH:
+                break;
+            case CMD_SCREEN_VHIGH:
+                break;
+
+            // speech frequency
+            case CMD_SPEECH_NEVER:
+                setSpeechFrequency(SPEECH_NEVER);
+                break;
+            case CMD_SPEECH_RARE:
+                setSpeechFrequency(SPEECH_RARE);
+                break;
+            case CMD_SPEECH_OFTEN:
+                setSpeechFrequency(SPEECH_OFTEN);
+                break;
+            case CMD_SPEECH_ALWAYS:
+                setSpeechFrequency(SPEECH_ALWAYS);
+                break;
+
+            // Voice recognition on / off
+            case CMD_VOICE_OFF:
+                setVoiceEnabled(false);
+                break;
+            case CMD_VOICE_ON:
+                setVoiceEnabled(true);
+                break;
+
+            // system volume
+            case CMD_VOLUME_OFF:
+                setSystemVolume(VOL_OFF);
+                break;
+            case CMD_VOLUME_VLOW:
+                setSystemVolume(VOL_VLOW);
+                break;
+            case CMD_VOLUME_LOW:
+                setSystemVolume(VOL_LOW);
+                break;
+            case CMD_VOLUME_MEDIUM:
+                setSystemVolume(VOL_MEDIUM);
+                break;
+            case CMD_VOLUME_HIGH:
+                setSystemVolume(VOL_HIGH);
+                break;
+            case CMD_VOLUME_VHIGH:
+                setSystemVolume(VOL_VHIGH);
+                break;
+
+            // weather units
+            case CMD_WEATHER_ENGLISH:
+                setWeatherUnits(ENGLISH);
+                break;
+            case CMD_WEATHER_METRIC:
+                setWeatherUnits(METRIC);
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
     private Preferences() {
         Context appContext = MainActivity.getContextForApplication();
         mSharedPreferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -94,10 +280,16 @@ public class Preferences {
         mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);
         mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
+
+        // This may not work (giving appContext)
+        LocalBroadcastManager.getInstance(appContext).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
     }
 
     // Clean up any refs that might hang around to prevent leaks.
     public void destroy(){
+        Context appContext = MainActivity.getContextForApplication();
+        LocalBroadcastManager.getInstance(appContext).unregisterReceiver(mMessageReceiver);
         mPreferences = null;
         mSharedPreferences = null;
     }
