@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import io.fabric.sdk.android.Fabric;
+import twitter4j.Status;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterFragment extends Fragment {
 
@@ -42,10 +45,10 @@ public class TwitterFragment extends Fragment {
                              Bundle savedInstanceState) {
 
 
-        authConfig = new TwitterAuthConfig(mTWITTER_KEY, mTWITTER_SECRET);
-        Fabric.with(super.getActivity(), new Twitter(authConfig));
+        //authConfig = new TwitterAuthConfig(mTWITTER_KEY, mTWITTER_SECRET);
+        //Fabric.with(super.getActivity(), new Twitter(authConfig));
 
-        View view = inflater.inflate(R.layout.twitter_login_fragment, container, false);
+        View view = inflater.inflate(R.layout.twitter_fragment, container, false);
 
 /*        authClient = new TwitterAuthClient();
         authClient.authorize(getActivity(), new Callback<TwitterSession>() {
@@ -60,38 +63,39 @@ public class TwitterFragment extends Fragment {
             }
         });*/
 
-        loginButton = (TwitterLoginButton) view.findViewById(R.id.twitter_login_button);
+        /*loginButton = (TwitterLoginButton) view.findViewById(R.id.twitter_login_button);
 
         loginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
 
-                TwitterSession session = result.data;
+                *//*TwitterSession session = result.data;
 
                 String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
-                Toast.makeText(getActivity().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), msg, Toast.LENGTH_LONG).show();*//*
             }
 
             @Override
             public void failure(TwitterException exception) {
                 Log.d("TwitterKit", "Login with Twitter failure", exception);
             }
-        });
+        });*/
 
         return view;
     }
 
-
+/*
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         loginButton.onActivityResult(requestCode, resultCode, data);
-        /*Fragment fragment = getFragmentManager().findFragmentById(R.id.twitter_login_button);
+        *//*Fragment fragment = getFragmentManager().findFragmentById(R.id.twitter_login_button);
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
-        }*/
+        }*//*
 
-    }
+    }*/
+
 
 
 }

@@ -11,16 +11,13 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -34,19 +31,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import io.fabric.sdk.android.Fabric;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
-
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
-    private static final String TWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
 
 
     private final boolean DEBUG=true;
@@ -135,8 +124,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(authConfig));
 
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
@@ -202,6 +189,11 @@ public class MainActivity extends AppCompatActivity
 
         // start with weather displayed
         displayView(WEATHER);
+
+        //start sample twitter activity
+        /*Intent intent = new Intent(this, TwitterAct.class);
+        startActivity(intent);*/
+
     }
 
     @Override
@@ -513,5 +505,9 @@ public class MainActivity extends AppCompatActivity
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         startActivity(i);
+    }
+
+    public void sampleTwitter(View v) {
+        new TwitterASyncTask().execute();
     }
 }

@@ -5,7 +5,13 @@
     android:layout_height="wrap_content"
     android:padding="15dp">
 
-
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GET"
+        android:onClick="sampleTwitter"
+        android:id="@+id/btn_twitter"
+        android:layout_gravity="right" />
 
 
 </LinearLayout>

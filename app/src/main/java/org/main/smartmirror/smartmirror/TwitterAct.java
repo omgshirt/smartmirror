@@ -3,15 +3,18 @@ package org.main.smartmirror.smartmirror;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.twitter.sdk.android.Twitter;
+//import com.twitter.sdk.android.Twitter;
+//import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.*;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.identity.*;
@@ -20,49 +23,62 @@ import com.twitter.sdk.android.tweetui.TweetUtils;
 import com.twitter.sdk.android.tweetui.TweetView;
 import com.twitter.sdk.android.tweetui.TweetViewFetchAdapter;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
+
 import retrofit.http.GET;
 import retrofit.http.Query;
 import twitter4j.Paging;
 import twitter4j.ResponseList;
 import twitter4j.Status;
-//import twitter4j.Twitter;
+import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
+import twitter4j.User;
 import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+import twitter4j.util.function.Consumer;
+
 
 
 public class TwitterAct extends Activity{
+
     private TwitterLoginButton loginButton;
     private TextView mStatus;
-    private static final String mTWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx"; //from twitter
-    private static final String mTWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt"; //from twitter
-    //private static final String mTWITTER_KEY = "GAZWTz0pd3bduld0PzZMexSrH"; //from Fabric
-    //private static final String mTWITTER_SECRET = "oUtQGP4NX9L9ZGVZ8mvYSqaJ3dJCzMDtjLcojybwrT9PL9keud"; //from Fabric
-    private static final String mACCESSTOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
-    private static final String mACCESSSECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
 
     TwitterSession mSession;
     long mUserID;
     String mScreenName;
     Handler mHandler = new Handler();
-    String mTwitterQuery = "https://api.twitter.com/1.1/statuses/show/210462857140252672.json";
-    //Twitter twitter;
-    //String url = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=";
-    //String tUser ="";
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(mTWITTER_KEY, mTWITTER_SECRET);
-        Fabric.with(this, new com.twitter.sdk.android.Twitter(authConfig));
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
+        Fabric.with(this, new com.twitter.sdk.android.Twitter(authConfig), new com.twitter.sdk.android.Twitter(authConfig));
 
         setContentView(R.layout.twitter_login_fragment);
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
@@ -84,28 +100,32 @@ public class TwitterAct extends Activity{
                 mScreenName = mSession.getUserName();
                 String msg = "@" + mSession.getUserName() + " logged in! (#" + mUserID + ")";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                Long id = mSession.getId();
+                Log.i("ID: ", id.toString());
                 long tweetID = 631879971628183552L;
                 //showTweet(tweetID);
                 Log.i("auth token ", mSession.getAuthToken().token);
-                //mTwitterQuery="https://api.twitter.com/1.1/statuses/";
-                //String tUser = "https://api.twitter.com/1.1/statuses/user_timeline.json";
-                //example https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&count=2
-                //Twitter twitter = new TwitterAuthClient(mTWITTER_KEY, mTWITTER_SECRET, mACCESSTOKEN, mACCESSSECRET);
 
-                //String url = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=";
-                //String tUser = url + mScreenName;
-                //Log.i("url being passed ", tUser);
-                String tUser = "https://api.twitter.com/1.1/account/verify_credentials.json:";
+                ConfigurationBuilder cb = new ConfigurationBuilder();
 
-                updateFeed(tUser);
+                cb.setDebugEnabled(true)
+                        .setOAuthConsumerKey(Constants.TWITTER_CONSUMER_KEY)
+                        .setOAuthConsumerSecret(Constants.TWITTER_CONSUMER_SECRET)
+                        .setOAuthAccessToken(Constants.TWITTER_ACCESS_TOKEN)
+                        .setOAuthAccessTokenSecret(Constants.TWITTER_ACCESS_SECRET);
 
+                TwitterFactory tf = new TwitterFactory(cb.build());
+                Twitter twitter = tf.getInstance();
+                try {
+                    Status status = twitter.updateStatus("test");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-
-
-
-
-
-
+                String url = "https://api.twitter.com/1.1/statuses/home_timeline.json";
+                String tUser = url + mScreenName;
+                Log.i("url being passed ", tUser);
+                updateFeed(url);
 
 
                 //tweets(mScreenName);
@@ -236,10 +256,27 @@ public class TwitterAct extends Activity{
             }
         });
 
-
-
     }
 
+    /*public void getTwitter(View v) {
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(Constants.TWITTER_CONSUMER_KEY)
+                .setOAuthConsumerSecret(Constants.TWITTER_CONSUMER_SECRET)
+                .setOAuthAccessToken(Constants.TWITTER_ACCESS_TOKEN)
+                .setOAuthAccessTokenSecret(Constants.TWITTER_ACCESS_SECRET);
+
+        TwitterFactory tf = new TwitterFactory(cb.build());
+        Twitter twitter = tf.getInstance();
+        try {
+            Status status = twitter.updateStatus("test");
+            Log.i("STATUS ","SUCCESS");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("STATUS ", "FAIL");
+        }
+    }*/
  /*   void getUserTimeLine(long userID) {
         try{
             ResponseList<Status> statuses = twitter.getUserTimeline(userID);
