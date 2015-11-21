@@ -5,6 +5,16 @@
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
     <string name="nyt_api_key">89899870d1024b962dc582806e3e9c34:3:73303333</string>
 
+    <string name="twitter_api_key">mQ51h9ZbAz9Xk2AZtsUBJAGlx</string>
+    <string name="twitter_secret">uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt</string>
+    <string name="twitter_access_token">4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG</string>
+    <string name="twitter_error">Error with Twitter Data</string>
+
+    <string name="facebook_app_id">913606198722814</string>
+    <string name="facebook_app_secret">7ab77882cb36c0e7f942ebee16117444</string>
+    <string name="scroll_up">Scroll Up</string>
+    <string name="scroll_down">Scroll Down</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="results_speech">Speech Results</string>
@@ -21,6 +31,7 @@
     <string name="title_settings">Settings</string>
     <string name="title_traffic">Traffic</string>
     <string name="title_weather">Weather</string>
+    <string name="title_twitter">Twitter</string>
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
@@ -67,5 +78,16 @@
 
     <!-- WiFi P2P strings -->
     <string name="wifi_not_enabled">Wifi Not Enabled</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- -->
+    <string name="kws_caption">To start demonstration say \"computer\".</string>
+    <string name="menu_caption">Say \"mirror\", \"digits\", \"forecast\" or \"phones\" to choose the grammar, language model or phonetic decoder example.</string>
+    <string name="digits_caption">To try recognition of digits: say something like \"one two three four five\".</string>
+    <string name="forecast_caption">To try recognition of a weather forecast like \"sunny spells on Wednesday\".</string>
+    <string name="phone_caption">To try phonetic recognition say anything.</string>
+    <string name="smartmirror_caption">Test smartmirror grammar</string>
 
 </resources>

@@ -1,15 +1,33 @@
 apply plugin: 'com.android.application'
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'https://maven.fabric.io/public' }
+    }
 
+    dependencies {
+
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
+
+apply plugin: 'io.fabric'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
+}
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-
     defaultConfig {
         applicationId "org.main.smartmirror.smartmirror"
         minSdkVersion 17
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        multiDexEnabled = true
     }
     buildTypes {
         release {
@@ -17,13 +35,26 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+    compile('com.google.api-client:google-api-client-android:1.20.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile('com.google.apis:google-api-services-calendar:v3-rev125-1.20.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:design:23.1.0'
-
-
+    compile 'com.google.android.gms:play-services-identity:8.1.0'
+    compile('com.twitter.sdk.android:twitter:1.10.0@aar') {
+        transitive = true;
+    }
+    compile 'com.facebook.android:facebook-android-sdk:4.7.0'
+    compile project(':pocketsphinx-android-5prealpha-nolib')
+    
 }

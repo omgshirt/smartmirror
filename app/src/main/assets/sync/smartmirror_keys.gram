@@ -1,0 +1,52 @@
+calendar /1e-3/
+camera /1e-3/
+facebook /1e-2/
+forecast /1e-2/
+help /1e-1/
+light /1e-1/
+news /1e-1/
+music /1e-2/
+options /1e-3/
+settings /1e-4/
+sports /1e-1/
+technology /1e-4/
+twitter /1e-2/
+weather /1e-2/
+hangman /1e-2/
+traffic /1e-2/
+brightness very low /1e-5/
+brightness low /1e-3/
+brightness medium /1e-5/
+brightness high /1e-3/
+brightness very high /1e-5/
+camera on /1e-4/
+camera off /1e-4/
+light very low /1e-4/
+light low /1e-3/
+light medium /1e-4/
+light high /1e-2/
+light very high /1e-4/
+listen on /1e-2/
+listen off /1e-2/
+music very low /1e-5/
+music low /1e-3/
+music medium /1e-3/
+music high /1e-3/
+music very high /1e-5/
+remote on /1e-3/
+remote off /1e-3/
+speech never /1e-3/
+speech rare /1e-2/
+speech often /1e-3/
+speech always /1e-3/
+start listening /1e-4/
+stop listening /1e-4/
+volume very low /1e-5/
+volume low /1e-3/
+volume medium /1e-5/
+volume high /1e-3/
+volume very high /1e-5/
+voice recognition off /1e-6/
+voice recognition on /1e-6/
+weather metric /1e-4/
+weather english /1e-4/
