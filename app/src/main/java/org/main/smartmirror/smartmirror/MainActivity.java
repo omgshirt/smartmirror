@@ -75,11 +75,13 @@ public class MainActivity extends AppCompatActivity
     public static final String NEWS = "news";
     public static final String OFF = "off";
     public static final String ON = "on";
+    public static final String OPTIONS = "options";
     public static final String SETTINGS = "settings";
     public static final String SLEEP = "sleep";
     public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
     public static final String WAKE = "wake";
+    public static final String WAKEUP = "wakeup";
     public static final String WEATHER = "weather";
 
     public static final int SLEEPING = 0;
@@ -379,7 +381,6 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         // If sleeping, save viewName and wake screen. Otherwise ignore command.
-        // displayView will be called again from onStart() with the fragment to show
         Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
             if (!viewName.equals(WAKE)) return;
@@ -409,12 +410,15 @@ public class MainActivity extends AppCompatActivity
                 fragment = new LightFragment();
                 title = LIGHT;
                 break;
+            case OPTIONS:
             case SETTINGS:
                 fragment = new SettingsFragment();
                 title = SETTINGS;
                 break;
             case ON:
             case WAKE:
+            case WAKEUP:
+                // displayView will be called again from onStart() with the fragment to show
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
@@ -618,9 +622,11 @@ public class MainActivity extends AppCompatActivity
      * Stop Text to Speech
      */
     public void stopTTS() {
-        if (mTTSHelper != null) {
-            mTTSHelper.stop();
-        }
+        if (mTTSHelper != null) { mTTSHelper.stop(); }
+    }
+
+    public boolean isTTSSpeaking() {
+        return ( mTTSHelper != null && mTTSHelper.isSpeaking() );
     }
 
     // ------------------------------  WIFI P2P  ----------------------------------

@@ -1,4 +1,4 @@
-back /1e20/
+back /1e10/
 calendar /1e-3/
 camera /1e-3/
 close /1e1/
@@ -8,25 +8,27 @@ facebook /1e-2/
 forecast /1e-2/
 forward /1e-2/
 hangman /1e-2/
-help /1e-1/
+help /1e10/
 hide /1e1/
 light /1e5/
 more /1e1/
 music /1e-2/
-news /1e5/
+news /1e10/
 options /1e-3/
-off /1e5/
-on /1e5/
-open /1e-1/
-quotes /1e-2/
+off /1e15/
+on /1e10/
+open /1e15/
+quotes /1e1/
 settings /1e-4/
-sleep /1e20/
+scroll up /1e1/
+scroll down /1e1/
+sleep /1e10/
 sports /1e-1/
 technology /1e-4/
 traffic /1e-2/
 twitter /1e-2/
-wake /1e1/
-wakeup /1e-3/
+wake /1e11/
+wakeup /1e5/
 weather /1e-2/
 brightness very low /1e-5/
 brightness low /1e-3/
@@ -35,11 +37,11 @@ brightness high /1e-3/
 brightness very high /1e-5/
 camera on /1e-4/
 camera off /1e-4/
-light very low /1e-4/
-light low /1e-3/
-light medium /1e-4/
-light high /1e-2/
-light very high /1e-4/
+light very low /1e1/
+light low /1e2/
+light medium /1e1/
+light high /1e2/
+light very high /1e1/
 listen on /1e-2/
 listen off /1e-2/
 music very low /1e-5/

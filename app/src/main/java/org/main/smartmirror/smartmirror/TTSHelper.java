@@ -1,6 +1,7 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
@@ -95,6 +96,7 @@ public class TTSHelper{
         // Map passes in the UtteranceProgressListener so we can handle callbacks from the TTS.speak event
         HashMap<String, String> map = new HashMap<>();
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, Integer.toString(messageId++));
+        // String.valueOf(AudioManager.STREAM_NOTIFICATION); // param to set TTS to use NOTIFICATION stream
         mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
     }
 

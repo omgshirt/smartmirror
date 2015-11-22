@@ -110,6 +110,7 @@ public class Preferences {
     public static final String OFF = "off";
     public static final String ON = "on";
     public static final String ENGLISH = "imperial";
+    public static final String LISTENING = "listening";
     public static final String METRIC = "metric";
 
     public static final String MPH = "mph";
@@ -228,6 +229,7 @@ public class Preferences {
                 setVoiceEnabled(false);
                 break;
             case CMD_VOICE_ON:
+                ((MainActivity)context).startTTS(LISTENING);
                 setVoiceEnabled(true);
                 break;
 
