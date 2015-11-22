@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity
 
     // Globals, prefs, debug flags
     private final boolean DEBUG = true;
-
     private static Context mContext;
     private Preferences mPreferences;
     
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity
 
     // Constants
     public static final String TAG = "SmartMirror";
-
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
