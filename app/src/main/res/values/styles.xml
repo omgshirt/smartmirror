@@ -10,6 +10,7 @@
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:radioButtonStyle">@style/MyRadioButtonStyle</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">

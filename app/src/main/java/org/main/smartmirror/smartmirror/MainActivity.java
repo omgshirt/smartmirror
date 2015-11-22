@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,15 +12,20 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PowerManager;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -35,29 +41,52 @@ import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import io.fabric.sdk.android.Fabric;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
 
+    // Globals, prefs, debug flags
+    private final boolean DEBUG = true;
+
+    private static Context mContext;
+    private Preferences mPreferences;
+    
+    //twitter keys
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
     private static final String TWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
 
+    // Constants
+    public static final String TAG = "SmartMirror";
 
+    public static final String CALENDAR = "calendar";
+    public static final String CAMERA = "camera";
+    public static final String FACEBOOK = "facebook";
+    public static final String CONDITIONS = "conditions";
+    public static final String FORECAST = "forecast";
+    public static final String LIGHT = "light";
+    public static final String MUSIC = "music";
+    public static final String NEWS = "news";
+    public static final String OFF = "off";
+    public static final String ON = "on";
+    public static final String SETTINGS = "settings";
+    public static final String SLEEP = "sleep";
+    public static final String TRAFFIC = "traffic";
+    public static final String TWITTER = "twitter";
+    public static final String WAKE = "wake";
+    public static final String WEATHER = "weather";
 
-    private final boolean DEBUG=true;
-    private final String NEWS = "News";
-    private final String CALENDAR = "Calendar";
-    private final String WEATHER = "Weather";
-    private final String LIGHT = "Light";
-    private final String SETTINGS = "Settings";
-    private final String OFF="Off";
-    private final String TWITTER = "Twitter";
-    private final String FACEBOOK = "Facebook";
-    private TTSHelper mTTSHelper;
-    private static Context mContext; // Hold the app context
-    private Preferences mPreferences;
+    public static final int SLEEPING = 0;
+    public static final int LIGHT_SLEEP = 1;
+    public static final int AWAKE = 2;
+
+    // News
     private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     private String mPostURL = "&sort=newest&api-key=";
@@ -65,18 +94,30 @@ public class MainActivity extends AppCompatActivity
     private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
+    // Sleep state & wakelocks
+    // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
+    private int mirrorSleepState;
+    private String mCurrentFragment = null;
+    private final int WAKELOCK_TIMEOUT = 1000;
+    private PowerManager.WakeLock mWakeLock;
+
+
     // WiFiP2p
-    private WifiP2pManager mManager;
-    private WifiP2pManager.Channel mChannel;
-    private WifiP2pDeviceList mDeviceList;
-    private WifiP2pInfo mInfo;
+    private WifiP2pManager mWifiManager;
+    private WifiP2pManager.Channel mWifiChannel;
+    private WifiP2pDeviceList mWifiDeviceList;
+    private WifiP2pInfo mWifiInfo;
     private BroadcastReceiver mWifiReceiver;
-    private IntentFilter mIntentFilter;
+    private IntentFilter mWifiIntentFilter;
+    private RemoteServerAsyncTask mServerTask;
     public final static int PORT = 8888;
     public final static int SOCKET_TIMEOUT = 500;
-    private String mOwnerIP;
+    private ScheduledFuture<?> wifiHeartbeat;
 
-    //Speech
+    // TTS
+    private TTSHelper mTTSHelper;
+
+    // Speech recognition
     private Messenger mMessenger = new Messenger(new IHandler());
     private boolean mIsBound;
     private Messenger mService;
@@ -140,32 +181,28 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance();
 
         // check for permission to write system settings on API 23 and greater.
-        // Get authorization on >= 23
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        // Leaving this in case we need the WRITE_SETTINGS permission later on.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(!Settings.System.canWrite( getApplicationContext() )) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                 startActivityForResult(intent, 1);
             }
-            if(!Settings.System.canWrite(getApplicationContext() )) {
-                Intent intent = new Intent(Settings.ACTION_VOICE_INPUT_SETTINGS);
-                startActivityForResult(intent, 1);
-            }
-        }*/
+        }
 
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
 
         // Initialize WiFiP2P services
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
-
+        mWifiIntentFilter = new IntentFilter();
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
         discoverPeers();
 
+        // Set up view and nav drawer
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -185,9 +222,9 @@ public class MainActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_FULLSCREEN;
-        //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
-        //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
-        //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
+                //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
+                //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
+                //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         decorView.setSystemUiVisibility(uiOptions);
 
         try {
@@ -195,7 +232,11 @@ public class MainActivity extends AppCompatActivity
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+    }
 
+    public static Context getContextForApplication() {
+        return mContext;
+    }
 
         // start with weather displayed
         displayView(WEATHER);
@@ -204,24 +245,97 @@ public class MainActivity extends AppCompatActivity
         /*Intent intent = new Intent(this, TwitterAct.class);
         startActivity(intent);*/
 
+    // -------------------------  LIFECYCLE CALLBACKS ----------------------------
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i(TAG, "onStart");
+        bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
+        mIsBound=true;
+        mirrorSleepState = AWAKE;
+        // if there's a fragment pending to display, show it
+        if (mCurrentFragment != null) {
+            displayView(mCurrentFragment);
+        } else {
+            // on first run mCurrentFragment isn't set: start with weather displayed
+            displayView(WEATHER);
+        }
+    }
+
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        stopWifiHeartbeat();
     }
 
     @Override
     public void onResume(){
         super.onResume();
+        Log.i(TAG, "onResume");
         mPreferences.setAppBrightness(this);
-        mWifiReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
-        registerReceiver(mWifiReceiver, mIntentFilter);
-        //AppEventsLogger.activateApp(this); //logs installs and app activate app events //facebook
+        mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
+        registerReceiver(mWifiReceiver, mWifiIntentFilter);
     }
 
     @Override
     public void onPause(){
         super.onPause();
+        Log.i(TAG, "onPause");
+        startWifiHeartbeat();
         unregisterReceiver(mWifiReceiver);
-
-        //AppEventsLogger.deactivateApp(this); //logs app deactivate app event //facebook
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mirrorSleepState = SLEEPING;
+        Log.i(TAG, "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTTSHelper.destroy();
+        mPreferences.destroy();
+        if (wifiHeartbeat != null) {
+            wifiHeartbeat.cancel(true);
+            wifiHeartbeat = null;
+        }
+        unbindService(mConnection);
+        mIsBound=false;
+        Log.i(TAG, "onDestroy");
+    }
+
+    // ------------------------- Handle Inputs / Broadcasts --------------------------
+
+    /**
+     * Broadcast a message on intentName
+     * @param intentName intent name
+     * @param msg String message to send
+     */
+    private void broadcastMessage(String intentName, String msg) {
+        Intent intent = new Intent(intentName);
+        intent.putExtra("message", msg);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
+
+    protected void wakeScreen() {
+        Log.i(TAG, "wakeScreen() called");
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
+        kl.disableKeyguard();
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
+                | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
+        mWakeLock.acquire(WAKELOCK_TIMEOUT);
+        mirrorSleepState = AWAKE;
+    }
+
+    // -------------------------- DRAWER AND INTERFACE ---------------------------------
 
     @Override
     public void onBackPressed() {
@@ -248,7 +362,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            displayView(item.toString());
+            displayView(item.toString().toLowerCase(Locale.US));
         }
 
         return super.onOptionsItemSelected(item);
@@ -258,9 +372,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        if (DEBUG)
+        if(DEBUG)
             Log.i("item selected", item.toString());
-        displayView(item.toString());
+        displayView(item.toString().toLowerCase(Locale.US));
         return true;
     }
 
@@ -271,7 +385,13 @@ public class MainActivity extends AppCompatActivity
     public void displayView(String viewName){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-        stopTTS();                                      // shut down any pending TTS
+        // If sleeping, save viewName and wake screen. Otherwise ignore command.
+        // displayView will be called again from onStart() with the fragment to show
+        Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
+        if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
+            if (!viewName.equals(WAKE)) return;
+        }
+
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -294,11 +414,21 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
-                title= SETTINGS;
+                title = SETTINGS;
                 break;
-            case OFF:
-                fragment = new OffFragment();
-                title = OFF;
+            case CAMERA:
+                fragment = new CameraFragment();
+                title = CAMERA;
+                break;
+            case WAKE:
+                if (mirrorSleepState == LIGHT_SLEEP) {
+                    mirrorSleepState = AWAKE;
+                    displayView(mCurrentFragment);
+                } else {
+                    mirrorSleepState = AWAKE;
+                    wakeScreen();
+                    return;
+                }
                 break;
             case TWITTER:
                 fragment = new TwitterFragment();
@@ -308,18 +438,39 @@ public class MainActivity extends AppCompatActivity
                 fragment = new FacebookFragment();
                 title = FACEBOOK;
                 break;
+            case SLEEP:
+                fragment = new OffFragment();
+                mirrorSleepState = LIGHT_SLEEP;
+                title = SLEEP;
+                break;
+            default:
+                // The command isn't one of the view swap instructions,
+                // so broadcast the viewName (our input) to any listening fragments.
+                broadcastMessage("inputAction", viewName);
+                break;
         }
+
+        startTTS(viewName);
+
+        // If we're changing fragments, stop speech, set the wake state, and do the transaction
         if(fragment != null){
             if(DEBUG)
-                Log.i("Fragments", "Displaying " + viewName);
+                Log.i("displayView", "Displaying: " + viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
-            if (!isFinishing() ) {
+
+            if (!isFinishing()) {
                 ft.commit();
+                // Any command != SLEEP sets stores value as last visible frag
+                if ( !viewName.equals(SLEEP) ) {
+                    mCurrentFragment = viewName;
+                }
+            } else {
+                Log.e("Fragments", "commit skipped. isFinishing() returned true");
             }
         }
 
-        if(getSupportActionBar() != null){
+        if (getSupportActionBar() != null){
             getSupportActionBar().setTitle(title);
         }
 
@@ -328,15 +479,44 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Handles the result of the speech input
-     * @param voiceInput the command the user gave
+     * Gets the fragment currently being viewed. If the mirror in SLEEP or LIGHT_SLEEP,
+     * this will return the value of the previously-displayed fragment.
+     * @return String fragment name
      */
-    public void speechResult(String voiceInput) {
+    protected String getCurrentFragment() {
+        return mCurrentFragment;
+    }
+
+    // ----------------------- SPEECH RECOGNITION --------------------------
+
+    /**
+     * Handles the result of the speech input
+     * @param input the command the user gave
+     */
+    public void speechResult(String input) {
+
+        String voiceInput = input.trim();
+
+        // if voice is disabled, ignore everything except "start listening" command
+        if (!mPreferences.isVoiceEnabled()) {
+            if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
+                broadcastMessage("inputAction", voiceInput);
+            }
+            return;
+        }
+
+        displayView(voiceInput);
+
+        /*
+            BYPASSING THIS BLOCK FOR NOW - WE WONT NEED THIS SWITCH CASE
+
+
+        // Process voiceInput to make it fit with accepted commands
         try {
             String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
             int i = 0;
             while (i < urlArr.length) {
-                if (voiceInput.contains(urlArr[i].toLowerCase())) {
+                if (voiceInput.contains(urlArr[i])) {
                     mNewsDesk = urlArr[i];
                     mNYTURL = mPreURL + mNewsDesk + mPostURL;
                     mDefaultURL = mNYTURL;
@@ -346,75 +526,50 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     i++;
                     if(DEBUG) {
-                        Log.i("news desk: ", Arrays.toString(urlArr));
-                        Log.i("I heard: ", voiceInput);
+                        //Log.i("news desk: ", Arrays.toString(urlArr));
+                        //Log.i("I heard: ", voiceInput);
                     }
                 }
             }
-
-
-
             if(DEBUG)
                 Log.i("I heard: ", voiceInput);
-            if (voiceInput.contains(CALENDAR.toLowerCase())) {
+            if (voiceInput.contains(CALENDAR)) {
                 startTTS(CALENDAR);
                 displayView(CALENDAR);
-            } else if (voiceInput.contains(WEATHER.toLowerCase())) {
+            }else if (voiceInput.contains(CAMERA)){
+                startTTS(CAMERA);
+                displayView(CAMERA);
+            } else if (voiceInput.contains(WEATHER)) {
                 startTTS(WEATHER);
                 displayView(WEATHER);
-            } else if (voiceInput.contains(LIGHT.toLowerCase())) {
+            } else if (voiceInput.contains(LIGHT)) {
                 startTTS(LIGHT);
                 displayView(LIGHT);
-            } else if (voiceInput.contains(SETTINGS.toLowerCase())) {
+            } else if (voiceInput.contains(SETTINGS)) {
                 startTTS(SETTINGS);
                 displayView(SETTINGS);
-            } else if (voiceInput.contains(NEWS.toLowerCase())) {
+            } else if (voiceInput.contains(NEWS)) {
                 startTTS(NEWS);
                 mDefaultURL = mNewsDefault;
                 displayView(NEWS);
-            } else if(voiceInput.contains(OFF.toLowerCase())){
-                displayView(OFF);
-            } else if (voiceInput.contains(FACEBOOK.toLowerCase())) {
+            } else if(voiceInput.contains(OFF) || voiceInput.contains(SLEEP)){
+                displayView(SLEEP);
+            } else if (voiceInput.contains(FACEBOOK)) {
                 startTTS(FACEBOOK);
                 displayView(FACEBOOK);
-            }else if (voiceInput.contains(mNewsDesk.toLowerCase())) {
+            } else if (voiceInput.contains(TWITTER)) {
+                startTTS(TWITTER);
+                displayView(TWITTER);
+            } else if (voiceInput.contains(mNewsDesk)) {
                 startTTS(mNewsDesk);
                 displayView(NEWS);
             }
-
         }catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Didn't catch that",
                     Toast.LENGTH_LONG).show();
             startTTS("Didn't catch that");
         }
-    }
-
-    /**
-     * Say a phrase using text to speech
-     * @param phrase the phrase to speak
-     */
-    public void startTTS(final String phrase){
-        Thread mSpeechThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mTTSHelper.speakText(phrase);
-                    Thread.sleep(2000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        mSpeechThread.start();
-    }
-
-    /**
-     * Stop Text to Speech
-     */
-    public void stopTTS() {
-        if (mTTSHelper != null) {
-            mTTSHelper.stop();
-        }
+        */
     }
 
     /**
@@ -443,30 +598,42 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mTTSHelper.destroy();
-        mPreferences.destroy();
-        unbindService(mConnection);
-        mIsBound=false;
+    // --------------------------------- Text to Speech (TTS) ---------------------------------
+
+    /**
+     * Say a phrase using text to speech
+     * @param phrase the phrase to speak
+     */
+    public void startTTS(final String phrase){
+        Thread mSpeechThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mTTSHelper.speakText(phrase);
+                    //Thread.sleep(2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        mSpeechThread.start();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
-        mIsBound=true;
+    /**
+     * Stop Text to Speech
+     */
+    public void stopTTS() {
+        if (mTTSHelper != null) {
+            mTTSHelper.stop();
+        }
     }
 
-    public static Context getContextForApplication() {
-        return mContext;
-    }
+    // ------------------------------  WIFI P2P  ----------------------------------
 
 
     // calls the P2pManager to refresh peer list
     public void discoverPeers() {
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+        mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 if (DEBUG)
@@ -484,7 +651,7 @@ public class MainActivity extends AppCompatActivity
     // Interface passes back a device list when the peer list changes, or discovery is successful
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
-        mDeviceList = peers;
+        mWifiDeviceList = peers;
     }
 
 
@@ -494,18 +661,63 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-        // make this the group owner and start the server to listen
-        Toast.makeText(this, "Remote Connected", Toast.LENGTH_SHORT).show();
+        // make this the group owner and start the server to listen for commands
         if(DEBUG)
             Log.i("Wifi", "Connection info: " + info.toString());
-        mInfo = info;
+        mWifiInfo = info;
         WifiP2pConfig config = new WifiP2pConfig();
         config.groupOwnerIntent = 15;
         if (info.groupFormed && info.isGroupOwner) {
             if(DEBUG)
                 Log.i("Wifi", "onConnectionInfo is starting server...");
-            new RemoteServerAsyncTask(this).execute();
+            startRemoteServer();
         } else if (info.groupFormed){
+            Log.i("Wifi", "group exists, mirror is not owner");
+        }
+    }
+
+    /**
+     * Enables or disables WifiP2P connections to the mirror. This should not be called directly,
+     * but through Preferences.setRemoteEnabled()
+     * @param isEnabled service state: enabled or disabled
+     */
+    public void setRemoteStatus(boolean isEnabled) {
+        if (isEnabled) {
+            // if there's a connection established, ignore
+            // otherwise, start peer discovery.
+            discoverPeers();
+        } else {
+            // if a connection exists, cancel and refuse further
+            mServerTask.cancel(true);
+        }
+    }
+
+    // Start a server socket: this will listen to commands from the remote control
+    public void startRemoteServer() {
+        mServerTask = new RemoteServerAsyncTask(this);
+        mServerTask.execute();
+    }
+
+    // OnStop, start a thread that keeps the wifip2p connection alive by pinging every 60 seconds
+    private void startWifiHeartbeat() {
+        ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
+                Executors.newScheduledThreadPool(1);
+
+        final Runnable heartbeatTask = new Runnable() {
+            @Override
+            public void run() {
+                discoverPeers();
+                Log.i("Wifi", "Heartbeat: discoverPeers()" );
+            }
+        };
+        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 60, 60,
+                TimeUnit.SECONDS);
+    }
+
+    // Stop the heartbeat thread
+    public void stopWifiHeartbeat() {
+        if (wifiHeartbeat != null) {
+            wifiHeartbeat.cancel(true);
         }
     }
 

@@ -16,15 +16,15 @@
 			android:id="@+id/time_clock"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textSize="60sp"
+			android:textSize="30sp"
 			/>
 
 		<TextClock
 			android:id="@+id/date_clock"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:textSize="40sp"
+			android:layout_marginLeft="10dp"
+			android:textSize="20sp"
 			/>
 	</LinearLayout>
 	<!-- Current weather, temp and humidity-->
@@ -34,15 +34,14 @@
 		android:orientation="horizontal">
 		<TextView
 			android:id="@+id/weather_icon"
-			android:textSize="60sp"
+			android:textSize="30sp"
 			android:layout_marginRight="10dp"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
 		<!-- current temp -->
 		<TextView
 			android:id="@+id/current_temp"
-			android:text="00&#176;"
-			android:textSize="60sp"
+			android:textSize="30sp"
 			android:layout_marginRight="10dp"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
@@ -50,21 +49,19 @@
 		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-			android:layout_marginStart="20dp"
+			android:layout_marginStart="10dp"
 			android:layout_gravity="center_vertical"
 			android:orientation="vertical">
             <!-- current humidity -->
 				<TextView
 					android:id="@+id/current_humidity"
-					android:text="--"
-					android:textSize="25sp"
+					android:textSize="15sp"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content" />
             <!-- current wind -->
 				<TextView
 					android:id="@+id/current_wind"
-					android:text="--"
-					android:textSize="25sp"
+					android:textSize="15sp"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content" />
 		</LinearLayout>
@@ -77,33 +74,43 @@
 			<!-- daily high -->
 			<TextView
 				android:id="@+id/daily_high"
-				android:text="--"
-				android:textSize="25sp"
+				android:textSize="15sp"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
 
 			<!-- daily low -->
 			<TextView
 				android:id="@+id/daily_low"
-				android:textSize="25sp"
-				android:text="--"
+				android:textSize="15sp"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
 		</LinearLayout>
 
 	</LinearLayout>
 	<!-- weather forecast for upcoming hours // removed for now -->
-	<!--
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="horizontal">
-		<include android:id="@+id/forecast_h1" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_h2" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_h3" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_h4" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_h5" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_h6" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_1" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_2" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_3" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_4" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_5" layout="@layout/weather_hourly_forecast"/>
+		<include android:id="@+id/forecast_6" layout="@layout/weather_hourly_forecast"/>
 	</LinearLayout>
-	-->
+	<TextView
+		android:id="@+id/weather_alert"
+		android:visibility="gone"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:text="* WEATHER ALERT *"
+		android:textColor="#FF0000"/>
+	<TextView
+		android:id="@+id/alert_text"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:textColor="#FF0000"/>
 </LinearLayout>

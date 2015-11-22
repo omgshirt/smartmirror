@@ -5,19 +5,22 @@
     android:layout_margin="5dp">
     <TextView
         android:id="@+id/forecast_time"
-        android:text="11pm"
-        android:textSize="15dp"
+        android:textSize="12sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <ImageView
+    <TextView
         android:id="@+id/forecast_image"
-        android:textSize="15dp"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/forecast_temp"
-        android:text="107&#176;"
-        android:textSize="15dp"
+        android:textSize="15sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/forecast_rain"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </LinearLayout>

@@ -3,7 +3,7 @@
 
     <group android:checkableBehavior="single">
         <item android:id="@+id/nav_calendar" android:icon="@android:drawable/ic_menu_today"
-             android:title="@string/title_calendar"/>
+            android:title="@string/title_calendar"/>
         <item android:id="@+id/nav_camera" android:icon="@android:drawable/ic_menu_camera"
             android:title="@string/title_camera"/>
         <item android:id="@+id/nav_facebook" android:icon="@android:drawable/ic_menu_slideshow"
@@ -22,7 +22,6 @@
             android:title="@string/title_traffic"/>
         <item android:id="@+id/nav_weather" android:icon="@android:drawable/ic_menu_gallery"
         android:title="@string/title_weather"/>
-
     </group>
 
 </menu>

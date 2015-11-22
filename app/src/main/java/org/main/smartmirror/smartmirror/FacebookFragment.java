@@ -74,7 +74,9 @@ public class FacebookFragment extends Fragment {
         if (args != null) {
             // Use initialisation data
         }
-        String fbScroll = this.getArguments().getString("scroll");
+
+        //TODO put this elsewhere
+        /*String fbScroll = this.getArguments().getString("scroll");
         try {
             if(fbScroll.contains(SCROLLDOWN.toLowerCase())) {
                 webview.scrollBy(0, -20);
@@ -83,7 +85,8 @@ public class FacebookFragment extends Fragment {
             }
         }catch (Exception e) {
             Log.i("Err "," didn't catch that");
-        }
+        }*/
+        //TODO put this elsewhere
 
 
         btnLoginButton = (LoginButton) view.findViewById(R.id.fb_login_button);

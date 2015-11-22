@@ -67,9 +67,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             if (networkInfo.isConnected()) {
                 // we are connected with the other device, request connection
                 // info to find group owner IP
+                Toast.makeText(mActivity, "Remote Connected", Toast.LENGTH_SHORT).show();
                 mManager.requestConnectionInfo(mChannel, mActivity);
             } else {
-                Toast.makeText(mActivity, "Cannot Connect to Remote" ,Toast.LENGTH_LONG).show();
+                Toast.makeText(mActivity, "Cannot Connect to Remote" ,Toast.LENGTH_SHORT).show();
                 mActivity.discoverPeers();
             }
 
