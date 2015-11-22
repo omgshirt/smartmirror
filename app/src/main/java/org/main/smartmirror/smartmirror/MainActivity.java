@@ -232,18 +232,20 @@ public class MainActivity extends AppCompatActivity
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+
+        // start with weather displayed
+        //displayView(WEATHER);
+
+        //start sample twitter activity
+        /*Intent intent = new Intent(this, TwitterAct.class);
+        startActivity(intent);*/
     }
 
     public static Context getContextForApplication() {
         return mContext;
     }
 
-        // start with weather displayed
-        displayView(WEATHER);
 
-        //start sample twitter activity
-        /*Intent intent = new Intent(this, TwitterAct.class);
-        startActivity(intent);*/
 
     // -------------------------  LIFECYCLE CALLBACKS ----------------------------
 

@@ -24,6 +24,9 @@ public class NewsFragment extends Fragment {
     private TextView mTxtHeadline3;
     private TextView mTxtHeadline4;
     private TextView mTxtHeadline5;
+    private TextView mTxtHeadline6;
+    private TextView mTxtHeadline7;
+    private TextView mTxtHeadline8;
 
     Handler mHandler = new Handler();
 
@@ -42,12 +45,18 @@ public class NewsFragment extends Fragment {
         mTxtHeadline3 = (TextView)view.findViewById(R.id.headline3);
         mTxtHeadline4 = (TextView)view.findViewById(R.id.headline4);
         mTxtHeadline5 = (TextView)view.findViewById(R.id.headline5);
+        mTxtHeadline6 = (TextView)view.findViewById(R.id.headline6);
+        mTxtHeadline7 = (TextView)view.findViewById(R.id.headline7);
+        mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
 
         mTxtHeadline.setText("");
         mTxtHeadline2.setText("");
         mTxtHeadline3.setText("");
         mTxtHeadline4.setText("");
         mTxtHeadline5.setText("");
+        mTxtHeadline6.setText("");
+        mTxtHeadline7.setText("");
+        mTxtHeadline8.setText("");
 
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
@@ -103,7 +112,7 @@ public class NewsFragment extends Fragment {
             JSONObject headline = null;
 
             int i = 0;
-            int numFeeds = 5;
+            int numFeeds = 8;
             while (i < numFeeds) {
                 //Log.i("NYT_API", json.toString());
                 response = json.getJSONObject("response");
@@ -141,6 +150,15 @@ public class NewsFragment extends Fragment {
 
             String txt4 = "<b>" + hl[4] + "</b> " + "<br>" + newsFeed[4] + "<br>";
             mTxtHeadline5.setText(Html.fromHtml(txt4));
+
+            String txt5 = "<b>" + hl[5] + "</b> " + "<br>" + newsFeed[5] + "<br>";
+            mTxtHeadline6.setText(Html.fromHtml(txt5));
+
+            String txt6 = "<b>" + hl[6] + "</b> " + "<br>" + newsFeed[6] + "<br>";
+            mTxtHeadline7.setText(Html.fromHtml(txt6));
+
+            String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + newsFeed[7] + "<br>";
+            mTxtHeadline8.setText(Html.fromHtml(txt7));
 
         }catch(Exception e){
             Log.e("SPORTS ERROR", e.toString());
