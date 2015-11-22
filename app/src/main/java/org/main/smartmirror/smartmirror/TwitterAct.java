@@ -73,12 +73,15 @@ public class TwitterAct extends Activity{
     String mScreenName;
     Handler mHandler = new Handler();
 
+    public static String mAuthToken;
+    public static String mAuthSecret;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
-        Fabric.with(this, new com.twitter.sdk.android.Twitter(authConfig), new com.twitter.sdk.android.Twitter(authConfig));
+        Fabric.with(this, new com.twitter.sdk.android.Twitter(authConfig));
 
         setContentView(R.layout.twitter_login_fragment);
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
@@ -104,9 +107,14 @@ public class TwitterAct extends Activity{
                 Log.i("ID: ", id.toString());
                 long tweetID = 631879971628183552L;
                 //showTweet(tweetID);
-                Log.i("auth token ", mSession.getAuthToken().token);
+                mAuthToken = result.data.getAuthToken().token;
+                mAuthSecret = result.data.getAuthToken().secret;
+                Log.i("auth token ", mAuthToken);
+                Log.i("auth token ", mAuthSecret);
+                Constants.TWITTER_ACCESS_TOKEN = mAuthToken;
+                Constants.TWITTER_ACCESS_SECRET = mAuthSecret;
 
-                ConfigurationBuilder cb = new ConfigurationBuilder();
+                /*ConfigurationBuilder cb = new ConfigurationBuilder();
 
                 cb.setDebugEnabled(true)
                         .setOAuthConsumerKey(Constants.TWITTER_CONSUMER_KEY)
@@ -120,12 +128,12 @@ public class TwitterAct extends Activity{
                     Status status = twitter.updateStatus("test");
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
 
-                String url = "https://api.twitter.com/1.1/statuses/home_timeline.json";
+                /*String url = "https://api.twitter.com/1.1/statuses/home_timeline.json";
                 String tUser = url + mScreenName;
                 Log.i("url being passed ", tUser);
-                updateFeed(url);
+                updateFeed(url);*/
 
 
                 //tweets(mScreenName);
@@ -255,6 +263,8 @@ public class TwitterAct extends Activity{
                 Log.d("TwitterKit", "Login with Twitter failure", exception);
             }
         });
+
+
 
     }
 
@@ -386,5 +396,11 @@ public class TwitterAct extends Activity{
 
         }
     }*/
+
+    //to main activity
+    public void toMain(View v) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 
 }
