@@ -1,5 +1,7 @@
 package org.main.smartmirror.smartmirror;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -8,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONObject;
@@ -24,6 +27,7 @@ public class NewsFragment extends Fragment {
     private TextView mTxtHeadline3;
     private TextView mTxtHeadline4;
     private TextView mTxtHeadline5;
+    private ImageButton mNYTButton;
 
     Handler mHandler = new Handler();
 
@@ -37,6 +41,9 @@ public class NewsFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
+
+        // Initialize Items
+        mNYTButton  = (ImageButton)view.findViewById(R.id.btnNYTbranding);
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
         mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
         mTxtHeadline3 = (TextView)view.findViewById(R.id.headline3);
@@ -49,7 +56,17 @@ public class NewsFragment extends Fragment {
         mTxtHeadline4.setText("");
         mTxtHeadline5.setText("");
 
-        super.onCreate(savedInstanceState);
+        // set onClickListener
+        mNYTButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = getString(R.string.nyt_url);
+                Intent intntNYT = new Intent(Intent.ACTION_VIEW);
+                intntNYT.setData(Uri.parse(url));
+                startActivity(intntNYT);
+            }
+        });
+
         Bundle args = getArguments();
         if (args != null) {
             // Use initialisation data
@@ -146,5 +163,4 @@ public class NewsFragment extends Fragment {
             Log.e("SPORTS ERROR", e.toString());
         }
     }
-
 }

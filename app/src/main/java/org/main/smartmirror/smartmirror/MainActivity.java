@@ -710,12 +710,4 @@ public class MainActivity extends AppCompatActivity
             wifiHeartbeat.cancel(true);
         }
     }
-
-    //new york times branding
-    public void toNYT(View v) {
-        String url = "http://developer.nytimes.com/";
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
-    }
 }
