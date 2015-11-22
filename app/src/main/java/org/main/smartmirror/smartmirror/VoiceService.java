@@ -38,7 +38,9 @@ public class VoiceService extends Service implements RecognitionListener{
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
-    private String SMARTMIRROR_SEARCH="mirror";
+    private String SMARTMIRROR_SEARCH="mirrorSearch";
+    private final String GRAMMAR_SEARCH = "grammarSearch";
+    private final String MIRROR_KWS = "mirror";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -93,7 +95,10 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     public void startVoice(){
         if(mSpeechInitialized)
-            mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
+            mSpeechRecognizer.startListening(MIRROR_KWS);
+            //mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
+        // send message to main to check tts
+        //
     }
 
     /**
@@ -127,8 +132,13 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
-        if (hypothesis != null)
-            Log.i("VR", "onPartialResult: " + hypothesis.getHypstr());
+        if (hypothesis != null) {
+            String text = hypothesis.getHypstr();
+            Log.i("VR", "onPartialResult: " + text);
+            if (text.equals(MIRROR_KWS))
+                switchSearch(GRAMMAR_SEARCH);
+                //switchSearch(SMARTMIRROR_SEARCH);
+        }
     }
 
     /**
@@ -138,10 +148,11 @@ public class VoiceService extends Service implements RecognitionListener{
     public void onResult(Hypothesis hypothesis) {
         if(hypothesis != null) {
             Log.i("VR", "onResult: " + hypothesis.getHypstr());
+            if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
             setSpokenCommand(hypothesis.getHypstr());
             sendMessage();
         }
-        startVoice();
+        //startVoice();
     }
 
     /**
@@ -158,7 +169,9 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onEndOfSpeech() {
         //Log.i("VR", "onEndOfSpeech()");
-        stopVoice();
+        //stopVoice();
+        if (!mSpeechRecognizer.getSearchName().equals(MIRROR_KWS))
+            switchSearch(MIRROR_KWS);
     }
 
     /**
@@ -174,6 +187,17 @@ public class VoiceService extends Service implements RecognitionListener{
     public void onTimeout() {
 
     }
+
+    private void switchSearch(String searchName) {
+        mSpeechRecognizer.stop();
+
+        // If we are not spotting, start listening with timeout (10000 ms or 10 seconds).
+        if (searchName.equals(MIRROR_KWS))
+            mSpeechRecognizer.startListening(searchName);
+        else
+            mSpeechRecognizer.startListening(searchName, 5000);
+    }
+
 
     /**
      * Method that handles the initialization of the dictionary
@@ -231,8 +255,13 @@ public class VoiceService extends Service implements RecognitionListener{
          */
 
         // Create grammar-based search for selection between demos
-        File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
-        mSpeechRecognizer.addKeywordSearch(SMARTMIRROR_SEARCH, smartMirrorcommandList);
+        //File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
+        //mSpeechRecognizer.addKeywordSearch(SMARTMIRROR_SEARCH, smartMirrorcommandList);
+
+        mSpeechRecognizer.addKeyphraseSearch(MIRROR_KWS, "mirror");
+
+        File smGrammarSearch = new File(assetsDir, "sm-commands.gram");
+        mSpeechRecognizer.addGrammarSearch(GRAMMAR_SEARCH, smGrammarSearch);
 
     }
 
@@ -247,7 +276,8 @@ public class VoiceService extends Service implements RecognitionListener{
             switch(msg.what){
                 case START_SPEECH:
                     mClients.add(msg.replyTo);
-                    startVoice();
+                    //startVoice();
+                    switchSearch(MIRROR_KWS);
                     break;
                 case STOP_SPEECH:
                     mClients.remove(msg.replyTo);

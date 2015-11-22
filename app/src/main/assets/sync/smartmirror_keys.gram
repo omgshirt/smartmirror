@@ -6,12 +6,12 @@ conditions /1e-5/
 down /1e1/
 facebook /1e-2/
 forecast /1e-2/
-forward /1e-2/
+forward /1e1/
 hangman /1e-2/
 help /1e10/
 hide /1e1/
-light /1e5/
-more /1e1/
+light /1e20/
+more /1e10/
 music /1e-2/
 news /1e10/
 options /1e-3/
@@ -37,11 +37,11 @@ brightness high /1e-3/
 brightness very high /1e-5/
 camera on /1e-4/
 camera off /1e-4/
-light very low /1e1/
-light low /1e2/
-light medium /1e1/
-light high /1e2/
-light very high /1e1/
+light very low /1e-10/
+light low /1e-5/
+light medium /1e-10/
+light high /1e-5/
+light very high /1e-10/
 listen on /1e-2/
 listen off /1e-2/
 music very low /1e-5/

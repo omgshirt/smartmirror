@@ -1,0 +1,52 @@
+#JSGF V1.0;
+
+grammar commands;
+
+public <input> = (show | display | hide) <fragment> | <action> | <setting>;
+<fragment> = (calendar |
+                        camera |
+                        facebook |
+                        gallery |
+                        hangman |
+                        help |
+                        light |
+                        music |
+                        news |
+                        options |
+                        quotes |
+                        settings |
+                        sports |
+                        technology |
+                        traffic |
+                        twitter |
+                        weather);
+<setting> =  (      camera <bool> |
+                    light <level> |
+                    music volume <level>  |
+                    remote control <bool> |
+                    screen brightness <level> |
+                    speech frequency <rarity>  |
+                    system volume <bool>     |
+                    voice recognition <bool> |
+                    weather units <units> );
+<bool> = ( on | off );
+<rarity> = ( never | rarely | often | always );
+<level> = ( very low | low | medium | high | very high );
+<unit> = ( English | metric );
+<direction> = ( up | down );
+<number> = ( oh | zero | one | two | three | four | five | six | seven | eight | nine | ten );
+
+<action> = (go back |
+                conditions |
+                forecast |
+                go forward |
+                go to sleep |
+                hide    |
+                turn on  |
+                turn off |
+                scroll up |
+                scroll down |
+                take picture |
+                start listening  |
+                stop listening   |
+                wake up);

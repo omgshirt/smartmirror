@@ -138,7 +138,8 @@ public class Preferences {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("Preferences", "Got message: " + message);
+            Log.i("Preferences", "Got message:" + message);
+            Log.i("Preferences", "Context:" + context.toString());
             handleSettingsCommand(context, message);
         }
     };
@@ -229,7 +230,6 @@ public class Preferences {
                 setVoiceEnabled(false);
                 break;
             case CMD_VOICE_ON:
-                ((MainActivity)context).startTTS(LISTENING);
                 setVoiceEnabled(true);
                 break;
 

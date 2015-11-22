@@ -57,13 +57,16 @@
     <string name="weather_wind_strong">\uf050</string>
 
     <!-- Settings strings -->
+    <string name="settings_screen_brightness">Screen Brightness</string>
+    <string name="settings_light_brightness">Light Brightness</string>
     <string name="settings_weather_units">Weather Units</string>
     <string name="settings_system_vol">System Volume</string>
     <string name="settings_music_vol">Music Volume</string>
-    <string name="settings_speech_never">Never</string>
-    <string name="settings_speech_rare">Rarely</string>
-    <string name="settings_speech_often">Often</string>
-    <string name="settings_speech_always">Always</string>
+    <string name="settings_speech_freq">Settings Speech Frequency</string>
+    <string name="settings_never">Never</string>
+    <string name="settings_rare">Rarely</string>
+    <string name="settings_often">Often</string>
+    <string name="settings_always">Always</string>
 
     <string name="settings_off">Off</string>
     <string name="settings_vlow">Very Low</string>
@@ -78,16 +81,4 @@
 
     <!-- WiFi P2P strings -->
     <string name="wifi_not_enabled">Wifi Not Enabled</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <!-- -->
-    <string name="kws_caption">To start demonstration say \"computer\".</string>
-    <string name="menu_caption">Say \"mirror\", \"digits\", \"forecast\" or \"phones\" to choose the grammar, language model or phonetic decoder example.</string>
-    <string name="digits_caption">To try recognition of digits: say something like \"one two three four five\".</string>
-    <string name="forecast_caption">To try recognition of a weather forecast like \"sunny spells on Wednesday\".</string>
-    <string name="phone_caption">To try phonetic recognition say anything.</string>
-    <string name="smartmirror_caption">Test smartmirror grammar</string>
-
 </resources>

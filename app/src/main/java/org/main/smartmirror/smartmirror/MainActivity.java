@@ -22,7 +22,6 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -35,11 +34,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import io.fabric.sdk.android.Fabric;
-import java.util.Arrays;
+
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity
     public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
     public static final String WAKE = "wake";
-    public static final String WAKEUP = "wakeup";
+    public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
 
     public static final int SLEEPING = 0;
@@ -379,7 +378,6 @@ public class MainActivity extends AppCompatActivity
      */
     public void displayView(String viewName){
         Fragment fragment = null;
-        String title = getString(R.string.app_name);
         // If sleeping, save viewName and wake screen. Otherwise ignore command.
         Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
@@ -392,32 +390,26 @@ public class MainActivity extends AppCompatActivity
                 Bundle bundle = new Bundle();
                 bundle.putString("url", mDefaultURL);
                 fragment.setArguments(bundle);
-                title = NEWS;
                 break;
             case CALENDAR:
                 fragment = new CalendarFragment();
-                title = CALENDAR;
                 break;
             case CAMERA:
                 fragment = new CameraFragment();
-                title = CAMERA;
                 break;
             case FACEBOOK:
                 fragment = new FacebookFragment();
-                title = FACEBOOK;
                 break;
             case LIGHT:
                 fragment = new LightFragment();
-                title = LIGHT;
                 break;
             case OPTIONS:
             case SETTINGS:
                 fragment = new SettingsFragment();
-                title = SETTINGS;
                 break;
             case ON:
             case WAKE:
-            case WAKEUP:
+            case WAKE_UP:
                 // displayView will be called again from onStart() with the fragment to show
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
@@ -432,15 +424,12 @@ public class MainActivity extends AppCompatActivity
             case SLEEP:
                 fragment = new OffFragment();
                 mirrorSleepState = LIGHT_SLEEP;
-                title = SLEEP;
                 break;
             case TWITTER:
                 fragment = new TwitterFragment();
-                title = TWITTER;
                 break;
             case WEATHER:
                 fragment = new WeatherFragment();
-                title = WEATHER;
                 break;
             default:
                 // The command isn't one of the view swap instructions,
@@ -467,10 +456,6 @@ public class MainActivity extends AppCompatActivity
             } else {
                 Log.e("Fragments", "commit skipped. isFinishing() returned true");
             }
-        }
-
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setTitle(title);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
