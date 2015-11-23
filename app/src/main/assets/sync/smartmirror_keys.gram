@@ -1,25 +1,24 @@
-back /1e10/
+go back /1e10/
 calendar /1e-3/
 camera /1e-3/
 conditions /1e-5/
 facebook /1e-2/
 forecast /1e-2/
-go to sleep /1e-5/
+go to sleep /1e-10/
 hangman /1e1/
 show help /1e2/
 hide help /1e1/
-light /1e20/
-music /1e4/
+light /1e16/
 news /1e10/
-options /1e-3/
+options /1e-2/
 quotes /1e1/
 settings /1e-4/
-scroll up /1e1/
-scroll down /1e1/
+scroll up /1e10/
+scroll down /1e10/
 start listening /1e-1/
-stop listening /1e2/
+stop listening /1e-1/
 take a picture /1e-2/
-traffic /1e-2/
-twitter /1e-2/
-wake up /1e5/
-weather /1e-2/
+traffic /1e5/
+twitter /1e5/
+wake up /1e1/
+weather /1e5/

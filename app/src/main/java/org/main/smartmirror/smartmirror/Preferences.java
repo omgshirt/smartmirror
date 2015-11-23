@@ -139,8 +139,7 @@ public class Preferences {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.i("Preferences", "Got message:" + message);
-            Log.i("Preferences", "Context:" + context.toString());
+            Log.i("Preferences", "Got message:\"" + message + "\"");
             handleSettingsCommand(context, message);
         }
     };
@@ -536,10 +535,17 @@ public class Preferences {
 
     /**
      * Sets the voice enabled status
-     * @param mVoiceEnabled boolean
+     * @param voiceEnabled boolean
      */
-    public void setVoiceEnabled( boolean mVoiceEnabled) {
-        this.mVoiceEnabled = mVoiceEnabled;
+    public void setVoiceEnabled(boolean voiceEnabled) {
+        this.mVoiceEnabled = voiceEnabled;
+        String text;
+        if (voiceEnabled) {
+            text = mActivity.getResources().getString(R.string.tts_voice_recognition_on);
+        } else {
+            text = mActivity.getResources().getString(R.string.tts_voice_recognition_off);
+        }
+        ((MainActivity)mActivity).startTTS(text);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
         edit.apply();

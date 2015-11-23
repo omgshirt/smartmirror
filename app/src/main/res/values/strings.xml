@@ -81,4 +81,8 @@
 
     <!-- WiFi P2P strings -->
     <string name="wifi_not_enabled">Wifi Not Enabled</string>
+
+    <!-- Text to Speech phrases -->
+    <string name="tts_voice_recognition_on">I\'m listening</string>
+    <string name="tts_voice_recognition_off">I\'ll ignore you. for now.</string>
 </resources>

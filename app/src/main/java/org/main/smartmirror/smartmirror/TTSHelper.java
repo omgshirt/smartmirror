@@ -98,6 +98,7 @@ public class TTSHelper{
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, Integer.toString(messageId++));
         // String.valueOf(AudioManager.STREAM_NOTIFICATION); // param to set TTS to use NOTIFICATION stream
         mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
+        Log.i("TTS", "speak:\"" + mTextToSpeak + "\"");
     }
 
     public boolean isSpeaking() {

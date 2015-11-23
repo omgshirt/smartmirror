@@ -35,6 +35,7 @@ public class VoiceService extends Service implements RecognitionListener{
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
     private boolean mSpeechInitialized;
+    private boolean mVoiceForceStopped;
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
@@ -105,10 +106,13 @@ public class VoiceService extends Service implements RecognitionListener{
 
     /**
      * Stops voice recognition, invoked by the calling Activity
+     * @param forceStop whether this stop is forced by another agent
      */
-    public void stopVoice(){
-        if (mSpeechInitialized)
+    public void stopVoice(boolean forceStop){
+        mVoiceForceStopped = forceStop;
+        if (mSpeechInitialized) {
             mSpeechRecognizer.stop();
+        }
     }
 
     /**
@@ -148,13 +152,15 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        if(hypothesis != null) {
-            Log.i("VR", "onResult:\"" + hypothesis.getHypstr() + "\"");
-            //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
-            setSpokenCommand(hypothesis.getHypstr());
-            sendMessage();
+        if (!mVoiceForceStopped) {
+            if(hypothesis != null) {
+                Log.i("VR", "onResult:\"" + hypothesis.getHypstr() + "\"");
+                //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
+                setSpokenCommand(hypothesis.getHypstr());
+                sendMessage();
+            }
+            startVoice();
         }
-        startVoice();
     }
 
     /**
@@ -171,7 +177,7 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onEndOfSpeech() {
         Log.i("VR", "onEndOfSpeech()");
-        stopVoice();
+        stopVoice(false);
         //if (!mSpeechRecognizer.getSearchName().equals(MIRROR_KWS))
          //   switchSearch(MIRROR_KWS);
     }
@@ -282,7 +288,7 @@ public class VoiceService extends Service implements RecognitionListener{
                     break;
                 case STOP_SPEECH:
                     mClients.remove(msg.replyTo);
-                    stopVoice();
+                    stopVoice(true);
                     break;
                 default:
                     super.handleMessage(msg);

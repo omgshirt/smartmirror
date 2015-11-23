@@ -67,9 +67,11 @@ public class MainActivity extends AppCompatActivity
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
+    public static final String GALLERY = "gallery";
     public static final String GO_TO_SLEEP = "go to sleep";
+    public static final String SLEEP = "sleep";
     public static final String LIGHT = "light";
-    public static final String HELP = "show help";
+    public static final String SHOW_HELP = "show help";
     public static final String HIDE_HELP ="hide help";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
@@ -78,6 +80,7 @@ public class MainActivity extends AppCompatActivity
     public static final String SETTINGS = "settings";
     public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
+    public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
 
@@ -405,6 +408,7 @@ public class MainActivity extends AppCompatActivity
             case SETTINGS:
                 fragment = new SettingsFragment();
                 break;
+            case WAKE:
             case WAKE_UP:
                 // displayView will be called again from onStart() with the fragment to show
                 if (mirrorSleepState == LIGHT_SLEEP) {
@@ -416,6 +420,7 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
                 break;
+            case SLEEP:
             case GO_TO_SLEEP:
                 fragment = new OffFragment();
                 mirrorSleepState = LIGHT_SLEEP;
@@ -571,6 +576,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void stopSpeechRecognition(){
         try {
+            Log.i("VR", "stopSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
@@ -580,6 +586,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // --------------------------------- Text to Speech (TTS) ---------------------------------
+
 
     /**
      * Say a phrase using text to speech
