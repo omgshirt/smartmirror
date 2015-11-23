@@ -1,13 +1,17 @@
 package org.main.smartmirror.smartmirror;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,9 +41,9 @@ public class FacebookFragment extends Fragment {
 
     LoginButton btnLoginButton;
     CallbackManager mCBManager;
+    WebView webview;
 
-    private String SCROLLUP = "up";
-    private String SCROLLDOWN = "down";
+
 
 
     private String curURL;
@@ -57,9 +61,9 @@ public class FacebookFragment extends Fragment {
         FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
         mCBManager = CallbackManager.Factory.create();
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
-        init("https://m.facebook.com/home.php?refsrc=https%3A%2F%2Fwww.facebook.com%2F&refid=8&_rdr");
+        init("https://www.facebook.com/");
 
-        WebView webview = (WebView) view.findViewById(R.id.facebook_webview);
+        webview = (WebView) view.findViewById(R.id.facebook_webview);
         if (curURL != null) {
 
             webview.getSettings().setJavaScriptEnabled(true);
@@ -89,16 +93,16 @@ public class FacebookFragment extends Fragment {
         //TODO put this elsewhere
 
 
-        btnLoginButton = (LoginButton) view.findViewById(R.id.fb_login_button);
-        btnLoginButton.setReadPermissions("user_friends, user_posts");
+        //btnLoginButton = (LoginButton) view.findViewById(R.id.fb_login_button);
+        //btnLoginButton.setReadPermissions("user_friends, user_posts");
 
-        btnLoginButton.setFragment(this);
+        //btnLoginButton.setFragment(this);
 
-        btnLoginButton.registerCallback(mCBManager, new FacebookCallback<LoginResult>() {
+        /*btnLoginButton.registerCallback(mCBManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.i("status: ", "SUCCESS!");
-                /*new GraphRequest(
+                *//*new GraphRequest(
                         AccessToken.getCurrentAccessToken(),
                         //"/me/feed",
                         //"/{user_id}/notifications",
@@ -110,9 +114,9 @@ public class FacebookFragment extends Fragment {
                                 Log.i("response ", response.toString());
                             }
                         }
-                ).executeAsync();*/
+                ).executeAsync();*//*
 
-               /* mAccessToken = AccessToken.getCurrentAccessToken();
+               *//* mAccessToken = AccessToken.getCurrentAccessToken();
                 GraphRequest request = GraphRequest.newMeRequest(
                         mAccessToken,
                         new GraphRequest.GraphJSONObjectCallback() {
@@ -135,7 +139,7 @@ public class FacebookFragment extends Fragment {
                 Bundle parameters = new Bundle();
                 parameters.putString("fields", "id");
                 request.setParameters(parameters);
-                request.executeAsync();*/
+                request.executeAsync();*//*
 
                 //https://graph.facebook.com/page-username/posts?access_token=sometoken
                 //use this url
@@ -153,9 +157,49 @@ public class FacebookFragment extends Fragment {
             public void onError(FacebookException exception) {
                 Log.i("status: ", "ERROR!");
             }
-        });
+        });*/
 
         return view;
+    }
+
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("News", "Got message:\"" + message +"\"");
+            switch (message) {
+                case MainActivity.mSCROLLUP:
+                    Log.i(" is it ", message);
+                    webview.scrollBy(0, -1000);
+                    break;
+                case MainActivity.mSCROLLDOWN:
+                    Log.i(" is it ", message);
+                    webview.scrollBy(0, +1000);
+                    break;
+            }
+        }
+    };
+
+    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     *  voice recognition, the remote control, etc.
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
+    }
+
+    // when this goes out of view, halt listening
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     private class webClient extends WebViewClient {

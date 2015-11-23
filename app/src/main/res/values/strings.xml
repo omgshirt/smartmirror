@@ -5,13 +5,10 @@
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
     <string name="nyt_api_key">89899870d1024b962dc582806e3e9c34:3:73303333</string>
 
-
     <string name="twitter_error">Error with Twitter Data</string>
 
     <string name="facebook_app_id">913606198722814</string>
     <string name="facebook_app_secret">7ab77882cb36c0e7f942ebee16117444</string>
-    <string name="scroll_up">Scroll Up</string>
-    <string name="scroll_down">Scroll Down</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

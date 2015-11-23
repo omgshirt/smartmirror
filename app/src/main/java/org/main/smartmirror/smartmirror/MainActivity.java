@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity
 
     private static Context mContext;
     private Preferences mPreferences;
-    
+
     //twitter keys
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
@@ -86,13 +86,17 @@ public class MainActivity extends AppCompatActivity
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
+    public static final String mSCROLLUP = "scroll up";
+    public static final String mSCROLLDOWN = "scroll down";
+
     // News
-    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-    private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
-    private String mPostURL = "&sort=newest&api-key=";
-    private String mNewsDesk;
-    private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-    private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
+    public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
+    public static String mPostURL = "&sort=newest&api-key=";
+    public static String mNewsDesk;
+    public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
+    public static String mDesk;
 
     // Sleep state & wakelocks
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
@@ -222,9 +226,9 @@ public class MainActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_FULLSCREEN;
-                //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
-                //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
-                //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
+        //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
+        //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
+        //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         decorView.setSystemUiVisibility(uiOptions);
 
         try {
