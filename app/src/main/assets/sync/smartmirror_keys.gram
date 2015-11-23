@@ -1,10 +1,11 @@
-go back /1e10/
 calendar /1e-3/
 camera /1e-3/
 conditions /1e-5/
 facebook /1e-2/
 forecast /1e-2/
+gallery /1e-2/
 go to sleep /1e-10/
+go back /1e10/
 hangman /1e1/
 show help /1e2/
 hide help /1e1/
@@ -22,3 +23,5 @@ traffic /1e5/
 twitter /1e5/
 wake up /1e1/
 weather /1e5/
+weather english /1e2/
+weather metric /1e2/

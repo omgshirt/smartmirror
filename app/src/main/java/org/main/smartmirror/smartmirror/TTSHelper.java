@@ -40,7 +40,7 @@ public class TTSHelper{
                         public void onDone(String utteranceId){
                             ((MainActivity)mContext).startSpeechRecognition();
                             mIsSpeaking = false;
-                            stop();  // stop() discards other phrases in queue...
+                            //stop();  // stop() discards other phrases in queue...
                         }
 
                         @Override

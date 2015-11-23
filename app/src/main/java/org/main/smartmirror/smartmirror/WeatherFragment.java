@@ -58,8 +58,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
     private TextView txtWeatherAlert;
 
     private static String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
-    private String latitude = "0";
-    private String longitude = "0";
+    private String mLatitude = "0";
+    private String mLongitude = "0";
 
     // default weather values
     private int mCurrentTemp = 0;
@@ -89,10 +89,10 @@ public class WeatherFragment extends Fragment implements LocationListener {
         }
         if (location != null) {
             try {
-                latitude = Double.toString(location.getLatitude());
-                longitude = Double.toString(location.getLongitude());
-                Log.d("old","lat :  " + latitude);
-                Log.d("old","long :  " + longitude);
+                mLatitude = Double.toString(location.getLatitude());
+                mLongitude = Double.toString(location.getLongitude());
+                Log.d("old","lat :  " + mLatitude);
+                Log.d("old","long :  " + mLongitude);
                 this.onLocationChanged(location);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -100,17 +100,18 @@ public class WeatherFragment extends Fragment implements LocationListener {
         }
 
         // some static locations for now
-        latitude = "34";
-        longitude = "-118";
+        mLatitude = "34";
+        mLongitude = "-118";
+        startWeatherUpdate();
+    }
 
+    public void startWeatherUpdate(){
         String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
-        String weatherUnit;
+        String weatherUnit = "si";
         if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
             weatherUnit = "us";
-        } else {
-            weatherUnit = "si";
         }
-        updateWeatherData(String.format(darkSkyRequest, darkSkyKey, latitude, longitude, weatherUnit));
+        updateWeatherData(String.format(darkSkyRequest, darkSkyKey, mLatitude, mLongitude, weatherUnit));
     }
 
     @Override
@@ -154,6 +155,10 @@ public class WeatherFragment extends Fragment implements LocationListener {
                     break;
                 case CONDITIONS:
                     speakCurrentConditions();
+                    break;
+                case MainActivity.WEATHER_ENGLISH:
+                case MainActivity.WEATHER_METRIC:
+                    startWeatherUpdate();
                     break;
             }
         }
@@ -357,7 +362,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
                     txtAlerts.setText(title.toString());
                 }
             }
-            speakCurrentConditions();
+            //speakCurrentConditions();
         }catch(Exception e){
             e.printStackTrace();
             Log.e("SimpleWeather", "One or more fields not found in the JSON data");
@@ -410,8 +415,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         Log.i("Location", "Location change detected");
-        latitude = Double.toString(location.getLatitude());
-        longitude = Double.toString(location.getLongitude());
+        mLatitude = Double.toString(location.getLatitude());
+        mLongitude = Double.toString(location.getLongitude());
     }
 
     @Override

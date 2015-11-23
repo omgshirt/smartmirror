@@ -63,26 +63,32 @@ public class MainActivity extends AppCompatActivity
     // Constants
     public static final String TAG = "SmartMirror";
 
-    public static final String BACK = "go back";
+    public static final String BACK = "back";
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
+    public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
-    public static final String SLEEP = "sleep";
     public static final String LIGHT = "light";
+    public static final String HELP = "help";
     public static final String SHOW_HELP = "show help";
     public static final String HIDE_HELP ="hide help";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
     public static final String OPTIONS = "options";
     public static final String QUOTES = "quotes";
+    public static final String SCROLL_UP = "scroll up";
+    public static final String SCROLL_DOWN = "scroll down";
     public static final String SETTINGS = "settings";
+    public static final String SLEEP = "sleep";
     public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
+    public static final String WEATHER_ENGLISH = "weather english";
+    public static final String WEATHER_METRIC = "weather metric";
 
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
@@ -382,7 +388,7 @@ public class MainActivity extends AppCompatActivity
         // If sleeping, save viewName and wake screen. Otherwise ignore command.
         Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-            if (!viewName.equals(WAKE_UP)) return;
+            if (!viewName.equals(WAKE)) return;
         }
 
         switch (viewName) {
@@ -404,12 +410,10 @@ public class MainActivity extends AppCompatActivity
             case LIGHT:
                 fragment = new LightFragment();
                 break;
-            case OPTIONS:
             case SETTINGS:
                 fragment = new SettingsFragment();
                 break;
             case WAKE:
-            case WAKE_UP:
                 // displayView will be called again from onStart() with the fragment to show
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
@@ -421,7 +425,6 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
             case SLEEP:
-            case GO_TO_SLEEP:
                 fragment = new OffFragment();
                 mirrorSleepState = LIGHT_SLEEP;
                 break;
@@ -450,7 +453,7 @@ public class MainActivity extends AppCompatActivity
             if (!isFinishing()) {
                 ft.commit();
                 // Any command != SLEEP sets stores value as last visible frag
-                if ( !viewName.equals(GO_TO_SLEEP) ) {
+                if ( !viewName.equals(SLEEP) ) {
                     mCurrentFragment = viewName;
                 }
             } else {
@@ -478,9 +481,6 @@ public class MainActivity extends AppCompatActivity
      * @param input the command the user gave
      */
     public void speechResult(String input) {
-        // if TTS is speaking, ignore this input
-        if (mTTSHelper.isSpeaking()) return;
-
         String voiceInput = input.trim();
 
         // if voice is disabled, ignore everything except "start listening" command
@@ -489,6 +489,33 @@ public class MainActivity extends AppCompatActivity
                 broadcastMessage("inputAction", voiceInput);
             }
             return;
+        }
+
+        if(voiceInput.contains("weather")) {
+            if (voiceInput.contains("english")) {
+                voiceInput = WEATHER_ENGLISH;
+            } else if (voiceInput.contains("metric")) {
+                voiceInput = WEATHER_METRIC;
+            }
+        }
+
+        // Normalize speech commands to match remote control versions.
+        switch (voiceInput) {
+            case GO_BACK:
+                voiceInput = BACK;
+                break;
+            case GO_TO_SLEEP:
+                voiceInput = SLEEP;
+                break;
+            case OPTIONS:
+                voiceInput = SETTINGS;
+                break;
+            case SHOW_HELP:
+                voiceInput = HELP;
+                break;
+            case WAKE_UP:
+                voiceInput = WAKE;
+                break;
         }
 
         displayView(voiceInput);
