@@ -33,16 +33,20 @@ public class TTSHelper{
                         @Override
                         public void onStart(String utteranceId) {
                             mIsSpeaking = true;
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
 
                         @Override
                         public void onDone(String utteranceId){
-                            stop();  // stop() discards other phrases in queue.
+                            ((MainActivity)mContext).startSpeechRecognition();
+                            mIsSpeaking = false;
+                            stop();  // stop() discards other phrases in queue...
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-
+                            ((MainActivity)mContext).stopSpeechRecognition();
+                            mIsSpeaking = false;
                         }
                     });
                     mTtsInitialized = true;
@@ -89,7 +93,6 @@ public class TTSHelper{
     }
 
     private void speak() {
-        ((MainActivity)mContext).stopSpeechRecognition();
         // Map passes in the UtteranceProgressListener so we can handle callbacks from the TTS.speak event
         HashMap<String, String> map = new HashMap<>();
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, Integer.toString(messageId++));
@@ -104,7 +107,6 @@ public class TTSHelper{
         if (mTextToSpeech != null && mTtsInitialized) {
             mTextToSpeech.stop();
             mIsSpeaking = false;
-            ((MainActivity)mContext).startSpeechRecognition();
         }
     }
 

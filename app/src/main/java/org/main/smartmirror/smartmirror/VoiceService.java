@@ -34,11 +34,11 @@ public class VoiceService extends Service implements RecognitionListener{
     private Messenger mMessenger = new Messenger( new IHandler());
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
+    private boolean mVoiceForceStop;
     private boolean mSpeechInitialized;
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
-    static final int INPUT_READY=3;
     private String SMARTMIRROR_SEARCH="mirror";
 
     @Override
@@ -99,9 +99,10 @@ public class VoiceService extends Service implements RecognitionListener{
 
     /**
      * Stops voice recognition, invoked by the calling Activity
+     * @param forceStop whether this stop is forced by another agent
      */
-    public void stopVoice(){
-        Log.i("STOP", "Voice Stopped");
+    public void stopVoice(boolean forceStop){
+        mVoiceForceStop = forceStop;
         if (mSpeechInitialized)
             mSpeechRecognizer.stop();
     }
@@ -140,12 +141,13 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        if(hypothesis != null) {
-            Log.i("VR", "onResult: " + hypothesis.getHypstr());
-            setSpokenCommand(hypothesis.getHypstr());
-            sendMessage();
+        if(!mVoiceForceStop) {
+            if (hypothesis != null) {
+                Log.i("VR", "onResult: " + hypothesis.getHypstr());
+                setSpokenCommand(hypothesis.getHypstr());
+                sendMessage();
+            }
         }
-//        startVoice();
     }
 
     /**
@@ -161,7 +163,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
-        stopVoice();
+        stopVoice(false);
     }
 
     /**
@@ -254,7 +256,7 @@ public class VoiceService extends Service implements RecognitionListener{
                     break;
                 case STOP_SPEECH:
                     mClients.remove(msg.replyTo);
-                    stopVoice();
+                    stopVoice(true);
                     break;
                 default:
                     super.handleMessage(msg);

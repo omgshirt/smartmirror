@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity
     private final boolean DEBUG = true;
     private static Context mContext;
     private Preferences mPreferences;
-    
+
     //twitter keys
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
@@ -566,14 +566,12 @@ public class MainActivity extends AppCompatActivity
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
-        if(!mTTSHelper.isSpeaking()) {
-            try {
-                Message msg = Message.obtain(null, VoiceService.START_SPEECH);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
+        try {
+            Message msg = Message.obtain(null, VoiceService.START_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
             } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         }
     }
 
