@@ -29,17 +29,22 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
  */
 public class VoiceService extends Service implements RecognitionListener{
 
-    private final boolean DEBUG=true;
+    // Constants
+    private final boolean DEBUG = true;
+    private final String SMARTMIRROR_SEARCH = "mirror";
+    static final int STOP_SPEECH = 0;
+    static final int START_SPEECH = 1;
+    static final int RESULT_SPEECH = 2;
+
+    // Messaging and speech related objects
     private ArrayList<Messenger> mClients = new ArrayList<>();
     private Messenger mMessenger = new Messenger( new IHandler());
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
+
+    // Flags for speech
     private boolean mVoiceForceStop;
     private boolean mSpeechInitialized;
-    static final int STOP_SPEECH=0;
-    static final int START_SPEECH=1;
-    static final int RESULT_SPEECH=2;
-    private String SMARTMIRROR_SEARCH="mirror";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -55,7 +60,7 @@ public class VoiceService extends Service implements RecognitionListener{
 
     /**
      * Method that returns a binder for the calling Activity to bind and access this service
-     * @param intent the current inten
+     * @param intent the current intent
      * @return the binder
      */
     @Override
@@ -98,7 +103,8 @@ public class VoiceService extends Service implements RecognitionListener{
     }
 
     /**
-     * Stops voice recognition, invoked by the calling Activity
+     * Stops voice capture, invoked by the calling Activity. This induces
+     * a force stop so that the calling Activity doesn't hear itself.
      * @param forceStop whether this stop is forced by another agent
      */
     public void stopVoice(boolean forceStop){
@@ -111,9 +117,13 @@ public class VoiceService extends Service implements RecognitionListener{
      * Sends a message back to the Activity that started this service
      */
     public void sendMessage(){
+        // there's a potential that we might get a null String
+        // so we avoid it
         if(getSpokenCommand() != null) {
             Bundle bundle = new Bundle();
+            // key is result so the calling activity can handle the message
             bundle.putString("result", getSpokenCommand());
+            // used for the calling activity to check which message id to check
             Message msg = Message.obtain(null, RESULT_SPEECH);
             msg.setData(bundle);
             try {
@@ -132,8 +142,10 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
-        if (hypothesis != null)
-            Log.i("VR", "onPartialResult: " + hypothesis.getHypstr());
+        if(hypothesis != null) {
+            if(DEBUG)
+                Log.i("VR", "onPartialResult: " + hypothesis.getHypstr());
+        }
     }
 
     /**
@@ -143,7 +155,8 @@ public class VoiceService extends Service implements RecognitionListener{
     public void onResult(Hypothesis hypothesis) {
         if(!mVoiceForceStop) {
             if (hypothesis != null) {
-                Log.i("VR", "onResult: " + hypothesis.getHypstr());
+                if(DEBUG)
+                    Log.i("VR", "onResult: " + hypothesis.getHypstr());
                 setSpokenCommand(hypothesis.getHypstr());
                 sendMessage();
             }
@@ -172,7 +185,8 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onError(Exception error) {
-        Log.i("ERR", error.getMessage());
+        if(DEBUG)
+            Log.i("ERR", error.getMessage());
     }
 
     @Override
