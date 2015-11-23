@@ -38,6 +38,7 @@ public class VoiceService extends Service implements RecognitionListener{
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
+    static final int INPUT_READY=3;
     private String SMARTMIRROR_SEARCH="mirror";
 
     @Override
@@ -100,6 +101,7 @@ public class VoiceService extends Service implements RecognitionListener{
      * Stops voice recognition, invoked by the calling Activity
      */
     public void stopVoice(){
+        Log.i("STOP", "Voice Stopped");
         if (mSpeechInitialized)
             mSpeechRecognizer.stop();
     }
@@ -108,15 +110,17 @@ public class VoiceService extends Service implements RecognitionListener{
      * Sends a message back to the Activity that started this service
      */
     public void sendMessage(){
-        Bundle bundle = new Bundle();
-        bundle.putString("result", getSpokenCommand());
-        Message msg = Message.obtain(null, RESULT_SPEECH);
-        msg.setData(bundle);
-        try {
-            mClients.get(0).send(msg);
-        } catch (RemoteException e) {
-            mClients.remove(msg);
-            e.printStackTrace();
+        if(getSpokenCommand() != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("result", getSpokenCommand());
+            Message msg = Message.obtain(null, RESULT_SPEECH);
+            msg.setData(bundle);
+            try {
+                mClients.get(0).send(msg);
+            } catch (RemoteException e) {
+                mClients.remove(msg);
+                e.printStackTrace();
+            }
         }
     }
 
@@ -141,7 +145,7 @@ public class VoiceService extends Service implements RecognitionListener{
             setSpokenCommand(hypothesis.getHypstr());
             sendMessage();
         }
-        startVoice();
+//        startVoice();
     }
 
     /**
@@ -149,7 +153,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onBeginningOfSpeech() {
-        //Log.i("VR", "onBeginningOfSpeech");
+
     }
 
     /**
@@ -157,7 +161,6 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
-        //Log.i("VR", "onEndOfSpeech()");
         stopVoice();
     }
 

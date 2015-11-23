@@ -566,12 +566,14 @@ public class MainActivity extends AppCompatActivity
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
-        try {
-            Message msg = Message.obtain(null, VoiceService.START_SPEECH);
-            msg.replyTo = mMessenger;
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        if(!mTTSHelper.isSpeaking()) {
+            try {
+                Message msg = Message.obtain(null, VoiceService.START_SPEECH);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -600,7 +602,7 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
-                    //Thread.sleep(2000);
+//                    Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

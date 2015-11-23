@@ -56,5 +56,4 @@ dependencies {
     }
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
     compile project(':pocketsphinx-android-5prealpha-nolib')
-    
 }
