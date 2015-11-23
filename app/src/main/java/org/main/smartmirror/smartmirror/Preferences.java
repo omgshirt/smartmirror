@@ -139,7 +139,7 @@ public class Preferences {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.i("Preferences", "Got message:\"" + message + "\"");
+            //Log.i("Preferences", "Got message:\"" + message + "\"");
             handleSettingsCommand(context, message);
         }
     };

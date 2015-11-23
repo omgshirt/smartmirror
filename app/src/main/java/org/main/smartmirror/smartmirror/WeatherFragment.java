@@ -345,7 +345,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 rainForecast.setText(chanceOfRain);
             }
 
-            // check for weather alerts. Display and speak if they exist
+            // check for weather alerts.
             if (json.has("alerts")) {
                 JSONArray alerts = json.getJSONArray("alerts");
                 StringBuilder title = new StringBuilder();
@@ -362,7 +362,6 @@ public class WeatherFragment extends Fragment implements LocationListener {
                     txtAlerts.setText(title.toString());
                 }
             }
-            //speakCurrentConditions();
         }catch(Exception e){
             e.printStackTrace();
             Log.e("SimpleWeather", "One or more fields not found in the JSON data");
@@ -397,6 +396,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 break;
             case "wind" : icon = getActivity().getString(R.string.weather_wind_strong);
                 break;
+            // if we can't find the right icon, set it to generic day or night depending on time
             default:
                 long currentTime = new Date().getTime();
                 if(currentTime>=sunrise && currentTime<sunset) {
@@ -450,11 +450,10 @@ public class WeatherFragment extends Fragment implements LocationListener {
      * Given a wind bearing, returns the direction
      * @return String direction as abbreviation (NE, E, W...)
      */
-    public String getDirectionFromBearing(int bearing){
+    public static String getDirectionFromBearing(final int bearing){
         if (bearing < 0 || bearing > 360) return "error";
         String[] directions = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
-        int index = (int) ((bearing + 22.5) / 45);
-        index %= 8;
+        int index = ( (int)((bearing + 22.5) / 45)) % 8;
         return directions[ index ];
     }
 }

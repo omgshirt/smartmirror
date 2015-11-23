@@ -29,13 +29,11 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
  */
 public class VoiceService extends Service implements RecognitionListener{
 
-    private final boolean DEBUG=true;
     private ArrayList<Messenger> mClients = new ArrayList<>();
     private Messenger mMessenger = new Messenger( new IHandler());
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
     private boolean mSpeechInitialized;
-    private boolean mVoiceForceStopped;
     static final int STOP_SPEECH=0;
     static final int START_SPEECH=1;
     static final int RESULT_SPEECH=2;
@@ -100,16 +98,10 @@ public class VoiceService extends Service implements RecognitionListener{
             mSpeechRecognizer.startListening(PRIMARY_SEARCH);
             //mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
         }
-        // send message to main to check tts
-        //
     }
 
-    /**
-     * Stops voice recognition, invoked by the calling Activity
-     * @param forceStop whether this stop is forced by another agent
-     */
-    public void stopVoice(boolean forceStop){
-        mVoiceForceStopped = forceStop;
+    public void stopVoice(){
+
         if (mSpeechInitialized) {
             mSpeechRecognizer.stop();
         }
@@ -140,6 +132,7 @@ public class VoiceService extends Service implements RecognitionListener{
     public void onPartialResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
+            hypothesis.delete();
             Log.i("VR", "onPartialResult: " + text);
             //if (PRIMARY_SEARCH.equals(MIRROR_KWS) && text.equals(MIRROR_KWS))
             //    switchSearch(GRAMMAR_SEARCH);
@@ -152,15 +145,13 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        if (!mVoiceForceStopped) {
-            if(hypothesis != null) {
-                Log.i("VR", "onResult:\"" + hypothesis.getHypstr() + "\"");
-                //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
-                setSpokenCommand(hypothesis.getHypstr());
-                sendMessage();
-            }
-            startVoice();
+        if(hypothesis != null) {
+            Log.i("VR", "onResult:\"" + hypothesis.getHypstr() + "\"");
+            //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
+            setSpokenCommand(hypothesis.getHypstr());
+            sendMessage();
         }
+        startVoice();
     }
 
     /**
@@ -177,7 +168,7 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onEndOfSpeech() {
         Log.i("VR", "onEndOfSpeech()");
-        stopVoice(false);
+        stopVoice();
         //if (!mSpeechRecognizer.getSearchName().equals(MIRROR_KWS))
          //   switchSearch(MIRROR_KWS);
     }
@@ -288,7 +279,8 @@ public class VoiceService extends Service implements RecognitionListener{
                     break;
                 case STOP_SPEECH:
                     mClients.remove(msg.replyTo);
-                    stopVoice(true);
+                    //stopVoice(true);
+                    mSpeechRecognizer.cancel();
                     break;
                 default:
                     super.handleMessage(msg);

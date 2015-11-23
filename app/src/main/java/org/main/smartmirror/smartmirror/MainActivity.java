@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
 
     // Globals, prefs, debug flags
-    private final boolean DEBUG = true;
+    public static final boolean DEBUG = true;
 
     private static Context mContext;
     private Preferences mPreferences;
@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity
     public static final String NEWS = "news";
     public static final String OPTIONS = "options";
     public static final String QUOTES = "quotes";
+    public static final String REMOTE = "remote";
     public static final String SCROLL_UP = "scroll up";
     public static final String SCROLL_DOWN = "scroll down";
     public static final String SETTINGS = "settings";
@@ -391,6 +392,10 @@ public class MainActivity extends AppCompatActivity
             if (!viewName.equals(WAKE)) return;
         }
 
+        if (DEBUG) {
+            startTTS(viewName);
+        }
+
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -441,8 +446,6 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-        startTTS(viewName);
-
         // If we're changing fragments, stop speech, set the wake state, and do the transaction
         if(fragment != null){
             if(DEBUG)
@@ -477,7 +480,8 @@ public class MainActivity extends AppCompatActivity
     // ----------------------- SPEECH RECOGNITION --------------------------
 
     /**
-     * Handles the result of the speech input
+     * Handles the result of the speech input. Conform voice inputs into standard commands
+     * used by the remote.
      * @param input the command the user gave
      */
     public void speechResult(String input) {
@@ -491,11 +495,28 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if(voiceInput.contains("weather")) {
+        // Some silliness to solve "weather" showing up too many times
+        if(voiceInput.contains(WEATHER)) {
             if (voiceInput.contains("english")) {
-                voiceInput = WEATHER_ENGLISH;
+                voiceInput = Preferences.CMD_WEATHER_ENGLISH;
             } else if (voiceInput.contains("metric")) {
-                voiceInput = WEATHER_METRIC;
+                voiceInput = Preferences.CMD_WEATHER_METRIC;
+            }
+        }
+
+        if(voiceInput.contains(REMOTE)) {
+            if (voiceInput.contains("enable")) {
+                voiceInput = Preferences.CMD_REMOTE_ON;
+            } else if (voiceInput.contains("disable")) {
+                voiceInput = Preferences.CMD_REMOTE_OFF;
+            }
+        }
+
+        if(voiceInput.contains(CAMERA)) {
+            if (voiceInput.contains("enable")) {
+                voiceInput = Preferences.CMD_CAMERA_ON;
+            } else if (voiceInput.contains("disable")) {
+                voiceInput = Preferences.CMD_CAMERA_OFF;
             }
         }
 

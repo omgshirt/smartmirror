@@ -1,5 +1,7 @@
 calendar /1e-3/
 camera /1e-3/
+enable camera /1e-3/
+disable camera /1e-3/
 conditions /1e-5/
 facebook /1e-2/
 forecast /1e-2/
@@ -7,12 +9,14 @@ gallery /1e-2/
 go to sleep /1e-10/
 go back /1e10/
 hangman /1e1/
-show help /1e2/
-hide help /1e1/
+show help /1e6/
+hide help /1e6/
 light /1e16/
 news /1e10/
 options /1e-2/
 quotes /1e1/
+enable remote /1e-3/
+disable remote /1e-3/
 settings /1e-4/
 scroll up /1e10/
 scroll down /1e10/
@@ -21,7 +25,7 @@ stop listening /1e-1/
 take a picture /1e-2/
 traffic /1e5/
 twitter /1e5/
-wake up /1e1/
+wake up /1e5/
 weather /1e5/
 weather english /1e2/
 weather metric /1e2/
