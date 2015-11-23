@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
+    // scrolling
     public static final String mSCROLLUP = "scroll up";
     public static final String mSCROLLDOWN = "scroll down";
 
@@ -97,6 +98,10 @@ public class MainActivity extends AppCompatActivity
     public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
     public static String mDesk;
+
+    // News Desk
+    public static final String mSPORTS = "sports";
+    public static final String mTECHNOLOGY = "technology";
 
     // Sleep state & wakelocks
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE

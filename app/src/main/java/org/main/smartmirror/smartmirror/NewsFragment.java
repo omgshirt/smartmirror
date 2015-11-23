@@ -1,8 +1,13 @@
 package org.main.smartmirror.smartmirror;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONObject;
+
+import java.util.Arrays;
 
 //fetch news from New York Times
 //article search api key:89899870d1024b962dc582806e3e9c34:3:73303333
@@ -38,6 +45,9 @@ public class NewsFragment extends Fragment {
 
     public NewsFragment() {}
 
+    String mApiKey;
+    String mNewURL;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
@@ -63,10 +73,10 @@ public class NewsFragment extends Fragment {
         if (args != null) {
             // Use initialisation data
         }
-        String apiKey = getString(R.string.nyt_api_key);
+        mApiKey = getString(R.string.nyt_api_key);
 
         String newsURL = this.getArguments().getString("url");
-        newsURL += apiKey;
+        newsURL += mApiKey;
         updateNews(newsURL);
 
 
@@ -74,6 +84,120 @@ public class NewsFragment extends Fragment {
 
     }
 
+
+
+
+
+    /*public void setNews() {
+        String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+        int i = 0;
+        while (i < urlArr.length) {
+            if (MainActivity.mVoiceInput.contains(urlArr[i])) {
+                MainActivity.mNewsDesk = urlArr[i];
+                MainActivity.mNYTURL = MainActivity.mPreURL + MainActivity.mNewsDesk + MainActivity.mPostURL;
+                MainActivity.mDefaultURL = MainActivity.mNYTURL;
+                MainActivity.mVoiceInput = MainActivity.NEWS;
+                Log.i("voice news desk: ", urlArr[i]);
+                //displayView(NEWS);
+                break;
+            } else {
+                i++;
+                Log.i("news desk: ", Arrays.toString(urlArr));
+                Log.i("I heard: ", MainActivity.mVoiceInput);
+
+            }
+        }
+
+    }*/
+
+
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+
+            //prev in main
+/*            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+            int i = 0;
+            while (i < urlArr.length) {
+                if (input.contains(urlArr[i])) {
+                    mNewsDesk = urlArr[i];
+                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                    mDefaultURL = mNYTURL;
+                    voiceInput = NEWS;
+                    if (DEBUG)
+                        Log.i("voice news desk: ", urlArr[i]);
+                    break;
+                } else {
+                    i++;
+                    if (DEBUG) {
+                        Log.i("news desk: ", Arrays.toString(urlArr));
+                        Log.i("I heard: ", input);
+                    }
+                }
+            }*/
+
+            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+            int i = 0;
+            while (i < urlArr.length) {
+                if (message.contains(urlArr[i])) {
+                    MainActivity.mNewsDesk = urlArr[i];
+                    MainActivity.mNYTURL = MainActivity.mPreURL + MainActivity.mNewsDesk + MainActivity.mPostURL;
+                    //MainActivity.mDefaultURL = MainActivity.mNYTURL;
+                    mNewURL = MainActivity.mNYTURL + mApiKey;
+                    Log.i("voice news desk: ", urlArr[i]);
+                    break;
+                } else {
+                    i++;
+                    //Log.i("news desk: ", Arrays.toString(urlArr));
+                    Log.i("I heard: ", message);
+
+                }
+            }
+            Log.d("News", "Got message:\"" + message +"\"");
+            Log.i(" is it ", message);
+            switch (message) {
+                case MainActivity.mSPORTS:
+                    Log.i(" is it ", message);
+                    updateNews(mNewURL);
+                    break;
+                case MainActivity.mTECHNOLOGY:
+                    Log.i(" is it ", message);
+                    updateNews(mNewURL);
+                    break;
+            }
+        }
+    };
+ /*   private void speakNewsDesk(){
+
+       // if (forecasts == null) return;
+
+        String today = "test";
+
+    }*/
+
+    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     *  voice recognition, the remote control, etc.
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
+    }
+
+    // when this goes out of view, halt listening
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
 
     // Get news headlines from api and display
     private void updateNews(final String query){
