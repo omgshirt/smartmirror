@@ -3,14 +3,12 @@ package org.main.smartmirror.smartmirror;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
-import android.widget.TextView;
 
 
 public class SettingsFragment extends Fragment {
@@ -40,7 +38,7 @@ public class SettingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
-        mPreferences = Preferences.getInstance();
+        mPreferences = Preferences.getInstance(getActivity());
     }
 
     @Override
@@ -173,19 +171,19 @@ public class SettingsFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch(checkedId) {
                     case R.id.brightness_vlow:
-                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_VLOW);
+                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_VLOW);
                         break;
                     case R.id.brightness_low:
-                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_LOW);
+                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_LOW);
                         break;
                     case R.id.brightness_medium:
-                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_MEDIUM);
+                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_MEDIUM);
                         break;
                     case R.id.brightness_high:
-                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_HIGH);
+                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_HIGH);
                         break;
                     case R.id.brightness_vhigh:
-                        mPreferences.setAppBrightness(getActivity(), Preferences.BRIGHTNESS_VHIGH);
+                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_VHIGH);
                         break;
                 }
             }
@@ -292,9 +290,9 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    mPreferences.setRemoteEnabled(getActivity(), true);
+                    mPreferences.setRemoteEnabled(true);
                 } else {
-                    mPreferences.setRemoteEnabled(getActivity(), false);
+                    mPreferences.setRemoteEnabled(false);
                 }
                 setRemoteSwitchText();
             }

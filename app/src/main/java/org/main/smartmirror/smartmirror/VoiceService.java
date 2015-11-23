@@ -40,7 +40,8 @@ public class VoiceService extends Service implements RecognitionListener{
     static final int RESULT_SPEECH=2;
     private String SMARTMIRROR_SEARCH="mirrorSearch";
     private final String GRAMMAR_SEARCH = "grammarSearch";
-    private final String MIRROR_KWS = "mirror";
+    private final String MIRROR_KWS = "show";
+    private final String PRIMARY_SEARCH = SMARTMIRROR_SEARCH;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -94,9 +95,10 @@ public class VoiceService extends Service implements RecognitionListener{
      * Starts voice capture, invoked by the calling Activity
      */
     public void startVoice(){
-        if(mSpeechInitialized)
-            mSpeechRecognizer.startListening(MIRROR_KWS);
+        if(mSpeechInitialized) {
+            mSpeechRecognizer.startListening(PRIMARY_SEARCH);
             //mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
+        }
         // send message to main to check tts
         //
     }
@@ -135,9 +137,9 @@ public class VoiceService extends Service implements RecognitionListener{
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
             Log.i("VR", "onPartialResult: " + text);
-            if (text.equals(MIRROR_KWS))
-                switchSearch(GRAMMAR_SEARCH);
-                //switchSearch(SMARTMIRROR_SEARCH);
+            //if (PRIMARY_SEARCH.equals(MIRROR_KWS) && text.equals(MIRROR_KWS))
+            //    switchSearch(GRAMMAR_SEARCH);
+            //    switchSearch(SMARTMIRROR_SEARCH);
         }
     }
 
@@ -147,12 +149,12 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onResult(Hypothesis hypothesis) {
         if(hypothesis != null) {
-            Log.i("VR", "onResult: " + hypothesis.getHypstr());
-            if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
+            Log.i("VR", "onResult:\"" + hypothesis.getHypstr() + "\"");
+            //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
             setSpokenCommand(hypothesis.getHypstr());
             sendMessage();
         }
-        //startVoice();
+        startVoice();
     }
 
     /**
@@ -160,7 +162,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onBeginningOfSpeech() {
-        //Log.i("VR", "onBeginningOfSpeech");
+        Log.i("VR", "onBeginningOfSpeech");
     }
 
     /**
@@ -168,10 +170,10 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
-        //Log.i("VR", "onEndOfSpeech()");
-        //stopVoice();
-        if (!mSpeechRecognizer.getSearchName().equals(MIRROR_KWS))
-            switchSearch(MIRROR_KWS);
+        Log.i("VR", "onEndOfSpeech()");
+        stopVoice();
+        //if (!mSpeechRecognizer.getSearchName().equals(MIRROR_KWS))
+         //   switchSearch(MIRROR_KWS);
     }
 
     /**
@@ -242,7 +244,7 @@ public class VoiceService extends Service implements RecognitionListener{
                 .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
 
                         // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setKeywordThreshold(1e-10f)
+                .setKeywordThreshold(1e-2f)
 
                         // Use context-independent phonetic search, context-dependent is too slow for mobile
                 .setBoolean("-allphone_ci", true)
@@ -255,10 +257,10 @@ public class VoiceService extends Service implements RecognitionListener{
          */
 
         // Create grammar-based search for selection between demos
-        //File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
-        //mSpeechRecognizer.addKeywordSearch(SMARTMIRROR_SEARCH, smartMirrorcommandList);
+        File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
+        mSpeechRecognizer.addKeywordSearch(SMARTMIRROR_SEARCH, smartMirrorcommandList);
 
-        mSpeechRecognizer.addKeyphraseSearch(MIRROR_KWS, "mirror");
+        mSpeechRecognizer.addKeyphraseSearch(MIRROR_KWS, MIRROR_KWS);
 
         File smGrammarSearch = new File(assetsDir, "sm-commands.gram");
         mSpeechRecognizer.addGrammarSearch(GRAMMAR_SEARCH, smGrammarSearch);
@@ -276,8 +278,7 @@ public class VoiceService extends Service implements RecognitionListener{
             switch(msg.what){
                 case START_SPEECH:
                     mClients.add(msg.replyTo);
-                    //startVoice();
-                    switchSearch(MIRROR_KWS);
+                    startVoice();
                     break;
                 case STOP_SPEECH:
                     mClients.remove(msg.replyTo);

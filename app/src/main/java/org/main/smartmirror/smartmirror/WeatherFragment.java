@@ -76,7 +76,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
 
-        mPreferences = Preferences.getInstance();
+        mPreferences = Preferences.getInstance(getActivity());
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         forecasts = new DailyForecast[3];
 

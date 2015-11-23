@@ -63,23 +63,21 @@ public class MainActivity extends AppCompatActivity
     // Constants
     public static final String TAG = "SmartMirror";
 
-    public static final String BACK = "back";
+    public static final String BACK = "go back";
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
-    public static final String CLOSE = "close";
     public static final String FACEBOOK = "facebook";
-    public static final String HIDE = "hide";
+    public static final String GO_TO_SLEEP = "go to sleep";
     public static final String LIGHT = "light";
+    public static final String HELP = "show help";
+    public static final String HIDE_HELP ="hide help";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
-    public static final String OFF = "off";
-    public static final String ON = "on";
     public static final String OPTIONS = "options";
+    public static final String QUOTES = "quotes";
     public static final String SETTINGS = "settings";
-    public static final String SLEEP = "sleep";
     public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
-    public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
 
@@ -179,7 +177,7 @@ public class MainActivity extends AppCompatActivity
 
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
-        mPreferences = Preferences.getInstance();
+        mPreferences = Preferences.getInstance(this);
 
         // check for permission to write system settings on API 23 and greater.
         // Leaving this in case we need the WRITE_SETTINGS permission later on.
@@ -267,7 +265,7 @@ public class MainActivity extends AppCompatActivity
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
-        mPreferences.setAppBrightness(this);
+        mPreferences.resetScreenBrightness();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
     }
@@ -381,7 +379,7 @@ public class MainActivity extends AppCompatActivity
         // If sleeping, save viewName and wake screen. Otherwise ignore command.
         Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-            if (!viewName.equals(WAKE)) return;
+            if (!viewName.equals(WAKE_UP)) return;
         }
 
         switch (viewName) {
@@ -407,8 +405,6 @@ public class MainActivity extends AppCompatActivity
             case SETTINGS:
                 fragment = new SettingsFragment();
                 break;
-            case ON:
-            case WAKE:
             case WAKE_UP:
                 // displayView will be called again from onStart() with the fragment to show
                 if (mirrorSleepState == LIGHT_SLEEP) {
@@ -420,8 +416,7 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
                 break;
-            case OFF:
-            case SLEEP:
+            case GO_TO_SLEEP:
                 fragment = new OffFragment();
                 mirrorSleepState = LIGHT_SLEEP;
                 break;
@@ -450,7 +445,7 @@ public class MainActivity extends AppCompatActivity
             if (!isFinishing()) {
                 ft.commit();
                 // Any command != SLEEP sets stores value as last visible frag
-                if ( !viewName.equals(SLEEP) ) {
+                if ( !viewName.equals(GO_TO_SLEEP) ) {
                     mCurrentFragment = viewName;
                 }
             } else {
@@ -478,6 +473,8 @@ public class MainActivity extends AppCompatActivity
      * @param input the command the user gave
      */
     public void speechResult(String input) {
+        // if TTS is speaking, ignore this input
+        if (mTTSHelper.isSpeaking()) return;
 
         String voiceInput = input.trim();
 
@@ -616,6 +613,18 @@ public class MainActivity extends AppCompatActivity
 
     // ------------------------------  WIFI P2P  ----------------------------------
 
+    /**
+     * Callback from RemoteServerAsyncTask when a command is received from the remote control.
+     * @param command String: received command
+     */
+    public void handleRemoteCommand(String command) {
+        if (mPreferences.isRemoteEnabled())
+            displayView(command);
+        else {
+            Log.i("Remote", "Disabled. ignored:\"" + command + "\"");
+        }
+
+    }
 
     // calls the P2pManager to refresh peer list
     public void discoverPeers() {

@@ -63,7 +63,7 @@ public class TTSHelper{
      */
     public void speakText(String text) {
         Random rand = new Random();
-        Preferences prefs = Preferences.getInstance();
+        Preferences prefs = Preferences.getInstance((MainActivity)mContext);
         if (rand.nextFloat() < prefs.getSpeechFrequency()) {
             start(text);
         }

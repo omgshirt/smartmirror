@@ -2,12 +2,11 @@
 
 grammar commands;
 
-public <input> = (show | display | hide) <fragment> | <action> | <setting>;
-<fragment> = (calendar |
-                        camera |
+public <input> =  <fragment>;
+<fragment> = (          calendar |
+                        camera
                         facebook |
                         gallery |
-                        hangman |
                         help |
                         light |
                         music |
@@ -15,13 +14,10 @@ public <input> = (show | display | hide) <fragment> | <action> | <setting>;
                         options |
                         quotes |
                         settings |
-                        sports |
-                        technology |
-                        traffic |
                         twitter |
-                        weather);
+                        weather );
 <setting> =  (      camera <bool> |
-                    light <level> |
+                    light brightness <level> |
                     music volume <level>  |
                     remote control <bool> |
                     screen brightness <level> |
@@ -41,7 +37,6 @@ public <input> = (show | display | hide) <fragment> | <action> | <setting>;
                 forecast |
                 go forward |
                 go to sleep |
-                hide    |
                 turn on  |
                 turn off |
                 scroll up |

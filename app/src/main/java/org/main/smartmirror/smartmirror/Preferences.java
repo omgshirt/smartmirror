@@ -24,6 +24,7 @@ public class Preferences {
 
     private static Preferences mPreferences = null;
     private SharedPreferences mSharedPreferences;
+    private Activity mActivity;
 
     // constants define the names of the values to be saved to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
@@ -193,22 +194,27 @@ public class Preferences {
 
             // Remote
             case CMD_REMOTE_OFF:
-                // TODO: FIX THIS
+                setRemoteEnabled(false);
                 break;
             case CMD_REMOTE_ON:
+                setRemoteEnabled(true);
                 break;
 
             // screen brightness
-                // TODO: fix how this works, too
             case CMD_SCREEN_VLOW:
+                setScreenBrightness(BRIGHTNESS_VLOW);
                 break;
             case CMD_SCREEN_LOW:
+                setScreenBrightness(BRIGHTNESS_LOW);
                 break;
             case CMD_SCREEN_MEDIUM:
+                setScreenBrightness(BRIGHTNESS_MEDIUM);
                 break;
             case CMD_SCREEN_HIGH:
+                setScreenBrightness(BRIGHTNESS_HIGH);
                 break;
             case CMD_SCREEN_VHIGH:
+                setScreenBrightness(BRIGHTNESS_VHIGH);
                 break;
 
             // speech frequency
@@ -267,8 +273,9 @@ public class Preferences {
 
     }
 
-    private Preferences() {
+    private Preferences(Activity activity) {
         Context appContext = MainActivity.getContextForApplication();
+        mActivity = activity;
         mSharedPreferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
@@ -294,12 +301,13 @@ public class Preferences {
         LocalBroadcastManager.getInstance(appContext).unregisterReceiver(mMessageReceiver);
         mPreferences = null;
         mSharedPreferences = null;
+        mActivity = null;
     }
 
     // returns the instance of the Preferences class, or creates one if it does not exist
-    public static Preferences getInstance() {
+    public static Preferences getInstance(Activity activity) {
         if (mPreferences == null) {
-            mPreferences = new Preferences();
+            mPreferences = new Preferences(activity);
         }
         return mPreferences;
     }
@@ -474,13 +482,13 @@ public class Preferences {
      *
      *  @param brightness int (0-255)
      */
-    public void setAppBrightness(Activity activity, int brightness) {
+    public void setScreenBrightness(int brightness) {
         if (brightness < 0 || brightness > 255) return;
 
         try {
             this.mAppBrightness = brightness;
             ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
-            sbh.setScreenBrightness(activity, mAppBrightness);
+            sbh.setScreenBrightness(mActivity, mAppBrightness);
 
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
@@ -491,11 +499,11 @@ public class Preferences {
     }
 
     /**
-     * Sets the application's current brightness to value stored in preferences
+     * Resets the application's current brightness to value stored in preferences
      *  Requires Activity context
      */
-    public void setAppBrightness(Activity activity) {
-        setAppBrightness(activity, mAppBrightness);
+    public void resetScreenBrightness() {
+        setScreenBrightness(mAppBrightness);
     }
 
     public int getAppBrightness () {
@@ -508,13 +516,12 @@ public class Preferences {
 
     /**
      * Set whether the app will broadcast for wifi connections
-     * @param activity instance of MainActivity
      * @param isEnabled boolean
      */
-    public void setRemoteEnabled(Activity activity, boolean isEnabled) {
+    public void setRemoteEnabled(boolean isEnabled) {
         try {
             mRemoteEnabled = isEnabled;
-            ((MainActivity)activity).setRemoteStatus(mRemoteEnabled);
+            ((MainActivity)mActivity).setRemoteStatus(mRemoteEnabled);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
             edit.apply();
