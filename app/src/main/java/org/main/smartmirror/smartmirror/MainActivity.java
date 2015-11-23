@@ -114,12 +114,7 @@ public class MainActivity extends AppCompatActivity
     //Dialogue
     FragmentManager frag = getSupportFragmentManager();
     Helper_Fragment helperFragment;
-    Boolean news;
-    Boolean calendar;
-    Boolean weather;
-    Boolean settings;
-    Boolean help;
-    Boolean off;
+
 
     // used to establish a service connection
     private ServiceConnection mConnection = new ServiceConnection() {
