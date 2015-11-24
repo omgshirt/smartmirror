@@ -17,13 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONObject;
 
-import java.util.Arrays;
-
-//fetch news from New York Times
-//article search api key:89899870d1024b962dc582806e3e9c34:3:73303333
-//api: http://api.nytimes.com/svc/search/v2/articlesearch
-//uri structure: http://api.nytimes.com/svc/search/v2/articlesearch.response-format?[q=search term&fq=filter-field:(filter-term)&additional-params=values]&api-key=####
-
 public class NewsFragment extends Fragment {
 
     private TextView mTxtHeadline;
@@ -85,32 +78,6 @@ public class NewsFragment extends Fragment {
     }
 
 
-
-
-
-    /*public void setNews() {
-        String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
-        int i = 0;
-        while (i < urlArr.length) {
-            if (MainActivity.mVoiceInput.contains(urlArr[i])) {
-                MainActivity.mNewsDesk = urlArr[i];
-                MainActivity.mNYTURL = MainActivity.mPreURL + MainActivity.mNewsDesk + MainActivity.mPostURL;
-                MainActivity.mDefaultURL = MainActivity.mNYTURL;
-                MainActivity.mVoiceInput = MainActivity.NEWS;
-                Log.i("voice news desk: ", urlArr[i]);
-                //displayView(NEWS);
-                break;
-            } else {
-                i++;
-                Log.i("news desk: ", Arrays.toString(urlArr));
-                Log.i("I heard: ", MainActivity.mVoiceInput);
-
-            }
-        }
-
-    }*/
-
-
     // ----------------------- Local Broadcast Receiver -----------------------
 
     // Create a handler for received Intents. This will be called whenever an Intent
@@ -121,43 +88,18 @@ public class NewsFragment extends Fragment {
 
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-
-            //prev in main
-/*            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
-            int i = 0;
-            while (i < urlArr.length) {
-                if (input.contains(urlArr[i])) {
-                    mNewsDesk = urlArr[i];
-                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
-                    mDefaultURL = mNYTURL;
-                    voiceInput = NEWS;
-                    if (DEBUG)
-                        Log.i("voice news desk: ", urlArr[i]);
-                    break;
-                } else {
-                    i++;
-                    if (DEBUG) {
-                        Log.i("news desk: ", Arrays.toString(urlArr));
-                        Log.i("I heard: ", input);
-                    }
-                }
-            }*/
-
             String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
             int i = 0;
             while (i < urlArr.length) {
                 if (message.contains(urlArr[i])) {
                     MainActivity.mNewsDesk = urlArr[i];
                     MainActivity.mNYTURL = MainActivity.mPreURL + MainActivity.mNewsDesk + MainActivity.mPostURL;
-                    //MainActivity.mDefaultURL = MainActivity.mNYTURL;
                     mNewURL = MainActivity.mNYTURL + mApiKey;
                     Log.i("voice news desk: ", urlArr[i]);
                     break;
                 } else {
                     i++;
-                    //Log.i("news desk: ", Arrays.toString(urlArr));
                     Log.i("I heard: ", message);
-
                 }
             }
             Log.d("News", "Got message:\"" + message +"\"");
@@ -174,13 +116,6 @@ public class NewsFragment extends Fragment {
             }
         }
     };
- /*   private void speakNewsDesk(){
-
-       // if (forecasts == null) return;
-
-        String today = "test";
-
-    }*/
 
     /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
      *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
@@ -238,25 +173,15 @@ public class NewsFragment extends Fragment {
             int i = 0;
             int numFeeds = 8;
             while (i < numFeeds) {
-                //Log.i("NYT_API", json.toString());
                 response = json.getJSONObject("response");
                 docs = response.getJSONArray("docs").getJSONObject(i);
                 snippet = docs.getString("snippet");
                 headline = docs.getJSONObject("headline");
                 hl[i] = headline.getString("main");
-
                 newsFeed[i] = snippet;
-                //Log.i("news string : ", newsFeed[i]);
                 i++;
             }
 
-            //mTxtHeadline.setText(headline.getString("main") + "\n" + snippet);
-
-            /*mTxtHeadline.setText(hl[0] + "\n" + newsFeed[0] + "\n");
-            mTxtHeadline2.setText(hl[1] + "\n" + newsFeed[1] + "\n");
-            mTxtHeadline3.setText(hl[2] + "\n" + newsFeed[2] + "\n");
-            mTxtHeadline4.setText(hl[3] + "\n" + newsFeed[3] + "\n");
-            mTxtHeadline5.setText(hl[4] + "\n" + newsFeed[4] + "\n");*/
 
             //mytextview.setText(Html.fromHtml(sourceString)); //format
 
