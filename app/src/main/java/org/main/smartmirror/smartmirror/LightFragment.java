@@ -2,9 +2,7 @@ package org.main.smartmirror.smartmirror;
 
 
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +22,7 @@ public class LightFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.light_fragment, container, false);
-        int brightness = Preferences.getInstance().getLightBrightness();
+        int brightness = Preferences.getInstance(getActivity()).getLightBrightness();
         setWindowBrightness(brightness);
         return view;
     }
@@ -32,8 +30,8 @@ public class LightFragment extends Fragment {
     public void onPause() {
         super.onPause();
         // return brightness to the mAppBrightness level
-        Preferences prefs = Preferences.getInstance();
-        prefs.setAppBrightness(getActivity());
+        Preferences prefs = Preferences.getInstance(getActivity());
+        prefs.resetScreenBrightness();
     }
 
     private void setWindowBrightness(int brightness) {

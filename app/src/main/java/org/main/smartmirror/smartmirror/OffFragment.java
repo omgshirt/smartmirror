@@ -23,11 +23,15 @@ public class OffFragment extends Fragment {
         String voice = "";
         float rand = random.nextFloat();
         if (rand < .1)
-            voice = "Time for a nap";
-        else if (rand < .3)
+            voice = "Will I dream?";
+        else if (rand < .25)
             voice = "bye";
+        else if (rand < .4)
+            voice = "goodbye";
         else if (rand < .5)
             voice = "see you later";
+        else if (rand < .7)
+            voice = "I'll charge up for a bit";
 
         ((MainActivity)getActivity()).startTTS(voice);
 

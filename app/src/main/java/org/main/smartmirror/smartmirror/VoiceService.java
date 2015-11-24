@@ -29,22 +29,18 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
  */
 public class VoiceService extends Service implements RecognitionListener{
 
-    // Constants
-    private final boolean DEBUG = true;
-    private final String SMARTMIRROR_SEARCH = "mirror";
-    static final int STOP_SPEECH = 0;
-    static final int START_SPEECH = 1;
-    static final int RESULT_SPEECH = 2;
-
-    // Messaging and speech related objects
     private ArrayList<Messenger> mClients = new ArrayList<>();
     private Messenger mMessenger = new Messenger( new IHandler());
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
-
-    // Flags for speech
-    private boolean mVoiceForceStop;
     private boolean mSpeechInitialized;
+    static final int STOP_SPEECH=0;
+    static final int START_SPEECH=1;
+    static final int RESULT_SPEECH=2;
+    private String SMARTMIRROR_SEARCH="mirrorSearch";
+    private final String GRAMMAR_SEARCH = "grammarSearch";
+    private final String MIRROR_KWS = "show";
+    private final String PRIMARY_SEARCH = SMARTMIRROR_SEARCH;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -98,19 +94,16 @@ public class VoiceService extends Service implements RecognitionListener{
      * Starts voice capture, invoked by the calling Activity
      */
     public void startVoice(){
-        if(mSpeechInitialized)
-            mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
+        if(mSpeechInitialized) {
+            mSpeechRecognizer.startListening(PRIMARY_SEARCH);
+            //mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
+        }
     }
 
-    /**
-     * Stops voice capture, invoked by the calling Activity. This induces
-     * a force stop so that the calling Activity doesn't hear itself.
-     * @param forceStop whether this stop is forced by another agent
-     */
-    public void stopVoice(boolean forceStop){
-        mVoiceForceStop = forceStop;
-        if (mSpeechInitialized)
+    public void stopVoice(){
+        if (mSpeechInitialized) {
             mSpeechRecognizer.stop();
+        }
     }
 
     /**
@@ -142,9 +135,21 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
-        if(hypothesis != null) {
-            if(DEBUG)
-                Log.i("VR", "onPartialResult: " + hypothesis.getHypstr());
+        if (hypothesis != null) {
+            String text = hypothesis.getHypstr();
+            hypothesis.delete();
+            Log.i("VR", "onPartialResult: " + text);
+
+            /*if (text.equals("set speech frequency")) {
+                switchSearch(FREQUENCY_GRAMMAR);
+            } else if (text.equals("screen brightness") ||
+            text.equals("light brightness") ||
+            text.equals("system volume") ||
+            text.equals("music volume") ){
+                switchSearch(LEVEL_SEARCH);
+            }
+
+            */
         }
     }
 
@@ -153,14 +158,13 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        if(!mVoiceForceStop) {
-            if (hypothesis != null) {
-                if(DEBUG)
-                    Log.i("VR", "onResult: " + hypothesis.getHypstr());
-                setSpokenCommand(hypothesis.getHypstr());
-                sendMessage();
-            }
+        if(hypothesis != null) {
+            Log.i("VR", "onResult:\"" + hypothesis.getHypstr() + "\"");
+            //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
+            setSpokenCommand(hypothesis.getHypstr());
+            sendMessage();
         }
+        startVoice();
     }
 
     /**
@@ -168,7 +172,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onBeginningOfSpeech() {
-
+        Log.i("VR", "onBeginningOfSpeech");
     }
 
     /**
@@ -176,7 +180,10 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
-        stopVoice(false);
+        Log.i("VR", "onEndOfSpeech()");
+        stopVoice();
+        //if (!mSpeechRecognizer.getSearchName().equals(MIRROR_KWS))
+         //   switchSearch(MIRROR_KWS);
     }
 
     /**
@@ -185,14 +192,24 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onError(Exception error) {
-        if(DEBUG)
-            Log.i("ERR", error.getMessage());
+        Log.i("ERR", error.getMessage());
     }
 
     @Override
     public void onTimeout() {
 
     }
+
+    private void switchSearch(String searchName) {
+        mSpeechRecognizer.stop();
+
+        // If we are not spotting, start listening with timeout (10000 ms or 10 seconds).
+        if (searchName.equals(MIRROR_KWS))
+            mSpeechRecognizer.startListening(searchName);
+        else
+            mSpeechRecognizer.startListening(searchName, 5000);
+    }
+
 
     /**
      * Method that handles the initialization of the dictionary
@@ -237,7 +254,7 @@ public class VoiceService extends Service implements RecognitionListener{
                 .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
 
                         // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setKeywordThreshold(1e-10f)
+                .setKeywordThreshold(1e-2f)
 
                         // Use context-independent phonetic search, context-dependent is too slow for mobile
                 .setBoolean("-allphone_ci", true)
@@ -252,6 +269,11 @@ public class VoiceService extends Service implements RecognitionListener{
         // Create grammar-based search for selection between demos
         File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
         mSpeechRecognizer.addKeywordSearch(SMARTMIRROR_SEARCH, smartMirrorcommandList);
+
+        mSpeechRecognizer.addKeyphraseSearch(MIRROR_KWS, MIRROR_KWS);
+
+        File smGrammarSearch = new File(assetsDir, "sm-commands.gram");
+        mSpeechRecognizer.addGrammarSearch(GRAMMAR_SEARCH, smGrammarSearch);
 
     }
 
@@ -270,7 +292,8 @@ public class VoiceService extends Service implements RecognitionListener{
                     break;
                 case STOP_SPEECH:
                     mClients.remove(msg.replyTo);
-                    stopVoice(true);
+                    //stopVoice(true);
+                    mSpeechRecognizer.cancel();
                     break;
                 default:
                     super.handleMessage(msg);
