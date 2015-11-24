@@ -19,7 +19,6 @@ import io.fabric.sdk.android.Fabric;
 public class TwitterAct extends Activity{
 
     private TwitterLoginButton mTwitterLoginButton;
-    private Button mBackToMain;
     private TextView mStatus;
     private TwitterSession mSession;
     private long mUserID;
@@ -35,7 +34,6 @@ public class TwitterAct extends Activity{
         Fabric.with(this, new com.twitter.sdk.android.Twitter(authConfig));
 
         setContentView(R.layout.twitter_login_fragment);
-        mBackToMain = (Button) findViewById(R.id.btn_Main);
         mTwitterLoginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         mStatus = (TextView)findViewById(R.id.status);
         mStatus.setText("Status: Ready");

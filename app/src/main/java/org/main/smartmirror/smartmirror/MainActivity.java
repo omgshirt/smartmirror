@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity
     public static final String TWITTER = "twitter";
     public static final String WAKE = "wake";
     public static final String WEATHER = "weather";
+    public static final String QUOTES = "quotes";
 
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
@@ -367,6 +368,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         switch (viewName) {
+            case CALENDAR:
+                fragment = new CalendarFragment();
+                title = CALENDAR;
+                break;
+            case CAMERA:
+                fragment = new CameraFragment();
+                title = CAMERA;
+                break;
+            case FACEBOOK:
+                fragment = new FacebookFragment();
+                title = FACEBOOK;
+                break;
+            case LIGHT:
+                fragment = new LightFragment();
+                title = LIGHT;
+                break;
             case NEWS:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
@@ -374,25 +391,22 @@ public class MainActivity extends AppCompatActivity
                 fragment.setArguments(bundle);
                 title = NEWS;
                 break;
-            case CALENDAR:
-                fragment = new CalendarFragment();
-                title = CALENDAR;
-                break;
-            case LIGHT:
-                fragment = new LightFragment();
-                title = LIGHT;
-                break;
-            case WEATHER:
-                fragment = new WeatherFragment();
-                title = WEATHER;
+            case QUOTES:
+                fragment = new QuotesFragment();
+                title = QUOTES;
                 break;
             case SETTINGS:
                 fragment = new SettingsFragment();
                 title = SETTINGS;
                 break;
-            case CAMERA:
-                fragment = new CameraFragment();
-                title = CAMERA;
+            case SLEEP:
+                fragment = new OffFragment();
+                mirrorSleepState = LIGHT_SLEEP;
+                title = SLEEP;
+                break;
+            case TWITTER:
+                fragment = new TwitterFragment();
+                title = TWITTER;
                 break;
             case WAKE:
                 if (mirrorSleepState == LIGHT_SLEEP) {
@@ -404,18 +418,9 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
                 break;
-            case TWITTER:
-                fragment = new TwitterFragment();
-                title = TWITTER;
-                break;
-            case FACEBOOK:
-                fragment = new FacebookFragment();
-                title = FACEBOOK;
-                break;
-            case SLEEP:
-                fragment = new OffFragment();
-                mirrorSleepState = LIGHT_SLEEP;
-                title = SLEEP;
+            case WEATHER:
+                fragment = new WeatherFragment();
+                title = WEATHER;
                 break;
             default:
                 // The command isn't one of the view swap instructions,
