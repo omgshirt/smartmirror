@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -29,6 +31,13 @@ public class QuoteFragment extends Fragment {
         AssetManager assetManager = getContext().getAssets();
 
         View view = inflater.inflate(R.layout.quotes_fragment, container, false);
+
+        //setting the fade in an out
+       final Animation in = new AlphaAnimation(0.0f,1.0f);
+        in.setDuration(3000);
+
+        final Animation out =new AlphaAnimation(1.0f,0.0f);
+        out.setDuration(3000);
 
 
 
@@ -91,6 +100,8 @@ public class QuoteFragment extends Fragment {
                                                                 Random quoteRandomizer = new Random();
                                                                 int random_number = quoteRandomizer.nextInt(176);
                                                                 mquote.setText(parts[random_number].replaceAll("[0-9]", ""));
+                                                                mquote.startAnimation(in);
+
                                                             }
                                                         });
 
