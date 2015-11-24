@@ -21,10 +21,10 @@ public class FacebookFragment extends Fragment {
 
     //LoginButton btnLoginButton;
     //CallbackManager mCBManager;
-    WebView webview;
-
-
+    private WebView webview;
     private String curURL;
+    private static final String SCROLLUP="up";
+    private static final String SCROLLDOWN="down";
 
     public void init(String url) {
 
@@ -65,11 +65,11 @@ public class FacebookFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("News", "Got message:\"" + message +"\"");
             switch (message) {
-                case MainActivity.mSCROLLUP:
+                case SCROLLUP:
                     Log.i(" is it ", message);
                     webview.scrollBy(0, -1000);
                     break;
-                case MainActivity.mSCROLLDOWN:
+                case SCROLLDOWN:
                     Log.i(" is it ", message);
                     webview.scrollBy(0, +1000);
                     break;

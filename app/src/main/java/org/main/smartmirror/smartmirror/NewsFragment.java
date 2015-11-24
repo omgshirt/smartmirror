@@ -21,6 +21,11 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 public class NewsFragment extends Fragment {
+    public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
+    public static String mPostURL = "&sort=newest&api-key=";
+    public static String mNewsDesk;
+    public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     private TextView mTxtHeadline;
     private TextView mTxtHeadline2;
@@ -109,9 +114,9 @@ public class NewsFragment extends Fragment {
             int i = 0;
             while (i < urlArr.length) {
                 if (message.contains(urlArr[i])) {
-                    MainActivity.mNewsDesk = urlArr[i];
-                    MainActivity.mNYTURL = MainActivity.mPreURL + MainActivity.mNewsDesk + MainActivity.mPostURL;
-                    mNewURL = MainActivity.mNYTURL + mApiKey;
+                    mNewsDesk = urlArr[i];
+                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                    mNewURL = mNYTURL + mApiKey;
                     Log.i("voice news desk: ", urlArr[i]);
                     break;
                 } else {
@@ -120,17 +125,7 @@ public class NewsFragment extends Fragment {
                 }
             }
             Log.d("News", "Got message:\"" + message +"\"");
-            Log.i(" is it ", message);
-            switch (message) {
-                case MainActivity.mSPORTS:
-                    Log.i(" is it ", message);
-                    updateNews(mNewURL);
-                    break;
-                case MainActivity.mTECHNOLOGY:
-                    Log.i(" is it ", message);
-                    updateNews(mNewURL);
-                    break;
-            }
+            updateNews(mNewURL);
         }
     };
 

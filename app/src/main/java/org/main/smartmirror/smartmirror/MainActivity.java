@@ -76,12 +76,8 @@ public class MainActivity extends AppCompatActivity
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
-    // News
+    //News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-    public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
-    public static String mPostURL = "&sort=newest&api-key=";
-    public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-    public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     // Sleep state & wakelocks
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
@@ -486,70 +482,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         displayView(voiceInput);
-
-        /*
-            BYPASSING THIS BLOCK FOR NOW - WE WONT NEED THIS SWITCH CASE
-
-
-        // Process voiceInput to make it fit with accepted commands
-        try {
-            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
-            int i = 0;
-            while (i < urlArr.length) {
-                if (voiceInput.contains(urlArr[i])) {
-                    mNewsDesk = urlArr[i];
-                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
-                    mDefaultURL = mNYTURL;
-                    if(DEBUG)
-                        Log.i("voice news desk: ", urlArr[i]);
-                    break;
-                } else {
-                    i++;
-                    if(DEBUG) {
-                        //Log.i("news desk: ", Arrays.toString(urlArr));
-                        //Log.i("I heard: ", voiceInput);
-                    }
-                }
-            }
-            if(DEBUG)
-                Log.i("I heard: ", voiceInput);
-            if (voiceInput.contains(CALENDAR)) {
-                startTTS(CALENDAR);
-                displayView(CALENDAR);
-            }else if (voiceInput.contains(CAMERA)){
-                startTTS(CAMERA);
-                displayView(CAMERA);
-            } else if (voiceInput.contains(WEATHER)) {
-                startTTS(WEATHER);
-                displayView(WEATHER);
-            } else if (voiceInput.contains(LIGHT)) {
-                startTTS(LIGHT);
-                displayView(LIGHT);
-            } else if (voiceInput.contains(SETTINGS)) {
-                startTTS(SETTINGS);
-                displayView(SETTINGS);
-            } else if (voiceInput.contains(NEWS)) {
-                startTTS(NEWS);
-                mDefaultURL = mNewsDefault;
-                displayView(NEWS);
-            } else if(voiceInput.contains(OFF) || voiceInput.contains(SLEEP)){
-                displayView(SLEEP);
-            } else if (voiceInput.contains(FACEBOOK)) {
-                startTTS(FACEBOOK);
-                displayView(FACEBOOK);
-            } else if (voiceInput.contains(TWITTER)) {
-                startTTS(TWITTER);
-                displayView(TWITTER);
-            } else if (voiceInput.contains(mNewsDesk)) {
-                startTTS(mNewsDesk);
-                displayView(NEWS);
-            }
-        }catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Didn't catch that",
-                    Toast.LENGTH_LONG).show();
-            startTTS("Didn't catch that");
-        }
-        */
     }
 
     /**

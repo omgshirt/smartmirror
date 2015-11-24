@@ -12,14 +12,6 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"/>
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Main"
-        android:onClick="toMain"
-        android:id="@+id/btnMain" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
