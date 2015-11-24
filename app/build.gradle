@@ -21,6 +21,8 @@ repositories {
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
+    useLibrary 'org.apache.http.legacy'
+
     defaultConfig {
         applicationId "org.main.smartmirror.smartmirror"
         minSdkVersion 17
@@ -55,6 +57,8 @@ dependencies {
         transitive = true;
     }
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
+    compile 'org.twitter4j:twitter4j-core:4.0.4'
+
     compile project(':pocketsphinx-android-5prealpha-nolib')
     
     
@@ -72,3 +76,4 @@ dependencies {
 
 
 }
+

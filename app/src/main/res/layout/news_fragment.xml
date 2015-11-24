@@ -5,13 +5,6 @@
     android:layout_height="wrap_content"
     android:padding="15dp">
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:id="@+id/btnNYTbranding"
-        android:src="@drawable/poweredby_nytimes_30a" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,5 +34,30 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/headline5" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/headline6" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/headline7" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/headline8" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnNYTbranding"
+        android:background="@android:color/transparent"
+        android:src="@drawable/poweredby_nytimes_30a" />
 
 </LinearLayout>
