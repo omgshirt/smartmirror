@@ -24,27 +24,24 @@ public class TTSHelper{
         mTextToSpeechListener = new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                if (status== TextToSpeech.SUCCESS) {
+                if (status == TextToSpeech.SUCCESS) {
+                    Log.i("TTS", "TTS initialized");
                     mTextToSpeech.setLanguage(Locale.UK);
                     mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
-                            //Log.i("UTTERANCE_PROGRESS", "onStart called");
-                            mIsSpeaking = true;
-                            ((MainActivity)mContext).stopSpeechRecognition(); // stop recognition
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
 
                         @Override
-                        public void onDone(String utteranceId) {
-                            //Log.i("UTTERANCE_PROGRESS", "onDone called");
-                            stop();
+                        public void onDone(String utteranceId){
                             ((MainActivity)mContext).startSpeechRecognition();
+                            stop();
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-                            mIsSpeaking = false;
-                            ((MainActivity)mContext).startSpeechRecognition();
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
                     });
                     mTtsInitialized = true;
@@ -52,6 +49,7 @@ public class TTSHelper{
                 }
             }
         };
+        mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
     }
 
     /** Check preferences for speech frequency. If successful, say the text
@@ -73,7 +71,13 @@ public class TTSHelper{
      */
     public void start(final String text){
         mTextToSpeak = text;
-        if (mTextToSpeech == null || !mTtsInitialized) {
+        if (!mTtsInitialized) {
+            Log.i("TextToSpeech", "not initialized");
+            return;
+        }
+
+        if (mTextToSpeech == null) {
+            Log.i("TextToSpeech", "not initialized");
             try {
                 mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
             } catch (Exception e) {
@@ -90,9 +94,9 @@ public class TTSHelper{
         mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
     }
 
-    public boolean isSpeaking() {
+    /*public boolean isSpeaking() {
         return mIsSpeaking;
-    }
+    }*/
 
     public void stop(){
         if (mTextToSpeech != null) {

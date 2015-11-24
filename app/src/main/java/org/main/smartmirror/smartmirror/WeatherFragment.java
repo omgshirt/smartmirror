@@ -12,12 +12,14 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.Date;
 import java.util.Random;
 
 
+/**
+ * Fragment that displays the weather information
+ */
 public class WeatherFragment extends Fragment {
 
     Typeface weatherFont;
@@ -34,10 +36,10 @@ public class WeatherFragment extends Fragment {
 
     private String mCityCode = "5341114";                 // openweatherapi id for the city to find
 
-    // hold weather data for TTS
-    private int mTempMax = -999;
-    private int mTempMin = -999;
-    private int mCurrentTemp = -999;
+    // default weather values
+    private int mTempMax = 0;
+    private int mTempMin = 0;
+    private int mCurrentTemp = 0;
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
 
@@ -54,8 +56,7 @@ public class WeatherFragment extends Fragment {
         }
         mPreferences = Preferences.getInstance();
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
-        updateWeatherData(mCityCode, mPreferences.getDisplayUnitsAsString());
-
+        updateWeatherData(mCityCode, mPreferences.getWeatherUnits());
     }
 
     @Override
@@ -101,7 +102,7 @@ public class WeatherFragment extends Fragment {
             case 4:
                 if (mCurrentWind == 0) { saySomethingAboutWeather(); }
                 String speedUnits;
-                if( mPreferences.getWindDisplayFormat().equals(Preferences.KPH) )  {
+                if( mPreferences.getWeatherUnits().equals(Preferences.METRIC))  {
                     speedUnits = "kilometers per hour";
                 } else {
                     speedUnits = "miles per hour";
@@ -111,7 +112,7 @@ public class WeatherFragment extends Fragment {
         }
 
         if ( !text.equals("") ) {
-            ((MainActivity) getActivity()).startVoice(text);
+            ((MainActivity) getActivity()).startTTS(text);
         }
     }
 
@@ -165,7 +166,13 @@ public class WeatherFragment extends Fragment {
 
             // set Wind Speed
             mCurrentWind = (int) wind.getDouble("speed");
-            String windSpeed = "Wind: " + mCurrentWind + " " + mPreferences.getWindDisplayFormat();
+            String windFormat;
+            if (mPreferences.getWeatherUnits().equals(Preferences.METRIC) ) {
+                windFormat = "KPH";
+            } else {
+                windFormat = "MPH";
+            }
+            String windSpeed = "Wind: " + mCurrentWind + " " + windFormat;
             txtCurrentWind.setText( windSpeed );
 
             // Set the dailyHigh and dailyLow

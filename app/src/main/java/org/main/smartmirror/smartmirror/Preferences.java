@@ -3,7 +3,7 @@ package org.main.smartmirror.smartmirror;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
+import android.media.AudioManager;
 
 
 /**
@@ -22,16 +22,20 @@ public class Preferences {
 
     // constants define the names of the values to be saved to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
-    public static final String PREFS_VOL = "MIRROR_PREFS_VOL";
-    public static final String PREFS_WEATHER_UNIT = "MIRROR_PREFS_WEATHER_UNIT";
+    public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
+    public static final String PREFS_MUSIC_VOL = "MIRROR_PREFS_MUSIC_VOL";
+
+    public static final String PREFS_CAMERA_ENABLED = "MIRROR_PREFS_CAMERA_ENABLED";
+    public static final String PREFS_VOICE_ENABLED = "MIRROR_PREFS_VOICE_ENABLED";
+    public static final String PREFS_REMOTE_ENABLED = "MIRROR_PREFS_REMOTE_ENABLED";
     public static final String PREFS_SPEECH_FREQ = "MIRROR_PREFS_SPEECH_FREQ";
+
+    public static final String PREFS_WEATHER_UNIT = "MIRROR_PREFS_WEATHER_UNIT";
     public static final String PREFS_DATE_FORMAT = "MIRROR_PREFS_DATE_FORMAT";
     public static final String PREFS_TIME_FORMAT = "MIRROR_PREFS_TIME_FORMAT";
+
     public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
     public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
-    public static final String PREFS_CAMERA_ENABLED = "MIRROR_PREFS_CAMERA_ENABLED";
-    public static final String PREFS_WAKEON_SOUND = "MIRROR_PREFS_WAKEON_SOUND";
-    public static final String PREFS_REMOTE_ENABLED = "MIRROR_PREFS_REMOTE_ENABLED";
 
     // chance for TTS to happen (0-1)
     public static final float SPEECH_NEVER = 0;
@@ -40,28 +44,40 @@ public class Preferences {
     public static final float SPEECH_ALWAYS = 1;
 
     // Constants for screen brightness (0-255)
-    public static final int BRIGHTNESS_VERYLOW = 10;
+    public static final int BRIGHTNESS_VLOW= 10;
     public static final int BRIGHTNESS_LOW = 50;
     public static final int BRIGHTNESS_MEDIUM = 100;
     public static final int BRIGHTNESS_HIGH = 150;
-    public static final int BRIGHTNESS_VERYHIGH = 225;
-    public static final int BRIGHTNESS_DEFAULT = BRIGHTNESS_MEDIUM;
+    public static final int BRIGHTNESS_VHIGH = 225;
 
-    public static final float VOLUME_DEFAULT = 0.8f;        // not used currently
+    // constants for volumes
+    public static final float VOL_OFF = 0f;
+    public static final float VOL_VLOW = .2f;
+    public static final float VOL_LOW = .4f;
+    public static final float VOL_MEDIUM = .6f;
+    public static final float VOL_HIGH = .8f;
+    public static final float VOL_VHIGH = 1.0f;
 
-    public static final int IMPERIAL = 0;
-    public static final int METRIC = 1;
+    public static final String ENGLISH = "imperial";
+    public static final String METRIC = "metric";
     public static final String MPH = "mph";
     public static final String KPH = "kph";
 
-    private boolean mRemoteEnabled = true;
-    private int mDisplayUnits = IMPERIAL;    // control which unit scale to use for temperature (0,1)
-    private float mVolume;                  // control volume for TTS and other sounds (0-1)
-    private float mSpeechFrequency;         // control how often TTS voice responses occur (0-1)
-    private String mDateFormat = "EEE, LLL d";    // SimpleDateFormat string for displaying date
-    private String mTimeFormat = "h:mm a";         // Default string for displaying time
-    private int mLightBrightness;                  // Night light brightness
-    private int mAppBrightness;                     // general brightness setting for other modes
+    private int mAppBrightness;                     // general screen brightness
+    private int mLightBrightness;                   // Night light brightness
+
+    private boolean mRemoteEnabled;                 // Enable / disable remote control connections
+    private boolean mCameraEnabled;                 // Enable / disable all camera-related actions
+    private boolean mVoiceEnabled;                  // Enable / disable voice recognition UNTIL keyword spoken
+    private float mSpeechFrequency;                 // control how often TTS voice responses occur (0-1)
+
+    private float mSystemVolume;                    // control general system volume
+    private float mMusicVolume;                     // music stream volume
+
+    private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
+    private String mTimeFormat = "h:mm a";          // Default string for time display
+    private String mWeatherUnits;                      // Weather display format (English / metric)
+
 
     private Preferences() {
         Context appContext = MainActivity.getContextForApplication();
@@ -69,11 +85,15 @@ public class Preferences {
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
         mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
-        mDisplayUnits = mSharedPreferences.getInt(PREFS_WEATHER_UNIT, IMPERIAL);
-        mVolume = mSharedPreferences.getFloat(PREFS_VOL, VOLUME_DEFAULT);
+        mMusicVolume = mSharedPreferences.getFloat(PREFS_MUSIC_VOL, VOL_VLOW);
+        mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_VLOW);
+        mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
         mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
-        mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_DEFAULT);
+        mWeatherUnits = mSharedPreferences.getString(PREFS_WEATHER_UNIT, ENGLISH);
+
         mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);
+        mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
+        mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
     }
 
     // Clean up any refs that might hang around to prevent leaks.
@@ -90,55 +110,73 @@ public class Preferences {
         return mPreferences;
     }
 
+    public float getSystemVolume() {
+        return mSystemVolume;
+    }
+
     /**
      *
      * @param vol set system volume (0-1)
-     *            This may not be required
+     *
      */
-    public void setVolume(float vol) {
-        float volume = vol;
-        if (volume > 1 || volume < 0) {
-            return;
-        }
-
-        mVolume = volume;
+    public void setSystemVolume(float vol) {
+        if (vol < 0 || vol > 1) return;
+        mSystemVolume = vol;
+        setStreamVolume(vol, AudioManager.STREAM_SYSTEM);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putFloat(PREFS_VOL, mVolume);
+        edit.putFloat(PREFS_SYSTEM_VOL, mSystemVolume);
         edit.apply();
     }
 
-    public float getVolume() {
-        return mVolume;
+    public float getMusicVolume() {
+        return mMusicVolume;
     }
 
-    /** Sets weather display as imperial or metric
-     *
-     * @param unit
+    /**
+     * Sets the volume for music stream
+     * @param vol value to set (0-1)
      */
-    public void setDisplayUnits(int unit) {
-        if (unit == IMPERIAL || unit == METRIC) {
-            mDisplayUnits = unit;
+    public void setMusicVolume(float vol) {
+        if (vol < 0 || vol > 1) return;
+        mMusicVolume = vol;
+        setStreamVolume(vol, AudioManager.STREAM_MUSIC);
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putFloat(PREFS_MUSIC_VOL, mMusicVolume);
+        edit.apply();
+    }
+
+    // private helper to set the vol to the given stream
+    // Gets the max volume allowed for this stream, then sets the volume
+    private void setStreamVolume(float vol, int stream) {
+        Context context = MainActivity.getContextForApplication();
+        AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int max = am.getStreamMaxVolume(stream);
+        int setVol = (int)(vol * max);
+        am.setStreamVolume(stream, setVol, 0);
+    }
+
+    /** Sets weather display as english or metric
+     *
+     * @param unit Units to display ( 1=English / 0=Metric)
+     */
+    public void setWeatherUnits(String unit) {
+        if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
+            mWeatherUnits = unit;
             SharedPreferences.Editor edit = mSharedPreferences.edit();
-            edit.putInt(PREFS_WEATHER_UNIT, mDisplayUnits);
+            edit.putString(PREFS_WEATHER_UNIT, mWeatherUnits);
             edit.apply();
         }
     }
 
-    public int getDisplayUnits(){
-        return mDisplayUnits;
-    }
-
-    // get a string representation of the units used for weather display
-    public String getDisplayUnitsAsString() {
-        if (mDisplayUnits == IMPERIAL)  { return "imperial"; }
-        else                            { return  "metric"; }
+    public String getWeatherUnits(){
+        return mWeatherUnits;
     }
 
     // returns the unicode string for deg C or deg F based on the WeatherIcons font set
     public String getTempUnits() {
         String units;
         Context appContext = MainActivity.getContextForApplication();
-        if (mDisplayUnits == IMPERIAL)  {
+        if ( mWeatherUnits.equals(ENGLISH) )  {
             units = appContext.getResources().getString(R.string.weather_deg_f);
         }
         else {
@@ -178,15 +216,6 @@ public class Preferences {
 
     public String getTimeFormat() {
         return mTimeFormat;
-    }
-
-    public String getWindDisplayFormat() {
-        String val;
-        if (mDisplayUnits == IMPERIAL) {
-            val = MPH;
-        } else
-            val = KPH;
-        return val;
     }
 
     /**
@@ -229,14 +258,18 @@ public class Preferences {
      */
     public void setAppBrightness(Activity activity, int brightness) {
         if (brightness < 0 || brightness > 255) return;
-        mAppBrightness = brightness;
 
-        ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
-        sbh.setScreenBrightness(activity, mAppBrightness);
+        try {
+            this.mAppBrightness = brightness;
+            ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
+            sbh.setScreenBrightness(activity, mAppBrightness);
 
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
-        edit.apply();
+            SharedPreferences.Editor edit = mSharedPreferences.edit();
+            edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
+            edit.apply();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -255,10 +288,46 @@ public class Preferences {
         return  mRemoteEnabled;
     }
 
-    public void setRemoteEnabled(boolean isEnabled) {
-        mRemoteEnabled = isEnabled;
+    /**
+     * Set whether the app will broadcast for wifi connections
+     * @param activity instance of MainActivity
+     * @param isEnabled boolean
+     */
+    public void setRemoteEnabled(Activity activity, boolean isEnabled) {
+        try {
+            mRemoteEnabled = isEnabled;
+            ((MainActivity)activity).setRemoteStatus(mRemoteEnabled);
+            SharedPreferences.Editor edit = mSharedPreferences.edit();
+            edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
+            edit.apply();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isVoiceEnabled() {
+        return mVoiceEnabled;
+    }
+
+    /**
+     * Sets the voice enabled status
+     * @param mVoiceEnabled boolean
+     */
+    public void setVoiceEnabled( boolean mVoiceEnabled) {
+        this.mVoiceEnabled = mVoiceEnabled;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
+        edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
+        edit.apply();
+    }
+
+    public boolean isCameraEnabled() {
+        return mCameraEnabled;
+    }
+
+    public void setCameraEnabled(boolean mCameraEnabled) {
+        this.mCameraEnabled = mCameraEnabled;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putBoolean(PREFS_CAMERA_ENABLED, mCameraEnabled);
         edit.apply();
     }
 }
