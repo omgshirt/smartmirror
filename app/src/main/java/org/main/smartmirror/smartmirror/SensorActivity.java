@@ -12,7 +12,7 @@ import android.widget.TextView;
 /**
  * Created by Master N on 11/22/2015.
  */
-public class SensorActivity extends Activity implements SensorEventListener {
+public class SensorActivity extends Activity implements SensorEventListener  {
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
     private float mLightQuantity;
@@ -35,25 +35,25 @@ public class SensorActivity extends Activity implements SensorEventListener {
         }
     }
 
-    @Override
-    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Do something here if sensor accuracy changes.
-    }
-
-    @Override
-    public final void onSensorChanged(SensorEvent event) {
-        mLightQuantity = event.values[0];
-        if(event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            textLIGHT_reading.setText("LIGHT: " + event.values[0]);
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // Do something here if sensor accuracy changes.
         }
-        // Do something with this sensor data.
-    }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            mLightQuantity = event.values[0];
+            if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+                textLIGHT_reading.setText("LIGHT: " + event.values[0]);
+            }
+            // Do something with this sensor data.
+        }
 
     @Override
     protected void onResume() {
         // Register a listener for the sensor.
         super.onResume();
-        mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mLightSensor, 10000000);
     }
 
     @Override

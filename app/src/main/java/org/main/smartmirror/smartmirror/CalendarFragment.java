@@ -5,20 +5,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import java.util.ArrayList;
 
-/**
- * Fragment that displays the calendar evnts
- */
-//TODO: Add checks in CalendarUtil.java to check for all day events. Currently shows next days' all day event for current day
-//TODO: Pull from one calendar
 public class CalendarFragment extends Fragment {
 
-    public TextView mOutputText;
-    private LinearLayout activityLayout;
+    //Add events as list items
     private ListView listView;
 
     @Override
@@ -30,5 +22,4 @@ public class CalendarFragment extends Fragment {
         System.out.println(eventNames);
         return rootView;
     }
-
 }

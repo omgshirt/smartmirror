@@ -18,6 +18,7 @@ public class TTSHelper{
     private static boolean mTtsInitialized = false;
     private static TextToSpeech.OnInitListener mTextToSpeechListener;
     private static String mTextToSpeak;
+    private int messageId = 0;
 
     public TTSHelper(Context c) {
         mContext = c;
@@ -30,18 +31,21 @@ public class TTSHelper{
                     mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
-//                            ((MainActivity)mContext).stopSpeechRecognition();
+                            mIsSpeaking = true;
+                            ((MainActivity)mContext).stopSpeechRecognition();
                         }
 
                         @Override
                         public void onDone(String utteranceId){
                             ((MainActivity)mContext).startSpeechRecognition();
-                            stop();
+                            mIsSpeaking = false;
+                            stop();  // stop() discards other phrases in queue...
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-//                            ((MainActivity)mContext).stopSpeechRecognition();
+                            ((MainActivity)mContext).stopSpeechRecognition();
+                            mIsSpeaking = false;
                         }
                     });
                     mTtsInitialized = true;
@@ -90,16 +94,16 @@ public class TTSHelper{
     private void speak() {
         // Map passes in the UtteranceProgressListener so we can handle callbacks from the TTS.speak event
         HashMap<String, String> map = new HashMap<>();
-        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "messageID");
+        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, Integer.toString(messageId++));
         mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
     }
 
-    /*public boolean isSpeaking() {
+    public boolean isSpeaking() {
         return mIsSpeaking;
-    }*/
+    }
 
     public void stop(){
-        if (mTextToSpeech != null) {
+        if (mTextToSpeech != null && mTtsInitialized) {
             mTextToSpeech.stop();
             mIsSpeaking = false;
         }
@@ -110,7 +114,7 @@ public class TTSHelper{
      *
      */
     public void destroy() {
-        if(mTextToSpeech !=null){
+        if(mTextToSpeech != null){
             mTextToSpeech.stop();
             mTextToSpeech.shutdown();
             mIsSpeaking = false;

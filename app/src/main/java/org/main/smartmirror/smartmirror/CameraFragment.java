@@ -5,15 +5,8 @@ package org.main.smartmirror.smartmirror;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.support.v4.app.DialogFragment;
-//import android.app.DialogFragment;
 import android.support.v4.app.Fragment;
-//import android.support.v4.app.FragmentManager;
-//import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
@@ -38,7 +31,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v13.app.FragmentCompat;
-
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -72,9 +64,6 @@ import java.util.concurrent.TimeUnit;
 //@TargetApi(23)
 public class CameraFragment extends Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback  {
 
-    static final int REQUEST_ACCOUNT_PICKER = 1;
-    //static final int REQUEST_AUTHORIZATION = 2;
-    static final int CAPTURE_IMAGE = 3;
     private static Drive service;
     private GoogleAccountCredential credential;
 
@@ -83,7 +72,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
      */
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private static final String FRAGMENT_DIALOG = "dialog";
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -91,8 +79,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
-
-
 
     /**
      * Tag for the {@link Log}.
@@ -341,7 +327,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
                                        @NonNull TotalCaptureResult result) {
             process(result);
         }
-
     };
 
     /**
@@ -410,10 +395,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         }
     }
 
-    public static CameraFragment newInstance() {
-        return new CameraFragment();
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
@@ -421,15 +402,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         String accountName = ("smartmirrortesting@gmail.com");
         credential.setSelectedAccountName(accountName);
         service = getDriveService(credential);
-        //startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-
         return view;
     }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         view.findViewById(R.id.picture).setOnClickListener(this);
-        //view.findViewById(R.id.info).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
 
     }
@@ -440,30 +418,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
 
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode) {
-//            case REQUEST_ACCOUNT_PICKER:
-//               // if (resultCode == getActivity().RESULT_OK && data != null && data.getExtras() != null) {
-//                    String accountName = "smartmirrortesting@gmail.com";
-//                        credential.setSelectedAccountName(accountName);
-//                        service = getDriveService(credential);
-//              //  }
-//                break;
-//            case REQUEST_AUTHORIZATION:
-//                if (resultCode == Activity.RESULT_OK) {
-//                } else {
-//                    //startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-//                }
-//                break;
-//            case CAPTURE_IMAGE:
-//                if (resultCode == Activity.RESULT_OK) {
-//                   // takePhoto();
-//                   //takePicture();
-//                }
-//        }
-//    }
 
     @Override
     public void onResume() {
@@ -488,22 +442,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         super.onPause();
     }
 
-//    private void requestCameraPermission() {
-//        if (FragmentCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-//            new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
-//        } else {
-//            FragmentCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-//                    REQUEST_CAMERA_PERMISSION);
-//        }
-//    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-//                ErrorDialog.newInstance(getString(R.string.request_permission))
-//                        .show(getChildFragmentManager(), FRAGMENT_DIALOG);
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -615,16 +558,13 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         } catch (NullPointerException e) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-//            ErrorDialog.newInstance(getString(R.string.camera_error))
-//                    .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+            e.printStackTrace();
         }
     }
-
 
     private void openCamera(int width, int height) {
         if (getActivity().checkSelfPermission(Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            // requestCameraPermission();
             return;
         }
         setUpCameraOutputs(width, height);
@@ -861,19 +801,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
                                                @NonNull TotalCaptureResult result) {
                     showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
-//                    try {
-//                        java.io.File fileContent = new java.io.File(mFile.getPath());
-//                        FileContent mediaContent = new FileContent("image/jpeg", fileContent);
-//
-//                        // File's metadata.
-//                        com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-//                        body.setTitle(fileContent.getName());
-//                        body.setMimeType("image/jpeg");
-//
-//                        com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-//                    }catch (IOException e){
-//                        e.printStackTrace();
-//                    }
                     unlockFocus();
                 }
             };
@@ -914,16 +841,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
                 takePicture();
                 break;
             }
-            case R.id.info: {
-                Activity activity = getActivity();
-                if (null != activity) {
-//                    new AlertDialog.Builder(activity)
-//                            .setMessage(R.string.intro_message)
-//                            .setPositiveButton(android.R.string.ok, null)
-//                            .show();
-                }
-                break;
-            }
         }
     }
 
@@ -951,37 +868,17 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
-            //FileOutputStream output ;
             try {
                 FileOutputStream output = new FileOutputStream(mFile);
                 output.write(bytes);
                 saveFileToDrive();
-//                java.io.File fileContent = new java.io.File(mFile.getPath());
-//                FileContent mediaContent = new FileContent("image/jpeg", fileContent);
-//
-//                // File's metadata.
-//                com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-//                body.setTitle(fileContent.getName());
-//                body.setMimeType("image/jpeg");
-//
-//               com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-            }// catch (UserRecoverableAuthIOException e) {
-            // startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
-            //  }
+            }
             catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 mImage.close();
-//                if (null != output) {
-//                    try {
-//                        output.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
             }
         }
-
     }
 
     /**
@@ -995,71 +892,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
             return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
                     (long) rhs.getWidth() * rhs.getHeight());
         }
-
     }
 
-    /**
-     * Shows an error message dialog.
-     */
-    public static class ErrorDialog extends DialogFragment {
-
-        private static final String ARG_MESSAGE = "message";
-
-        public static ErrorDialog newInstance(String message) {
-            ErrorDialog dialog = new ErrorDialog();
-            Bundle args = new Bundle();
-            args.putString(ARG_MESSAGE, message);
-            dialog.setArguments(args);
-            return dialog;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Activity activity = getActivity();
-            return new AlertDialog.Builder(activity)
-                    .setMessage(getArguments().getString(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            activity.finish();
-                        }
-                    })
-                    .create();
-        }
-
-    }
-
-    /**
-     * Shows OK/Cancel confirmation dialog about camera permission.
-     */
-    public static class ConfirmationDialog extends DialogFragment {
-
-//        @Override
-//        public Dialog onCreateDialog(Bundle savedInstanceState) {
-//            final Fragment parent = getParentFragment();
-//            return new AlertDialog.Builder(getActivity())
-//                   // .setMessage(R.string.request_permission)
-//                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            FragmentCompat.requestPermissions(parent,
-//                                    new String[]{Manifest.permission.CAMERA},
-//                                    REQUEST_CAMERA_PERMISSION);
-//                        }
-//                    })
-//                    .setNegativeButton(android.R.string.cancel,
-//                            new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    Activity activity = parent.getActivity();
-//                                    if (activity != null) {
-//                                        activity.finish();
-//                                    }
-//                                }
-//                            })
-//                    .create();
-//        }
-    }
     private Drive getDriveService(GoogleAccountCredential credential) {
         return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
                 .build();
@@ -1081,7 +915,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
                 } catch (UserRecoverableAuthIOException e) {
-                    // startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+                    e.printStackTrace();
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -1090,5 +924,4 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         });
         t.start();
     }
-
 }
