@@ -83,6 +83,12 @@
     <string name="wifi_not_enabled">Wifi Not Enabled</string>
 
     <!-- Text to Speech phrases -->
-    <string name="tts_voice_recognition_on">I\'m listening</string>
-    <string name="tts_voice_recognition_off">I\'ll ignore you. for now.</string>
+    <string name="cmd_voice_recognition_on">I\'m listening</string>
+    <string name="cmd_voice_recognition_off">I\'ll ignore you. for now.</string>
+    <string name="cmd_remote_on">Remote control on</string>
+    <string name="cmd_remote_off">Remote control off</string>
+    <string name="cmd_camera_on">Camera on</string>
+    <string name="cmd_camera_off">Camera off</string>
+    <string name="cmd_weather_english">Weather display English</string>
+    <string name="cmd_weather_metric">Weather display metric</string>
 </resources>

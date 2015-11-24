@@ -156,8 +156,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 case CONDITIONS:
                     speakCurrentConditions();
                     break;
-                case MainActivity.WEATHER_ENGLISH:
-                case MainActivity.WEATHER_METRIC:
+                case Preferences.CMD_WEATHER_ENGLISH:
+                case Preferences.CMD_WEATHER_METRIC:
                     startWeatherUpdate();
                     break;
             }

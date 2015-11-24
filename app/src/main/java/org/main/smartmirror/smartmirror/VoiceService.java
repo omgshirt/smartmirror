@@ -134,9 +134,17 @@ public class VoiceService extends Service implements RecognitionListener{
             String text = hypothesis.getHypstr();
             hypothesis.delete();
             Log.i("VR", "onPartialResult: " + text);
-            //if (PRIMARY_SEARCH.equals(MIRROR_KWS) && text.equals(MIRROR_KWS))
-            //    switchSearch(GRAMMAR_SEARCH);
-            //    switchSearch(SMARTMIRROR_SEARCH);
+
+            /*if (text.equals("set speech frequency")) {
+                switchSearch(FREQUENCY_GRAMMAR);
+            } else if (text.equals("screen brightness") ||
+            text.equals("light brightness") ||
+            text.equals("system volume") ||
+            text.equals("music volume") ){
+                switchSearch(LEVEL_SEARCH);
+            }
+
+            */
         }
     }
 

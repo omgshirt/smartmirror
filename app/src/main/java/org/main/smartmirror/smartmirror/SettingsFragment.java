@@ -1,8 +1,14 @@
 package org.main.smartmirror.smartmirror;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -317,6 +323,61 @@ public class SettingsFragment extends Fragment {
         setWeatherSwitchText();
 
         return view;
+    }
+
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // If commands are broadcast to this fragment, respond by updating the UI
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("SettingsFragment", "Got message:\"" + message + "\"");
+            Boolean checked = false;
+            switch (message) {
+                case Preferences.CMD_CAMERA_ON:
+                    checked = true;
+                case Preferences.CMD_CAMERA_OFF:
+                    swtCameraEnabled.setChecked(checked);
+                    setCameraSwitchText();
+                    break;
+
+                case Preferences.CMD_REMOTE_ON:
+                    checked = true;
+                case Preferences.CMD_REMOTE_OFF:
+                    swtRemoteEnabled.setChecked(checked);
+                    setRemoteSwitchText();
+                    break;
+
+                case Preferences.CMD_VOICE_ON:
+                    checked = true;
+                case Preferences.CMD_VOICE_OFF:
+                    swtVoiceEnabled.setChecked(checked);
+                    setVoiceSwitchText();
+                    break;
+
+                case Preferences.CMD_WEATHER_ENGLISH:
+                    checked = true;
+                case Preferences.CMD_WEATHER_METRIC:
+                    swtWeatherEnglish.setChecked(checked);
+                    setWeatherSwitchText();
+                    break;
+            }
+        }
+    };
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     private void setVoiceSwitchText() {

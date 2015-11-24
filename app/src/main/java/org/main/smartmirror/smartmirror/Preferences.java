@@ -26,7 +26,7 @@ public class Preferences {
     private SharedPreferences mSharedPreferences;
     private Activity mActivity;
 
-    // constants define the names of the values to be saved to the storage file
+    // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
     public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
     public static final String PREFS_MUSIC_VOL = "MIRROR_PREFS_MUSIC_VOL";
@@ -111,7 +111,6 @@ public class Preferences {
     public static final String OFF = "off";
     public static final String ON = "on";
     public static final String ENGLISH = "imperial";
-    public static final String LISTENING = "listening";
     public static final String METRIC = "metric";
 
     public static final String MPH = "mph";
@@ -148,9 +147,11 @@ public class Preferences {
         switch (command) {
             //camera
             case CMD_CAMERA_OFF:
+                speakText(R.string.cmd_camera_off);
                 setCameraEnabled(false);
                 break;
             case CMD_CAMERA_ON:
+                speakText(R.string.cmd_camera_on);
                 setCameraEnabled(true);
                 break;
 
@@ -193,9 +194,11 @@ public class Preferences {
 
             // Remote
             case CMD_REMOTE_OFF:
+                speakText(R.string.cmd_remote_off);
                 setRemoteEnabled(false);
                 break;
             case CMD_REMOTE_ON:
+                speakText(R.string.cmd_remote_on);
                 setRemoteEnabled(true);
                 break;
 
@@ -232,9 +235,12 @@ public class Preferences {
 
             // Voice recognition on / off
             case CMD_VOICE_OFF:
+                speakText(R.string.cmd_voice_recognition_off);
                 setVoiceEnabled(false);
                 break;
+
             case CMD_VOICE_ON:
+                speakText(R.string.cmd_voice_recognition_on);
                 setVoiceEnabled(true);
                 break;
 
@@ -260,9 +266,11 @@ public class Preferences {
 
             // weather units
             case CMD_WEATHER_ENGLISH:
+                speakText(R.string.cmd_weather_english);
                 setWeatherUnits(ENGLISH);
                 break;
             case CMD_WEATHER_METRIC:
+                speakText(R.string.cmd_weather_metric);
                 setWeatherUnits(METRIC);
                 break;
 
@@ -539,13 +547,6 @@ public class Preferences {
      */
     public void setVoiceEnabled(boolean voiceEnabled) {
         this.mVoiceEnabled = voiceEnabled;
-        String text;
-        if (voiceEnabled) {
-            text = mActivity.getResources().getString(R.string.tts_voice_recognition_on);
-        } else {
-            text = mActivity.getResources().getString(R.string.tts_voice_recognition_off);
-        }
-        ((MainActivity)mActivity).startTTS(text);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
         edit.apply();
@@ -560,5 +561,11 @@ public class Preferences {
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_CAMERA_ENABLED, mCameraEnabled);
         edit.apply();
+    }
+
+    // helper sends a string to MainActivity to be spoken
+    private void speakText(int stringId) {
+        String text = mActivity.getResources().getString(stringId);
+        ((MainActivity)mActivity).startTTS(text);
     }
 }

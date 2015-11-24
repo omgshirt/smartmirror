@@ -88,8 +88,6 @@ public class MainActivity extends AppCompatActivity
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
-    public static final String WEATHER_ENGLISH = "weather english";
-    public static final String WEATHER_METRIC = "weather metric";
 
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
@@ -392,10 +390,6 @@ public class MainActivity extends AppCompatActivity
             if (!viewName.equals(WAKE)) return;
         }
 
-        if (DEBUG) {
-            startTTS(viewName);
-        }
-
         switch (viewName) {
             case NEWS:
                 fragment = new NewsFragment();
@@ -446,10 +440,13 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-        // If we're changing fragments, stop speech, set the wake state, and do the transaction
+        // If we're changing fragments set the wake state and do the transaction
         if(fragment != null){
-            if(DEBUG)
+            if(DEBUG) {
                 Log.i("displayView", "Displaying: " + viewName);
+                startTTS(viewName);
+            }
+
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
 
@@ -527,6 +524,8 @@ public class MainActivity extends AppCompatActivity
                 break;
             case GO_TO_SLEEP:
                 voiceInput = SLEEP;
+                break;
+            case HIDE_HELP:
                 break;
             case OPTIONS:
                 voiceInput = SETTINGS;
