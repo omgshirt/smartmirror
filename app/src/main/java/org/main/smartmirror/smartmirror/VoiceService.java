@@ -293,7 +293,8 @@ public class VoiceService extends Service implements RecognitionListener{
                 case STOP_SPEECH:
                     mClients.remove(msg.replyTo);
                     //stopVoice(true);
-                    mSpeechRecognizer.cancel();
+                    if(mSpeechInitialized)
+                        mSpeechRecognizer.cancel();
                     break;
                 default:
                     super.handleMessage(msg);

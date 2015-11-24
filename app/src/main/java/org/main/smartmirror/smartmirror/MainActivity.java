@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
-    public static final String GALLERY = "gallery";
     public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
     public static final String LIGHT = "light";
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity
     public static final String OFF = "off";
     public static final String ON = "on";
     public static final String OPTIONS = "options";
-    public static final String QUOTES = "quotes";
     public static final String REMOTE = "remote";
     public static final String SCROLL_UP = "scroll up";
     public static final String SCROLL_DOWN = "scroll down";
