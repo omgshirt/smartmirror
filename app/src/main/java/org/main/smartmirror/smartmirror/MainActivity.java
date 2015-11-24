@@ -80,8 +80,9 @@ public class MainActivity extends AppCompatActivity
     public static final int AWAKE = 2;
 
     // scrolling
-    public static final String mSCROLLUP = "up";
-    public static final String mSCROLLDOWN = "down";
+    public static final String mSCROLLUP = "scroll up";
+    public static final String mSCROLLDOWN = "scroll down";
+    public static final String mNEXTTWEET = "next";
 
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
