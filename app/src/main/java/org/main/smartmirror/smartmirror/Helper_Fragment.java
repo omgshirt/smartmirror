@@ -67,24 +67,24 @@ public class Helper_Fragment extends DialogFragment
 
             case "News":
                 builder.setTitle("News Help");
-                View layout_news=inflater.inflate(R.layout.news_help_fragment,null);
+                View layout_news=inflater.inflate(R.layout.main_help_fragment,null);
                 builder.setView((layout_news));
-                TextView view=(TextView)layout_news.findViewById(R.id.news_settings_content);
+                TextView view=(TextView)layout_news.findViewById(R.id.main_settings_content);
                 view.setText(news_string);
                 break;
 
             case "Calendar":
                 builder.setTitle("Calendar Help");
-                View layout_calendar=inflater.inflate(R.layout.calendar_help_fragment,null);
+                View layout_calendar=inflater.inflate(R.layout.main_help_fragment,null);
                 builder.setView((layout_calendar));
-                TextView view_calendar=(TextView)layout_calendar.findViewById(R.id.calendar_settings_content);
+                TextView view_calendar=(TextView)layout_calendar.findViewById(R.id.main_settings_content);
                 view_calendar.setText(helper_string);
                 break;
             case "Camera":
                 builder.setTitle("Camera Help");
-                View layout_camera=inflater.inflate(R.layout.calendar_help_fragment,null);
+                View layout_camera=inflater.inflate(R.layout.main_help_fragment,null);
                 builder.setView((layout_camera));
-                TextView view_camera=(TextView)layout_camera.findViewById(R.id.calendar_settings_content);
+                TextView view_camera=(TextView)layout_camera.findViewById(R.id.main_settings_content);
                 view_camera.setText(helper_string);
                break;
 
@@ -95,18 +95,18 @@ public class Helper_Fragment extends DialogFragment
 
             case "Weather":
                 builder.setTitle("Weather Help");
-                View layout_weather=inflater.inflate(R.layout.calendar_help_fragment,null);
+                View layout_weather=inflater.inflate(R.layout.main_help_fragment,null);
                 builder.setView((layout_weather));
-                TextView view_weather=(TextView)layout_weather.findViewById(R.id.calendar_settings_content);
+                TextView view_weather=(TextView)layout_weather.findViewById(R.id.main_settings_content);
                 view_weather.setText(helper_string);
 
 
                 break;
             case "Settings":
                 builder.setTitle("Settings Help");
-                View layout_settings=inflater.inflate(R.layout.settings_help_content,null);
+                View layout_settings=inflater.inflate(R.layout.main_help_fragment,null);
                 builder.setView((layout_settings));
-                TextView view_settings=(TextView)layout_settings.findViewById(R.id.help_settings_content);
+                TextView view_settings=(TextView)layout_settings.findViewById(R.id.main_settings_content);
                 view_settings.setText(settings_string);
                 break;
 
