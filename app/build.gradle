@@ -56,4 +56,19 @@ dependencies {
     }
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
     compile project(':pocketsphinx-android-5prealpha-nolib')
+    
+    
+    compile('com.google.api-client:google-api-client-android:1.20.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile('com.google.apis:google-api-services-drive:v2-rev170-1.20.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+
+    compile 'com.google.http-client:google-http-client-gson:1.19.0'
+    compile 'com.android.support:support-v13:23.1.0'
+
+
+
+
 }
