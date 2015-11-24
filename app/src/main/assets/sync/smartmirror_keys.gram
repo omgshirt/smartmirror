@@ -47,6 +47,7 @@ speech often /1e-3/
 speech always /1e-3/
 start listening /1e-4/
 stop listening /1e-4/
+take a picture /1e-4/
 volume very low /1e-5/
 volume low /1e-3/
 volume medium /1e-5/

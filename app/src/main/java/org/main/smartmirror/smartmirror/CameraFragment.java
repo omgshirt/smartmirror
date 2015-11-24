@@ -5,6 +5,10 @@ package org.main.smartmirror.smartmirror;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -31,6 +35,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v13.app.FragmentCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -61,9 +66,10 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-//@TargetApi(23)
-public class CameraFragment extends Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback  {
+@TargetApi(23)
+public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
 
+    private static final String TAKE_PICTURE="take a picture";
     private static Drive service;
     private GoogleAccountCredential credential;
 
@@ -113,12 +119,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
     /**
      * Max preview width that is guaranteed by Camera2 API
      */
-    private static final int MAX_PREVIEW_WIDTH = 1920;
+    private static final int MAX_PREVIEW_WIDTH = 1080;
 
     /**
      * Max preview height that is guaranteed by Camera2 API
      */
-    private static final int MAX_PREVIEW_HEIGHT = 1080;
+    private static final int MAX_PREVIEW_HEIGHT = 1920;
 
     /**
      * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
@@ -407,7 +413,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        view.findViewById(R.id.picture).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
 
     }
@@ -419,10 +424,30 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
 
     }
 
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("Camera", "Got message:\"" + message + "\"");
+            switch (message) {
+                case TAKE_PICTURE:
+                    takePicture();
+                    break;
+            }
+        }
+    };
+
     @Override
     public void onResume() {
         super.onResume();
         startBackgroundThread();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
 
         // When the screen is turned off and turned back on, the SurfaceTexture is already
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
@@ -439,6 +464,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
     public void onPause() {
         closeCamera();
         stopBackgroundThread();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
@@ -563,9 +589,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
     }
 
     private void openCamera(int width, int height) {
-        if (getActivity().checkSelfPermission(Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getActivity().checkSelfPermission(Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
         }
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
@@ -833,17 +861,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
             e.printStackTrace();
         }
     }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.picture: {
-                takePicture();
-                break;
-            }
-        }
-    }
-
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
