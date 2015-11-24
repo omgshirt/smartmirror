@@ -37,9 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import io.fabric.sdk.android.Fabric;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -57,10 +54,6 @@ public class MainActivity extends AppCompatActivity
     private static Context mContext;
     private Preferences mPreferences;
 
-    //twitter keys
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
-    private static final String TWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
 
     // Constants
     public static final String TAG = "SmartMirror";
@@ -87,8 +80,8 @@ public class MainActivity extends AppCompatActivity
     public static final int AWAKE = 2;
 
     // scrolling
-    public static final String mSCROLLUP = "scroll up";
-    public static final String mSCROLLDOWN = "scroll down";
+    public static final String mSCROLLUP = "up";
+    public static final String mSCROLLDOWN = "down";
 
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
@@ -182,8 +175,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(authConfig));
 
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
