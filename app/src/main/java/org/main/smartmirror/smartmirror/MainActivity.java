@@ -58,8 +58,6 @@ public class MainActivity extends AppCompatActivity
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
-    public static final String CONDITIONS = "conditions";
-    public static final String FORECAST = "forecast";
     public static final String LIGHT = "light";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
