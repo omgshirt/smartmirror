@@ -54,7 +54,7 @@ public class QuotesFragment extends Fragment {
                                     mquote.setText(parts[random_number].replaceAll("[0-9]", ""));
                                 }
                             });
-                            Thread.sleep(5000L);
+                            Thread.sleep(8000L);
                         }
                     } catch (InterruptedException iex) {}
                 }

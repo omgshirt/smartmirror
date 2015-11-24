@@ -37,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -58,11 +59,14 @@ public class MainActivity extends AppCompatActivity
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
+    public static final String GALLERY = "gallery";
+    public static final String HELP = "show help";
     public static final String LIGHT = "light";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
     public static final String OFF = "off";
     public static final String ON = "on";
+    public static final String OPTIONS = "options";
     public static final String SETTINGS = "settings";
     public static final String SLEEP = "sleep";
     public static final String TRAFFIC = "traffic";
@@ -380,6 +384,13 @@ public class MainActivity extends AppCompatActivity
                 fragment = new FacebookFragment();
                 title = FACEBOOK;
                 break;
+            case GALLERY:
+                fragment = new GalleryFragment();
+                title = GALLERY;
+                break;
+            case HELP:
+                // Help Dialog
+                break;
             case LIGHT:
                 fragment = new LightFragment();
                 title = LIGHT;
@@ -396,6 +407,7 @@ public class MainActivity extends AppCompatActivity
                 title = QUOTES;
                 break;
             case SETTINGS:
+            case OPTIONS:
                 fragment = new SettingsFragment();
                 title = SETTINGS;
                 break;
