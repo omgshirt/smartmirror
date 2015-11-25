@@ -43,25 +43,8 @@ public class GalleryFragment extends Fragment {
 
         mImageList = new ArrayList<>(Arrays.asList(imageGalleryNames));
 
-        Runnable imageRunnable=new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Random imageRandomizer = new Random();
-                                mRandomNumber = imageRandomizer.nextInt(mImageList.size());
-                            }
-                        });
-                        Thread.sleep(8000L);
-                    }
-                } catch (InterruptedException iex) {}
-            }
-        };
-        Thread imageThread=new Thread(imageRunnable);
-        imageThread.start();
+        Random imageRandomizer = new Random();
+        mRandomNumber = imageRandomizer.nextInt(mImageList.size());
 
         try {
             InputStream is = getContext().getAssets().open("gallery/" + mImageList.get(mRandomNumber));
@@ -78,4 +61,6 @@ public class GalleryFragment extends Fragment {
         mGalleryItem.setImageDrawable(mImageDrawable);
         return view;
     }
+
+
 }
