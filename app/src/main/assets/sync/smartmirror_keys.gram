@@ -25,7 +25,7 @@ stop listening /1e-1/
 take a picture /1e-2/
 traffic /1e5/
 twitter /1e5/
-wake up /1e6/
+wake up /1e5/
 weather /1e5/
 weather english /1e2/
 weather metric /1e2/
@@ -34,3 +34,17 @@ screen brightness low /1e-5/
 screen brightness medium /1e-5/
 screen brightness high /1e-5/
 screen brightness very high /1e-5/
+sports /1e5/
+foreign /1e5/
+technology /1e-3/
+books /1e5/
+business /1e5/
+cars /1e5/
+education /1e1/
+food /1e5/
+health /1e5/
+movies/1e3/
+politics /1e1/
+science /1e3/
+television /1e-3/
+world /1e5/

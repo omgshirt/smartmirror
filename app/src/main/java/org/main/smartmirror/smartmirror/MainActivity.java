@@ -408,6 +408,11 @@ public class MainActivity extends AppCompatActivity
             case HELP:
                 // display help
                 break;
+            case HIDE_HELP:
+                if (mCurrentFragment.equals(HELP)) {
+                    // call dismiss on fragment?
+                }
+                break;
             case LIGHT:
                 fragment = new LightFragment();
                 break;
@@ -512,7 +517,7 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = Preferences.CMD_WEATHER_METRIC;
             }
         }
-
+        // Junk fix for remote
         if(voiceInput.contains(REMOTE)) {
             if (voiceInput.contains("enable")) {
                 voiceInput = Preferences.CMD_REMOTE_ON;
@@ -520,7 +525,7 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = Preferences.CMD_REMOTE_OFF;
             }
         }
-
+        // more garbage...
         if(voiceInput.contains(CAMERA)) {
             if (voiceInput.contains("enable")) {
                 voiceInput = Preferences.CMD_CAMERA_ON;
@@ -707,7 +712,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i("Wifi", "Heartbeat: discoverPeers()" );
             }
         };
-        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 60, 60,
+        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 360, 360,
                 TimeUnit.SECONDS);
     }
 
