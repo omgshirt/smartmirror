@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.FragmentManager;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,7 +12,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -38,9 +38,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
-import java.io.FileReader;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -97,6 +94,12 @@ public class MainActivity extends AppCompatActivity
     public static final String mSCROLLDOWN = "scroll down";
     public static final String mNEXTTWEET = "next";
 
+    // Light Sensor
+    private SensorManager mSensorManager;
+    private Sensor mLightSensor;
+    private float mLightQuantity;
+    private ScheduledFuture<?> sensingLight;
+
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
 
@@ -122,12 +125,6 @@ public class MainActivity extends AppCompatActivity
 
     // TTS
     private TTSHelper mTTSHelper;
-
-    //Light Sensor
-    private SensorManager mSensorManager;
-    private Sensor mLightSensor;
-    private float mLightQuantity;
-    private ScheduledFuture<?> sensingLight;
 
     // Speech recognition
     private Messenger mMessenger = new Messenger(new IHandler());
@@ -409,7 +406,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new GalleryFragment();
                 break;
             case HELP:
-                // Help Dialog
+                // display help
                 break;
             case LIGHT:
                 fragment = new LightFragment();
