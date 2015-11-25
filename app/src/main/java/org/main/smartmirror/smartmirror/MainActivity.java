@@ -94,6 +94,9 @@ public class MainActivity extends AppCompatActivity
     public static final String mSCROLLDOWN = "scroll down";
     public static final String mNEXTTWEET = "next";
 
+    // Help
+    private HelpDialog mHelpDialog;
+
     // Light Sensor
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
@@ -406,7 +409,8 @@ public class MainActivity extends AppCompatActivity
                 fragment = new GalleryFragment();
                 break;
             case HELP:
-                // display help
+                mHelpDialog = HelpDialog.newInstance(getCurrentFragment());
+                mHelpDialog.show(getFragmentManager(), "HelpDialog");
                 break;
             case HIDE_HELP:
                 if (mCurrentFragment.equals(HELP)) {
