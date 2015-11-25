@@ -7,6 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
@@ -45,7 +49,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
+        WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, SensorEventListener {
 
     // Globals, prefs, debug flags
     public static final boolean DEBUG = true;
@@ -118,6 +122,12 @@ public class MainActivity extends AppCompatActivity
 
     // TTS
     private TTSHelper mTTSHelper;
+
+    //Light Sensor
+    private SensorManager mSensorManager;
+    private Sensor mLightSensor;
+    private float mLightQuantity;
+    private ScheduledFuture<?> sensingLight;
 
     // Speech recognition
     private Messenger mMessenger = new Messenger(new IHandler());
@@ -244,6 +254,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
+        stopLightSensor();
         bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mIsBound=true;
         mirrorSleepState = AWAKE;
@@ -283,6 +294,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         mirrorSleepState = SLEEPING;
+        startLightSensor();
         Log.i(TAG, "onStop");
     }
 
@@ -706,6 +718,56 @@ public class MainActivity extends AppCompatActivity
     public void stopWifiHeartbeat() {
         if (wifiHeartbeat != null) {
             wifiHeartbeat.cancel(true);
+        }
+    }
+
+    private void startLightSensor() {
+        ScheduledThreadPoolExecutor scheduler2 = (ScheduledThreadPoolExecutor)
+                Executors.newScheduledThreadPool(1);
+
+        final Runnable sensingLightTask = new Runnable() {
+            @Override
+            public void run() {
+                detectLight();
+                Log.i("LightSensor", "Detecting: detectLight()" );
+            }
+        };
+        sensingLight = scheduler2.scheduleAtFixedRate(sensingLightTask, 5, 5,
+                TimeUnit.SECONDS);
+    }
+
+    public void stopLightSensor() {
+        if (sensingLight != null) {
+            sensingLight.cancel(true);
+            mSensorManager = null;
+        }
+    }
+
+    public void detectLight() {
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        //Do something here if sensor accuracy changes
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        mLightQuantity = event.values[0];
+        if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+            if(event.values[0]>=0 && event.values[0]<=15){
+                //do nothing, room is dark
+                System.out.println("Light Level below 15");
+            }
+            else if(event.values[0]>15){
+                // if(mirrorSleepState==SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
+                displayView(WAKE);
+                System.out.println("Light Level above 15");
+                //}
+            }
         }
     }
 }
