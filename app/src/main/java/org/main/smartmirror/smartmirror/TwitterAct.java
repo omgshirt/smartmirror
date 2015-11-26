@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,15 +18,13 @@ import io.fabric.sdk.android.Fabric;
 
 public class TwitterAct extends Activity{
 
-    private TwitterLoginButton loginButton;
+    private TwitterLoginButton mTwitterLoginButton;
     private TextView mStatus;
-
-    TwitterSession mSession;
-    long mUserID;
-    String mScreenName;
-
-    public static String mAuthToken;
-    public static String mAuthSecret;
+    private TwitterSession mSession;
+    private long mUserID;
+    private String mScreenName;
+    private static String mAuthToken;
+    private static String mAuthSecret;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +34,11 @@ public class TwitterAct extends Activity{
         Fabric.with(this, new com.twitter.sdk.android.Twitter(authConfig));
 
         setContentView(R.layout.twitter_login_fragment);
-        loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
+        mTwitterLoginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         mStatus = (TextView)findViewById(R.id.status);
         mStatus.setText("Status: Ready");
 
-        loginButton.setCallback(new Callback<TwitterSession>() {
+        mTwitterLoginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
                 String output = "Status: " +
@@ -64,8 +63,7 @@ public class TwitterAct extends Activity{
                 Log.i("auth token ", mAuthSecret);
                 Constants.TWITTER_ACCESS_TOKEN = mAuthToken;
                 Constants.TWITTER_ACCESS_SECRET = mAuthSecret;
-
-
+                finish();
             }
 
             @Override
@@ -74,24 +72,13 @@ public class TwitterAct extends Activity{
                 Log.d("TwitterKit", "Login with Twitter failure", exception);
             }
         });
-
-
-
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        loginButton.onActivityResult(requestCode, resultCode, data);
-    }
-
-
-
-    //to main activity
-    public void toMain(View v) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
     }
 
 }

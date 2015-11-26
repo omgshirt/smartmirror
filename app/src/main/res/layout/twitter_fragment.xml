@@ -21,14 +21,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Login"
-            android:onClick="toLogin"
-            android:id="@+id/btnLogin" />
+            android:color="@color/black"
+            android:id="@+id/btn_login" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="GET"
-            android:onClick="sampleTwitter"
+            android:textColor="@color/black"
             android:id="@+id/btn_twitter"
             android:layout_gravity="right" />
 

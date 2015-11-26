@@ -15,10 +15,14 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- Features -->
     <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera2" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
@@ -27,6 +31,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- Activities -->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -39,13 +45,12 @@
             </intent-filter>
         </activity>
 
-        <!-- Services -->
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges=
                 "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:label="@string/app_name" />
-        <service android:name=".VoiceService"></service>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -57,8 +62,10 @@
             android:value="@string/facebook_app_id"/>
         <activity
             android:name=".TwitterAct"
-            android:label="@string/app_name"
-            />
+            android:label="@string/app_name" />
+
+        <!-- Services -->
+        <service android:name=".VoiceService"></service>
 
     </application>
 </manifest>

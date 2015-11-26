@@ -24,8 +24,9 @@ public class Preferences {
 
     private static Preferences mPreferences = null;
     private SharedPreferences mSharedPreferences;
+    private Activity mActivity;
 
-    // constants define the names of the values to be saved to the storage file
+    // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
     public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
     public static final String PREFS_MUSIC_VOL = "MIRROR_PREFS_MUSIC_VOL";
@@ -137,7 +138,7 @@ public class Preferences {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("Preferences", "Got message: " + message);
+            //Log.i("Preferences", "Got message:\"" + message + "\"");
             handleSettingsCommand(context, message);
         }
     };
@@ -146,9 +147,11 @@ public class Preferences {
         switch (command) {
             //camera
             case CMD_CAMERA_OFF:
+                speakText(R.string.cmd_camera_off);
                 setCameraEnabled(false);
                 break;
             case CMD_CAMERA_ON:
+                speakText(R.string.cmd_camera_on);
                 setCameraEnabled(true);
                 break;
 
@@ -191,22 +194,29 @@ public class Preferences {
 
             // Remote
             case CMD_REMOTE_OFF:
-                // TODO: FIX THIS
+                speakText(R.string.cmd_remote_off);
+                setRemoteEnabled(false);
                 break;
             case CMD_REMOTE_ON:
+                speakText(R.string.cmd_remote_on);
+                setRemoteEnabled(true);
                 break;
 
             // screen brightness
-                // TODO: fix how this works, too
             case CMD_SCREEN_VLOW:
+                setScreenBrightness(BRIGHTNESS_VLOW);
                 break;
             case CMD_SCREEN_LOW:
+                setScreenBrightness(BRIGHTNESS_LOW);
                 break;
             case CMD_SCREEN_MEDIUM:
+                setScreenBrightness(BRIGHTNESS_MEDIUM);
                 break;
             case CMD_SCREEN_HIGH:
+                setScreenBrightness(BRIGHTNESS_HIGH);
                 break;
             case CMD_SCREEN_VHIGH:
+                setScreenBrightness(BRIGHTNESS_VHIGH);
                 break;
 
             // speech frequency
@@ -225,9 +235,12 @@ public class Preferences {
 
             // Voice recognition on / off
             case CMD_VOICE_OFF:
+                speakText(R.string.cmd_voice_recognition_off);
                 setVoiceEnabled(false);
                 break;
+
             case CMD_VOICE_ON:
+                speakText(R.string.cmd_voice_recognition_on);
                 setVoiceEnabled(true);
                 break;
 
@@ -253,9 +266,11 @@ public class Preferences {
 
             // weather units
             case CMD_WEATHER_ENGLISH:
+                speakText(R.string.cmd_weather_english);
                 setWeatherUnits(ENGLISH);
                 break;
             case CMD_WEATHER_METRIC:
+                speakText(R.string.cmd_weather_metric);
                 setWeatherUnits(METRIC);
                 break;
 
@@ -265,8 +280,9 @@ public class Preferences {
 
     }
 
-    private Preferences() {
+    private Preferences(Activity activity) {
         Context appContext = MainActivity.getContextForApplication();
+        mActivity = activity;
         mSharedPreferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
@@ -292,12 +308,13 @@ public class Preferences {
         LocalBroadcastManager.getInstance(appContext).unregisterReceiver(mMessageReceiver);
         mPreferences = null;
         mSharedPreferences = null;
+        mActivity = null;
     }
 
     // returns the instance of the Preferences class, or creates one if it does not exist
-    public static Preferences getInstance() {
+    public static Preferences getInstance(Activity activity) {
         if (mPreferences == null) {
-            mPreferences = new Preferences();
+            mPreferences = new Preferences(activity);
         }
         return mPreferences;
     }
@@ -472,13 +489,13 @@ public class Preferences {
      *
      *  @param brightness int (0-255)
      */
-    public void setAppBrightness(Activity activity, int brightness) {
+    public void setScreenBrightness(int brightness) {
         if (brightness < 0 || brightness > 255) return;
 
         try {
             this.mAppBrightness = brightness;
             ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
-            sbh.setScreenBrightness(activity, mAppBrightness);
+            sbh.setScreenBrightness(mActivity, mAppBrightness);
 
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
@@ -489,11 +506,11 @@ public class Preferences {
     }
 
     /**
-     * Sets the application's current brightness to value stored in preferences
+     * Resets the application's current brightness to value stored in preferences
      *  Requires Activity context
      */
-    public void setAppBrightness(Activity activity) {
-        setAppBrightness(activity, mAppBrightness);
+    public void resetScreenBrightness() {
+        setScreenBrightness(mAppBrightness);
     }
 
     public int getAppBrightness () {
@@ -506,13 +523,12 @@ public class Preferences {
 
     /**
      * Set whether the app will broadcast for wifi connections
-     * @param activity instance of MainActivity
      * @param isEnabled boolean
      */
-    public void setRemoteEnabled(Activity activity, boolean isEnabled) {
+    public void setRemoteEnabled(boolean isEnabled) {
         try {
             mRemoteEnabled = isEnabled;
-            ((MainActivity)activity).setRemoteStatus(mRemoteEnabled);
+            ((MainActivity)mActivity).setRemoteStatus(mRemoteEnabled);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
             edit.apply();
@@ -527,10 +543,10 @@ public class Preferences {
 
     /**
      * Sets the voice enabled status
-     * @param mVoiceEnabled boolean
+     * @param voiceEnabled boolean
      */
-    public void setVoiceEnabled( boolean mVoiceEnabled) {
-        this.mVoiceEnabled = mVoiceEnabled;
+    public void setVoiceEnabled(boolean voiceEnabled) {
+        this.mVoiceEnabled = voiceEnabled;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
         edit.apply();
@@ -545,5 +561,11 @@ public class Preferences {
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_CAMERA_ENABLED, mCameraEnabled);
         edit.apply();
+    }
+
+    // helper sends a string to MainActivity to be spoken
+    private void speakText(int stringId) {
+        String text = mActivity.getResources().getString(stringId);
+        ((MainActivity)mActivity).startTTS(text);
     }
 }

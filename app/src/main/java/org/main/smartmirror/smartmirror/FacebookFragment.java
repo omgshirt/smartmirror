@@ -21,10 +21,10 @@ public class FacebookFragment extends Fragment {
 
     //LoginButton btnLoginButton;
     //CallbackManager mCBManager;
-    WebView webview;
-
-
+    private WebView webview;
     private String curURL;
+    private static final String SCROLLUP="up";
+    private static final String SCROLLDOWN="down";
 
     public void init(String url) {
 
@@ -39,7 +39,7 @@ public class FacebookFragment extends Fragment {
         //FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
         //mCBManager = CallbackManager.Factory.create();
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
-        init("https://www.facebook.com/");
+        init("https://m.facebook.com/");
 
         webview = (WebView) view.findViewById(R.id.facebook_webview);
         if (curURL != null) {
@@ -63,6 +63,9 @@ public class FacebookFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
+            Log.d("News", "Got message:\"" + message +"\"");
+            switch (message) {
+                case SCROLLUP:
             Log.d("News", "Got message:\"" + message + "\"");
             if(message.contains(MainActivity.mSCROLLUP))
                 webview.scrollTo(0, -(int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
@@ -72,15 +75,13 @@ public class FacebookFragment extends Fragment {
             /*switch (message) {
                 case MainActivity.mSCROLLUP:
                     Log.i(" is it ", message);
-                    //webview.scrollBy(0, -1000);
-                    webview.scrollTo(0, -(int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
+                    webview.scrollBy(0, -1000);
                     break;
-                case MainActivity.mSCROLLDOWN:
+                case SCROLLDOWN:
                     Log.i(" is it ", message);
-                    //webview.scrollBy(0, +1000);
-                    webview.scrollTo(0, (int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
+                    webview.scrollBy(0, +1000);
                     break;
-            }*/
+            }
         }
     };
 

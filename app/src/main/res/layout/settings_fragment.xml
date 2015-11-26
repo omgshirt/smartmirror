@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Mirror Brightness"
+            android:text="@string/settings_screen_brightness"
             android:textSize="20sp" />
 
         <RadioGroup
@@ -64,7 +64,7 @@
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Night Light Brightness"
+            android:text="@string/settings_light_brightness"
             android:textSize="20sp" />
 
         <RadioGroup
@@ -225,7 +225,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Speech Frequency"
+            android:text="@string/settings_speech_freq"
             android:textSize="20sp" />
 
         <RadioGroup
@@ -238,28 +238,28 @@
                 android:id="@+id/speech_never"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_speech_never" />
+                android:text="@string/settings_never" />
 
             <RadioButton
                 android:id="@+id/speech_rare"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:text="@string/settings_speech_rare" />
+                android:text="@string/settings_rare" />
 
             <RadioButton
                 android:id="@+id/speech_often"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:text="@string/settings_speech_often" />
+                android:text="@string/settings_often" />
 
             <RadioButton
                 android:id="@+id/speech_always"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:text="@string/settings_speech_always" />
+                android:text="@string/settings_always" />
         </RadioGroup>
 
         <Switch
