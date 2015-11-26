@@ -39,7 +39,7 @@ public class FacebookFragment extends Fragment {
         //FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
         //mCBManager = CallbackManager.Factory.create();
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
-        init("https://www.facebook.com/");
+        init("https://m.facebook.com/");
 
         webview = (WebView) view.findViewById(R.id.facebook_webview);
         if (curURL != null) {
