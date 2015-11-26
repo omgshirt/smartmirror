@@ -6,7 +6,7 @@ conditions /1e-5/
 facebook /1e-2/
 forecast /1e-2/
 gallery /1e-2/
-go to sleep /1e-10/
+go to sleep /1e-20/
 go back /1e10/
 hangman /1e1/
 show help /1e6/
@@ -14,7 +14,7 @@ hide help /1e6/
 light /1e16/
 news /1e10/
 options /1e-2/
-quotes /1e1/
+quotes /1e5/
 enable remote /1e-3/
 disable remote /1e-3/
 settings /1e-4/
@@ -34,17 +34,17 @@ screen brightness low /1e-5/
 screen brightness medium /1e-5/
 screen brightness high /1e-5/
 screen brightness very high /1e-5/
-sports /1e5/
+sports /1e10/
 foreign /1e5/
 technology /1e-3/
-books /1e5/
+books /1e10/
 business /1e5/
-cars /1e5/
+cars /1e10/
 education /1e1/
-food /1e5/
-health /1e5/
-movies/1e3/
-politics /1e1/
+food /1e10/
+health /1e10/
+movies/1e10/
+politics /1e-1/
 science /1e3/
 television /1e-3/
-world /1e5/
+world /1e10/

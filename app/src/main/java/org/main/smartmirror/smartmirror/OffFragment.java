@@ -34,7 +34,6 @@ public class OffFragment extends Fragment {
             voice = "I'll charge up for a bit";
 
         ((MainActivity)getActivity()).startTTS(voice);
-
         return view;
     }
 }
