@@ -23,8 +23,9 @@ import org.json.JSONObject;
 public class NewsFragment extends Fragment {
     public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     public static String mPostURL = "&sort=newest&api-key=";
-    public static String mNewsDesk;
-    public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    public static String mNewsDesk = "U.S.";
+    //public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    public static String mNewsDefault ="http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     private TextView mTxtHeadline;
@@ -36,6 +37,7 @@ public class NewsFragment extends Fragment {
     private TextView mTxtHeadline7;
     private TextView mTxtHeadline8;
     private ImageButton mNYTButton;
+    private TextView txtNewsDesk;
 
     Handler mHandler = new Handler();
 
@@ -64,6 +66,8 @@ public class NewsFragment extends Fragment {
         mTxtHeadline7 = (TextView)view.findViewById(R.id.headline7);
         mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
 
+        txtNewsDesk = (TextView)view.findViewById(R.id.txtNewsDesk);
+
         mTxtHeadline.setText("");
         mTxtHeadline2.setText("");
         mTxtHeadline3.setText("");
@@ -72,6 +76,8 @@ public class NewsFragment extends Fragment {
         mTxtHeadline6.setText("");
         mTxtHeadline7.setText("");
         mTxtHeadline8.setText("");
+
+        txtNewsDesk.setText(mNewsDesk);
 
         // set onClickListener
         mNYTButton.setOnClickListener(new View.OnClickListener() {
@@ -92,8 +98,7 @@ public class NewsFragment extends Fragment {
 
         String newsURL = this.getArguments().getString("url");
         newsURL += mApiKey;
-        updateNews(newsURL);
-
+        updateNews(mNewsDefault+mNewsDesk+mPostURL+mApiKey);
 
         return view;
 
@@ -196,6 +201,7 @@ public class NewsFragment extends Fragment {
 
 
             //mytextview.setText(Html.fromHtml(sourceString)); //format
+            txtNewsDesk.setText(mNewsDesk.toUpperCase());
 
             String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + newsFeed[0] + "<br>";
             mTxtHeadline.setText(Html.fromHtml(txt0));

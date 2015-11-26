@@ -71,14 +71,8 @@ public class FacebookFragment extends Fragment {
                     break;
 
             }
-            //if(message.contains(Constants.SCROLLDOWN))
-                //webview.scrollBy(0, -(int) 0.2*(((int)getResources().getDisplayMetrics().density * webview.getContentHeight())-webview.getHeight()));
-                //webview.scrollBy(0, -(int)0.2*webview.getContentHeight());
-            //else if (message.contains(Constants.SCROLLUP))
-                //webview.scrollBy(0, (int) 0.2*(((int)getResources().getDisplayMetrics().density * webview.getContentHeight())-webview.getHeight()));
-                //webview.scrollBy(0, (int)0.2*webview.getContentHeight());
 
-            }
+        }
     };
 
     /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
