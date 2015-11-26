@@ -4,12 +4,14 @@ import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.TextView;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
@@ -24,6 +26,7 @@ public class QuotesFragment extends Fragment {
     private Typeface mQuoteFont;
     private Animation mFadeIn;
     private Animation mFadeOut;
+    private static final String TAG = "QuotesFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,7 +77,7 @@ public class QuotesFragment extends Fragment {
                                 mquote.startAnimation(mFadeIn);
                             }
                         });
-                        Thread.sleep(8000L);
+                        Thread.sleep(10000L);
                     }
                 } catch (InterruptedException iex) {
 
@@ -96,5 +99,24 @@ public class QuotesFragment extends Fragment {
         mTitle.setTypeface(mQuoteFont);
         return view;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e(TAG, "OnDestroy");
+
+    }
+
+    public void onStop(){
+        super.onStop();
+        Log.e(TAG,"OnStop");
+    }
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        Log.e(TAG,"OnPause");
+    }
+
 
 }

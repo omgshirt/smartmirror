@@ -1,6 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.FragmentManager;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity
     public static final String mNEXTTWEET = "next";
 
     // Help
-    private HelpDialog mHelpDialog;
+    private HelpFragment mHelpFragment;
 
     // Light Sensor
     private SensorManager mSensorManager;
@@ -409,12 +408,13 @@ public class MainActivity extends AppCompatActivity
                 fragment = new GalleryFragment();
                 break;
             case HELP:
-                mHelpDialog = HelpDialog.newInstance(getCurrentFragment());
-                mHelpDialog.show(getFragmentManager(), "HelpDialog");
+                mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
+                mHelpFragment.show(getFragmentManager(), "HelpFragment");
                 break;
             case HIDE_HELP:
                 if (mCurrentFragment.equals(HELP)) {
                     // call dismiss on fragment?
+                    mHelpFragment.dismiss();
                 }
                 break;
             case LIGHT:
@@ -547,6 +547,7 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = SLEEP;
                 break;
             case HIDE_HELP:
+                voiceInput =HIDE_HELP;
                 break;
             case OPTIONS:
                 voiceInput = SETTINGS;
