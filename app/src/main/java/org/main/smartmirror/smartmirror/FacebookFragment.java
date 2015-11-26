@@ -23,8 +23,6 @@ public class FacebookFragment extends Fragment {
     //CallbackManager mCBManager;
     private WebView webview;
     private String curURL;
-    private static final String SCROLLUP="up";
-    private static final String SCROLLDOWN="down";
 
     public void init(String url) {
 
@@ -63,26 +61,24 @@ public class FacebookFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("News", "Got message:\"" + message +"\"");
+            Log.d("Facebook ", "Got message:\"" + message +"\"");
             switch (message) {
-                case SCROLLUP:
-            Log.d("News", "Got message:\"" + message + "\"");
-            if(message.contains(MainActivity.mSCROLLUP))
-                webview.scrollTo(0, -(int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
-            else
-                webview.scrollTo(0, (int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
+                case Constants.SCROLLDOWN:
+                    webview.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * webview.getContentHeight())-webview.getHeight()));
+                    break;
+                case Constants.SCROLLUP:
+                    webview.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * webview.getContentHeight())-webview.getHeight());
+                    break;
 
-            /*switch (message) {
-                case MainActivity.mSCROLLUP:
-                    Log.i(" is it ", message);
-                    webview.scrollBy(0, -1000);
-                    break;
-                case SCROLLDOWN:
-                    Log.i(" is it ", message);
-                    webview.scrollBy(0, +1000);
-                    break;
             }
-        }
+            //if(message.contains(Constants.SCROLLDOWN))
+                //webview.scrollBy(0, -(int) 0.2*(((int)getResources().getDisplayMetrics().density * webview.getContentHeight())-webview.getHeight()));
+                //webview.scrollBy(0, -(int)0.2*webview.getContentHeight());
+            //else if (message.contains(Constants.SCROLLUP))
+                //webview.scrollBy(0, (int) 0.2*(((int)getResources().getDisplayMetrics().density * webview.getContentHeight())-webview.getHeight()));
+                //webview.scrollBy(0, (int)0.2*webview.getContentHeight());
+
+            }
     };
 
     /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
