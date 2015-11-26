@@ -17,7 +17,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Fragment that displays a gallery using images located on this application
+ * Fragment that displays images located on this application.
+ * These images cycle for a predefined number of seconds.
  */
 public class GalleryFragment extends Fragment {
 
@@ -64,6 +65,7 @@ public class GalleryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.gallery_fragment, container, false);
+        // initialize the ImageView
         mGalleryItem = (ImageView) view.findViewById(R.id.gallery_item);
         // start the timer
         mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
@@ -82,7 +84,6 @@ public class GalleryFragment extends Fragment {
      * to be painted on the UI
      * @param num the random number seed
      */
-
     public void makeRandomImage(int num){
         Random imageRandomizer = new Random();
         int randomNumber = imageRandomizer.nextInt(num);
