@@ -75,22 +75,6 @@ public class VoiceService extends Service implements RecognitionListener{
     }
 
     /**
-     * Sets the spoken command
-     * @param cmd the command
-     */
-    public void setSpokenCommand(String cmd){
-        mSpokenCommand = cmd;
-    }
-
-    /**
-     * Returns the spoken command
-     * @return the command
-     */
-    public String getSpokenCommand(){
-        return mSpokenCommand;
-    }
-
-    /**
      * Starts voice capture, invoked by the calling Activity
      */
     public void startVoice(){
@@ -109,22 +93,18 @@ public class VoiceService extends Service implements RecognitionListener{
     /**
      * Sends a message back to the Activity that started this service
      */
-    public void sendMessage(){
-        // there's a potential that we might get a null String
-        // so we avoid it
-        if(getSpokenCommand() != null) {
-            Bundle bundle = new Bundle();
-            // key is result so the calling activity can handle the message
-            bundle.putString("result", getSpokenCommand());
-            // used for the calling activity to check which message id to check
-            Message msg = Message.obtain(null, RESULT_SPEECH);
-            msg.setData(bundle);
-            try {
-                mClients.get(0).send(msg);
-            } catch (RemoteException e) {
-                mClients.remove(msg);
-                e.printStackTrace();
-            }
+    public void sendMessage(String message){
+        Bundle bundle = new Bundle();
+        // key is result so the calling activity can handle the message
+        bundle.putString("result", message);
+        // used for the calling activity to check which message id to check
+        Message msg = Message.obtain(null, RESULT_SPEECH);
+        msg.setData(bundle);
+        try {
+            mClients.get(0).send(msg);
+        } catch (RemoteException e) {
+            mClients.remove(msg);
+            e.printStackTrace();
         }
     }
 
@@ -138,7 +118,7 @@ public class VoiceService extends Service implements RecognitionListener{
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
             hypothesis.delete();
-            Log.i("VR", "onPartialResult: " + text);
+            //Log.i("VR", "onPartialResult: " + text);
 
             /*if (text.equals("set speech frequency")) {
                 switchSearch(FREQUENCY_GRAMMAR);
@@ -159,10 +139,10 @@ public class VoiceService extends Service implements RecognitionListener{
     @Override
     public void onResult(Hypothesis hypothesis) {
         if(hypothesis != null) {
-            Log.i("VR", "onResult:\"" + hypothesis.getHypstr() + "\"");
+            String hypstr = hypothesis.getHypstr().trim();
+            Log.i("VR", "onResult:\"" + hypstr + "\"");
             //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
-            setSpokenCommand(hypothesis.getHypstr());
-            sendMessage();
+            sendMessage(hypstr);
         }
         startVoice();
     }
