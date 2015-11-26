@@ -16,4 +16,6 @@ public class Constants {
     final public static String	TWITTER_CALLBACK_SCHEME = "x-latify-oauth-twitter";
     final public static String	TWITTER_CALLBACK_URL = "https://twitter.com/";
 
+    public static String TWITTER_SCREEN_NAME = "";
+
 }

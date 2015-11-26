@@ -63,17 +63,24 @@ public class FacebookFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("News", "Got message:\"" + message +"\"");
-            switch (message) {
+            Log.d("News", "Got message:\"" + message + "\"");
+            if(message.contains(MainActivity.mSCROLLUP))
+                webview.scrollTo(0, -(int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
+            else
+                webview.scrollTo(0, (int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
+
+            /*switch (message) {
                 case MainActivity.mSCROLLUP:
                     Log.i(" is it ", message);
-                    webview.scrollBy(0, -1000);
+                    //webview.scrollBy(0, -1000);
+                    webview.scrollTo(0, -(int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
                     break;
                 case MainActivity.mSCROLLDOWN:
                     Log.i(" is it ", message);
-                    webview.scrollBy(0, +1000);
+                    //webview.scrollBy(0, +1000);
+                    webview.scrollTo(0, (int) 0.5*(((int)webview.getScale() * webview.getContentHeight())-webview.getHeight()));
                     break;
-            }
+            }*/
         }
     };
 

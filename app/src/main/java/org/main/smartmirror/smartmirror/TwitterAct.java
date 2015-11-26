@@ -64,6 +64,8 @@ public class TwitterAct extends Activity{
                 Log.i("auth token ", mAuthSecret);
                 Constants.TWITTER_ACCESS_TOKEN = mAuthToken;
                 Constants.TWITTER_ACCESS_SECRET = mAuthSecret;
+                Constants.TWITTER_SCREEN_NAME = mScreenName;
+
 
             }
 

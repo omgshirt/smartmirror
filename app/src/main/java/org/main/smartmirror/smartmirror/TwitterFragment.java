@@ -5,13 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
@@ -23,12 +26,15 @@ import com.twitter.sdk.android.tweetui.TweetUtils;
 import com.twitter.sdk.android.tweetui.TweetView;
 
 
+import org.json.JSONObject;
+
 import io.fabric.sdk.android.Fabric;
 
 public class TwitterFragment extends Fragment {
 
     int mTweetNumber = 0;
     TweetView tweetView;
+    Handler mHandler = new Handler();
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
@@ -42,7 +48,7 @@ public class TwitterFragment extends Fragment {
         final ViewGroup parentView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
         long tweetIds[] = {631879971628183552L, 503435417459249153L, 510908133917487104L, 473514864153870337L, 477788140900347904L};
         long currentTweet = tweetIds[mTweetNumber];
-        TweetUtils.loadTweet(currentTweet, new Callback<Tweet>() {
+        /*TweetUtils.loadTweet(currentTweet, new Callback<Tweet>() {
             @Override
             public void success(Result<Tweet> result) {
                 //TweetView tweetView = new TweetView(getActivity(), result.data);
@@ -54,7 +60,8 @@ public class TwitterFragment extends Fragment {
             public void failure(TwitterException exception) {
                 Log.d("TwitterKit", "Load Tweet failure", exception);
             }
-        });
+        });*/
+
 
 
 
@@ -105,19 +112,18 @@ public class TwitterFragment extends Fragment {
         final ViewGroup parentView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
         long tweetIds[] = {631879971628183552L, 503435417459249153L, 510908133917487104L, 473514864153870337L, 477788140900347904L};
         long currentTweet = tweetIds[tw];
-        TweetUtils.loadTweet(currentTweet, new Callback<Tweet>() {
+        /*TweetUtils.loadTweet(currentTweet, new Callback<Tweet>() {
             @Override
             public void success(Result<Tweet> result) {
-                tweetView = new TweetView(getActivity(), result.data);
-                parentView.addView(tweetView);
+                //tweetView = new TweetView(getActivity(), result.data);
+                //parentView.addView(tweetView);
             }
 
             @Override
             public void failure(TwitterException exception) {
                 Log.d("TwitterKit", "Load Tweet failure", exception);
             }
-        });
+        });*/
     }
-
 
 }
