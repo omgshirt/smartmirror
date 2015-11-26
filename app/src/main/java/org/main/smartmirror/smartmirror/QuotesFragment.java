@@ -15,6 +15,8 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Fragment that displays the inspirational quotes
@@ -22,22 +24,28 @@ import java.util.Random;
 public class QuotesFragment extends Fragment {
 
     private TextView mquote;
+    private TextView mName;
     private TextView mTitle;
     private Typeface mQuoteFont;
     private Animation mFadeIn;
     private Animation mFadeOut;
     private static final String TAG = "QuotesFragment";
+    private Timer mTimer;
+    private TimerTask mTimerTask;
+    private Runnable mRunnable;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //new timer
+        mTimer=new Timer();
 
         // get the assets
         AssetManager assetManager = getContext().getAssets();
         // Loading Font Face
         mQuoteFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/AlexBrush.ttf");
         InputStream input;
-        final String[] parts;
+        final String[] parts,names,parts_no_name;
         byte[] buffer;
         //setting the fade in an out
         mFadeIn = new AlphaAnimation(0.0f, 1.0f);
@@ -62,30 +70,46 @@ public class QuotesFragment extends Fragment {
 
         //break the string to parts by lines
         parts = text.split("\n");
+        names=new String[parts.length];
+        parts_no_name=new String[parts.length];
+
+        //takes the name of the speaker into another array to put in the second textView
+        //finds the index of where '-' occurs
+        for (int x=0;x<parts.length;x++) {
+
+
+                int index = parts[x].indexOf('-');
+                String speaker_names = parts[x].substring(index);
+                names[x] = speaker_names;
+                parts_no_name[x] = parts[x].replaceAll(names[x], "");
+
+
+        }
+
+
         //Runnable thread portion
-        Runnable quoteRunnable = new Runnable() {
+          mRunnable = new Runnable() {
+              @Override
+              public void run() {
+
+                  Random quoteRandomizer = new Random();
+                  int random_number = quoteRandomizer.nextInt(parts.length);
+                  mquote.setText(parts_no_name[random_number]);
+                  mName.setText(names[random_number]);
+                  mquote.startAnimation(mFadeIn);
+                  mName.setAnimation(mFadeIn);
+
+              }
+
+
+          };
+        mTimerTask= new TimerTask() {
             @Override
             public void run() {
-                try {
-                    while (true) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Random quoteRandomizer = new Random();
-                                int random_number = quoteRandomizer.nextInt(176);
-                                mquote.setText(parts[random_number]);
-                                mquote.startAnimation(mFadeIn);
-                            }
-                        });
-                        Thread.sleep(10000L);
-                    }
-                } catch (InterruptedException iex) {
-
-                }
+                getActivity().runOnUiThread(mRunnable);
             }
         };
-        Thread quoteThread = new Thread(quoteRunnable);
-        quoteThread.start();
+
     }
 
     @Override
@@ -93,10 +117,12 @@ public class QuotesFragment extends Fragment {
         View view = inflater.inflate(R.layout.quotes_fragment, container, false);
         // read the string into a table object
         mquote = (TextView) view.findViewById(R.id.quote_settings_content);
+        mName = (TextView) view.findViewById(R.id.quote_settings_content2);
         mTitle= (TextView) view.findViewById(R.id.quote_settings_title);
         // Applying font
         mquote.setTypeface(mQuoteFont);
         mTitle.setTypeface(mQuoteFont);
+        mTimer.scheduleAtFixedRate(mTimerTask,0,10000);
         return view;
     }
 
@@ -104,6 +130,7 @@ public class QuotesFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.e(TAG, "OnDestroy");
+        mTimer.cancel();
 
     }
 
