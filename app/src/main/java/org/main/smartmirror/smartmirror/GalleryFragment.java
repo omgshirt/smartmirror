@@ -25,9 +25,9 @@ public class GalleryFragment extends Fragment {
     private ArrayList<String> mImageList;
     private Drawable mImageDrawable;
     private ImageView mGalleryItem;
+    private Runnable mRunnable;
     private Timer mTimer;
     private TimerTask mTimerTask;
-    private Runnable mRunnable;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
