@@ -37,11 +37,8 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
             AccessToken accessToken = new AccessToken(Constants.TWITTER_ACCESS_TOKEN, Constants.TWITTER_ACCESS_SECRET);
             Twitter twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
 
-            Paging paging = new Paging(1); // MAX 200 IN ONE CALL
+            Paging paging = new Paging(5); // MAX 200 IN ONE CALL
             List<twitter4j.Status> statuses = twitter.getHomeTimeline(paging);
-
-            StringBuilder sb = new StringBuilder();
-
 
             try {
 
@@ -62,7 +59,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                 Log.i("TWITTER JSON Parse ", "Didnt work");
             }
         }catch (Exception e) {
-            Log.i("Something's not right", "wtf");
+            Log.i("ERR ", "Something's not right");
 
         }
 
@@ -73,7 +70,6 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String message) {
-        Log.i("SUCCESS", " I think");
 
     }
 }
