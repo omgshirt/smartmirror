@@ -130,6 +130,10 @@ public class MainActivity extends AppCompatActivity
     private Sensor mLightSensor;
     private float mLightQuantity;
     private ScheduledFuture<?> sensingLight;
+    private boolean wasDark;
+    private boolean isDark;
+    private boolean wasBright;
+    private boolean isBright;
 
     // used to establish a service connection
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -752,6 +756,7 @@ public class MainActivity extends AppCompatActivity
         if (sensingLight != null) {
             sensingLight.cancel(true);
             mSensorManager = null;
+            System.out.println("Sensing Light STOP");
         }
     }
 

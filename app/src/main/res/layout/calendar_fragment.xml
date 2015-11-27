@@ -8,9 +8,16 @@
     android:layout_marginBottom="20dp"
     android:id="@+id/calendar">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/calendarTitle"
+        android:layout_gravity="center"
+        android:textSize="30dp"
+        android:text=""/>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/listViewNames"
-        />
+        android:id="@+id/listViewNames"/>
 </LinearLayout>
