@@ -20,12 +20,12 @@ disable remote /1e-3/
 settings /1e-4/
 scroll up /1e10/
 scroll down /1e10/
-start listening /1e-1/
-stop listening /1e-1/
+start listening /1e-5/
+stop listening /1e-5/
 take a picture /1e-2/
 traffic /1e5/
 twitter /1e5/
-wake up /1e-1/
+wake up /1e-3/
 weather /1e5/
 weather english /1e2/
 weather metric /1e2/

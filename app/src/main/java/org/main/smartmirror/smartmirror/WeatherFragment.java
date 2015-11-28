@@ -38,7 +38,7 @@ import java.util.Random;
  *              "forecast" speaks the 3-day forecast
  *              "conditions" speaks the current conditions
  */
-public class WeatherFragment extends Fragment implements LocationListener {
+public class WeatherFragment extends Fragment {
 
     Typeface weatherFont;
     Preferences mPreferences;
@@ -81,28 +81,9 @@ public class WeatherFragment extends Fragment implements LocationListener {
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         forecasts = new DailyForecast[3];
 
-        // TODO: Find current lat and long positions. This should be within its own class so other frags can use it.
-        // maybe store this value in preferences?
-        LocationManager locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-        Location location = null;
-        if (getActivity().checkCallingOrSelfPermission(LocationManager.GPS_PROVIDER) == PackageManager.PERMISSION_GRANTED) {
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
-        if (location != null) {
-            try {
-                mLatitude = Double.toString(location.getLatitude());
-                mLongitude = Double.toString(location.getLongitude());
-                Log.d("old","lat :  " + mLatitude);
-                Log.d("old","long :  " + mLongitude);
-                this.onLocationChanged(location);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
         // some static locations for now
-        mLatitude = "34";
-        mLongitude = "-118";
+        mLatitude = Double.toString(mPreferences.getLatitude());
+        mLongitude = Double.toString(mPreferences.getLongitude());
         startWeatherUpdate();
     }
 
@@ -413,28 +394,6 @@ public class WeatherFragment extends Fragment implements LocationListener {
         tv.setTypeface(weatherFont);
     }
 
-    // Location Listener Implementation
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.i("Location", "Location change detected");
-        mLatitude = Double.toString(location.getLatitude());
-        mLongitude = Double.toString(location.getLongitude());
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 
     // holds forecast data for one day
     private class DailyForecast {
