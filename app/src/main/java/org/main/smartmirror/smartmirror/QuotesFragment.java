@@ -1,48 +1,127 @@
 package org.main.smartmirror.smartmirror;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Fragment that displays the inspirational quotes
  */
 public class QuotesFragment extends Fragment {
-
-    private TextView mquote;
-    private TextView mTitle;
+    
+    private ArrayList<String> mQuotesList;
+    private Runnable mRunnable;
+    private TextView mQuoteContent;
+    private TextView mQuoteTitle;
+    private Timer mTimer;
+    private TimerTask mTimerTask;
     private Typeface mQuoteFont;
-    private Animation mFadeIn;
-    private Animation mFadeOut;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // get the assets
-        AssetManager assetManager = getContext().getAssets();
+        //instantiate the timer object
+        mTimer = new Timer();
         // Loading Font Face
         mQuoteFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/AlexBrush.ttf");
-        InputStream input;
-        final String[] parts;
-        byte[] buffer;
-        //setting the fade in an out
-        mFadeIn = new AlphaAnimation(0.0f, 1.0f);
-        mFadeIn.setDuration(3000);
 
-        mFadeOut = new AlphaAnimation(1.0f, 0.0f);
-        mFadeOut.setDuration(3000);
+        // Set-up the fade in
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator());
+        fadeIn.setDuration(5000);
+
+        // Set-up the fade out
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
+        fadeOut.setStartOffset(5000);
+        fadeOut.setDuration(5000);
+
+        // Create our animation
+        final AnimationSet animation = new AnimationSet(false);
+        animation.addAnimation(fadeIn);
+        animation.addAnimation(fadeOut);
+
+        // Get the quotes as an array list
+        mQuotesList = new ArrayList<>(Arrays.asList(getQuotes()));
+
+        // Set the runnable
+        mRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // Set the Random quote in the Text View
+                mQuoteContent.setText(getRandomQuote(mQuotesList.size()));
+                // Start the animation
+                mQuoteContent.startAnimation(animation);
+            }
+        };
+
+        // Set the timer task
+        mTimerTask  = new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(mRunnable);
+            }
+        };
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.quotes_fragment, container, false);
+        // Set-up the text views
+        mQuoteTitle= (TextView) view.findViewById(R.id.quote_title);
+        mQuoteContent = (TextView) view.findViewById(R.id.quote_content);
+
+        // Apply the font
+        mQuoteContent.setTypeface(mQuoteFont);
+        mQuoteTitle.setTypeface(mQuoteFont);
+        // Start the timer
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, 10000);
+        return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // kill the timer
+        mTimer.cancel();
+    }
+
+    /**
+     * Method that handles loading the quotes from assets/quotes and saves
+     * them into an array
+     * @return the quotes in a String array
+     */
+    public String[] getQuotes(){
+        // get the quotes
+        AssetManager assetManager = getContext().getAssets();
+        byte[] buffer;
+        InputStream input;
         String text = null;
+        String[] quotes;
         try {
             input = assetManager.open("quotes");
             int size = input.available();
@@ -52,49 +131,62 @@ public class QuotesFragment extends Fragment {
             // byte buffer into a string
             text = new String(buffer);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-
         //break the string to parts by lines
-        parts = text.split("\n");
-        //Runnable thread portion
-        Runnable quoteRunnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Random quoteRandomizer = new Random();
-                                int random_number = quoteRandomizer.nextInt(176);
-                                mquote.setText(parts[random_number]);
-                                mquote.startAnimation(mFadeIn);
-                            }
-                        });
-                        Thread.sleep(8000L);
-                    }
-                } catch (InterruptedException iex) {
+        quotes = text.split("\n");
+        return quotes;
+    }
 
-                }
+    /**
+     * Method that handles the picking a random quote based on
+     * a given number
+     * @param num the random number seed
+     * @return the selected random quote string
+     */
+    public String getRandomQuote(int num){
+        //TODO make sure that the quotes are truly random (they don't repeat)
+        Random quoteRandomizer = new Random();
+        int randNum = quoteRandomizer.nextInt(num);
+        return mQuotesList.get(randNum);
+    }
+
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("News", "Got message:\"" + message + "\"");
+            switch(message){
+                case MainActivity.BACK:
+                    getFragmentManager().popBackStack();
+                    break;
+
             }
-        };
-        Thread quoteThread = new Thread(quoteRunnable);
-        quoteThread.start();
+
+        }
+    };
+
+    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     *  voice recognition, the remote control, etc.
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.quotes_fragment, container, false);
-        // read the string into a table object
-        mquote = (TextView) view.findViewById(R.id.quote_settings_content);
-        mTitle= (TextView) view.findViewById(R.id.quote_settings_title);
-        // Applying font
-        mquote.setTypeface(mQuoteFont);
-        mTitle.setTypeface(mQuoteFont);
-        return view;
+    // when this goes out of view, halt listening
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
-
 }
