@@ -145,7 +145,7 @@ public class QuotesFragment extends Fragment {
      * @return the selected random quote string
      */
     public String getRandomQuote(int num){
-        //TODO make sure that the quotes are trully random (they don't repeat)
+        //TODO make sure that the quotes are truly random (they don't repeat)
         Random quoteRandomizer = new Random();
         int randNum = quoteRandomizer.nextInt(num);
         return mQuotesList.get(randNum);
