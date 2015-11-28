@@ -7,7 +7,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Quote of the day"
-        android:id="@+id/quote_settings_title"
+        android:id="@+id/quote_title"
         android:textSize="30dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
@@ -17,9 +17,9 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:textSize="30dp"
-        android:id="@+id/quote_settings_content"
+        android:id="@+id/quote_content"
         android:layout_gravity="center_vertical"
-        android:layout_below="@+id/quote_settings_title"
+        android:layout_below="@+id/quote_title"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="80dp" />
 

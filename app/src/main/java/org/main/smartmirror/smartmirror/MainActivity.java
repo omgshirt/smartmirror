@@ -38,6 +38,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -400,7 +402,12 @@ public class MainActivity extends AppCompatActivity
                 fragment = new CalendarFragment();
                 break;
             case CAMERA:
-                fragment = new CameraFragment();
+                if(mPreferences.isCameraEnabled()) {
+                    fragment = new CameraFragment();
+                }
+                else {
+                    Toast.makeText(this, "Camera Disabled. Please say 'Enable Camera' to change this setting.", Toast.LENGTH_LONG).show();
+                }
                 break;
             case FACEBOOK:
                 fragment = new FacebookFragment();

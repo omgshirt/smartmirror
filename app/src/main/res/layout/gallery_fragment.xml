@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/gallery_item"
+        android:scaleType="centerCrop"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
