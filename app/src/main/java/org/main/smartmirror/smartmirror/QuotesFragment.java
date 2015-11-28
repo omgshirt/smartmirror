@@ -31,8 +31,7 @@ import java.util.TimerTask;
  * Fragment that displays the inspirational quotes
  */
 public class QuotesFragment extends Fragment {
-
-    private static final String BACK="back";
+    
     private ArrayList<String> mQuotesList;
     private Runnable mRunnable;
     private TextView mQuoteContent;
@@ -164,7 +163,7 @@ public class QuotesFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("News", "Got message:\"" + message + "\"");
             switch(message){
-                case BACK:
+                case MainActivity.BACK:
                     getFragmentManager().popBackStack();
                     break;
 

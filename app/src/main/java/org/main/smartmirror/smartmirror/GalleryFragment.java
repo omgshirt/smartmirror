@@ -28,7 +28,6 @@ import java.util.TimerTask;
  */
 public class GalleryFragment extends Fragment {
 
-    private static final String BACK="back";
     private ArrayList<String> mImageList;
     private Drawable mImageDrawable;
     private ImageView mGalleryItem;
@@ -115,7 +114,7 @@ public class GalleryFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("News", "Got message:\"" + message + "\"");
             switch(message){
-                case BACK:
+                case MainActivity.BACK:
                     getFragmentManager().popBackStack();
                     break;
 
