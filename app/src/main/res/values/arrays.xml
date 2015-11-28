@@ -33,6 +33,7 @@
 
     <string-array name="help_settings">
         <item>Settings:</item>
+        <item> </item>
         <item>Mirror Brightness </item>
         <item>Night Light Brightness </item>
         <item>System Volume</item>
@@ -46,6 +47,7 @@
 
     <string-array name="help_settings2">
         <item>Speech Options: </item>
+        <item> </item>
         <item>VeryLow -->Very High</item>
         <item>VeryLow -->Very High </item>
         <item>OFF -->Very High</item>
@@ -93,11 +95,8 @@
     </string-array>
 
     <string-array name="news_settings">
-        <item>Say News Desk Name:</item>
+        <item>News Desk Name:</item>
         <item> </item>
-        <item></item>
-        <item> </item>
-        <item>sports</item>
         <item>foreign</item>
         <item>technology</item>
         <item>books</item>
@@ -106,8 +105,6 @@
         <item>education</item>
     </string-array>
     <string-array name="news_settings2">
-        <item>  </item>
-        <item>  </item>
         <item>  </item>
         <item>  </item>
         <item>food</item>
