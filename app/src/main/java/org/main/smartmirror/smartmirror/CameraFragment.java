@@ -5,6 +5,8 @@ package org.main.smartmirror.smartmirror;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -39,6 +41,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -66,6 +69,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
 
     private static Drive service;
     private GoogleAccountCredential credential;
+
+    //Preview image before uploading Variables
+    ImageView previewImage;
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -402,6 +408,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         String accountName = ("smartmirrortesting@gmail.com");
         credential.setSelectedAccountName(accountName);
         service = getDriveService(credential);
+        previewImage = (ImageView)getActivity().findViewById(R.id.imagePreview);
         return view;
     }
 
@@ -839,6 +846,13 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         switch (view.getId()) {
             case R.id.picture: {
                 takePicture();
+                previewImage = (ImageView)getActivity().findViewById(R.id.imagePreview);
+
+                Bitmap bitmap;
+                BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+
+                bitmap = BitmapFactory.decodeFile(mFile.getAbsolutePath(), bitmapOptions);
+                previewImage.setImageBitmap(bitmap);
                 break;
             }
         }
