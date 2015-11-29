@@ -1,96 +1,122 @@
 package org.main.smartmirror.smartmirror;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import com.twitter.sdk.android.core.*;
-import com.twitter.sdk.android.core.identity.*;
+import android.widget.TextView;
 
 import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.tweetui.TweetUtils;
 import com.twitter.sdk.android.tweetui.TweetView;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Logger;
-
 import io.fabric.sdk.android.Fabric;
 
 public class TwitterFragment extends Fragment {
 
-    private static final String mTWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
-    private static final String mTWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
-
-    public TwitterFragment() {}
-    //TwitterAuthClient authClient;
-    TwitterAuthConfig authConfig;
-
-    private TwitterLoginButton loginButton;
+    int mTweetNumber = 0;
+    TweetView tweetView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
 
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
+        Fabric.with(getActivity(), new Twitter(authConfig));
 
-        authConfig = new TwitterAuthConfig(mTWITTER_KEY, mTWITTER_SECRET);
-        Fabric.with(super.getActivity(), new Twitter(authConfig));
+        View view = inflater.inflate(R.layout.twitter_fragment, container, false);
 
-        View view = inflater.inflate(R.layout.twitter_login_fragment, container, false);
-
-/*        authClient = new TwitterAuthClient();
-        authClient.authorize(getActivity(), new Callback<TwitterSession>() {
+        // show initial tweet
+        final ViewGroup parentView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
+        long tweetIds[] = {631879971628183552L, 503435417459249153L, 510908133917487104L, 473514864153870337L, 477788140900347904L};
+        long currentTweet = tweetIds[mTweetNumber];
+        TweetUtils.loadTweet(currentTweet, new Callback<Tweet>() {
             @Override
-            public void success(Result<TwitterSession> twitterSessionResult) {
-                Log.i("status: ", "SUCCESS!");
-            }
-
-            @Override
-            public void failure(TwitterException e) {
-                Log.i("status: ", "ERROR!");
-            }
-        });*/
-
-        loginButton = (TwitterLoginButton) view.findViewById(R.id.twitter_login_button);
-
-        loginButton.setCallback(new Callback<TwitterSession>() {
-            @Override
-            public void success(Result<TwitterSession> result) {
-
-                TwitterSession session = result.data;
-
-                String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
-                Toast.makeText(getActivity().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+            public void success(Result<Tweet> result) {
+                //TweetView tweetView = new TweetView(getActivity(), result.data);
+                tweetView = new TweetView(getActivity(), result.data);
+                parentView.addView(tweetView);
             }
 
             @Override
             public void failure(TwitterException exception) {
-                Log.d("TwitterKit", "Login with Twitter failure", exception);
+                Log.d("TwitterKit", "Load Tweet failure", exception);
             }
         });
+
+
 
         return view;
     }
 
+    // ----------------------- Local Broadcast Receiver -----------------------
 
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("Twitter ", "Got message:\"" + message +"\"");
+            switch (message) {
+                case MainActivity.mNEXTTWEET:
+                    mTweetNumber++;
+                    tweetView.removeAllViews();
+                    if(mTweetNumber > 4)
+                        mTweetNumber = 0;
+                    showTweets(mTweetNumber);
+                    break;
+            }
+        }
+    };
+
+    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     *  voice recognition, the remote control, etc.
+     */
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        loginButton.onActivityResult(requestCode, resultCode, data);
-        /*Fragment fragment = getFragmentManager().findFragmentById(R.id.twitter_login_button);
-        if (fragment != null) {
-            fragment.onActivityResult(requestCode, resultCode, data);
-        }*/
+    public void onResume(){
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
+    }
 
+    // when this goes out of view, halt listening
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    public void showTweets(int tw) {
+
+        final ViewGroup parentView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
+        long tweetIds[] = {631879971628183552L, 503435417459249153L, 510908133917487104L, 473514864153870337L, 477788140900347904L};
+        long currentTweet = tweetIds[tw];
+        TweetUtils.loadTweet(currentTweet, new Callback<Tweet>() {
+            @Override
+            public void success(Result<Tweet> result) {
+                tweetView = new TweetView(getActivity(), result.data);
+                parentView.addView(tweetView);
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                Log.d("TwitterKit", "Load Tweet failure", exception);
+            }
+        });
     }
 
 

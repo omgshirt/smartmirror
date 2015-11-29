@@ -4,6 +4,66 @@
         <item>sports</item>
         <item>foreign</item>
         <item>technology</item>
+        <item>books</item>
+        <item>business</item>
+        <item>cars</item>
+        <item>education</item>
+        <item>food</item>
+        <item>health</item>
+        <item>movies</item>
+        <item>politics</item>
+        <item>science</item>
+        <item>television</item>
+        <item>world</item>
+    </string-array>
+
+    <!--Help Array-->
+
+    <string-array name="help_array">
+        <item>If you want to go to Calendar say Calendar</item>
+        <item>If you want to go to Camera  say Camera </item>
+        <item>If you want to go to Light say Light</item>
+        <item>If you want to go to News say News</item>
+        <item>If you want to go to Music say Music</item>
+        <item>If you want to go to Settings say Settings</item>
+        <item>If you want to go to Weather say Weather</item>
+        <item>If you want to go to Help say Help</item>
+    </string-array>
+
+
+    <string-array name="help_settings">
+
+        <item>To change the Mirror Brightness say (Very Low,Low,Medium,High,Very High)</item>
+        <item>To change the Night Light Brightness say (Very Low,Low,Medium,Very High)</item>
+        <item>To change the System Volume say (Off,Very Low,Low,Medium, High,Very High)</item>
+        <item>To change the Music Volume say (Off,Very Low,Low,Medium,High,Very High)</item>
+        <item>To change the Speech Frequency say (Never,Rarely,Often,Always)</item>
+        <item>To use the Camera say (Off,On)</item>
+        <item>To use Voice Recognition say (Off, On)</item>
+        <item>To use Remote Control say (Off, On</item>
+        <item>To switch between Weather units say (Metric,English</item>
+
+    </string-array>
+
+    <string-array name="smart_help_array">
+        <item>News</item>
+        <item> Calendar </item>
+        <item>Light</item>
+        <item> Weather</item>
+        <item> Settings</item>
+        <item> Off</item>
+        <item> Traffic</item>
+        <item>Weather</item>
+        <item> Help</item>
+        <item>Camera</item>
+    </string-array>
+
+    <string-array name="news_settings">
+        <item>To access the different news desk say their Name</item>
+        <item>News Desk choices are:</item>
+        <item>sports</item>
+        <item>foreign</item>
+        <item>technology</item>
         <item>arts</item>
         <item>autmobiles</item>
         <item>blogs</item>

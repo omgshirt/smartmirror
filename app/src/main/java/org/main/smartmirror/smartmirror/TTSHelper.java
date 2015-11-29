@@ -1,6 +1,7 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
@@ -19,6 +20,7 @@ public class TTSHelper{
     private static TextToSpeech.OnInitListener mTextToSpeechListener;
     private static String mTextToSpeak;
     private int messageId = 0;
+
 
     public TTSHelper(Context c) {
         mContext = c;
@@ -39,7 +41,7 @@ public class TTSHelper{
                         public void onDone(String utteranceId){
                             ((MainActivity)mContext).startSpeechRecognition();
                             mIsSpeaking = false;
-                            stop();  // stop() discards other phrases in queue...
+                            //stop();  // stop() discards other phrases in queue...
                         }
 
                         @Override
@@ -62,7 +64,7 @@ public class TTSHelper{
      */
     public void speakText(String text) {
         Random rand = new Random();
-        Preferences prefs = Preferences.getInstance();
+        Preferences prefs = Preferences.getInstance((MainActivity)mContext);
         if (rand.nextFloat() < prefs.getSpeechFrequency()) {
             start(text);
         }
@@ -95,7 +97,9 @@ public class TTSHelper{
         // Map passes in the UtteranceProgressListener so we can handle callbacks from the TTS.speak event
         HashMap<String, String> map = new HashMap<>();
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, Integer.toString(messageId++));
+        // String.valueOf(AudioManager.STREAM_NOTIFICATION); // param to set TTS to use NOTIFICATION stream
         mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
+        Log.i("TTS", "speak:\"" + mTextToSpeak + "\"");
     }
 
     public boolean isSpeaking() {

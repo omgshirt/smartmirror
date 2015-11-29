@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.FragmentManager;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,7 +12,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -26,7 +26,6 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -40,10 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import io.fabric.sdk.android.Fabric;
-import java.util.Arrays;
+
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -55,47 +51,62 @@ public class MainActivity extends AppCompatActivity
         WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, SensorEventListener {
 
     // Globals, prefs, debug flags
-    private final boolean DEBUG = true;
+    public static final boolean DEBUG = true;
 
     private static Context mContext;
     private Preferences mPreferences;
-    
-    //twitter keys
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
-    private static final String TWITTER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
 
     // Constants
     public static final String TAG = "SmartMirror";
 
+    public static final String BACK = "back";
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
-    public static final String CONDITIONS = "conditions";
-    public static final String FORECAST = "forecast";
-    public static final String LIGHT = "light";
+    public static final String GALLERY = "gallery";
+    public static final String GO_BACK = "go back";
+    public static final String GO_TO_SLEEP = "go to sleep";
+    public static final String HELP = "help";
+    public static final String SHOW_HELP = "show help";
+    public static final String HIDE_HELP ="hide help";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
+    public static final String NIGHT_LIGHT = "night light";
     public static final String OFF = "off";
     public static final String ON = "on";
+    public static final String OPTIONS = "options";
+    public static final String REMOTE = "remote";
+    public static final String SCROLL_UP = "scroll up";
+    public static final String SCROLL_DOWN = "scroll down";
     public static final String SETTINGS = "settings";
     public static final String SLEEP = "sleep";
     public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
     public static final String WAKE = "wake";
+    public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
+    public static final String QUOTES = "quotes";
 
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
+    // scrolling
+    public static final String mSCROLLUP = "scroll up";
+    public static final String mSCROLLDOWN = "scroll down";
+    public static final String mNEXTTWEET = "next";
+
+    // Help
+    private HelpDialog mHelpDialog;
+
+    // Light Sensor
+    private SensorManager mSensorManager;
+    private Sensor mLightSensor;
+    private boolean mLightIsOff;
+    private ScheduledFuture<?> sensingLight;
+
     // News
-    private String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-    private String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
-    private String mPostURL = "&sort=newest&api-key=";
-    private String mNewsDesk;
-    private String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-    private String mNYTURL = mPreURL + mNewsDesk + mPostURL;
+    public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
 
     // Sleep state & wakelocks
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
@@ -124,16 +135,6 @@ public class MainActivity extends AppCompatActivity
     private Messenger mMessenger = new Messenger(new IHandler());
     private boolean mIsBound;
     private Messenger mService;
-
-    //Light Sensor
-    private SensorManager mSensorManager;
-    private Sensor mLightSensor;
-    private float mLightQuantity;
-    private ScheduledFuture<?> sensingLight;
-    private boolean wasDark;
-    private boolean isDark;
-    private boolean wasBright;
-    private boolean isBright;
 
     // used to establish a service connection
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -186,12 +187,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(authConfig));
 
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
-        mPreferences = Preferences.getInstance();
+        mPreferences = Preferences.getInstance(this);
 
         // check for permission to write system settings on API 23 and greater.
         // Leaving this in case we need the WRITE_SETTINGS permission later on.
@@ -214,6 +213,9 @@ public class MainActivity extends AppCompatActivity
         mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
         discoverPeers();
+
+        // Light Sensor for waking / sleeping
+        initializeLightSensor();
 
         // Set up view and nav drawer
         setContentView(R.layout.activity_main);
@@ -257,7 +259,6 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
-        stopLightSensor();
         bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mIsBound=true;
         mirrorSleepState = AWAKE;
@@ -271,7 +272,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onRestart() {
+    protected void onRestart(){
         super.onRestart();
         stopWifiHeartbeat();
     }
@@ -280,7 +281,7 @@ public class MainActivity extends AppCompatActivity
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
-        mPreferences.setAppBrightness(this);
+        mPreferences.resetScreenBrightness();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
     }
@@ -297,7 +298,6 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         mirrorSleepState = SLEEPING;
-        startLightSensor();
         Log.i(TAG, "onStop");
     }
 
@@ -340,7 +340,6 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
-        mirrorSleepState = AWAKE;
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -392,78 +391,99 @@ public class MainActivity extends AppCompatActivity
      */
     public void displayView(String viewName){
         Fragment fragment = null;
-        String title = getString(R.string.app_name);
         // If sleeping, save viewName and wake screen. Otherwise ignore command.
-        // displayView will be called again from onStart() with the fragment to show
         Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-            if (!viewName.equals(WAKE)) return;
+            if (!viewName.equals(WAKE) && !viewName.equals(NIGHT_LIGHT)) return;
         }
 
         switch (viewName) {
+            case CALENDAR:
+                fragment = new CalendarFragment();
+                break;
+            case CAMERA:
+                if(mPreferences.isCameraEnabled()) {
+                    fragment = new CameraFragment();
+                }
+                else {
+                    Toast.makeText(this, "Camera Disabled. Please say 'Enable Camera' to change this setting.", Toast.LENGTH_LONG).show();
+                }
+                break;
+            case FACEBOOK:
+                fragment = new FacebookFragment();
+                break;
+            case GALLERY:
+                fragment = new GalleryFragment();
+                break;
+            case HELP:
+                mHelpDialog = HelpDialog.newInstance(getCurrentFragment());
+                mHelpDialog.show(getFragmentManager(), "HelpDialog");
+                break;
+            case HIDE_HELP:
+                if (mCurrentFragment.equals(HELP)) {
+                    // call dismiss on fragment?
+                }
+                break;
             case NEWS:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("url", mDefaultURL);
                 fragment.setArguments(bundle);
-                title = NEWS;
                 break;
-            case CALENDAR:
-                fragment = new CalendarFragment();
-                title = CALENDAR;
+            case NIGHT_LIGHT:
+                stopLightSensor();
+                if (mirrorSleepState == SLEEPING) {
+                    mCurrentFragment = NIGHT_LIGHT;
+                    wakeScreen();
+                    return;
+                } else {
+                    mirrorSleepState = AWAKE;
+                    fragment = new LightFragment();
+                }
                 break;
-            case LIGHT:
-                fragment = new LightFragment();
-                title = LIGHT;
-                break;
-            case WEATHER:
-                fragment = new WeatherFragment();
-                title = WEATHER;
+            case QUOTES:
+                fragment = new QuotesFragment();
                 break;
             case SETTINGS:
+            case OPTIONS:
                 fragment = new SettingsFragment();
-                title = SETTINGS;
                 break;
-            case CAMERA:
-                fragment = new CameraFragment();
-                title = CAMERA;
+            case SLEEP:
+                fragment = new OffFragment();
+                startLightSensor();
+                mirrorSleepState = LIGHT_SLEEP;
+                break;
+            case TWITTER:
+                fragment = new TwitterFragment();
                 break;
             case WAKE:
+                stopLightSensor();
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
                 } else {
-                    mirrorSleepState = AWAKE;
+                    // displayView will be called again from onStart() with the fragment to show
                     wakeScreen();
                     return;
                 }
                 break;
-            case TWITTER:
-                fragment = new TwitterFragment();
-                title = TWITTER;
-                break;
-            case FACEBOOK:
-                fragment = new FacebookFragment();
-                title = FACEBOOK;
-                break;
-            case SLEEP:
-                fragment = new OffFragment();
-                mirrorSleepState = LIGHT_SLEEP;
-                title = SLEEP;
+            case WEATHER:
+                fragment = new WeatherFragment();
                 break;
             default:
                 // The command isn't one of the view swap instructions,
-                // so broadcast the viewName (our input) to any listening fragments.
+                // so broadcast the viewName (our input) to any listeners.
                 broadcastMessage("inputAction", viewName);
                 break;
         }
 
-        startTTS(viewName);
-
-        // If we're changing fragments, stop speech, set the wake state, and do the transaction
+        // If we're changing fragments set the wake state and do the transaction
         if(fragment != null){
-            if(DEBUG)
+            if(DEBUG) {
                 Log.i("displayView", "Displaying: " + viewName);
+                startTTS(viewName);
+            }
+
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
 
@@ -476,10 +496,6 @@ public class MainActivity extends AppCompatActivity
             } else {
                 Log.e("Fragments", "commit skipped. isFinishing() returned true");
             }
-        }
-
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setTitle(title);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -498,13 +514,13 @@ public class MainActivity extends AppCompatActivity
     // ----------------------- SPEECH RECOGNITION --------------------------
 
     /**
-     * Handles the result of the speech input
+     * Handles the result of the speech input. Conform voice inputs into standard commands
+     * used by the remote.
      * @param input the command the user gave
      */
     public void speechResult(String input) {
-
         String voiceInput = input.trim();
-
+        Log.i("VR", "speechResult:"+input);
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
@@ -513,71 +529,57 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        displayView(voiceInput);
-
-        /*
-            BYPASSING THIS BLOCK FOR NOW - WE WONT NEED THIS SWITCH CASE
-
-
-        // Process voiceInput to make it fit with accepted commands
-        try {
-            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
-            int i = 0;
-            while (i < urlArr.length) {
-                if (voiceInput.contains(urlArr[i])) {
-                    mNewsDesk = urlArr[i];
-                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
-                    mDefaultURL = mNYTURL;
-                    if(DEBUG)
-                        Log.i("voice news desk: ", urlArr[i]);
-                    break;
-                } else {
-                    i++;
-                    if(DEBUG) {
-                        //Log.i("news desk: ", Arrays.toString(urlArr));
-                        //Log.i("I heard: ", voiceInput);
-                    }
-                }
-            }
-            if(DEBUG)
-                Log.i("I heard: ", voiceInput);
-            if (voiceInput.contains(CALENDAR)) {
-                startTTS(CALENDAR);
-                displayView(CALENDAR);
-            }else if (voiceInput.contains(CAMERA)){
-                startTTS(CAMERA);
-                displayView(CAMERA);
-            } else if (voiceInput.contains(WEATHER)) {
-                startTTS(WEATHER);
-                displayView(WEATHER);
-            } else if (voiceInput.contains(LIGHT)) {
-                startTTS(LIGHT);
-                displayView(LIGHT);
-            } else if (voiceInput.contains(SETTINGS)) {
-                startTTS(SETTINGS);
-                displayView(SETTINGS);
-            } else if (voiceInput.contains(NEWS)) {
-                startTTS(NEWS);
-                mDefaultURL = mNewsDefault;
-                displayView(NEWS);
-            } else if(voiceInput.contains(OFF) || voiceInput.contains(SLEEP)){
-                displayView(SLEEP);
-            } else if (voiceInput.contains(FACEBOOK)) {
-                startTTS(FACEBOOK);
-                displayView(FACEBOOK);
-            } else if (voiceInput.contains(TWITTER)) {
-                startTTS(TWITTER);
-                displayView(TWITTER);
-            } else if (voiceInput.contains(mNewsDesk)) {
-                startTTS(mNewsDesk);
-                displayView(NEWS);
-            }
-        }catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Didn't catch that",
-                    Toast.LENGTH_LONG).show();
-            startTTS("Didn't catch that");
+        if(voiceInput.contains(NIGHT_LIGHT)) {
+            voiceInput = NIGHT_LIGHT;
         }
-        */
+
+        // Some silliness to solve "weather" showing up too many times
+        if(voiceInput.contains(WEATHER)) {
+            if (voiceInput.contains("english")) {
+                voiceInput = Preferences.CMD_WEATHER_ENGLISH;
+            } else if (voiceInput.contains("metric")) {
+                voiceInput = Preferences.CMD_WEATHER_METRIC;
+            }
+        }
+        // Junk fix for remote
+        if(voiceInput.contains(REMOTE)) {
+            if (voiceInput.contains("enable")) {
+                voiceInput = Preferences.CMD_REMOTE_ON;
+            } else if (voiceInput.contains("disable")) {
+                voiceInput = Preferences.CMD_REMOTE_OFF;
+            }
+        }
+        // more garbage...
+        if(voiceInput.contains(CAMERA)) {
+            if (voiceInput.contains("enable")) {
+                voiceInput = Preferences.CMD_CAMERA_ON;
+            } else if (voiceInput.contains("disable")) {
+                voiceInput = Preferences.CMD_CAMERA_OFF;
+            }
+        }
+
+        // Normalize speech commands to match remote control versions.
+        switch (voiceInput) {
+            case GO_BACK:
+                voiceInput = BACK;
+                break;
+            case GO_TO_SLEEP:
+                voiceInput = SLEEP;
+                break;
+            case HIDE_HELP:
+                break;
+            case OPTIONS:
+                voiceInput = SETTINGS;
+                break;
+            case SHOW_HELP:
+                voiceInput = HELP;
+                break;
+            case WAKE_UP:
+                voiceInput = WAKE;
+                break;
+        }
+
+        displayView(voiceInput);
     }
 
     /**
@@ -598,6 +600,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void stopSpeechRecognition(){
         try {
+            Log.i("VR", "stopSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
@@ -607,6 +610,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // --------------------------------- Text to Speech (TTS) ---------------------------------
+
 
     /**
      * Say a phrase using text to speech
@@ -631,13 +635,27 @@ public class MainActivity extends AppCompatActivity
      * Stop Text to Speech
      */
     public void stopTTS() {
-        if (mTTSHelper != null) {
-            mTTSHelper.stop();
-        }
+        if (mTTSHelper != null) { mTTSHelper.stop(); }
+    }
+
+    public boolean isTTSSpeaking() {
+        return ( mTTSHelper != null && mTTSHelper.isSpeaking() );
     }
 
     // ------------------------------  WIFI P2P  ----------------------------------
 
+    /**
+     * Callback from RemoteServerAsyncTask when a command is received from the remote control.
+     * @param command String: received command
+     */
+    public void handleRemoteCommand(String command) {
+        if (mPreferences.isRemoteEnabled())
+            displayView(command);
+        else {
+            Log.i("Remote", "Disabled. ignored:\"" + command + "\"");
+        }
+
+    }
 
     // calls the P2pManager to refresh peer list
     public void discoverPeers() {
@@ -718,7 +736,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i("Wifi", "Heartbeat: discoverPeers()" );
             }
         };
-        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 60, 60,
+        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 360, 360,
                 TimeUnit.SECONDS);
     }
 
@@ -729,61 +747,40 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //new york times branding
-    public void toNYT(View v) {
-        String url = "http://developer.nytimes.com/";
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
+    // --------------------------- LIGHT SENSSOR --------------------------------------
+
+    private void initializeLightSensor(){
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
     }
 
-    private void startLightSensor() {
-        ScheduledThreadPoolExecutor scheduler2 = (ScheduledThreadPoolExecutor)
-                Executors.newScheduledThreadPool(1);
-
-        final Runnable sensingLightTask = new Runnable() {
-            @Override
-            public void run() {
-                detectLight();
-                Log.i("LightSensor", "Detecting: detectLight()" );
-            }
-        };
-        sensingLight = scheduler2.scheduleAtFixedRate(sensingLightTask, 5, 5,
-                TimeUnit.SECONDS);
+    public void startLightSensor() {
+        mLightIsOff = false;
+        mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void stopLightSensor() {
-        if (sensingLight != null) {
-            sensingLight.cancel(true);
-            mSensorManager = null;
-            System.out.println("Sensing Light STOP");
-        }
-    }
-
-    public void detectLight() {
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    //Do something here if sensor accuracy changes
+        //Do something here if sensor accuracy changes
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        mLightQuantity = event.values[0];
+        float currentLight = event.values[0];
+        System.out.println("LightSENSORWORKING???");
+        Log.i("LightSensor", Float.toString(currentLight));
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(event.values[0]>=0 && event.values[0]<=15){
-                //do nothing, room is dark
-                System.out.println("Light Level below 15");
-            }
-            else if(event.values[0]>15){
-               // if(mirrorSleepState==SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-                    displayView(WAKE);
-                    System.out.println("Light Level above 15");
-                //}
+            if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
+            if(currentLight < .1 ){//.1
+                mLightIsOff = true;
+                Log.i("LightSensor", "lights off. value:" + currentLight);
+            } else if(currentLight > 3 && mLightIsOff ){//3
+                // the sensor sees some light, but the lights were "off" last poll. turn on the screen!
+                displayView(WAKE);
             }
         }
     }

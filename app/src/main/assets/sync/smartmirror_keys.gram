@@ -1,58 +1,50 @@
 calendar /1e-3/
 camera /1e-3/
+enable camera /1e-3/
+disable camera /1e-3/
+conditions /1e-5/
 facebook /1e-2/
 forecast /1e-2/
-hangman /1e-2/
-help /1e-1/
-light /1e5/
-news /1e5/
-music /1e-2/
-options /1e-3/
-off /1e5/
-on /1e5/
-quotes /1e-2/
+gallery /1e-2/
+go to sleep /1e-21/
+go back /1e10/
+hangman /1e1/
+show help /1e1/
+hide help /1e6/
+news /1e10/
+night light /1e-5/
+options /1e-2/
+quotes /1e5/
+enable remote /1e-3/
+disable remote /1e-3/
 settings /1e-4/
-sleep /1e20/
-sports /1e-1/
-technology /1e-4/
-traffic /1e-2/
-twitter /1e-2/
-wake /1e1/
-wakeup /1e-3/
-weather /1e-2/
-brightness very low /1e-5/
-brightness low /1e-3/
-brightness medium /1e-5/
-brightness high /1e-3/
-brightness very high /1e-5/
-camera on /1e-4/
-camera off /1e-4/
-light very low /1e-4/
-light low /1e-3/
-light medium /1e-4/
-light high /1e-2/
-light very high /1e-4/
-listen on /1e-2/
-listen off /1e-2/
-music very low /1e-5/
-music low /1e-3/
-music medium /1e-3/
-music high /1e-3/
-music very high /1e-5/
-remote on /1e-3/
-remote off /1e-3/
-speech never /1e-3/
-speech rare /1e-2/
-speech often /1e-3/
-speech always /1e-3/
-start listening /1e-4/
-stop listening /1e-4/
-volume very low /1e-5/
-volume low /1e-3/
-volume medium /1e-5/
-volume high /1e-3/
-volume very high /1e-5/
-voice recognition off /1e-6/
-voice recognition on /1e-6/
-weather metric /1e-4/
-weather english /1e-4/
+scroll up /1e10/
+scroll down /1e10/
+start listening /1e-1/
+stop listening /1e-1/
+take a picture /1e-2/
+traffic /1e5/
+twitter /1e5/
+wake up /1e-1/
+weather /1e5/
+weather english /1e2/
+weather metric /1e2/
+screen brightness very low /1e-5/
+screen brightness low /1e-5/
+screen brightness medium /1e-5/
+screen brightness high /1e-5/
+screen brightness very high /1e-5/
+sports /1e10/
+foreign /1e5/
+technology /1e-3/
+books /1e10/
+business /1e5/
+cars /1e10/
+education /1e1/
+food /1e10/
+health /1e20/
+movies/1e10/
+politics /1e-1/
+science /1e3/
+television /1e-3/
+world /1e10/

@@ -1,29 +1,41 @@
 package org.main.smartmirror.smartmirror;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONObject;
 
-//fetch news from New York Times
-//article search api key:89899870d1024b962dc582806e3e9c34:3:73303333
-//api: http://api.nytimes.com/svc/search/v2/articlesearch
-//uri structure: http://api.nytimes.com/svc/search/v2/articlesearch.response-format?[q=search term&fq=filter-field:(filter-term)&additional-params=values]&api-key=####
-
 public class NewsFragment extends Fragment {
+    public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
+    public static String mPostURL = "&sort=newest&api-key=";
+    public static String mNewsDesk;
+    public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     private TextView mTxtHeadline;
     private TextView mTxtHeadline2;
     private TextView mTxtHeadline3;
     private TextView mTxtHeadline4;
     private TextView mTxtHeadline5;
+    private TextView mTxtHeadline6;
+    private TextView mTxtHeadline7;
+    private TextView mTxtHeadline8;
+    private ImageButton mNYTButton;
 
     Handler mHandler = new Handler();
 
@@ -35,29 +47,51 @@ public class NewsFragment extends Fragment {
 
     public NewsFragment() {}
 
+    String mApiKey;
+    String mNewURL;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
+
+        // Initialize Items
+        mNYTButton  = (ImageButton)view.findViewById(R.id.btnNYTbranding);
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
         mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
         mTxtHeadline3 = (TextView)view.findViewById(R.id.headline3);
         mTxtHeadline4 = (TextView)view.findViewById(R.id.headline4);
         mTxtHeadline5 = (TextView)view.findViewById(R.id.headline5);
+        mTxtHeadline6 = (TextView)view.findViewById(R.id.headline6);
+        mTxtHeadline7 = (TextView)view.findViewById(R.id.headline7);
+        mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
 
         mTxtHeadline.setText("");
         mTxtHeadline2.setText("");
         mTxtHeadline3.setText("");
         mTxtHeadline4.setText("");
         mTxtHeadline5.setText("");
+        mTxtHeadline6.setText("");
+        mTxtHeadline7.setText("");
+        mTxtHeadline8.setText("");
 
-        super.onCreate(savedInstanceState);
+        // set onClickListener
+        mNYTButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = getString(R.string.nyt_url);
+                Intent intntNYT = new Intent(Intent.ACTION_VIEW);
+                intntNYT.setData(Uri.parse(url));
+                startActivity(intntNYT);
+            }
+        });
+
         Bundle args = getArguments();
         if (args != null) {
             // Use initialisation data
         }
-        String apiKey = getString(R.string.nyt_api_key);
+        mApiKey = getString(R.string.nyt_api_key);
 
         String newsURL = this.getArguments().getString("url");
-        newsURL += apiKey;
+        newsURL += mApiKey;
         updateNews(newsURL);
 
 
@@ -65,6 +99,52 @@ public class NewsFragment extends Fragment {
 
     }
 
+
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+            int i = 0;
+            while (i < urlArr.length) {
+                if (message.contains(urlArr[i])) {
+                    mNewsDesk = urlArr[i];
+                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                    mNewURL = mNYTURL + mApiKey;
+                    Log.i("voice news desk: ", urlArr[i]);
+                    break;
+                } else {
+                    i++;
+                    Log.i("I heard: ", message);
+                }
+            }
+            Log.d("News", "Got message:\"" + message +"\"");
+            updateNews(mNewURL);
+        }
+    };
+
+    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     *  voice recognition, the remote control, etc.
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
+    }
+
+    // when this goes out of view, halt listening
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
 
     // Get news headlines from api and display
     private void updateNews(final String query){
@@ -103,27 +183,17 @@ public class NewsFragment extends Fragment {
             JSONObject headline = null;
 
             int i = 0;
-            int numFeeds = 5;
+            int numFeeds = 8;
             while (i < numFeeds) {
-                //Log.i("NYT_API", json.toString());
                 response = json.getJSONObject("response");
                 docs = response.getJSONArray("docs").getJSONObject(i);
                 snippet = docs.getString("snippet");
                 headline = docs.getJSONObject("headline");
                 hl[i] = headline.getString("main");
-
                 newsFeed[i] = snippet;
-                //Log.i("news string : ", newsFeed[i]);
                 i++;
             }
 
-            //mTxtHeadline.setText(headline.getString("main") + "\n" + snippet);
-
-            /*mTxtHeadline.setText(hl[0] + "\n" + newsFeed[0] + "\n");
-            mTxtHeadline2.setText(hl[1] + "\n" + newsFeed[1] + "\n");
-            mTxtHeadline3.setText(hl[2] + "\n" + newsFeed[2] + "\n");
-            mTxtHeadline4.setText(hl[3] + "\n" + newsFeed[3] + "\n");
-            mTxtHeadline5.setText(hl[4] + "\n" + newsFeed[4] + "\n");*/
 
             //mytextview.setText(Html.fromHtml(sourceString)); //format
 
@@ -141,6 +211,15 @@ public class NewsFragment extends Fragment {
 
             String txt4 = "<b>" + hl[4] + "</b> " + "<br>" + newsFeed[4] + "<br>";
             mTxtHeadline5.setText(Html.fromHtml(txt4));
+
+            String txt5 = "<b>" + hl[5] + "</b> " + "<br>" + newsFeed[5] + "<br>";
+            mTxtHeadline6.setText(Html.fromHtml(txt5));
+
+            String txt6 = "<b>" + hl[6] + "</b> " + "<br>" + newsFeed[6] + "<br>";
+            mTxtHeadline7.setText(Html.fromHtml(txt6));
+
+            String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + newsFeed[7] + "<br>";
+            mTxtHeadline8.setText(Html.fromHtml(txt7));
 
         }catch(Exception e){
             Log.e("SPORTS ERROR", e.toString());

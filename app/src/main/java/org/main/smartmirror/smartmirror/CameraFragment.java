@@ -1,12 +1,14 @@
 package org.main.smartmirror.smartmirror;
-/**
- * Created by Master N on 11/20/2015.
- */
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -119,12 +121,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
     /**
      * Max preview width that is guaranteed by Camera2 API
      */
-    private static final int MAX_PREVIEW_WIDTH = 1920;
+    private static final int MAX_PREVIEW_WIDTH = 1080;
 
     /**
      * Max preview height that is guaranteed by Camera2 API
      */
-    private static final int MAX_PREVIEW_HEIGHT = 1080;
+    private static final int MAX_PREVIEW_HEIGHT = 1920;
 
     /**
      * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
@@ -570,9 +572,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
     }
 
     private void openCamera(int width, int height) {
-        if (getActivity().checkSelfPermission(Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getActivity().checkSelfPermission(Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
         }
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
@@ -846,13 +850,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         switch (view.getId()) {
             case R.id.picture: {
                 takePicture();
-                previewImage = (ImageView)getActivity().findViewById(R.id.imagePreview);
-
-                Bitmap bitmap;
-                BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-
-                bitmap = BitmapFactory.decodeFile(mFile.getAbsolutePath(), bitmapOptions);
-                previewImage.setImageBitmap(bitmap);
                 break;
             }
         }

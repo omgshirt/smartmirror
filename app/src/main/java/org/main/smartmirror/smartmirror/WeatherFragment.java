@@ -43,6 +43,10 @@ public class WeatherFragment extends Fragment implements LocationListener {
     Typeface weatherFont;
     Preferences mPreferences;
 
+    // commands
+    public static final String CONDITIONS = "conditions";
+    public static final String FORECAST = "forecast";
+
     private TextView txtWeatherIcon;
     private TextClock clkTextClock;
     private TextClock clkDateClock;
@@ -55,8 +59,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
     private TextView txtWeatherAlert;
 
     private static String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
-    private String latitude = "0";
-    private String longitude = "0";
+    private String mLatitude = "0";
+    private String mLongitude = "0";
 
     // default weather values
     private int mCurrentTemp = 0;
@@ -73,7 +77,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
 
-        mPreferences = Preferences.getInstance();
+        mPreferences = Preferences.getInstance(getActivity());
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         forecasts = new DailyForecast[3];
 
@@ -86,10 +90,10 @@ public class WeatherFragment extends Fragment implements LocationListener {
         }
         if (location != null) {
             try {
-                latitude = Double.toString(location.getLatitude());
-                longitude = Double.toString(location.getLongitude());
-                Log.d("old","lat :  " + latitude);
-                Log.d("old","long :  " + longitude);
+                mLatitude = Double.toString(location.getLatitude());
+                mLongitude = Double.toString(location.getLongitude());
+                Log.d("old","lat :  " + mLatitude);
+                Log.d("old","long :  " + mLongitude);
                 this.onLocationChanged(location);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -97,17 +101,18 @@ public class WeatherFragment extends Fragment implements LocationListener {
         }
 
         // some static locations for now
-        latitude = "34";
-        longitude = "-118";
+        mLatitude = "34";
+        mLongitude = "-118";
+        startWeatherUpdate();
+    }
 
+    public void startWeatherUpdate(){
         String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
-        String weatherUnit;
+        String weatherUnit = "si";
         if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
             weatherUnit = "us";
-        } else {
-            weatherUnit = "si";
         }
-        updateWeatherData(String.format(darkSkyRequest, darkSkyKey, latitude, longitude, weatherUnit));
+        updateWeatherData(String.format(darkSkyRequest, darkSkyKey, mLatitude, mLongitude, weatherUnit));
     }
 
     @Override
@@ -146,11 +151,15 @@ public class WeatherFragment extends Fragment implements LocationListener {
             String message = intent.getStringExtra("message");
             Log.d("Weather", "Got message:\"" + message +"\"");
             switch (message) {
-                case MainActivity.FORECAST:
+                case FORECAST:
                     speakWeatherForecast();
                     break;
-                case MainActivity.CONDITIONS:
+                case CONDITIONS:
                     speakCurrentConditions();
+                    break;
+                case Preferences.CMD_WEATHER_ENGLISH:
+                case Preferences.CMD_WEATHER_METRIC:
+                    startWeatherUpdate();
                     break;
             }
         }
@@ -337,7 +346,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 rainForecast.setText(chanceOfRain);
             }
 
-            // check for weather alerts. Display and speak if they exist
+            // check for weather alerts.
             if (json.has("alerts")) {
                 JSONArray alerts = json.getJSONArray("alerts");
                 StringBuilder title = new StringBuilder();
@@ -354,7 +363,6 @@ public class WeatherFragment extends Fragment implements LocationListener {
                     txtAlerts.setText(title.toString());
                 }
             }
-            speakCurrentConditions();
         }catch(Exception e){
             e.printStackTrace();
             Log.e("SimpleWeather", "One or more fields not found in the JSON data");
@@ -364,6 +372,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
     // choose weather icon based on iconType
     private void setWeatherIcon(TextView tv, String iconType, long sunrise, long sunset){
         String icon = "";
+        if (getActivity() == null) return;
         switch(iconType) {
             case "clear-day": icon = getActivity().getString(R.string.weather_sunny);
                 break;
@@ -389,6 +398,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 break;
             case "wind" : icon = getActivity().getString(R.string.weather_wind_strong);
                 break;
+            // if we can't find the right icon, set it to generic day or night depending on time
             default:
                 long currentTime = new Date().getTime();
                 if(currentTime>=sunrise && currentTime<sunset) {
@@ -407,8 +417,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         Log.i("Location", "Location change detected");
-        latitude = Double.toString(location.getLatitude());
-        longitude = Double.toString(location.getLongitude());
+        mLatitude = Double.toString(location.getLatitude());
+        mLongitude = Double.toString(location.getLongitude());
     }
 
     @Override
@@ -442,11 +452,10 @@ public class WeatherFragment extends Fragment implements LocationListener {
      * Given a wind bearing, returns the direction
      * @return String direction as abbreviation (NE, E, W...)
      */
-    public String getDirectionFromBearing(int bearing){
+    public static String getDirectionFromBearing(final int bearing){
         if (bearing < 0 || bearing > 360) return "error";
         String[] directions = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
-        int index = (int) ((bearing + 22.5) / 45);
-        index %= 8;
+        int index = ( (int)((bearing + 22.5) / 45)) % 8;
         return directions[ index ];
     }
 }
