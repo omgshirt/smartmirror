@@ -80,12 +80,12 @@ public class TwitterFragment extends Fragment {
 
         //mTwitterButton = (Button)view.findViewById(R.id.btn_twitter);
         mTwitterLogin = (Button)view.findViewById(R.id.btn_login);
-        mTwitterButton.setOnClickListener(new View.OnClickListener() {
+        /*mTwitterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 twitterAsync();
             }
-        });
+        });*/
 
         mTwitterLogin.setOnClickListener(new View.OnClickListener() {
             @Override

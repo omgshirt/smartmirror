@@ -98,7 +98,9 @@ public class NewsFragment extends Fragment {
 
         String newsURL = this.getArguments().getString("url");
         newsURL += mApiKey;
-        updateNews(mNewsDefault+mNewsDesk+mPostURL+mApiKey);
+        updateNews(newsURL);
+        mNewsDesk = "U.S. News";
+        //updateNews(mNewsDefault+mNewsDesk+mPostURL+mApiKey);
 
         return view;
 
@@ -112,7 +114,7 @@ public class NewsFragment extends Fragment {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            txtNewsDesk.setText("");
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
@@ -178,6 +180,7 @@ public class NewsFragment extends Fragment {
 
 
     private void renderNews(JSONObject json){
+        txtNewsDesk.setText("");
         try {
             String newsFeed[] = new String[10];
             String hl[] = new String[10];
