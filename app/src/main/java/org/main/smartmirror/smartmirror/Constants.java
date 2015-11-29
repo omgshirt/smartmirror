@@ -11,7 +11,9 @@ public class Constants {
     public static String mUser[] = new String[100];
     public static String mStatus[] = new String[100];
     public static String mUserAt[] = new String[100];
+    public static final String mLogin= "log me in";
     public static final String mGet= "get";
+    public static final String mRefresh= "refresh";
 
     //--------------FACEBOOK--------------
     public static final String SCROLLUP="scroll up";

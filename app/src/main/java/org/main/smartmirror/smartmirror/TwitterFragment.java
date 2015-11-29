@@ -79,7 +79,7 @@ public class TwitterFragment extends Fragment {
         });*/
 
         //mTwitterButton = (Button)view.findViewById(R.id.btn_twitter);
-        mTwitterLogin = (Button)view.findViewById(R.id.btn_login);
+        //mTwitterLogin = (Button)view.findViewById(R.id.btn_login);
         /*mTwitterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,12 +87,12 @@ public class TwitterFragment extends Fragment {
             }
         });*/
 
-        mTwitterLogin.setOnClickListener(new View.OnClickListener() {
+        /*mTwitterLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 twitterLogin();
             }
-        });
+        });*/
 
         mStatus1 = (TextView)view.findViewById(R.id.status1);
         mStatus2 = (TextView)view.findViewById(R.id.status2);
@@ -106,7 +106,7 @@ public class TwitterFragment extends Fragment {
         mStatus10 = (TextView)view.findViewById(R.id.status10);
         mStatus11 = (TextView)view.findViewById(R.id.status11);
 
-        mStatus1.setText("Say 'Get'");
+        mStatus1.setText("");
         mStatus2.setText("");
         mStatus3.setText("");
         mStatus4.setText("");
@@ -134,6 +134,12 @@ public class TwitterFragment extends Fragment {
             switch (message) {
                 case Constants.mGet:
                     twitterAsync();
+                    break;
+                case Constants.mRefresh:
+                    twitterAsync();
+                    break;
+                case Constants.mLogin:
+                    twitterLogin();
                     break;
 
                 /*case MainActivity.mNEXTTWEET:
