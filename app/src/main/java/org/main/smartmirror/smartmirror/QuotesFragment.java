@@ -109,7 +109,6 @@ public class QuotesFragment extends Fragment {
      * them into an array
      */
     public void setUpQuotes(){
-//    public String[] getQuotes(){
         // get the quotes
         AssetManager assetManager = getContext().getAssets();
         byte[] buffer;
@@ -132,6 +131,11 @@ public class QuotesFragment extends Fragment {
         setUpArrayLists(quotes);
     }
 
+    /**-
+     * Sets up the two array lists that will contain the quote itself and
+     * the author as two separate array lists
+     * @param fullQuote the full quote with author
+     */
     public void setUpArrayLists(String[] fullQuote){
         String[] parts_no_name;
         String[] names;
