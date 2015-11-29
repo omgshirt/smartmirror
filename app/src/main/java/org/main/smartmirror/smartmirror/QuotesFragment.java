@@ -34,6 +34,7 @@ public class QuotesFragment extends Fragment {
     
     private ArrayList<String> mQuotesList;
     private Runnable mRunnable;
+    private TextView mQuoteAuthor;
     private TextView mQuoteContent;
     private TextView mQuoteTitle;
     private Timer mTimer;
@@ -92,9 +93,10 @@ public class QuotesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.quotes_fragment, container, false);
         // Set-up the text views
-        mQuoteTitle= (TextView) view.findViewById(R.id.quote_title);
+        mQuoteAuthor = (TextVIew) view.findViewById(R.id.quote_author);
         mQuoteContent = (TextView) view.findViewById(R.id.quote_content);
-
+        mQuoteTitle = (TextView) view.findViewById(R.id.quote_title);
+        
         // Apply the font
         mQuoteContent.setTypeface(mQuoteFont);
         mQuoteTitle.setTypeface(mQuoteFont);
@@ -121,6 +123,7 @@ public class QuotesFragment extends Fragment {
         byte[] buffer;
         InputStream input;
         String text = null;
+        String[] authors;
         String[] quotes;
         try {
             input = assetManager.open("quotes");
