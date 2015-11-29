@@ -56,6 +56,8 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
 
         // Initialize Items
+        mNewsDesk = "U.S.";
+
         mNYTButton  = (ImageButton)view.findViewById(R.id.btnNYTbranding);
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
         mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
@@ -77,7 +79,7 @@ public class NewsFragment extends Fragment {
         mTxtHeadline7.setText("");
         mTxtHeadline8.setText("");
 
-        txtNewsDesk.setText(mNewsDesk);
+        txtNewsDesk.setText(mNewsDesk.toUpperCase());
 
         // set onClickListener
         mNYTButton.setOnClickListener(new View.OnClickListener() {
@@ -90,6 +92,7 @@ public class NewsFragment extends Fragment {
             }
         });
 
+
         Bundle args = getArguments();
         if (args != null) {
             // Use initialisation data
@@ -99,7 +102,7 @@ public class NewsFragment extends Fragment {
         String newsURL = this.getArguments().getString("url");
         newsURL += mApiKey;
         updateNews(newsURL);
-        mNewsDesk = "U.S. News";
+
         //updateNews(mNewsDefault+mNewsDesk+mPostURL+mApiKey);
 
         return view;
@@ -125,6 +128,8 @@ public class NewsFragment extends Fragment {
                     mNYTURL = mPreURL + mNewsDesk + mPostURL;
                     mNewURL = mNYTURL + mApiKey;
                     Log.i("voice news desk: ", urlArr[i]);
+                    txtNewsDesk.setText(mNewsDesk.toUpperCase());
+                    updateNews(mNewURL);
                     break;
                 } else {
                     i++;
@@ -132,7 +137,6 @@ public class NewsFragment extends Fragment {
                 }
             }
             Log.d("News", "Got message:\"" + message +"\"");
-            updateNews(mNewURL);
         }
     };
 
@@ -180,7 +184,6 @@ public class NewsFragment extends Fragment {
 
 
     private void renderNews(JSONObject json){
-        txtNewsDesk.setText("");
         try {
             String newsFeed[] = new String[10];
             String hl[] = new String[10];
@@ -204,7 +207,6 @@ public class NewsFragment extends Fragment {
 
 
             //mytextview.setText(Html.fromHtml(sourceString)); //format
-            txtNewsDesk.setText(mNewsDesk.toUpperCase());
 
             String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + newsFeed[0] + "<br>";
             mTxtHeadline.setText(Html.fromHtml(txt0));
