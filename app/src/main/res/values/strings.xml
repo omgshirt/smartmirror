@@ -35,6 +35,9 @@
     <string name="title_traffic">Traffic</string>
     <string name="title_weather">Weather</string>
     <string name="title_twitter">Twitter</string>
+    <string name="title_help">Help</string>
+    <string name="title_hide_help">Hide_Help</string>
+    <string name="title_makeup">Makeup</string>
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>

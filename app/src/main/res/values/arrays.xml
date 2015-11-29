@@ -32,103 +32,90 @@
 
 
     <string-array name="help_settings">
-
-        <item>To change the Mirror Brightness say (Very Low,Low,Medium,High,Very High)</item>
-        <item>To change the Night Light Brightness say (Very Low,Low,Medium,Very High)</item>
-        <item>To change the System Volume say (Off,Very Low,Low,Medium, High,Very High)</item>
-        <item>To change the Music Volume say (Off,Very Low,Low,Medium,High,Very High)</item>
-        <item>To change the Speech Frequency say (Never,Rarely,Often,Always)</item>
-        <item>To use the Camera say (Off,On)</item>
-        <item>To use Voice Recognition say (Off, On)</item>
-        <item>To use Remote Control say (Off, On</item>
-        <item>To switch between Weather units say (Metric,English</item>
-
+        <item>Settings:</item>
+        <item> </item>
+        <item>Mirror Brightness </item>
+        <item>Night Light Brightness </item>
+        <item>System Volume</item>
+        <item>Music Volume </item>
+        <item>Speech Frequency </item>
+        <item>Camera</item>
+        <item>Voice Recognition</item>
+        <item>Remote Control</item>
+        <item>Weather units</item>
     </string-array>
 
-    <string-array name="smart_help_array">
-        <item>News</item>
-        <item> Calendar </item>
-        <item>Light</item>
-        <item> Weather</item>
-        <item> Settings</item>
-        <item> Off</item>
-        <item> Traffic</item>
-        <item>Weather</item>
-        <item> Help</item>
+    <string-array name="help_settings2">
+        <item>Speech Options: </item>
+        <item> </item>
+        <item>VeryLow -->Very High</item>
+        <item>VeryLow -->Very High </item>
+        <item>OFF -->Very High</item>
+        <item>OFF -->Very High</item>
+        <item>Never -->Always </item>
+        <item>ON|OFF</item>
+        <item>ON|OFF</item>
+        <item>ON|OFF</item>
+        <item>ENGLISH|METRIC</item>
+    </string-array>
+
+    <string-array name="General_help_array">
+        <item>Spoken Command:</item>
+        <item>Say:</item>
+        <item>Calendar</item>
         <item>Camera</item>
+        <item>Facebook</item>
+        <item>Gallery</item>
+        <item>Help</item>
+        <item>Light</item>
+        <item>News</item>
+        <item>Music</item>
+        <item>Quotes</item>
+        <item>Settings</item>
+        <item>Twitter</item>
+        <item>Weather</item>
+        <item>Makeup</item>
+    </string-array>
+
+    <string-array name="General_help_array2">
+        <item>Action Taken:</item>
+        <item> </item>
+        <item>starts CalendarFragment</item>
+        <item>starts CameraFragment</item>
+        <item>starts FacebookFragment</item>
+        <item>starts GalleryFragment</item>
+        <item>starts HelpFragment</item>
+        <item>starts LightFragment</item>
+        <item>starts NewsFragment</item>
+        <item>starts MusicFragment</item>
+        <item>starts QuotesFragment</item>
+        <item>starts SettingsFragment</item>
+        <item>starts TwitterFragment</item>
+        <item>starts WeatherFragment</item>
+        <item>starts MakeupFragment</item>
+
     </string-array>
 
     <string-array name="news_settings">
-        <item>To access the different news desk say their Name</item>
-        <item>News Desk choices are:</item>
-        <item>sports</item>
+        <item>News Desk Name:</item>
+        <item> </item>
         <item>foreign</item>
         <item>technology</item>
-        <item>arts</item>
-        <item>autmobiles</item>
-        <item>blogs</item>
         <item>books</item>
-        <item>booming</item>
         <item>business</item>
         <item>cars</item>
-        <item>circuits</item>
-        <item>classifieds</item>
-        <item>connecticut</item>
-        <item>culture</item>
-        <item>dining</item>
-        <item>editorial</item>
         <item>education</item>
-        <item>energy</item>
-        <item>entrepreneurs</item>
-        <item>environment</item>
-        <item>escapes</item>
-        <item>fashion</item>
-        <item>favorites</item>
-        <item>financial</item>
-        <item>flight</item>
+    </string-array>
+    <string-array name="news_settings2">
+        <item>  </item>
+        <item>  </item>
         <item>food</item>
-        <item>generations</item>
-        <item>giving</item>
         <item>health</item>
-        <item>home</item>
-        <item>jobs</item>
-        <item>key</item>
-        <item>letters</item>
-        <item>magazine</item>
-        <item>media</item>
-        <item>metro</item>
-        <item>metropolitan</item>
         <item>movies</item>
-        <item>museums</item>
-        <item>national</item>
-        <item>nesting</item>
-        <item>obits</item>
-        <item>obituaries</item>
-        <item>obituary</item>
-        <item>opinion</item>
-        <item>outlook</item>
-        <item>play</item>
         <item>politics</item>
-        <item>regionals</item>
-        <item>retial</item>
-        <item>retirement</item>
         <item>science</item>
-        <item>society</item>
-        <item>style</item>
-        <item>teens</item>
         <item>television</item>
-        <item>theater</item>
-        <item>travel</item>
-        <item>universal</item>
-        <item>upshot</item>
-        <item>vacation</item>
-        <item>washington</item>
-        <item>wealth</item>
-        <item>week</item>
-        <item>weekend</item>
-        <item>westchester</item>
-        <item>working</item>
-        <item>workplace</item>
         <item>world</item>
+
     </string-array>
 </resources>

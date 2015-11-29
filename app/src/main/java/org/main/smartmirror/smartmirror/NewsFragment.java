@@ -23,8 +23,9 @@ import org.json.JSONObject;
 public class NewsFragment extends Fragment {
     public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     public static String mPostURL = "&sort=newest&api-key=";
-    public static String mNewsDesk;
-    public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    public static String mNewsDesk = "U.S.";
+    //public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
+    public static String mNewsDefault ="http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
     private TextView mTxtHeadline;
@@ -36,6 +37,7 @@ public class NewsFragment extends Fragment {
     private TextView mTxtHeadline7;
     private TextView mTxtHeadline8;
     private ImageButton mNYTButton;
+    private TextView txtNewsDesk;
 
     Handler mHandler = new Handler();
 
@@ -54,6 +56,8 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
 
         // Initialize Items
+        mNewsDesk = "U.S.";
+
         mNYTButton  = (ImageButton)view.findViewById(R.id.btnNYTbranding);
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
         mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
@@ -64,6 +68,8 @@ public class NewsFragment extends Fragment {
         mTxtHeadline7 = (TextView)view.findViewById(R.id.headline7);
         mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
 
+        txtNewsDesk = (TextView)view.findViewById(R.id.txtNewsDesk);
+
         mTxtHeadline.setText("");
         mTxtHeadline2.setText("");
         mTxtHeadline3.setText("");
@@ -72,6 +78,8 @@ public class NewsFragment extends Fragment {
         mTxtHeadline6.setText("");
         mTxtHeadline7.setText("");
         mTxtHeadline8.setText("");
+
+        txtNewsDesk.setText(mNewsDesk.toUpperCase());
 
         // set onClickListener
         mNYTButton.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +92,7 @@ public class NewsFragment extends Fragment {
             }
         });
 
+
         Bundle args = getArguments();
         if (args != null) {
             // Use initialisation data
@@ -94,6 +103,7 @@ public class NewsFragment extends Fragment {
         newsURL += mApiKey;
         updateNews(newsURL);
 
+        //updateNews(mNewsDefault+mNewsDesk+mPostURL+mApiKey);
 
         return view;
 
@@ -107,25 +117,33 @@ public class NewsFragment extends Fragment {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            txtNewsDesk.setText("");
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
-            int i = 0;
-            while (i < urlArr.length) {
-                if (message.contains(urlArr[i])) {
-                    mNewsDesk = urlArr[i];
-                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
-                    mNewURL = mNYTURL + mApiKey;
-                    Log.i("voice news desk: ", urlArr[i]);
+            switch (message) {
+                case MainActivity.BACK:
+                    getFragmentManager().popBackStack();
                     break;
-                } else {
-                    i++;
-                    Log.i("I heard: ", message);
-                }
+                default:
+                    String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+                    int i = 0;
+                    while (i < urlArr.length) {
+                        if (message.contains(urlArr[i])) {
+                            mNewsDesk = urlArr[i];
+                            mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                            mNewURL = mNYTURL + mApiKey;
+                            Log.i("voice news desk: ", urlArr[i]);
+                            txtNewsDesk.setText(mNewsDesk.toUpperCase());
+                            updateNews(mNewURL);
+                            break;
+                        } else {
+                            i++;
+                            Log.i("I heard: ", message);
+                        }
+                    }
+                    Log.d("News", "Got message:\"" + message + "\"");
+                    break;
             }
-            Log.d("News", "Got message:\"" + message +"\"");
-            updateNews(mNewURL);
         }
     };
 
@@ -168,7 +186,6 @@ public class NewsFragment extends Fragment {
                 }
             }
         }.start();
-
     }
 
 
@@ -222,7 +239,7 @@ public class NewsFragment extends Fragment {
             mTxtHeadline8.setText(Html.fromHtml(txt7));
 
         }catch(Exception e){
-            Log.e("SPORTS ERROR", e.toString());
+            Log.e("NEWS ERROR", e.toString());
         }
     }
 

@@ -6,21 +6,27 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Quote of the day"
-        android:id="@+id/quote_title"
+        android:text="Quote"
         android:textSize="30dp"
+        android:id="@+id/quote_content"
+        android:layout_gravity="center_vertical"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
-        android:textSize="30dp"
-        android:id="@+id/quote_content"
+        android:text="SpeakerName"
+        android:textSize="15dp"
+        android:id="@+id/quote_author"
         android:layout_gravity="center_vertical"
-        android:layout_below="@+id/quote_title"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp" />
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/quote_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="49dp" />
+
+
 
 </RelativeLayout>
