@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity
     // Light Sensor
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
-    private float mLightQuantity;
+    private boolean mLightIsOff;
     private ScheduledFuture<?> sensingLight;
 
     // News
@@ -214,6 +214,9 @@ public class MainActivity extends AppCompatActivity
         mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
         discoverPeers();
 
+        // Light Sensor for waking / sleeping
+        initializeLightSensor();
+
         // Set up view and nav drawer
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -256,7 +259,6 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
-        stopLightSensor();
         bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mIsBound=true;
         mirrorSleepState = AWAKE;
@@ -296,7 +298,6 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         mirrorSleepState = SLEEPING;
-        startLightSensor();
         Log.i(TAG, "onStop");
     }
 
@@ -442,6 +443,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SLEEP:
                 fragment = new OffFragment();
+                startLightSensor();
                 mirrorSleepState = LIGHT_SLEEP;
                 break;
             case TWITTER:
@@ -449,6 +451,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case WAKE:
                 // displayView will be called again from onStart() with the fragment to show
+                stopLightSensor();
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
@@ -734,32 +737,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startLightSensor() {
-        ScheduledThreadPoolExecutor scheduler2 = (ScheduledThreadPoolExecutor)
-                Executors.newScheduledThreadPool(1);
+    // --------------------------- LIGHT SENSSOR --------------------------------------
 
-        final Runnable sensingLightTask = new Runnable() {
-            @Override
-            public void run() {
-                detectLight();
-                Log.i("LightSensor", "Detecting: detectLight()" );
-            }
-        };
-        sensingLight = scheduler2.scheduleAtFixedRate(sensingLightTask, 5, 5,
-                TimeUnit.SECONDS);
+    private void initializeLightSensor(){
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+    }
+
+    public void startLightSensor() {
+        mLightIsOff = false;
+        mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void stopLightSensor() {
-        if (sensingLight != null) {
-            sensingLight.cancel(true);
-            mSensorManager = null;
-        }
-    }
-
-    public void detectLight() {
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -769,17 +760,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        mLightQuantity = event.values[0];
+        float currentLight = event.values[0];
+        Log.i("LightSensor", Float.toString(currentLight));
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(event.values[0]>=0 && event.values[0]<=15){
-                //do nothing, room is dark
-                System.out.println("Light Level below 15");
-            }
-            else if(event.values[0]>15){
-                // if(mirrorSleepState==SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
+            if(currentLight < .1 ){
+                mLightIsOff = true;
+                Log.i("LightSensor", "lights off. value:" + currentLight);
+            } else if(currentLight > 3 && mLightIsOff ){
+                // the sensor sees some light, but the lights were "off" last poll. turn on the screen!
                 displayView(WAKE);
-                System.out.println("Light Level above 15");
-                //}
             }
         }
     }
