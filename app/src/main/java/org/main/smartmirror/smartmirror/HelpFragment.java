@@ -156,6 +156,15 @@ public class HelpFragment extends DialogFragment {
                 view_quotes.setText(main_string);
                 view_quotes2.setText(main_string2);
                 break;
+
+            case "makeup":
+                builder.setTitle("Makeup_Help");
+                View layout_makeup=inflater.inflate(R.layout.help_fragment,null);
+                builder.setView((layout_makeup));
+                TextView view_makeup=(TextView)layout_makeup.findViewById(R.id.General_Help_Content);
+                TextView view_makeup2=(TextView)layout_makeup.findViewById(R.id.General_Help_content2);
+                view_makeup.setText(main_string);
+                view_makeup2.setText(main_string2);
         }
         return builder.create();
 

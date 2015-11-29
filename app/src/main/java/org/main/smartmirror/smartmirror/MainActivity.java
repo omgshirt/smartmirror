@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity
     public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
     public static final String QUOTES = "quotes";
+    public static final String MAKEUP= "makeup";
 
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
@@ -453,6 +454,10 @@ public class MainActivity extends AppCompatActivity
                 break;
             case WEATHER:
                 fragment = new WeatherFragment();
+                break;
+
+            case MAKEUP:
+                fragment =new MakeupFragment();
                 break;
             default:
                 // The command isn't one of the view swap instructions,
