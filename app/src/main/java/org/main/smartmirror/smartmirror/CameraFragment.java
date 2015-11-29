@@ -1,13 +1,15 @@
 package org.main.smartmirror.smartmirror;
-
+/**
+ * Created by Master N on 11/20/2015.
+ */
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -35,6 +37,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v13.app.FragmentCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -58,22 +61,27 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 //@TargetApi(23)
-public class CameraFragment extends Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback  {
-
+public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
+    private static final String TAKE_PICTURE="take a picture";
     private static Drive service;
     private GoogleAccountCredential credential;
 
-    //Preview image before uploading Variables
-    ImageView previewImage;
+    //Gets current date and time to name pictures
+    public static String dateTimeStr;
+
+    //Delay for Cheese
+    public static Handler cheeseHandler = new Handler();
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -245,7 +253,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         public void onImageAvailable(ImageReader reader) {
             mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
         }
-
     };
 
     /**
@@ -410,13 +417,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         String accountName = ("smartmirrortesting@gmail.com");
         credential.setSelectedAccountName(accountName);
         service = getDriveService(credential);
-        previewImage = (ImageView)getActivity().findViewById(R.id.imagePreview);
         return view;
     }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        view.findViewById(R.id.picture).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
 
     }
@@ -424,15 +429,36 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+        String curDTime = getCurrentDateTime();
+        String stringDateTime = String.format("%s.jpg", curDTime);
+        mFile = new File(getActivity().getExternalFilesDir(null), stringDateTime);
 
     }
+
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("Camera", "Got message:\"" + message + "\"");
+            switch (message) {
+                case TAKE_PICTURE:
+                    takePicture();
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onResume() {
         super.onResume();
         startBackgroundThread();
-
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
         // When the screen is turned off and turned back on, the SurfaceTexture is already
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
         // a camera and start preview from here (otherwise, we wait until the surface is ready in
@@ -448,6 +474,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
     public void onPause() {
         closeCamera();
         stopBackgroundThread();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
@@ -740,7 +767,19 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
      * Initiate a still image capture.
      */
     private void takePicture() {
-        lockFocus();
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                showToast("3");
+                showToast("2");
+                showToast("1");
+                showToast("CHEESE");
+                }
+        }, 0);
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                lockFocus();
+            }
+        }, 7000);
     }
 
     /**
@@ -810,7 +849,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    showToast("Saved: " + mFile);
+                    //showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
@@ -842,16 +881,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
                     mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.picture: {
-                takePicture();
-                break;
-            }
         }
     }
 
@@ -925,6 +954,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
                     body.setMimeType("image/jpeg");
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
+                    showToast("Upload to Drive Successful!");
                 } catch (UserRecoverableAuthIOException e) {
                     e.printStackTrace();
                 }
@@ -935,4 +965,20 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Fr
         });
         t.start();
     }
+
+    public static String getCurrentDateTime(){
+        Date curDateTime = new Date();
+        SimpleDateFormat format = new SimpleDateFormat();
+        dateTimeStr = format.format(curDateTime);
+
+        format = new SimpleDateFormat("ddMMMyyyHHmm");
+        dateTimeStr = format.format(curDateTime);
+        setCurrentDateTime(dateTimeStr);
+        return dateTimeStr;
+    }
+
+    public static void setCurrentDateTime(String dateTimeString){
+        dateTimeStr = dateTimeString;
+    }
+
 }
