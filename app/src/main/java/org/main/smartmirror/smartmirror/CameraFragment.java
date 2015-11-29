@@ -423,7 +423,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-
     }
 
     @Override
