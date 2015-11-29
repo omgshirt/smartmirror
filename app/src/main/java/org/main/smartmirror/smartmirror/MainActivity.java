@@ -771,7 +771,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
-        System.out.println("LightSENSORWORKING???");
         Log.i("LightSensor", Float.toString(currentLight));
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
             if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
