@@ -33,10 +33,10 @@ import java.util.TimerTask;
 public class QuotesFragment extends Fragment {
     
     private ArrayList<String> mQuotesList;
+    private ArrayList<String> mQuotesAuthor;
     private Runnable mRunnable;
     private TextView mQuoteAuthor;
     private TextView mQuoteContent;
-    private TextView mQuoteTitle;
     private Timer mTimer;
     private TimerTask mTimerTask;
     private Typeface mQuoteFont;
@@ -67,15 +67,17 @@ public class QuotesFragment extends Fragment {
         animation.addAnimation(fadeOut);
 
         // Get the quotes as an array list
-        mQuotesList = new ArrayList<>(Arrays.asList(getQuotes()));
+        // mQuotesList = new ArrayList<>(Arrays.asList(getQuotes()));
+        setUpQuotes();
 
         // Set the runnable
         mRunnable = new Runnable() {
             @Override
             public void run() {
                 // Set the Random quote in the Text View
-                mQuoteContent.setText(getRandomQuote(mQuotesList.size()));
+                getRandomQuote(mQuotesList.size());
                 // Start the animation
+                mQuoteAuthor.startAnimation(animation);
                 mQuoteContent.startAnimation(animation);
             }
         };
@@ -93,37 +95,26 @@ public class QuotesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.quotes_fragment, container, false);
         // Set-up the text views
-        mQuoteAuthor = (TextVIew) view.findViewById(R.id.quote_author);
+        mQuoteAuthor = (TextView) view.findViewById(R.id.quote_author);
         mQuoteContent = (TextView) view.findViewById(R.id.quote_content);
-        mQuoteTitle = (TextView) view.findViewById(R.id.quote_title);
-        
         // Apply the font
         mQuoteContent.setTypeface(mQuoteFont);
-        mQuoteTitle.setTypeface(mQuoteFont);
         // Start the timer
         mTimer.scheduleAtFixedRate(mTimerTask, 0, 10000);
         return view;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // kill the timer
-        mTimer.cancel();
-    }
-
     /**
      * Method that handles loading the quotes from assets/quotes and saves
      * them into an array
-     * @return the quotes in a String array
      */
-    public String[] getQuotes(){
+    public void setUpQuotes(){
+//    public String[] getQuotes(){
         // get the quotes
         AssetManager assetManager = getContext().getAssets();
         byte[] buffer;
         InputStream input;
         String text = null;
-        String[] authors;
         String[] quotes;
         try {
             input = assetManager.open("quotes");
@@ -138,20 +129,37 @@ public class QuotesFragment extends Fragment {
         }
         //break the string to parts by lines
         quotes = text.split("\n");
-        return quotes;
+        setUpArrayLists(quotes);
+    }
+
+    public void setUpArrayLists(String[] fullQuote){
+        String[] parts_no_name;
+        String[] names;
+        names=new String[fullQuote.length];
+        parts_no_name=new String[fullQuote.length];
+        //takes the name of the speaker into another array to put in the second textView
+        //finds the index of where '-' occurs
+        for (int x=0; x<fullQuote.length; x++) {
+            int index = fullQuote[x].indexOf('-');
+            String speaker_names = fullQuote[x].substring(index);
+            names[x] = speaker_names;
+            parts_no_name[x] = fullQuote[x].replaceAll(names[x], "");
+        }
+        mQuotesList = new ArrayList<>(Arrays.asList(parts_no_name));
+        mQuotesAuthor = new ArrayList<>(Arrays.asList(names));
     }
 
     /**
      * Method that handles the picking a random quote based on
      * a given number
      * @param num the random number seed
-     * @return the selected random quote string
      */
-    public String getRandomQuote(int num){
+    public void getRandomQuote(int num){
         //TODO make sure that the quotes are trully random (they don't repeat)
         Random quoteRandomizer = new Random();
         int randNum = quoteRandomizer.nextInt(num);
-        return mQuotesList.get(randNum);
+        mQuoteContent.setText(mQuotesList.get(randNum));
+        mQuoteAuthor.setText(mQuotesAuthor.get(randNum));
     }
 
     // ----------------------- Local Broadcast Receiver -----------------------
@@ -161,17 +169,14 @@ public class QuotesFragment extends Fragment {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("News", "Got message:\"" + message + "\"");
+            Log.d("Quotes", "Got message:\"" + message + "\"");
             switch(message){
                 case MainActivity.BACK:
                     getFragmentManager().popBackStack();
                     break;
-
             }
-
         }
     };
 
@@ -191,5 +196,12 @@ public class QuotesFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // kill the timer
+        mTimer.cancel();
     }
 }

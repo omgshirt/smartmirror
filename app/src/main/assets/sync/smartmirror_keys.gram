@@ -22,7 +22,7 @@ scroll up /1e10/
 scroll down /1e10/
 start listening /1e-1/
 stop listening /1e-1/
-take a picture /1e-2/
+take a picture /1e-10/
 traffic /1e5/
 twitter /1e5/
 wake up /1e5/
