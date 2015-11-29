@@ -14,7 +14,7 @@ public class Constants {
     public static final String mGet= "get";
 
     //--------------FACEBOOK--------------
-    public static final String SCROLLUP="move up";
+    public static final String SCROLLUP="scroll up";
     public static final String SCROLLDOWN="scroll down";
 
 }
