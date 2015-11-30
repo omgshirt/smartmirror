@@ -17,6 +17,8 @@ options /1e-2/
 quotes /1e5/
 enable remote /1e-3/
 disable remote /1e-3/
+log me in /1e-3/
+refresh /1e-4/
 settings /1e-4/
 scroll up /1e10/
 scroll down /1e10/
@@ -47,4 +49,4 @@ movies/1e10/
 politics /1e-1/
 science /1e3/
 television /1e-3/
-world /1e10/
+world /1e14/
