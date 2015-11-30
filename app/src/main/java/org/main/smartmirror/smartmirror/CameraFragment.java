@@ -71,7 +71,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-//@TargetApi(23)
+@TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
     private static final String TAKE_PICTURE="take a picture";
     private static Drive service;
