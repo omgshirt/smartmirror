@@ -6,13 +6,13 @@ conditions /1e-5/
 facebook /1e-2/
 forecast /1e-2/
 gallery /1e-2/
-go to sleep /1e-20/
+go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
-show help /1e6/
+show help /1e1/
 hide help /1e6/
-light /1e16/
 news /1e10/
+night light /1e-5/
 options /1e-2/
 quotes /1e5/
 enable remote /1e-3/
@@ -25,7 +25,7 @@ stop listening /1e-1/
 take a picture /1e-10/
 traffic /1e5/
 twitter /1e5/
-wake up /1e5/
+wake up /1e-1/
 weather /1e5/
 weather english /1e2/
 weather metric /1e2/
@@ -42,7 +42,7 @@ business /1e5/
 cars /1e10/
 education /1e1/
 food /1e10/
-health /1e10/
+health /1e20/
 movies/1e10/
 politics /1e-1/
 science /1e3/

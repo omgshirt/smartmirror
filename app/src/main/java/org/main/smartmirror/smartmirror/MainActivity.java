@@ -65,12 +65,12 @@ public class MainActivity extends AppCompatActivity
     public static final String GALLERY = "gallery";
     public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
-    public static final String LIGHT = "light";
     public static final String HELP = "help";
     public static final String SHOW_HELP = "show help";
     public static final String HIDE_HELP ="hide help";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
+    public static final String NIGHT_LIGHT = "night light";
     public static final String OFF = "off";
     public static final String ON = "on";
     public static final String OPTIONS = "options";
@@ -340,7 +340,6 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
-        mirrorSleepState = AWAKE;
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -395,7 +394,7 @@ public class MainActivity extends AppCompatActivity
         // If sleeping, save viewName and wake screen. Otherwise ignore command.
         Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-            if (!viewName.equals(WAKE)) return;
+            if (!viewName.equals(WAKE) && !viewName.equals(NIGHT_LIGHT)) return;
         }
 
         switch (viewName) {
@@ -426,14 +425,22 @@ public class MainActivity extends AppCompatActivity
                     mHelpFragment.dismiss();
                 }
                 break;
-            case LIGHT:
-                fragment = new LightFragment();
-                break;
             case NEWS:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("url", mDefaultURL);
                 fragment.setArguments(bundle);
+                break;
+            case NIGHT_LIGHT:
+                stopLightSensor();
+                if (mirrorSleepState == SLEEPING) {
+                    mCurrentFragment = NIGHT_LIGHT;
+                    wakeScreen();
+                    return;
+                } else {
+                    mirrorSleepState = AWAKE;
+                    fragment = new LightFragment();
+                }
                 break;
             case QUOTES:
                 fragment = new QuotesFragment();
@@ -451,13 +458,12 @@ public class MainActivity extends AppCompatActivity
                 fragment = new TwitterFragment();
                 break;
             case WAKE:
-                // displayView will be called again from onStart() with the fragment to show
                 stopLightSensor();
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
                 } else {
-                    mirrorSleepState = AWAKE;
+                    // displayView will be called again from onStart() with the fragment to show
                     wakeScreen();
                     return;
                 }
@@ -519,13 +525,17 @@ public class MainActivity extends AppCompatActivity
      */
     public void speechResult(String input) {
         String voiceInput = input.trim();
-
+        Log.i("VR", "speechResult:"+input);
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
                 broadcastMessage("inputAction", voiceInput);
             }
             return;
+        }
+
+        if(voiceInput.contains(NIGHT_LIGHT)) {
+            voiceInput = NIGHT_LIGHT;
         }
 
         // Some silliness to solve "weather" showing up too many times
@@ -769,10 +779,11 @@ public class MainActivity extends AppCompatActivity
         float currentLight = event.values[0];
         Log.i("LightSensor", Float.toString(currentLight));
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(currentLight < .1 ){
+            if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
+            if(currentLight < .1 ){//.1
                 mLightIsOff = true;
                 Log.i("LightSensor", "lights off. value:" + currentLight);
-            } else if(currentLight > 3 && mLightIsOff ){
+            } else if(currentLight > 3 && mLightIsOff ){//3
                 // the sensor sees some light, but the lights were "off" last poll. turn on the screen!
                 displayView(WAKE);
             }

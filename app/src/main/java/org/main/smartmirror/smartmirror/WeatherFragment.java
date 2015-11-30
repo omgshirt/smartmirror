@@ -372,6 +372,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
     // choose weather icon based on iconType
     private void setWeatherIcon(TextView tv, String iconType, long sunrise, long sunset){
         String icon = "";
+        if (getActivity() == null) return;
         switch(iconType) {
             case "clear-day": icon = getActivity().getString(R.string.weather_sunny);
                 break;

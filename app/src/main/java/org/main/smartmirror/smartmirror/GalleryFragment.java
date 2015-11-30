@@ -91,7 +91,7 @@ public class GalleryFragment extends Fragment {
      * @param num the random number seed
      */
     public void makeRandomImage(int num){
-        //TODO make sure that the images are trully random (they don't repeat)
+        //TODO make sure that the images are truly random (they don't repeat)
         Random imageRandomizer = new Random();
         int randomNumber = imageRandomizer.nextInt(num);
         try {
