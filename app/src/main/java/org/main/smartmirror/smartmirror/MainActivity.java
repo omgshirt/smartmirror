@@ -281,6 +281,7 @@ public class MainActivity extends AppCompatActivity
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
+        stopLightSensor();
         mPreferences.resetScreenBrightness();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
@@ -297,6 +298,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
+        startLightSensor();
         mirrorSleepState = SLEEPING;
         Log.i(TAG, "onStop");
     }
@@ -451,14 +453,12 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SLEEP:
                 fragment = new OffFragment();
-                startLightSensor();
                 mirrorSleepState = LIGHT_SLEEP;
                 break;
             case TWITTER:
                 fragment = new TwitterFragment();
                 break;
             case WAKE:
-                stopLightSensor();
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
