@@ -422,9 +422,10 @@ public class MainActivity extends AppCompatActivity
                 mHelpFragment.show(getFragmentManager(), "HelpFragment");
                 break;
             case HIDE_HELP:
-                if (mCurrentFragment.equals(HELP)) {
+                if (mHelpFragment != null) {
                     // call dismiss on fragment?
                     mHelpFragment.dismiss();
+                    mHelpFragment = null;
                 }
                 break;
             case NEWS:
