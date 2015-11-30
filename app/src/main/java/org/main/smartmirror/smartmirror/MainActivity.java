@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     public static final String GO_TO_SLEEP = "go to sleep";
     public static final String HELP = "help";
     public static final String SHOW_HELP = "show help";
+    public static final String HIDE = "hide";
     public static final String HIDE_HELP ="hide help";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
@@ -275,13 +276,13 @@ public class MainActivity extends AppCompatActivity
     protected void onRestart(){
         super.onRestart();
         stopWifiHeartbeat();
+        stopLightSensor();
     }
 
     @Override
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
-        stopLightSensor();
         mPreferences.resetScreenBrightness();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
@@ -291,13 +292,13 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
-        startWifiHeartbeat();
         unregisterReceiver(mWifiReceiver);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        startWifiHeartbeat();
         startLightSensor();
         mirrorSleepState = SLEEPING;
         Log.i(TAG, "onStop");
@@ -573,7 +574,8 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = SLEEP;
                 break;
             case HIDE_HELP:
-                voiceInput =HIDE_HELP;
+            case HIDE:
+                voiceInput = HIDE_HELP;
                 break;
             case OPTIONS:
                 voiceInput = SETTINGS;

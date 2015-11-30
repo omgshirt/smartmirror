@@ -10,9 +10,10 @@ go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
 show help /1e1/
+hide /1e10/
 hide help /1e6/
 news /1e10/
-night light /1e-5/
+night light /1e-9/
 options /1e-2/
 quotes /1e5/
 enable remote /1e-3/

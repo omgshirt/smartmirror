@@ -16,7 +16,6 @@
         android:layout_height="wrap_content"
         android:paddingTop="20sp"
         android:paddingRight="10sp"
-      
         android:text="New Text"
         android:id="@+id/General_Help_content2"
         android:layout_alignParentTop="true"
