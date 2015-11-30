@@ -777,13 +777,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
-        //Log.i("LightSensor", Float.toString(currentLight));
+        Log.i("LightSensor", Float.toString(currentLight));
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
             if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
-            if(currentLight < .1 ){
+            if(currentLight < .1 ){//.1
                 mLightIsOff = true;
                 Log.i("LightSensor", "lights off. value:" + currentLight);
-            } else if(currentLight > 3 && mLightIsOff ){
+            } else if(currentLight > 3 && mLightIsOff ){//3
                 // the sensor sees some light, but the lights were "off" last poll. turn on the screen!
                 displayView(WAKE);
             }
