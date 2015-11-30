@@ -58,7 +58,7 @@ public class HelpFragment extends DialogFragment {
 
 
             case "news":
-                builder.setTitle("News Help");
+                builder.setTitle("News");
                 View layout_news=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_news));
                 TextView view=(TextView)layout_news.findViewById(R.id.General_Help_Content);
@@ -69,7 +69,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "calendar":
-                builder.setTitle("Calendar_Help");
+                builder.setTitle("Calendar");
                 View layout_calendar=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_calendar));
                 TextView view_calendar=(TextView)layout_calendar.findViewById(R.id.General_Help_Content);
@@ -78,7 +78,7 @@ public class HelpFragment extends DialogFragment {
                 view_calendar2.setText(main_string2);
                 break;
             case "camera":
-                builder.setTitle("Camera_Help");
+                builder.setTitle("Camera");
                 View layout_camera=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_camera));
                 TextView view_camera=(TextView)layout_camera.findViewById(R.id.General_Help_Content);
@@ -88,7 +88,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "light":
-                builder.setTitle("Light_Help");
+                builder.setTitle("Light");
                 View layout_light=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_light));
                 TextView view_light=(TextView)layout_light.findViewById(R.id.General_Help_Content);
@@ -98,7 +98,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "weather":
-                builder.setTitle("Weather_Help");
+                builder.setTitle("Weather");
                 View layout_weather=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_weather));
                 TextView view_weather=(TextView)layout_weather.findViewById(R.id.General_Help_Content);
@@ -108,7 +108,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "settings":
-                builder.setTitle("Settings_Help");
+                builder.setTitle("Settings");
                 View layout_settings=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_settings));
                 TextView view_settings=(TextView)layout_settings.findViewById(R.id.General_Help_Content);
@@ -118,7 +118,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "twitter":
-                builder.setTitle("Twitter_Help");
+                builder.setTitle("Twitter");
                 View layout_twitter=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_twitter));
                 TextView view_twitter=(TextView)layout_twitter.findViewById(R.id.General_Help_Content);
@@ -128,7 +128,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "facebook":
-                builder.setTitle("Facebook_Help");
+                builder.setTitle("Facebook");
                 View layout_facebook=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_facebook));
                 TextView view_facebook=(TextView)layout_facebook.findViewById(R.id.General_Help_Content);
@@ -138,7 +138,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "gallery":
-                builder.setTitle("Gallery_Help");
+                builder.setTitle("Gallery");
                 View layout_gallery=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_gallery));
                 TextView view_gallery=(TextView)layout_gallery.findViewById(R.id.General_Help_Content);
@@ -148,7 +148,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "quotes":
-                builder.setTitle("Quotes_Help");
+                builder.setTitle("Quotes");
                 View layout_quotes=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_quotes));
                 TextView view_quotes=(TextView)layout_quotes.findViewById(R.id.General_Help_Content);
@@ -158,7 +158,7 @@ public class HelpFragment extends DialogFragment {
                 break;
 
             case "makeup":
-                builder.setTitle("Makeup_Help");
+                builder.setTitle("Makeup");
                 View layout_makeup=inflater.inflate(R.layout.help_fragment,null);
                 builder.setView((layout_makeup));
                 TextView view_makeup=(TextView)layout_makeup.findViewById(R.id.General_Help_Content);

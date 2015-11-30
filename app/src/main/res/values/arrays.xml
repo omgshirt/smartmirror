@@ -62,43 +62,46 @@
     <string-array name="General_help_array">
         <item>Spoken Command:</item>
         <item>Say:</item>
-        <item>Calendar</item>
-        <item>Camera</item>
-        <item>Facebook</item>
-        <item>Gallery</item>
-        <item>Help</item>
-        <item>Light</item>
-        <item>News</item>
-        <item>Music</item>
-        <item>Quotes</item>
-        <item>Settings</item>
-        <item>Twitter</item>
-        <item>Weather</item>
-        <item>Makeup</item>
+        <item>  </item>
+        <item>"Calendar"</item>
+        <item>"Camera"</item>
+        <item>"Facebook"</item>
+        <item>"Gallery"</item>
+        <item>"Help"</item>
+        <item>"Light"</item>
+        <item>"Makeup"</item>
+        <item>"News"</item>
+        <item>"Quotes"</item>
+        <item>"Settings"</item>
+        <item>"Twitter"</item>
+        <item>"Weather"</item>
+
     </string-array>
 
     <string-array name="General_help_array2">
         <item>Action Taken:</item>
         <item> </item>
-        <item>starts CalendarFragment</item>
-        <item>starts CameraFragment</item>
-        <item>starts FacebookFragment</item>
-        <item>starts GalleryFragment</item>
-        <item>starts HelpFragment</item>
-        <item>starts LightFragment</item>
-        <item>starts NewsFragment</item>
-        <item>starts MusicFragment</item>
-        <item>starts QuotesFragment</item>
-        <item>starts SettingsFragment</item>
-        <item>starts TwitterFragment</item>
-        <item>starts WeatherFragment</item>
-        <item>starts MakeupFragment</item>
+        <item> </item>
+        <item>starts Calendar</item>
+        <item>starts Camera</item>
+        <item>starts Facebook</item>
+        <item>starts Gallery</item>
+        <item>starts Help</item>
+        <item>starts Light</item>
+        <item>starts Makeup</item>
+        <item>starts News</item>
+        <item>starts Quotes</item>
+        <item>starts Settings</item>
+        <item>starts Twitter</item>
+        <item>starts Weather</item>
+
 
     </string-array>
 
     <string-array name="news_settings">
-        <item>News Desk Name:</item>
-        <item> </item>
+        <item>Say the News Desk Name:</item>
+        <item>Choices are:</item>
+        <item>  </item>
         <item>foreign</item>
         <item>technology</item>
         <item>books</item>
@@ -107,6 +110,7 @@
         <item>education</item>
     </string-array>
     <string-array name="news_settings2">
+        <item>  </item>
         <item>  </item>
         <item>  </item>
         <item>food</item>
