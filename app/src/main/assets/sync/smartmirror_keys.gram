@@ -5,7 +5,7 @@ enable camera /1e-3/
 enable remote /1e-3/
 disable camera /1e-3/
 disable remote /1e-3/
-facebook /1e-2/
+facebook /1e-5/
 forecast /1e-4/
 gallery /1e-2/
 go to sleep /1e-21/
@@ -42,7 +42,6 @@ screen brightness very high /1e-5/
 sports /1e10/
 foreign /1e5/
 technology /1e-3/
-books /1e10/
 business /1e5/
 cars /1e10/
 education /1e1/
