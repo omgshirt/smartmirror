@@ -787,7 +787,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i("LightSensor", "light is off");
             }
             if (currentLight > 3 && mLightIsOff ){
-                // the sensor sees some light, but the lights were "off" last poll. turn on the screen!
+                // the sensor sees some light. turn on the screen!
                 displayView(WAKE);
             }
         }

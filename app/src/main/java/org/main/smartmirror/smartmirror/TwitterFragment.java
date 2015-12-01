@@ -138,7 +138,7 @@ public class TwitterFragment extends Fragment {
                     break;
                 case Constants.mRefresh:
                     twitterAsync();
-                    Toast.makeText(getActivity(),"refreshed",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"Twitter Feed Refreshed",Toast.LENGTH_LONG).show();
                     break;
                 case Constants.mLogin:
                     twitterLogin();

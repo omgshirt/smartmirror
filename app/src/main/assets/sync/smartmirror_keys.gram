@@ -1,17 +1,17 @@
 calendar /1e-3/
-camera /1e-3/
+camera /1e-1/
+conditions /1e-8/
 enable camera /1e-3/
 disable camera /1e-3/
-conditions /1e-5/
 facebook /1e-2/
-forecast /1e-2/
+forecast /1e-4/
 gallery /1e-2/
 go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
 show help /1e1/
-hide /1e10/
-hide help /1e6/
+hide /1e1/
+hide help /1e1/
 news /1e10/
 night light /1e-9/
 options /1e-2/
@@ -25,9 +25,9 @@ scroll up /1e10/
 scroll down /1e10/
 start listening /1e-1/
 stop listening /1e-1/
-take a picture /1e-10/
-traffic /1e5/
-twitter /1e5/
+take a picture /1e-15/
+traffic /1e1/
+twitter /1e1/
 wake up /1e-1/
 weather /1e5/
 weather english /1e2/
