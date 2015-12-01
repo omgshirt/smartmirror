@@ -355,6 +355,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    ((MainActivity)getActivity()).startTTS(text);
                     Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
                 }
             });

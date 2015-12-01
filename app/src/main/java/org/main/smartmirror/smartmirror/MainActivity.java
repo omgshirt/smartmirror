@@ -540,6 +540,10 @@ public class MainActivity extends AppCompatActivity
             voiceInput = NIGHT_LIGHT;
         }
 
+        if(voiceInput.contains(SLEEP)) {
+            voiceInput = SLEEP;
+        }
+
         // Some silliness to solve "weather" showing up too many times
         if(voiceInput.contains(WEATHER)) {
             if (voiceInput.contains("english")) {

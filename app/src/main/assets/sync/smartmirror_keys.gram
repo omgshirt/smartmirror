@@ -1,28 +1,30 @@
-calendar /1e-3/
+calendar /1e-1/
 camera /1e-1/
 conditions /1e-8/
 enable camera /1e-3/
+enable remote /1e-3/
 disable camera /1e-3/
+disable remote /1e-3/
 facebook /1e-2/
 forecast /1e-4/
 gallery /1e-2/
 go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
-show help /1e1/
 hide /1e1/
 hide help /1e1/
-news /1e10/
+log me in /1e-3/
+makeup /1e7/
+news /1e12/
 night light /1e-9/
 options /1e-2/
-quotes /1e5/
-enable remote /1e-3/
-disable remote /1e-3/
-log me in /1e-3/
+quotes /1e4/
 refresh /1e-4/
 settings /1e-4/
 scroll up /1e10/
 scroll down /1e10/
+show help /1e1/
+sleep /1e15/
 start listening /1e-1/
 stop listening /1e-1/
 take a picture /1e-15/
