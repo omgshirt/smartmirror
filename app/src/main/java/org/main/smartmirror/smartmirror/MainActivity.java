@@ -39,6 +39,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -104,7 +105,6 @@ public class MainActivity extends AppCompatActivity
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
     private boolean mLightIsOff;
-    private ScheduledFuture<?> sensingLight;
 
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
@@ -734,7 +734,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // OnStop, start a thread that keeps the wifip2p connection alive by pinging every 60 seconds
-    private void startWifiHeartbeat() {
+    public void startWifiHeartbeat() {
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
                 Executors.newScheduledThreadPool(1);
 
@@ -756,7 +756,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // --------------------------- LIGHT SENSSOR --------------------------------------
+    // --------------------------- LIGHT SENSOR --------------------------------------
 
     private void initializeLightSensor(){
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -780,13 +780,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
-        Log.i("LightSensor", Float.toString(currentLight));
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
-            if(currentLight < .1 ){//.1
+            //if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
+            if(currentLight < .1 ){
                 mLightIsOff = true;
-                Log.i("LightSensor", "lights off. value:" + currentLight);
-            } else if(currentLight > 3 && mLightIsOff ){//3
+                Log.i("LightSensor", "light is off");
+            }
+            if (currentLight > 3 && mLightIsOff ){
                 // the sensor sees some light, but the lights were "off" last poll. turn on the screen!
                 displayView(WAKE);
             }
