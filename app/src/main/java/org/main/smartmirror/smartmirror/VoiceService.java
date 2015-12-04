@@ -10,17 +10,14 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
-import static android.widget.Toast.makeText;
 import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
 /**
@@ -152,7 +149,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onBeginningOfSpeech() {
-        Log.i("VR", "onBeginningOfSpeech");
+        //Log.i("VR", "onBeginningOfSpeech");
     }
 
     /**
@@ -160,7 +157,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onEndOfSpeech() {
-        Log.i("VR", "onEndOfSpeech()");
+        //Log.i("VR", "onEndOfSpeech()");
         stopVoice();
         //if (!mSpeechRecognizer.getSearchName().equals(MIRROR_KWS))
          //   switchSearch(MIRROR_KWS);
@@ -250,10 +247,10 @@ public class VoiceService extends Service implements RecognitionListener{
         File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
         mSpeechRecognizer.addKeywordSearch(SMARTMIRROR_SEARCH, smartMirrorcommandList);
 
-        mSpeechRecognizer.addKeyphraseSearch(MIRROR_KWS, MIRROR_KWS);
+        //mSpeechRecognizer.addKeyphraseSearch(MIRROR_KWS, MIRROR_KWS);
 
-        File smGrammarSearch = new File(assetsDir, "sm-commands.gram");
-        mSpeechRecognizer.addGrammarSearch(GRAMMAR_SEARCH, smGrammarSearch);
+        //File smGrammarSearch = new File(assetsDir, "sm-commands.gram");
+        //mSpeechRecognizer.addGrammarSearch(GRAMMAR_SEARCH, smGrammarSearch);
 
     }
 
