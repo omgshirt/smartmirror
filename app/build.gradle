@@ -71,4 +71,3 @@ dependencies {
     compile 'com.google.http-client:google-http-client-gson:1.19.0'
     compile 'com.android.support:support-v13:23.1.0'
 }
-

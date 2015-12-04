@@ -1,6 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.FragmentManager;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -86,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
     public static final String QUOTES = "quotes";
+    public static final String MAKEUP= "makeup";
 
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity
     public static final String mNEXTTWEET = "next";
 
     // Help
-    private HelpDialog mHelpDialog;
+    private HelpFragment mHelpFragment;
 
     // Light Sensor
     private SensorManager mSensorManager;
@@ -416,12 +416,13 @@ public class MainActivity extends AppCompatActivity
                 fragment = new GalleryFragment();
                 break;
             case HELP:
-                mHelpDialog = HelpDialog.newInstance(getCurrentFragment());
-                mHelpDialog.show(getFragmentManager(), "HelpDialog");
+                mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
+                mHelpFragment.show(getFragmentManager(), "HelpFragment");
                 break;
             case HIDE_HELP:
                 if (mCurrentFragment.equals(HELP)) {
                     // call dismiss on fragment?
+                    mHelpFragment.dismiss();
                 }
                 break;
             case NEWS:
@@ -469,6 +470,10 @@ public class MainActivity extends AppCompatActivity
                 break;
             case WEATHER:
                 fragment = new WeatherFragment();
+                break;
+
+            case MAKEUP:
+                fragment =new MakeupFragment();
                 break;
             default:
                 // The command isn't one of the view swap instructions,
@@ -567,6 +572,7 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = SLEEP;
                 break;
             case HIDE_HELP:
+                voiceInput =HIDE_HELP;
                 break;
             case OPTIONS:
                 voiceInput = SETTINGS;
