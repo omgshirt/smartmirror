@@ -11,6 +11,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -178,6 +181,7 @@ public class MainActivity extends AppCompatActivity
                     if(DEBUG)
                         Log.i("MAIN", result);
                     speechResult(result);
+                    playSuccessSound();
                     break;
                 default:
                     super.handleMessage(msg);
@@ -281,7 +285,7 @@ public class MainActivity extends AppCompatActivity
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
-        Log.i(TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
+        Log.i(TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
         mPreferences.resetScreenBrightness();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
@@ -295,7 +299,7 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
-        Log.i(TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
+        Log.i(TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
         unregisterReceiver(mWifiReceiver);
         if (!ScreenReceiver.screenIsOn) {
             mirrorSleepState = SLEEPING;
@@ -407,6 +411,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // TODO: At this point we can play a sound effect to indicate that a command has been received and is being processed.
+        // See line 184 & 525
 
         switch (viewName) {
             case CALENDAR:
@@ -516,6 +521,16 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+    }
+
+    public void playSuccessSound(){
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            ringtone.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
