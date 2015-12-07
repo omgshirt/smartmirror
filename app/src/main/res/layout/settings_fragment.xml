@@ -21,7 +21,7 @@
             android:id="@+id/brightness_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/brightness_vlow"
@@ -64,14 +64,14 @@
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_light_brightness"
+            android:text="@string/settings_night_light_brightness"
             android:textSize="20sp" />
 
         <RadioGroup
             android:id="@+id/light_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/light_vlow"
@@ -120,7 +120,7 @@
             android:id="@+id/sys_vol_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/sys_vol_off"
@@ -176,7 +176,7 @@
             android:id="@+id/mus_vol_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/mus_vol_off"
@@ -232,12 +232,13 @@
             android:id="@+id/speech_frequency_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/speech_never"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
                 android:text="@string/settings_never" />
 
             <RadioButton

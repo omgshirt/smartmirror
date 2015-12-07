@@ -10,22 +10,21 @@
             android:title="@string/title_facebook"/>
         <item android:id="@+id/nav_gallery" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_gallery"/>
+        <item android:id="@+id/nav_help" android:icon="@android:drawable/ic_menu_gallery"
+            android:title="@string/title_help"/>
         <item android:id="@+id/nav_light" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_light"/>
-        <item android:id="@+id/nav_music" android:icon="@android:drawable/ic_menu_gallery"
-            android:title="@string/title_music"/>
+        <item android:id="@+id/nav_makeup" android:icon="@android:drawable/ic_menu_gallery"
+            android:title="@string/title_makeup"/>
         <item android:id="@+id/nav_news" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_news"/>
         <item android:id="@+id/nav_quotes" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_quotes"/>
         <item android:id="@+id/nav_settings" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_settings"/>
-        <item android:id="@+id/nav_traffic" android:icon="@android:drawable/ic_menu_directions"
-            android:title="@string/title_traffic"/>
         <item android:id="@+id/nav_twitter" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_twitter"/>
         <item android:id="@+id/nav_weather" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_weather"/>
     </group>
-
 </menu>

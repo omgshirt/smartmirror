@@ -1,6 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.FragmentManager;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -38,6 +37,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -64,12 +66,13 @@ public class MainActivity extends AppCompatActivity
     public static final String GALLERY = "gallery";
     public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
-    public static final String LIGHT = "light";
     public static final String HELP = "help";
     public static final String SHOW_HELP = "show help";
+    public static final String HIDE = "hide";
     public static final String HIDE_HELP ="hide help";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
+    public static final String NIGHT_LIGHT = "night light";
     public static final String OFF = "off";
     public static final String ON = "on";
     public static final String OPTIONS = "options";
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     public static final String WAKE_UP = "wake up";
     public static final String WEATHER = "weather";
     public static final String QUOTES = "quotes";
+    public static final String MAKEUP= "makeup";
 
     public static final int SLEEPING = 0;
     public static final int LIGHT_SLEEP = 1;
@@ -95,13 +99,12 @@ public class MainActivity extends AppCompatActivity
     public static final String mNEXTTWEET = "next";
 
     // Help
-    private HelpDialog mHelpDialog;
+    private HelpFragment mHelpFragment;
 
     // Light Sensor
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
     private boolean mLightIsOff;
-    private ScheduledFuture<?> sensingLight;
 
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
@@ -215,6 +218,12 @@ public class MainActivity extends AppCompatActivity
         // Light Sensor for waking / sleeping
         initializeLightSensor();
 
+        // Set up ScreenReceiver to hold screen on / off status
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        BroadcastReceiver screenReceiver = new ScreenReceiver();
+        registerReceiver(screenReceiver, intentFilter);
+
         // Set up view and nav drawer
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -257,8 +266,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
-        bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
-        mIsBound=true;
+        mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mirrorSleepState = AWAKE;
         // if there's a fragment pending to display, show it
         if (mCurrentFragment != null) {
@@ -270,32 +278,35 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onRestart(){
-        super.onRestart();
-        stopWifiHeartbeat();
-    }
-
-    @Override
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
+        Log.i(TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
         mPreferences.resetScreenBrightness();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
+        if (ScreenReceiver.screenIsOn) {
+            stopWifiHeartbeat();
+            stopLightSensor();
+        }
     }
 
     @Override
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
-        startWifiHeartbeat();
+        Log.i(TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
         unregisterReceiver(mWifiReceiver);
+        if (!ScreenReceiver.screenIsOn) {
+            mirrorSleepState = SLEEPING;
+            startWifiHeartbeat();
+            startLightSensor();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mirrorSleepState = SLEEPING;
         Log.i(TAG, "onStop");
     }
 
@@ -338,7 +349,6 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
-        mirrorSleepState = AWAKE;
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -390,18 +400,25 @@ public class MainActivity extends AppCompatActivity
      */
     public void displayView(String viewName){
         Fragment fragment = null;
-        // If sleeping, save viewName and wake screen. Otherwise ignore command.
         Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
+        // If sleeping, ignore commands except WAKE and NIGHT_LIGHT
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-            if (!viewName.equals(WAKE)) return;
+            if (!viewName.equals(WAKE) && !viewName.equals(NIGHT_LIGHT)) return;
         }
+
+        // TODO: At this point we can play a sound effect to indicate that a command has been received and is being processed.
 
         switch (viewName) {
             case CALENDAR:
                 fragment = new CalendarFragment();
                 break;
             case CAMERA:
-                fragment = new CameraFragment();
+                if(mPreferences.isCameraEnabled()) {
+                    fragment = new CameraFragment();
+                }
+                else {
+                    Toast.makeText(this, "Camera Disabled. Please say 'Enable Camera' to change this setting.", Toast.LENGTH_LONG).show();
+                }
                 break;
             case FACEBOOK:
                 fragment = new FacebookFragment();
@@ -410,22 +427,33 @@ public class MainActivity extends AppCompatActivity
                 fragment = new GalleryFragment();
                 break;
             case HELP:
-                mHelpDialog = HelpDialog.newInstance(getCurrentFragment());
-                mHelpDialog.show(getFragmentManager(), "HelpDialog");
+                mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
+                mHelpFragment.show(getFragmentManager(), "HelpFragment");
                 break;
             case HIDE_HELP:
-                if (mCurrentFragment.equals(HELP)) {
+                if (mHelpFragment != null) {
                     // call dismiss on fragment?
+                    mHelpFragment.dismiss();
+                    mHelpFragment = null;
                 }
-                break;
-            case LIGHT:
-                fragment = new LightFragment();
                 break;
             case NEWS:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("url", mDefaultURL);
                 fragment.setArguments(bundle);
+                break;
+            case NIGHT_LIGHT:
+                stopLightSensor();
+                stopWifiHeartbeat();
+                if (mirrorSleepState == SLEEPING) {
+                    mCurrentFragment = NIGHT_LIGHT;
+                    wakeScreen();
+                    return;
+                } else {
+                    mirrorSleepState = AWAKE;
+                    fragment = new LightFragment();
+                }
                 break;
             case QUOTES:
                 fragment = new QuotesFragment();
@@ -436,26 +464,27 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SLEEP:
                 fragment = new OffFragment();
-                startLightSensor();
                 mirrorSleepState = LIGHT_SLEEP;
                 break;
             case TWITTER:
                 fragment = new TwitterFragment();
                 break;
             case WAKE:
-                // displayView will be called again from onStart() with the fragment to show
-                stopLightSensor();
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
                 } else {
-                    mirrorSleepState = AWAKE;
+                    // displayView will be called again from onStart() with the fragment to show
                     wakeScreen();
                     return;
                 }
                 break;
             case WEATHER:
                 fragment = new WeatherFragment();
+                break;
+
+            case MAKEUP:
+                fragment =new MakeupFragment();
                 break;
             default:
                 // The command isn't one of the view swap instructions,
@@ -507,13 +536,21 @@ public class MainActivity extends AppCompatActivity
      */
     public void speechResult(String input) {
         String voiceInput = input.trim();
-
+        Log.i("VR", "speechResult:"+input);
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
                 broadcastMessage("inputAction", voiceInput);
             }
             return;
+        }
+
+        if(voiceInput.contains(NIGHT_LIGHT)) {
+            voiceInput = NIGHT_LIGHT;
+        }
+
+        if(voiceInput.contains(SLEEP)) {
+            voiceInput = SLEEP;
         }
 
         // Some silliness to solve "weather" showing up too many times
@@ -550,6 +587,8 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = SLEEP;
                 break;
             case HIDE_HELP:
+            case HIDE:
+                voiceInput = HIDE_HELP;
                 break;
             case OPTIONS:
                 voiceInput = SETTINGS;
@@ -708,7 +747,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // OnStop, start a thread that keeps the wifip2p connection alive by pinging every 60 seconds
-    private void startWifiHeartbeat() {
+    public void startWifiHeartbeat() {
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
                 Executors.newScheduledThreadPool(1);
 
@@ -730,7 +769,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // --------------------------- LIGHT SENSSOR --------------------------------------
+    // --------------------------- LIGHT SENSOR --------------------------------------
 
     private void initializeLightSensor(){
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -754,13 +793,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
-        Log.i("LightSensor", Float.toString(currentLight));
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+            if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
             if(currentLight < .1 ){
                 mLightIsOff = true;
-                Log.i("LightSensor", "lights off. value:" + currentLight);
-            } else if(currentLight > 3 && mLightIsOff ){
-                // the sensor sees some light, but the lights were "off" last poll. turn on the screen!
+                Log.i("LightSensor", "light is off");
+            }
+            if (currentLight > 3 && mLightIsOff ){
+                // the sensor sees some light. turn on the screen!
                 displayView(WAKE);
             }
         }

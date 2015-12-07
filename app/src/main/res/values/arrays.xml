@@ -17,118 +17,90 @@
         <item>world</item>
     </string-array>
 
-    <!--Help Array-->
-
-    <string-array name="help_array">
-        <item>If you want to go to Calendar say Calendar</item>
-        <item>If you want to go to Camera  say Camera </item>
-        <item>If you want to go to Light say Light</item>
-        <item>If you want to go to News say News</item>
-        <item>If you want to go to Music say Music</item>
-        <item>If you want to go to Settings say Settings</item>
-        <item>If you want to go to Weather say Weather</item>
-        <item>If you want to go to Help say Help</item>
-    </string-array>
-
-
     <string-array name="help_settings">
+        <item>Mirror Brightness</item>
+        <item>Night Light Brightness</item>
+        <item>System Volume</item>
+        <item>Music Volume</item>
+        <item>Speech Frequency</item>
+        <item>\"Enable Camera\"</item>
+        <item>\"Disable Camera\"</item>
+        <item>\"Start Listening\"</item>
+        <item>\"Stop Listening\"</item>
+        <item>\"Enable Remote\"</item>
+        <item>\"Disable Remote\"</item>
+        <item>\"Weather English\"</item>
+        <item>\"Weather Metric\"</item>
+    </string-array>
 
-        <item>To change the Mirror Brightness say (Very Low,Low,Medium,High,Very High)</item>
-        <item>To change the Night Light Brightness say (Very Low,Low,Medium,Very High)</item>
-        <item>To change the System Volume say (Off,Very Low,Low,Medium, High,Very High)</item>
-        <item>To change the Music Volume say (Off,Very Low,Low,Medium,High,Very High)</item>
-        <item>To change the Speech Frequency say (Never,Rarely,Often,Always)</item>
-        <item>To use the Camera say (Off,On)</item>
-        <item>To use Voice Recognition say (Off, On)</item>
-        <item>To use Remote Control say (Off, On</item>
-        <item>To switch between Weather units say (Metric,English</item>
+    <string-array name="help_settings2">
+        <item>VeryLow --> Very High</item>
+        <item>VeryLow --> Very High</item>
+        <item>OFF --> Very High</item>
+        <item>OFF --> Very High</item>
+        <item>Never / Rarely / Often / Always</item>
+        <item>Camera On</item>
+        <item>Camera Off</item>
+        <item>Voice Recognition On</item>
+        <item>Voice Recognition Off</item>
+        <item>Remote Control On</item>
+        <item>Remote Control Off</item>
+        <item>Set Weather units English</item>
+        <item>Set Weather units Metric</item>
+    </string-array>
+
+    <string-array name="General_help_array">
+        <item>\"Calendar\"</item>
+        <item>\"Camera\"</item>
+        <item>\"Facebook\"</item>
+        <item>\"Gallery\"</item>
+        <item>\"Show Help\"</item>
+        <item>\"Hide Help\", \"Hide\"</item>
+        <item>\"Night Light\"</item>
+        <item>\"Makeup\"</item>
+        <item>\"News\"</item>
+        <item>\"Quotes\"</item>
+        <item>\"Settings\"</item>
+        <item>\"Twitter\"</item>
+        <item>\"Weather\"</item>
 
     </string-array>
 
-    <string-array name="smart_help_array">
-        <item>News</item>
-        <item> Calendar </item>
-        <item>Light</item>
-        <item> Weather</item>
-        <item> Settings</item>
-        <item> Off</item>
-        <item> Traffic</item>
-        <item>Weather</item>
-        <item> Help</item>
+    <string-array name="General_help_array2">
+        <item>Google Calendar</item>
         <item>Camera</item>
+        <item>Facebook</item>
+        <item>Famous Images</item>
+        <item>Show Help Commands</item>
+        <item>Close Help</item>
+        <item>Provide Light</item>
+        <item>Makeup</item>
+        <item>Articles from The NY Times</item>
+        <item>Famous Quotes</item>
+        <item>SmartMirror Settings</item>
+        <item>Twitter</item>
+        <item>Current Weather</item>
+
+
     </string-array>
 
     <string-array name="news_settings">
-        <item>To access the different news desk say their Name</item>
-        <item>News Desk choices are:</item>
-        <item>sports</item>
-        <item>foreign</item>
-        <item>technology</item>
-        <item>arts</item>
-        <item>autmobiles</item>
-        <item>blogs</item>
-        <item>books</item>
-        <item>booming</item>
-        <item>business</item>
-        <item>cars</item>
-        <item>circuits</item>
-        <item>classifieds</item>
-        <item>connecticut</item>
-        <item>culture</item>
-        <item>dining</item>
-        <item>editorial</item>
-        <item>education</item>
-        <item>energy</item>
-        <item>entrepreneurs</item>
-        <item>environment</item>
-        <item>escapes</item>
-        <item>fashion</item>
-        <item>favorites</item>
-        <item>financial</item>
-        <item>flight</item>
-        <item>food</item>
-        <item>generations</item>
-        <item>giving</item>
-        <item>health</item>
-        <item>home</item>
-        <item>jobs</item>
-        <item>key</item>
-        <item>letters</item>
-        <item>magazine</item>
-        <item>media</item>
-        <item>metro</item>
-        <item>metropolitan</item>
-        <item>movies</item>
-        <item>museums</item>
-        <item>national</item>
-        <item>nesting</item>
-        <item>obits</item>
-        <item>obituaries</item>
-        <item>obituary</item>
-        <item>opinion</item>
-        <item>outlook</item>
-        <item>play</item>
-        <item>politics</item>
-        <item>regionals</item>
-        <item>retial</item>
-        <item>retirement</item>
-        <item>science</item>
-        <item>society</item>
-        <item>style</item>
-        <item>teens</item>
-        <item>television</item>
-        <item>theater</item>
-        <item>travel</item>
-        <item>universal</item>
-        <item>upshot</item>
-        <item>vacation</item>
-        <item>washington</item>
-        <item>wealth</item>
-        <item>week</item>
-        <item>weekend</item>
-        <item>westchester</item>
-        <item>working</item>
-        <item>workplace</item>
-        <item>world</item>
+        <item>Choose from the following sections:</item>
+        <item>Books</item>
+        <item>Business</item>
+        <item>Cars</item>
+        <item>Education</item>
+        <item>Food</item>
+        <item>Foreign</item>
+        <item>Health</item>
+    </string-array>
+    <string-array name="news_settings2">
+        <item>  </item>
+        <item>Movies</item>
+        <item>Politics</item>
+        <item>Science</item>
+        <item>Technology</item>
+        <item>Television</item>
+        <item>World</item>
     </string-array>
 </resources>

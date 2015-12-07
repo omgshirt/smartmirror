@@ -1,11 +1,15 @@
 package org.main.smartmirror.smartmirror;
-
+/**
+ * Created by Master N on 11/20/2015.
+ */
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -42,6 +46,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -56,27 +61,27 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-
-/**
- * Fragment that handles all the things that have to do with camera.
- * This includes: Taking a picture, handling the command to take a picture
- * as well as saving the picture to the device and upload to google drive
- * to the smartmirrortesting gmail account
- */
 @TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
-
     private static final String TAKE_PICTURE="take a picture";
     private static Drive service;
     private GoogleAccountCredential credential;
+
+    //Gets current date and time to name pictures
+    public static String dateTimeStr;
+
+    //Delay for Cheese
+    public static Handler cheeseHandler = new Handler();
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -248,7 +253,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         public void onImageAvailable(ImageReader reader) {
             mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
         }
-
     };
 
     /**
@@ -351,6 +355,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    ((MainActivity)getActivity()).startTTS(text);
                     Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -419,13 +424,14 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+        String curDTime = getCurrentDateTime();
+        String stringDateTime = String.format("%s.jpg", curDTime);
+        mFile = new File(getActivity().getExternalFilesDir(null), stringDateTime);
 
     }
 
@@ -453,7 +459,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         startBackgroundThread();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
-
         // When the screen is turned off and turned back on, the SurfaceTexture is already
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
         // a camera and start preview from here (otherwise, we wait until the surface is ready in
@@ -762,7 +767,19 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * Initiate a still image capture.
      */
     private void takePicture() {
-        lockFocus();
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                showToast("3");
+                showToast("2");
+                showToast("1");
+                showToast("CHEESE");
+                }
+        }, 0);
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                lockFocus();
+            }
+        }, 7000);
     }
 
     /**
@@ -832,7 +849,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    showToast("Saved: " + mFile);
+                    //showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
@@ -866,6 +883,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             e.printStackTrace();
         }
     }
+
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
@@ -936,6 +954,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     body.setMimeType("image/jpeg");
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
+                    showToast("Upload to Drive Successful!");
                 } catch (UserRecoverableAuthIOException e) {
                     e.printStackTrace();
                 }
@@ -946,4 +965,20 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         });
         t.start();
     }
+
+    public static String getCurrentDateTime(){
+        Date curDateTime = new Date();
+        SimpleDateFormat format = new SimpleDateFormat();
+        dateTimeStr = format.format(curDateTime);
+
+        format = new SimpleDateFormat("ddMMMyyyHHmm");
+        dateTimeStr = format.format(curDateTime);
+        setCurrentDateTime(dateTimeStr);
+        return dateTimeStr;
+    }
+
+    public static void setCurrentDateTime(String dateTimeString){
+        dateTimeStr = dateTimeString;
+    }
+
 }

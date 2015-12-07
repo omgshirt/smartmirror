@@ -117,6 +117,7 @@ public class TwitterFragment extends Fragment {
         mStatus9.setText("");
         mStatus10.setText("");
         mStatus11.setText("");
+        twitterAsync();
 
         return view;
     }
@@ -137,6 +138,7 @@ public class TwitterFragment extends Fragment {
                     break;
                 case Constants.mRefresh:
                     twitterAsync();
+                    Toast.makeText(getActivity(),"Twitter Feed Refreshed",Toast.LENGTH_LONG).show();
                     break;
                 case Constants.mLogin:
                     twitterLogin();

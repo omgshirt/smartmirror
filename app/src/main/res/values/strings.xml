@@ -35,6 +35,9 @@
     <string name="title_traffic">Traffic</string>
     <string name="title_weather">Weather</string>
     <string name="title_twitter">Twitter</string>
+    <string name="title_help">Help</string>
+    <string name="title_hide_help">Hide_Help</string>
+    <string name="title_makeup">Makeup</string>
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
@@ -61,11 +64,11 @@
 
     <!-- Settings strings -->
     <string name="settings_screen_brightness">Screen Brightness</string>
-    <string name="settings_light_brightness">Light Brightness</string>
+    <string name="settings_night_light_brightness">Night Light Brightness</string>
     <string name="settings_weather_units">Weather Units</string>
     <string name="settings_system_vol">System Volume</string>
-    <string name="settings_music_vol">Music Volume</string>
-    <string name="settings_speech_freq">Settings Speech Frequency</string>
+    <string name="settings_music_vol">Speech Volume</string>
+    <string name="settings_speech_freq">Speech Frequency</string>
     <string name="settings_never">Never</string>
     <string name="settings_rare">Rarely</string>
     <string name="settings_often">Often</string>

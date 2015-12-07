@@ -120,23 +120,30 @@ public class NewsFragment extends Fragment {
             txtNewsDesk.setText("");
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
-            int i = 0;
-            while (i < urlArr.length) {
-                if (message.contains(urlArr[i])) {
-                    mNewsDesk = urlArr[i];
-                    mNYTURL = mPreURL + mNewsDesk + mPostURL;
-                    mNewURL = mNYTURL + mApiKey;
-                    Log.i("voice news desk: ", urlArr[i]);
-                    txtNewsDesk.setText(mNewsDesk.toUpperCase());
-                    updateNews(mNewURL);
+            switch (message) {
+                case MainActivity.BACK:
+                    getFragmentManager().popBackStack();
                     break;
-                } else {
-                    i++;
-                    Log.i("I heard: ", message);
-                }
+                default:
+                    String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+                    int i = 0;
+                    while (i < urlArr.length) {
+                        if (message.contains(urlArr[i])) {
+                            mNewsDesk = urlArr[i];
+                            mNYTURL = mPreURL + mNewsDesk + mPostURL;
+                            mNewURL = mNYTURL + mApiKey;
+                            Log.i("voice news desk: ", urlArr[i]);
+                            txtNewsDesk.setText(mNewsDesk.toUpperCase());
+                            updateNews(mNewURL);
+                            break;
+                        } else {
+                            i++;
+                            Log.i("I heard: ", message);
+                        }
+                    }
+                    Log.d("News", "Got message:\"" + message + "\"");
+                    break;
             }
-            Log.d("News", "Got message:\"" + message +"\"");
         }
     };
 
@@ -179,7 +186,6 @@ public class NewsFragment extends Fragment {
                 }
             }
         }.start();
-
     }
 
 
@@ -233,7 +239,7 @@ public class NewsFragment extends Fragment {
             mTxtHeadline8.setText(Html.fromHtml(txt7));
 
         }catch(Exception e){
-            Log.e("SPORTS ERROR", e.toString());
+            Log.e("NEWS ERROR", e.toString());
         }
     }
 

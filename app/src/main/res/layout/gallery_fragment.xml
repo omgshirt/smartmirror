@@ -6,7 +6,6 @@
     <ImageView
         android:id="@+id/gallery_item"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 

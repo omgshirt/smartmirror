@@ -32,8 +32,13 @@ public class OffFragment extends Fragment {
             voice = "see you later";
         else if (rand < .7)
             voice = "I'll charge up for a bit";
-
+        ((MainActivity)getActivity()).startLightSensor();
         ((MainActivity)getActivity()).startTTS(voice);
         return view;
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        ((MainActivity)getActivity()).stopLightSensor();
     }
 }
