@@ -326,12 +326,13 @@ public class Preferences implements LocationListener {
             try {
                 mLatitude = location.getLatitude();
                 mLongitude = location.getLongitude();
+
+                this.onLocationChanged(location);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        this.onLocationChanged(location);
         Log.d("Location","lat:" + Double.toString(mLatitude));
         Log.d("Location","long:" + Double.toString(mLongitude));
 

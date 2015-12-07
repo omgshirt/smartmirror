@@ -188,10 +188,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mContext = getApplicationContext();
-        // Load any application preferences. If prefs do not exist, set them to defaults
-        mPreferences = Preferences.getInstance(this);
 
         // check for permission to write system settings on API 23 and greater.
         // Leaving this in case we need the WRITE_SETTINGS permission later on.
@@ -201,6 +198,9 @@ public class MainActivity extends AppCompatActivity
                 startActivityForResult(intent, 1);
             }
         }
+
+        // Load any application preferences. If prefs do not exist, set them to defaults
+        mPreferences = Preferences.getInstance(this);
 
         // initialize TTS
         mTTSHelper = new TTSHelper(this);
@@ -794,7 +794,7 @@ public class MainActivity extends AppCompatActivity
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
+            //if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
             if(currentLight < .1 ){
                 mLightIsOff = true;
                 Log.i("LightSensor", "light is off");
