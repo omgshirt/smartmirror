@@ -1,15 +1,9 @@
 package org.main.smartmirror.smartmirror;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,44 +94,5 @@ public class GalleryFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    // ----------------------- Local Broadcast Receiver -----------------------
-
-    // Create a handler for received Intents. This will be called whenever an Intent
-    // with an action named "inputAction" is broadcast.
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("message");
-            Log.d("News", "Got message:\"" + message + "\"");
-            switch(message){
-                case MainActivity.BACK:
-                    getFragmentManager().popBackStack();
-                    break;
-
-            }
-
-        }
-    };
-
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
-     */
-    @Override
-    public void onResume(){
-        super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-                new IntentFilter("inputAction"));
-    }
-
-    @Override
-    // when this goes out of view, halt listening
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 }
