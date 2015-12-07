@@ -39,6 +39,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity
     public static final String GO_TO_SLEEP = "go to sleep";
     public static final String HELP = "help";
     public static final String SHOW_HELP = "show help";
+    public static final String HIDE = "hide";
     public static final String HIDE_HELP ="hide help";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
@@ -103,7 +105,6 @@ public class MainActivity extends AppCompatActivity
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
     private boolean mLightIsOff;
-    private ScheduledFuture<?> sensingLight;
 
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
@@ -275,6 +276,7 @@ public class MainActivity extends AppCompatActivity
     protected void onRestart(){
         super.onRestart();
         stopWifiHeartbeat();
+        stopLightSensor();
     }
 
     @Override
@@ -290,13 +292,14 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
-        startWifiHeartbeat();
         unregisterReceiver(mWifiReceiver);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        startWifiHeartbeat();
+        startLightSensor();
         mirrorSleepState = SLEEPING;
         Log.i(TAG, "onStop");
     }
@@ -420,9 +423,10 @@ public class MainActivity extends AppCompatActivity
                 mHelpFragment.show(getFragmentManager(), "HelpFragment");
                 break;
             case HIDE_HELP:
-                if (mCurrentFragment.equals(HELP)) {
+                if (mHelpFragment != null) {
                     // call dismiss on fragment?
                     mHelpFragment.dismiss();
+                    mHelpFragment = null;
                 }
                 break;
             case NEWS:
@@ -451,14 +455,12 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SLEEP:
                 fragment = new OffFragment();
-                startLightSensor();
                 mirrorSleepState = LIGHT_SLEEP;
                 break;
             case TWITTER:
                 fragment = new TwitterFragment();
                 break;
             case WAKE:
-                stopLightSensor();
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
@@ -538,6 +540,10 @@ public class MainActivity extends AppCompatActivity
             voiceInput = NIGHT_LIGHT;
         }
 
+        if(voiceInput.contains(SLEEP)) {
+            voiceInput = SLEEP;
+        }
+
         // Some silliness to solve "weather" showing up too many times
         if(voiceInput.contains(WEATHER)) {
             if (voiceInput.contains("english")) {
@@ -572,7 +578,8 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = SLEEP;
                 break;
             case HIDE_HELP:
-                voiceInput =HIDE_HELP;
+            case HIDE:
+                voiceInput = HIDE_HELP;
                 break;
             case OPTIONS:
                 voiceInput = SETTINGS;
@@ -731,7 +738,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // OnStop, start a thread that keeps the wifip2p connection alive by pinging every 60 seconds
-    private void startWifiHeartbeat() {
+    public void startWifiHeartbeat() {
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
                 Executors.newScheduledThreadPool(1);
 
@@ -753,7 +760,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // --------------------------- LIGHT SENSSOR --------------------------------------
+    // --------------------------- LIGHT SENSOR --------------------------------------
 
     private void initializeLightSensor(){
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -777,14 +784,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
-        Log.i("LightSensor", Float.toString(currentLight));
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
-            if(currentLight < .1 ){//.1
+            //if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
+            if(currentLight < .1 ){
                 mLightIsOff = true;
-                Log.i("LightSensor", "lights off. value:" + currentLight);
-            } else if(currentLight > 3 && mLightIsOff ){//3
-                // the sensor sees some light, but the lights were "off" last poll. turn on the screen!
+                Log.i("LightSensor", "light is off");
+            }
+            if (currentLight > 3 && mLightIsOff ){
+                // the sensor sees some light. turn on the screen!
                 displayView(WAKE);
             }
         }

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="30dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Quote"
-        android:textSize="30dp"
+        android:text=""
+        android:textSize="30sp"
         android:id="@+id/quote_content"
         android:layout_gravity="center_vertical"
         android:layout_alignParentTop="true"
@@ -18,8 +19,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SpeakerName"
-        android:textSize="15dp"
+        android:text=""
+        android:textSize="23sp"
         android:id="@+id/quote_author"
         android:layout_gravity="center_vertical"
         android:layout_marginTop="27dp"

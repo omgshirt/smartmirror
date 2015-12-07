@@ -64,11 +64,11 @@
 
     <!-- Settings strings -->
     <string name="settings_screen_brightness">Screen Brightness</string>
-    <string name="settings_light_brightness">Light Brightness</string>
+    <string name="settings_night_light_brightness">Night Light Brightness</string>
     <string name="settings_weather_units">Weather Units</string>
     <string name="settings_system_vol">System Volume</string>
-    <string name="settings_music_vol">Music Volume</string>
-    <string name="settings_speech_freq">Settings Speech Frequency</string>
+    <string name="settings_music_vol">Speech Volume</string>
+    <string name="settings_speech_freq">Speech Frequency</string>
     <string name="settings_never">Never</string>
     <string name="settings_rare">Rarely</string>
     <string name="settings_often">Often</string>

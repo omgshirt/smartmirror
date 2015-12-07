@@ -71,7 +71,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-//@TargetApi(23)
+@TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
     private static final String TAKE_PICTURE="take a picture";
     private static Drive service;
@@ -355,6 +355,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    ((MainActivity)getActivity()).startTTS(text);
                     Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -768,12 +769,24 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private void takePicture() {
         cheeseHandler.postDelayed(new Runnable() {
             public void run() {
-                showToast("3");
-                showToast("2");
-                showToast("1");
-                showToast("CHEESE");
-                }
+                showToast("three");
+            }
         }, 0);
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                showToast("two");
+            }
+        }, 2000);
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                showToast("one");
+            }
+        }, 4000);
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                showToast("say cheese");
+            }
+        }, 6000);
         cheeseHandler.postDelayed(new Runnable() {
             public void run() {
                 lockFocus();

@@ -58,7 +58,7 @@ public class QuotesFragment extends Fragment {
         // Set-up the fade out
         Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
-        fadeOut.setStartOffset(5000);
+        fadeOut.setStartOffset(8000);
         fadeOut.setDuration(5000);
 
         // Create our animation

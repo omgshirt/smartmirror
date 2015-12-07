@@ -297,7 +297,8 @@ public class Preferences {
         mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
 
-        // This may not work (giving appContext)
+        setSystemVolume(mSystemVolume);
+
         LocalBroadcastManager.getInstance(appContext).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
     }

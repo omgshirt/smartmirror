@@ -81,8 +81,6 @@ public class WeatherFragment extends Fragment implements LocationListener {
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         forecasts = new DailyForecast[3];
 
-        // TODO: Find current lat and long positions. This should be within its own class so other frags can use it.
-        // maybe store this value in preferences?
         LocationManager locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
         if (getActivity().checkCallingOrSelfPermission(LocationManager.GPS_PROVIDER) == PackageManager.PERMISSION_GRANTED) {
