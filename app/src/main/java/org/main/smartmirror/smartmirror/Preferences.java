@@ -1,12 +1,20 @@
 package org.main.smartmirror.smartmirror;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.AudioManager;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -20,7 +28,7 @@ import android.util.Log;
  * Class is created at MainActivity start and loads the SharedPrefences for the application
  * Access is by getters and setters, which also handle file storage:
  */
-public class Preferences {
+public class Preferences implements LocationListener {
 
     private static Preferences mPreferences = null;
     private SharedPreferences mSharedPreferences;
@@ -130,6 +138,9 @@ public class Preferences {
     private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
     private String mTimeFormat = "h:mm a";          // Default string for time display
     private String mWeatherUnits;                      // Weather display format (English / metric)
+
+    private double mLatitude;
+    private double mLongitude;
 
 
     // Handle any messages sent from MainActivity
@@ -297,7 +308,32 @@ public class Preferences {
         mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
 
-        setSystemVolume(mSystemVolume);
+        // Find current lat and long positions.
+        // This is not currently saved to the prefs file, system will re-discover location on start
+        LocationManager locationManager = (LocationManager)mActivity.getSystemService(Context.LOCATION_SERVICE);
+        Location location = null;
+        if (locationManager != null) {
+            if (ContextCompat.checkSelfPermission(mActivity, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(mActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED)
+            {
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+        }
+
+        if (location != null) {
+            try {
+                mLatitude = location.getLatitude();
+                mLongitude = location.getLongitude();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        this.onLocationChanged(location);
+        Log.d("Location","lat:" + Double.toString(mLatitude));
+        Log.d("Location","long:" + Double.toString(mLongitude));
 
         LocalBroadcastManager.getInstance(appContext).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
@@ -315,6 +351,7 @@ public class Preferences {
     // returns the instance of the Preferences class, or creates one if it does not exist
     public static Preferences getInstance(Activity activity) {
         if (mPreferences == null) {
+            Log.d("Preferences", "Creating new prefs instance...");
             mPreferences = new Preferences(activity);
         }
         return mPreferences;
@@ -568,5 +605,44 @@ public class Preferences {
     private void speakText(int stringId) {
         String text = mActivity.getResources().getString(stringId);
         ((MainActivity)mActivity).startTTS(text);
+    }
+
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    public void setLatitude(double mLatitude) {
+        this.mLatitude = mLatitude;
+    }
+
+    public double getLongitude() {
+        return mLongitude;
+    }
+
+    public void setLongitude(double mLongitude) {
+        this.mLongitude = mLongitude;
+    }
+
+    // Location Listener Implementation
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.i("Location", "Location change detected");
+        mLatitude = location.getLatitude();
+        mLongitude = location.getLongitude();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.i("Location", "onStatusChanged:" + Integer.toString(status) );
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

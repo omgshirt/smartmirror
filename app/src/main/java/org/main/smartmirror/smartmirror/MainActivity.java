@@ -218,6 +218,12 @@ public class MainActivity extends AppCompatActivity
         // Light Sensor for waking / sleeping
         initializeLightSensor();
 
+        // Set up ScreenReceiver to hold screen on / off status
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        BroadcastReceiver screenReceiver = new ScreenReceiver();
+        registerReceiver(screenReceiver, intentFilter);
+
         // Set up view and nav drawer
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -260,8 +266,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
-        bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
-        mIsBound=true;
+        mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mirrorSleepState = AWAKE;
         // if there's a fragment pending to display, show it
         if (mCurrentFragment != null) {
@@ -273,34 +278,35 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onRestart(){
-        super.onRestart();
-        stopWifiHeartbeat();
-        stopLightSensor();
-    }
-
-    @Override
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
+        Log.i(TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
         mPreferences.resetScreenBrightness();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
+        if (ScreenReceiver.screenIsOn) {
+            stopWifiHeartbeat();
+            stopLightSensor();
+        }
     }
 
     @Override
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
+        Log.i(TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
         unregisterReceiver(mWifiReceiver);
+        if (!ScreenReceiver.screenIsOn) {
+            mirrorSleepState = SLEEPING;
+            startWifiHeartbeat();
+            startLightSensor();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        startWifiHeartbeat();
-        startLightSensor();
-        mirrorSleepState = SLEEPING;
         Log.i(TAG, "onStop");
     }
 
@@ -394,11 +400,13 @@ public class MainActivity extends AppCompatActivity
      */
     public void displayView(String viewName){
         Fragment fragment = null;
-        // If sleeping, save viewName and wake screen. Otherwise ignore command.
         Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
+        // If sleeping, ignore commands except WAKE and NIGHT_LIGHT
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
             if (!viewName.equals(WAKE) && !viewName.equals(NIGHT_LIGHT)) return;
         }
+
+        // TODO: At this point we can play a sound effect to indicate that a command has been received and is being processed.
 
         switch (viewName) {
             case CALENDAR:
@@ -437,6 +445,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case NIGHT_LIGHT:
                 stopLightSensor();
+                stopWifiHeartbeat();
                 if (mirrorSleepState == SLEEPING) {
                     mCurrentFragment = NIGHT_LIGHT;
                     wakeScreen();
@@ -785,7 +794,7 @@ public class MainActivity extends AppCompatActivity
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            //if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
+            if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
             if(currentLight < .1 ){
                 mLightIsOff = true;
                 Log.i("LightSensor", "light is off");

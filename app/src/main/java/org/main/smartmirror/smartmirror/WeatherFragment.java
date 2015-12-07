@@ -4,11 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Typeface;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -28,8 +24,6 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Random;
-
 
 /**
  * Fragment that displays the weather information
@@ -38,7 +32,7 @@ import java.util.Random;
  *              "forecast" speaks the 3-day forecast
  *              "conditions" speaks the current conditions
  */
-public class WeatherFragment extends Fragment implements LocationListener {
+public class WeatherFragment extends Fragment {
 
     Typeface weatherFont;
     Preferences mPreferences;
@@ -75,32 +69,14 @@ public class WeatherFragment extends Fragment implements LocationListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
 
         mPreferences = Preferences.getInstance(getActivity());
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         forecasts = new DailyForecast[3];
 
-        LocationManager locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-        Location location = null;
-        if (getActivity().checkCallingOrSelfPermission(LocationManager.GPS_PROVIDER) == PackageManager.PERMISSION_GRANTED) {
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
-        if (location != null) {
-            try {
-                mLatitude = Double.toString(location.getLatitude());
-                mLongitude = Double.toString(location.getLongitude());
-                Log.d("old","lat :  " + mLatitude);
-                Log.d("old","long :  " + mLongitude);
-                this.onLocationChanged(location);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
         // some static locations for now
-        mLatitude = "34";
-        mLongitude = "-118";
+        mLatitude = Double.toString(mPreferences.getLatitude());
+        mLongitude = Double.toString(mPreferences.getLongitude());
         startWeatherUpdate();
     }
 
@@ -145,7 +121,6 @@ public class WeatherFragment extends Fragment implements LocationListener {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             Log.d("Weather", "Got message:\"" + message +"\"");
             switch (message) {
@@ -264,8 +239,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
 
             // set current temp
             mCurrentTemp = (int)Math.round(currentHour.getDouble("temperature"));
-            String tempFormat = mPreferences.getTempString();
-            txtCurrentTemp.setText(mCurrentTemp + tempFormat);
+            String tempFormat = mCurrentTemp + mPreferences.getTempString();
+            txtCurrentTemp.setText(tempFormat);
 
             // set humidity
             mCurrentHumidity = (int) Math.round((currentHour.getDouble("humidity") * 100));
@@ -329,8 +304,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 timeForecast.setTextSize(15);
 
                 TextView tempForecast = (TextView)forecastLayout.findViewById(R.id.forecast_temp);
-                int temp = (int)Math.round(forecast.getDouble("temperature"));
-                tempForecast.setText( temp + getResources().getString(R.string.weather_deg) );
+                String textTmp = (int)Math.round(forecast.getDouble("temperature")) + getResources().getString(R.string.weather_deg);
+                tempForecast.setText(textTmp);
                 tempForecast.setTypeface(weatherFont);
                 tempForecast.setTextSize(15);
 
@@ -352,7 +327,8 @@ public class WeatherFragment extends Fragment implements LocationListener {
                 while (i < alerts.length()) {
                     // Alert descriptions can get really long. Ignoring for now.
                     //String description = alerts.getJSONObject(i).getString("description");
-                    title.append(alerts.getJSONObject(i).getString("title") + "\n");
+                    String txtTemp = alerts.getJSONObject(i).getString("title") + "\n";
+                    title.append(txtTemp);
                     txtWeatherAlert.setVisibility(View.VISIBLE);
                     i++;
                 }
@@ -369,7 +345,7 @@ public class WeatherFragment extends Fragment implements LocationListener {
 
     // choose weather icon based on iconType
     private void setWeatherIcon(TextView tv, String iconType, long sunrise, long sunset){
-        String icon = "";
+        String icon;
         if (getActivity() == null) return;
         switch(iconType) {
             case "clear-day": icon = getActivity().getString(R.string.weather_sunny);
@@ -411,28 +387,6 @@ public class WeatherFragment extends Fragment implements LocationListener {
         tv.setTypeface(weatherFont);
     }
 
-    // Location Listener Implementation
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.i("Location", "Location change detected");
-        mLatitude = Double.toString(location.getLatitude());
-        mLongitude = Double.toString(location.getLongitude());
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 
     // holds forecast data for one day
     private class DailyForecast {
