@@ -73,7 +73,7 @@ import java.util.concurrent.TimeUnit;
 
 @TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
-    private static final String TAKE_PICTURE="take a picture";
+
     private static Drive service;
     private GoogleAccountCredential credential;
 
@@ -446,7 +446,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             String message = intent.getStringExtra("message");
             Log.d("Camera", "Got message:\"" + message + "\"");
             switch (message) {
-                case TAKE_PICTURE:
+                case Constants.TAKE_PICTURE:
                     takePicture();
                     break;
             }

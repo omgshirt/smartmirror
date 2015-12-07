@@ -37,10 +37,6 @@ public class WeatherFragment extends Fragment {
     Typeface weatherFont;
     Preferences mPreferences;
 
-    // commands
-    public static final String CONDITIONS = "conditions";
-    public static final String FORECAST = "forecast";
-
     private TextView txtWeatherIcon;
     private TextClock clkTextClock;
     private TextClock clkDateClock;
@@ -124,10 +120,10 @@ public class WeatherFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("Weather", "Got message:\"" + message +"\"");
             switch (message) {
-                case FORECAST:
+                case Constants.FORECAST:
                     speakWeatherForecast();
                     break;
-                case CONDITIONS:
+                case Constants.CONDITIONS:
                     speakCurrentConditions();
                     break;
                 case Preferences.CMD_WEATHER_ENGLISH:

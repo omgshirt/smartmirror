@@ -114,7 +114,7 @@ public class GalleryFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("News", "Got message:\"" + message + "\"");
             switch(message){
-                case MainActivity.BACK:
+                case Constants.BACK:
                     getFragmentManager().popBackStack();
                     break;
 

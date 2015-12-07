@@ -23,7 +23,7 @@ public class FacebookFragment extends Fragment {
     public void init(String url) {
         curURL = url;
     }
-    
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
