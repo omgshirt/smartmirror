@@ -14,28 +14,19 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookSdk;
 
 public class FacebookFragment extends Fragment {
 
-    //LoginButton btnLoginButton;
-    //CallbackManager mCBManager;
     private WebView webview;
     private String curURL;
 
     public void init(String url) {
-
         curURL = url;
-
     }
-
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
-        //mCBManager = CallbackManager.Factory.create();
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
         init("https://m.facebook.com/");
 
@@ -88,21 +79,9 @@ public class FacebookFragment extends Fragment {
     }
 
     private class webClient extends WebViewClient {
-
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
             return false;
-
         }
-
     }
-
-/*    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mCBManager.onActivityResult(requestCode, resultCode, data);
-    }*/
-
-
 }

@@ -177,7 +177,7 @@ public class QuotesFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("Quotes", "Got message:\"" + message + "\"");
             switch(message){
-                case MainActivity.BACK:
+                case Constants.BACK:
                     getFragmentManager().popBackStack();
                     break;
             }
