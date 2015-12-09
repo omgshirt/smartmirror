@@ -1,7 +1,5 @@
 package org.main.smartmirror.smartmirror;
-/**
- * Created by Master N on 11/20/2015.
- */
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -71,6 +69,10 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+
+/**
+ * Fragment that handles the Camera taking and uploading functionality.
+ */
 @TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
 

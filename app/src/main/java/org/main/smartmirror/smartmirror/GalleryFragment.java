@@ -187,43 +187,4 @@ public class GalleryFragment extends Fragment {
             e.printStackTrace();
         }
     }
-
-    // ----------------------- Local Broadcast Receiver -----------------------
-
-    // Create a handler for received Intents. This will be called whenever an Intent
-    // with an action named "inputAction" is broadcast.
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("message");
-            Log.d("News", "Got message:\"" + message + "\"");
-            switch(message){
-                case MainActivity.BACK:
-                    getFragmentManager().popBackStack();
-                    break;
-
-            }
-
-        }
-    };
-
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
-     */
-    @Override
-    public void onResume(){
-        super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-                new IntentFilter("inputAction"));
-    }
-
-    @Override
-    // when this goes out of view, halt listening
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-    }
 }
