@@ -14,12 +14,9 @@ import android.util.Log;
 
 public class FetchWeather {
 
-    private static final String OPEN_WEATHER_MAP_API =
-            "http://api.openweathermap.org/data/2.5/weather?id=%s&units=%s";
-
     public static JSONObject getJSON(Context context, String city, String units){
         try {
-            URL url = new URL(String.format(OPEN_WEATHER_MAP_API, city, units));
+            URL url = new URL(String.format(Constants.OPEN_WEATHER_MAP_API, city, units));
             HttpURLConnection connection =
                     (HttpURLConnection)url.openConnection();
 
