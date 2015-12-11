@@ -313,10 +313,8 @@ public class Preferences implements LocationListener {
         LocationManager locationManager = (LocationManager)mActivity.getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
         if (locationManager != null) {
-            if (ContextCompat.checkSelfPermission(mActivity, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(mActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED)
+            if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             {
                 location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }

@@ -42,7 +42,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -71,12 +70,14 @@ public class MainActivity extends AppCompatActivity
     private Sensor mLightSensor;
     private boolean mLightIsOff;
 
+
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
 
     // Sleep state & wakelocks
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
+    private BroadcastReceiver mScreenReceiver;
     private String mCurrentFragment = null;
     private final int WAKELOCK_TIMEOUT = 1000;
     private PowerManager.WakeLock mWakeLock;
@@ -142,8 +143,7 @@ public class MainActivity extends AppCompatActivity
                     String result = msg.getData().getString("result");
                     if(DEBUG)
                         Log.i("MAIN", result);
-                    speechResult(result);
-                    playSuccessSound();
+                    handleVoiceCommand(result);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -187,8 +187,8 @@ public class MainActivity extends AppCompatActivity
         // Set up ScreenReceiver to hold screen on / off status
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        BroadcastReceiver screenReceiver = new ScreenReceiver();
-        registerReceiver(screenReceiver, intentFilter);
+        mScreenReceiver = new ScreenReceiver();
+        registerReceiver(mScreenReceiver, intentFilter);
 
         // Set up view and nav drawer
         setContentView(R.layout.activity_main);
@@ -249,6 +249,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "onResume");
         Log.i(Constants.TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
         mPreferences.resetScreenBrightness();
+        // TODO: Why is this creating a new object?
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
         if (ScreenReceiver.screenIsOn) {
@@ -286,6 +287,7 @@ public class MainActivity extends AppCompatActivity
             wifiHeartbeat = null;
         }
         unbindService(mConnection);
+        unregisterReceiver(mScreenReceiver);
         mIsBound=false;
         Log.i(Constants.TAG, "onDestroy");
     }
@@ -373,7 +375,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // TODO: At this point we can play a sound effect to indicate that a command has been received and is being processed.
-        // See line 184 & 525
+        playSuccessSound();
 
         switch (viewName) {
             case Constants.CALENDAR:
@@ -511,9 +513,9 @@ public class MainActivity extends AppCompatActivity
      * used by the remote.
      * @param input the command the user gave
      */
-    public void speechResult(String input) {
+    public void handleVoiceCommand(String input) {
         String voiceInput = input.trim();
-        Log.i("VR", "speechResult:"+input);
+        Log.i("VR", "handleVoiceCommand:"+input);
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
