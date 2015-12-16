@@ -41,6 +41,11 @@ public class QuotesFragment extends Fragment {
     private TimerTask mTimerTask;
     private Typeface mQuoteFont;
 
+    private final int fadeInTime = 2500;
+    private final int fadeOutTime = 2500;
+    private final int quoteDisplayLength = 6000;
+    private final int totalDisplayTime = fadeInTime + quoteDisplayLength + fadeOutTime;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +58,13 @@ public class QuotesFragment extends Fragment {
         // Set-up the fade in
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setInterpolator(new DecelerateInterpolator());
-        fadeIn.setDuration(5000);
+        fadeIn.setDuration(fadeInTime);
 
         // Set-up the fade out
         Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
-        fadeOut.setStartOffset(8000);
-        fadeOut.setDuration(5000);
+        fadeOut.setStartOffset(fadeInTime + quoteDisplayLength);
+        fadeOut.setDuration(fadeOutTime);
 
         // Create our animation
         final AnimationSet animation = new AnimationSet(false);
@@ -100,7 +105,7 @@ public class QuotesFragment extends Fragment {
         // Apply the font
         mQuoteContent.setTypeface(mQuoteFont);
         // Start the timer
-        mTimer.scheduleAtFixedRate(mTimerTask, 0, 10000);
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
         return view;
     }
 

@@ -181,6 +181,8 @@ public class MainActivity extends AppCompatActivity
         mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
         discoverPeers();
 
+        mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
+
         // Light Sensor for waking / sleeping
         initializeLightSensor();
 
@@ -247,10 +249,8 @@ public class MainActivity extends AppCompatActivity
     public void onResume(){
         super.onResume();
         Log.i(Constants.TAG, "onResume");
-        Log.i(Constants.TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
+        Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
         mPreferences.resetScreenBrightness();
-        // TODO: Why is this creating a new object?
-        mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
         if (ScreenReceiver.screenIsOn) {
             stopWifiHeartbeat();
@@ -374,7 +374,6 @@ public class MainActivity extends AppCompatActivity
             if (!viewName.equals(Constants.WAKE) && !viewName.equals(Constants.NIGHT_LIGHT)) return;
         }
 
-        // TODO: At this point we can play a sound effect to indicate that a command has been received and is being processed.
         playSuccessSound();
 
         switch (viewName) {
@@ -413,6 +412,7 @@ public class MainActivity extends AppCompatActivity
                 fragment.setArguments(bundle);
                 break;
             case Constants.NIGHT_LIGHT:
+            case Constants.LIGHT:
                 stopLightSensor();
                 stopWifiHeartbeat();
                 if (mirrorSleepState == SLEEPING) {
@@ -588,6 +588,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void startSpeechRecognition(){
         try {
+            Log.i("VR", "startSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.START_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
