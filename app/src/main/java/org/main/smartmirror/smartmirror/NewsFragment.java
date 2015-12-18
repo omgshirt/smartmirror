@@ -28,6 +28,8 @@ public class NewsFragment extends Fragment {
     public static String mNewsDefault ="http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
 
+    public static String mGuardURL = "http://content.guardianapis.com/search?show-fields=all&q=football&api-key=";
+
     private TextView mTxtHeadline;
     private TextView mTxtHeadline2;
     private TextView mTxtHeadline3;
@@ -51,6 +53,7 @@ public class NewsFragment extends Fragment {
 
     String mApiKey;
     String mNewURL;
+    String mGuardAPIKey;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
@@ -98,10 +101,11 @@ public class NewsFragment extends Fragment {
             // Use initialisation data
         }
         mApiKey = getString(R.string.nyt_api_key);
+        mGuardAPIKey = getString(R.string.guardian_api_key);
 
         String newsURL = this.getArguments().getString("url");
         newsURL += mApiKey;
-        updateNews(newsURL);
+        updateNews(mGuardURL+mGuardAPIKey);
 
         //updateNews(mNewsDefault+mNewsDesk+mPostURL+mApiKey);
 
@@ -191,7 +195,8 @@ public class NewsFragment extends Fragment {
 
     private void renderNews(JSONObject json){
         try {
-            String newsFeed[] = new String[10];
+            Log.i("NEWS JSON", json.toString());
+            /*String newsFeed[] = new String[10];
             String hl[] = new String[10];
 
             JSONObject response = null;
@@ -209,12 +214,12 @@ public class NewsFragment extends Fragment {
                 hl[i] = headline.getString("main");
                 newsFeed[i] = snippet;
                 i++;
-            }
+            }*/
 
 
             //mytextview.setText(Html.fromHtml(sourceString)); //format
 
-            String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + newsFeed[0] + "<br>";
+            /*String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + newsFeed[0] + "<br>";
             mTxtHeadline.setText(Html.fromHtml(txt0));
 
             String txt1 = "<b>" + hl[1] + "</b> " + "<br>" + newsFeed[1] + "<br>";
@@ -236,7 +241,7 @@ public class NewsFragment extends Fragment {
             mTxtHeadline7.setText(Html.fromHtml(txt6));
 
             String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + newsFeed[7] + "<br>";
-            mTxtHeadline8.setText(Html.fromHtml(txt7));
+            mTxtHeadline8.setText(Html.fromHtml(txt7));*/
 
         }catch(Exception e){
             Log.e("NEWS ERROR", e.toString());
