@@ -11,9 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
+import android.media.MediaPlayer;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -103,12 +101,15 @@ public class MainActivity extends AppCompatActivity
     private boolean mIsBound;
     private Messenger mService;
 
+    // Sound effects
+    private MediaPlayer mFXPlayer;
+
     // used to establish a service connection
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = new Messenger(service);
-
+            initSpeechRecognition();
             // not sure if I need this keep me
             /*try {
                 Message msg = Message.obtain(null, VoiceService.REGISTER_SERV);
@@ -222,6 +223,7 @@ public class MainActivity extends AppCompatActivity
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+
     }
 
     public static Context getContextForApplication() {
@@ -262,7 +264,7 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         Log.i(Constants.TAG, "onPause");
-        Log.i(Constants.TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
+        Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
         unregisterReceiver(mWifiReceiver);
         if (!ScreenReceiver.screenIsOn) {
             mirrorSleepState = SLEEPING;
@@ -288,7 +290,7 @@ public class MainActivity extends AppCompatActivity
         }
         unbindService(mConnection);
         unregisterReceiver(mScreenReceiver);
-        mIsBound=false;
+        mIsBound = false;
         Log.i(Constants.TAG, "onDestroy");
     }
 
@@ -307,6 +309,7 @@ public class MainActivity extends AppCompatActivity
 
     // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
 
+    @SuppressWarnings("deprecation")
     protected void wakeScreen() {
         Log.i(Constants.TAG, "wakeScreen() called");
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
@@ -373,8 +376,6 @@ public class MainActivity extends AppCompatActivity
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
             if (!viewName.equals(Constants.WAKE) && !viewName.equals(Constants.NIGHT_LIGHT)) return;
         }
-
-        playSuccessSound();
 
         switch (viewName) {
             case Constants.CALENDAR:
@@ -466,9 +467,10 @@ public class MainActivity extends AppCompatActivity
         if(fragment != null){
             if(DEBUG) {
                 Log.i("displayView", "Displaying: " + viewName);
-                startTTS(viewName);
             }
-
+            // TODO: change this to Preferences.acknowledgeWithVoice / FX?
+            playSound(R.raw.celeste_a);
+            //startTTS(viewName);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
 
@@ -487,15 +489,6 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    public void playSuccessSound(){
-        try {
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
-            ringtone.play();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Gets the fragment currently being viewed. If the mirror in SLEEP or LIGHT_SLEEP,
@@ -583,10 +576,22 @@ public class MainActivity extends AppCompatActivity
         displayView(voiceInput);
     }
 
+    public void initSpeechRecognition() {
+        try {
+            Log.i("VR", "startSpeechRecognition()");
+            Message msg = Message.obtain(null, VoiceService.INIT_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
+        if(mTTSHelper.isSpeaking()) return;
         try {
             Log.i("VR", "startSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.START_SPEECH);
@@ -608,6 +613,25 @@ public class MainActivity extends AppCompatActivity
             mService.send(msg);
         } catch (RemoteException e) {
             e.printStackTrace();
+        }
+    }
+
+    // --------------------------------- Sound Effects Playback -----------------------------
+
+    /**
+     * Plays the sound resource located in /res/raw
+     * @param _id sound resource to play
+     */
+    public void playSound(int _id)
+    {
+        if(mFXPlayer != null)
+        {
+            mFXPlayer.reset();
+            mFXPlayer.release();
+        }
+        mFXPlayer = MediaPlayer.create(this, _id);
+        if(mFXPlayer != null) {
+            mFXPlayer.start();
         }
     }
 
