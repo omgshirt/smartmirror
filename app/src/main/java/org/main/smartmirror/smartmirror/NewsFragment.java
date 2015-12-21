@@ -195,7 +195,21 @@ public class NewsFragment extends Fragment {
 
     private void renderNews(JSONObject json){
         try {
-            Log.i("NEWS JSON", json.toString());
+            //Log.i("NEWS JSON", json.toString());
+            JSONObject response = null;
+            JSONObject results = null;
+            JSONObject fields = null;
+            String body = null;
+            String standFirst = null;
+            String webTitle = null;
+
+            response = json.getJSONObject("response");
+            results = response.getJSONArray("results").getJSONObject(1);
+            webTitle = results.getString("webTitle");
+            fields = results.getJSONObject("fields");
+            body = fields.getString("body");
+            standFirst = fields.getString("standFirst");
+
             /*String newsFeed[] = new String[10];
             String hl[] = new String[10];
 
