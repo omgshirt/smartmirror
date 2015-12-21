@@ -21,14 +21,21 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 public class NewsFragment extends Fragment {
-    public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
+
+    // new york times api
+    /*public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
     public static String mPostURL = "&sort=newest&api-key=";
     public static String mNewsDesk = "U.S.";
     //public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
     public static String mNewsDefault ="http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
-    public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;
+    public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;*/
 
-    public static String mGuardURL = "http://content.guardianapis.com/search?show-fields=all&q=football&api-key=";
+    // the guardian api
+    public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=all&order-by=newest&q=world&api-key=";
+    public static String mNewsSection = "world";
+    public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&q=";
+    public static String mPostURL = "&api-key=";
+    public static String mGuardURL = mPreURL + mNewsSection + mPostURL;
 
     private TextView mTxtHeadline;
     private TextView mTxtHeadline2;
@@ -59,7 +66,7 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
 
         // Initialize Items
-        mNewsDesk = "U.S.";
+        mNewsSection = "world";
 
         mNYTButton  = (ImageButton)view.findViewById(R.id.btnNYTbranding);
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
@@ -82,7 +89,7 @@ public class NewsFragment extends Fragment {
         mTxtHeadline7.setText("");
         mTxtHeadline8.setText("");
 
-        txtNewsDesk.setText(mNewsDesk.toUpperCase());
+        txtNewsDesk.setText(mNewsSection.toUpperCase());
 
         // set onClickListener
         mNYTButton.setOnClickListener(new View.OnClickListener() {
@@ -100,12 +107,12 @@ public class NewsFragment extends Fragment {
         if (args != null) {
             // Use initialisation data
         }
-        mApiKey = getString(R.string.nyt_api_key);
-        mGuardAPIKey = getString(R.string.guardian_api_key);
+        mApiKey = getString(R.string.nyt_api_key); // nyt api key
+        mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
 
         String newsURL = this.getArguments().getString("url");
         newsURL += mApiKey;
-        updateNews(mGuardURL+mGuardAPIKey);
+        updateNews(mDefaultGuardURL+mGuardAPIKey);
 
         //updateNews(mNewsDefault+mNewsDesk+mPostURL+mApiKey);
 
@@ -129,16 +136,17 @@ public class NewsFragment extends Fragment {
                     getFragmentManager().popBackStack();
                     break;
                 default:
-                    String[] urlArr = getResources().getStringArray(R.array.nyt_news_desk);
+                    String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
                     int i = 0;
                     while (i < urlArr.length) {
                         if (message.contains(urlArr[i])) {
-                            mNewsDesk = urlArr[i];
-                            mNYTURL = mPreURL + mNewsDesk + mPostURL;
-                            mNewURL = mNYTURL + mApiKey;
+                            mNewsSection = urlArr[i];
+                            mGuardURL = mPreURL + mNewsSection + mPostURL;
+                            mNewURL = mGuardURL + mGuardAPIKey;
                             Log.i("voice news desk: ", urlArr[i]);
-                            txtNewsDesk.setText(mNewsDesk.toUpperCase());
+                            txtNewsDesk.setText(mNewsSection.toUpperCase());
                             updateNews(mNewURL);
+
                             break;
                         } else {
                             i++;
@@ -200,15 +208,52 @@ public class NewsFragment extends Fragment {
             JSONObject results = null;
             JSONObject fields = null;
             String body = null;
-            String standFirst = null;
+            String trailText = null;
             String webTitle = null;
 
-            response = json.getJSONObject("response");
-            results = response.getJSONArray("results").getJSONObject(1);
-            webTitle = results.getString("webTitle");
-            fields = results.getJSONObject("fields");
-            body = fields.getString("body");
-            standFirst = fields.getString("standFirst");
+            int i = 0;
+            int numItems = 8;
+            String hl[] = new String[numItems];
+            String snippets[] = new String[numItems];
+            String article[] = new String[numItems];
+
+
+            while (i < numItems) {
+                response = json.getJSONObject("response");
+                results = response.getJSONArray("results").getJSONObject(i);
+                webTitle = results.getString("webTitle");
+                hl[i] = webTitle;
+                fields = results.getJSONObject("fields");
+                body = fields.getString("body");
+                article[i] = body;
+                trailText = fields.getString("trailText");
+                snippets[i] = trailText;
+                i++;
+            }
+
+            String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + snippets[0] + "<br>";
+            mTxtHeadline.setText(Html.fromHtml(txt0));
+
+            String txt1 = "<b>" + hl[1] + "</b> " + "<br>" + snippets[1] + "<br>";
+            mTxtHeadline2.setText(Html.fromHtml(txt1));
+
+            String txt2 = "<b>" + hl[2] + "</b> " + "<br>" + snippets[2] + "<br>";
+            mTxtHeadline3.setText(Html.fromHtml(txt2));
+
+            String txt3 = "<b>" + hl[3] + "</b> " + "<br>" + snippets[3] + "<br>";
+            mTxtHeadline4.setText(Html.fromHtml(txt3));
+
+            String txt4 = "<b>" + hl[4] + "</b> " + "<br>" + snippets[4] + "<br>";
+            mTxtHeadline5.setText(Html.fromHtml(txt4));
+
+            String txt5 = "<b>" + hl[5] + "</b> " + "<br>" + snippets[5] + "<br>";
+            mTxtHeadline6.setText(Html.fromHtml(txt5));
+
+            String txt6 = "<b>" + hl[6] + "</b> " + "<br>" + snippets[6] + "<br>";
+            mTxtHeadline7.setText(Html.fromHtml(txt6));
+
+            String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + snippets[7] + "<br>";
+            mTxtHeadline8.setText(Html.fromHtml(txt7));
 
             /*String newsFeed[] = new String[10];
             String hl[] = new String[10];
@@ -233,29 +278,7 @@ public class NewsFragment extends Fragment {
 
             //mytextview.setText(Html.fromHtml(sourceString)); //format
 
-            /*String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + newsFeed[0] + "<br>";
-            mTxtHeadline.setText(Html.fromHtml(txt0));
 
-            String txt1 = "<b>" + hl[1] + "</b> " + "<br>" + newsFeed[1] + "<br>";
-            mTxtHeadline2.setText(Html.fromHtml(txt1));
-
-            String txt2 = "<b>" + hl[2] + "</b> " + "<br>" + newsFeed[2] + "<br>";
-            mTxtHeadline3.setText(Html.fromHtml(txt2));
-
-            String txt3 = "<b>" + hl[3] + "</b> " + "<br>" + newsFeed[3] + "<br>";
-            mTxtHeadline4.setText(Html.fromHtml(txt3));
-
-            String txt4 = "<b>" + hl[4] + "</b> " + "<br>" + newsFeed[4] + "<br>";
-            mTxtHeadline5.setText(Html.fromHtml(txt4));
-
-            String txt5 = "<b>" + hl[5] + "</b> " + "<br>" + newsFeed[5] + "<br>";
-            mTxtHeadline6.setText(Html.fromHtml(txt5));
-
-            String txt6 = "<b>" + hl[6] + "</b> " + "<br>" + newsFeed[6] + "<br>";
-            mTxtHeadline7.setText(Html.fromHtml(txt6));
-
-            String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + newsFeed[7] + "<br>";
-            mTxtHeadline8.setText(Html.fromHtml(txt7));*/
 
         }catch(Exception e){
             Log.e("NEWS ERROR", e.toString());
