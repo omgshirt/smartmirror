@@ -365,6 +365,13 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    public void hideHelpFragment() {
+        if (mHelpFragment != null) {
+            mHelpFragment.dismiss();
+            mHelpFragment = null;
+        }
+    }
+
     /**
      * Handles which fragment will be displayed to the user
      * @param viewName the name of the view to be displayed
@@ -375,6 +382,18 @@ public class MainActivity extends AppCompatActivity
         // If sleeping, ignore commands except WAKE and NIGHT_LIGHT
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
             if (!viewName.equals(Constants.WAKE) && !viewName.equals(Constants.NIGHT_LIGHT)) return;
+        }
+
+        // help dismissed by all commands
+        hideHelpFragment();
+
+        // 'menu' command toggles drawer open / close.
+        // all other commands will close the drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (viewName.equals(Constants.MENU) && !drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.openDrawer(GravityCompat.START);
+        } else {
+            drawer.closeDrawer(GravityCompat.START);
         }
 
         switch (viewName) {
@@ -396,14 +415,10 @@ public class MainActivity extends AppCompatActivity
                 fragment = new GalleryFragment();
                 break;
             case Constants.HELP:
-                mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
-                mHelpFragment.show(getFragmentManager(), "HelpFragment");
-                break;
-            case Constants.HIDE_HELP:
-                if (mHelpFragment != null) {
-                    // call dismiss on fragment?
-                    mHelpFragment.dismiss();
-                    mHelpFragment = null;
+                // only display help if it is not already visible
+                if (mHelpFragment == null) {
+                    mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
+                    mHelpFragment.show(getFragmentManager(), "HelpFragment");
                 }
                 break;
             case Constants.NEWS:
@@ -485,8 +500,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
     }
 
 

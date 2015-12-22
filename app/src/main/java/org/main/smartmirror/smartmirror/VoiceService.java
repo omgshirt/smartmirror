@@ -36,6 +36,7 @@ public class VoiceService extends Service implements RecognitionListener{
     static final int START_SPEECH = 1;
     static final int RESULT_SPEECH = 2;
     public static final int INIT_SPEECH = 3;
+    public static final int CANCEL_SPEECH = 4;
     private String SMARTMIRROR_SEARCH = "mirrorSearch";
     private final String GRAMMAR_SEARCH = "grammarSearch";
     private final String MIRROR_KWS = "show";
@@ -274,7 +275,10 @@ public class VoiceService extends Service implements RecognitionListener{
                     //mClients.add(msg.replyTo);
                     startVoice();
                     break;
+                case CANCEL_SPEECH:
                 case STOP_SPEECH:
+                    // We may want to discriminate between these options. Stop should process
+                    // any audio in the queue, while cancel throws out any pending results.
                     //mClients.remove(msg.replyTo);
                     if(mSpeechInitialized)
                         mSpeechRecognizer.cancel();

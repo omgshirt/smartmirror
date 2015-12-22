@@ -8,6 +8,7 @@ public class Constants {
     public static final String BACK = "back";
     public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
+    public static final String MENU = "menu";
     public static final String OFF = "off";
     public static final String ON = "on";
     public static final String OPTIONS = "options";
