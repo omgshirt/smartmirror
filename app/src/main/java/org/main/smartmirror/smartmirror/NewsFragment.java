@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
@@ -20,18 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONObject;
 
-public class NewsFragment extends Fragment {
-
-    // new york times api
-    /*public static String mPreURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
-    public static String mPostURL = "&sort=newest&api-key=";
-    public static String mNewsDesk = "U.S.";
-    //public static String mNewsDefault = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-    public static String mNewsDefault ="http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3A";
-    public static String mNYTURL = mPreURL + mNewsDesk + mPostURL;*/
+public class NewsFragment extends Fragment{
 
     // the guardian api
-    public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=all&order-by=newest&q=world&api-key=";
+    public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
+            "all&order-by=newest&q=world&api-key=";
     public static String mNewsSection = "world";
     public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&q=";
     public static String mPostURL = "&api-key=";
@@ -45,30 +40,22 @@ public class NewsFragment extends Fragment {
     private TextView mTxtHeadline6;
     private TextView mTxtHeadline7;
     private TextView mTxtHeadline8;
-    private ImageButton mNYTButton;
     private TextView txtNewsDesk;
 
     Handler mHandler = new Handler();
 
-    // this URL does some filtering so as to only retrieve the "headline" and "snippet" for each item,
-    // without the full text and other extras (date, etc).
-    // see the NYTIMES API console for JSON format
-/*    private String sportsUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3Asports&" +
-            "begin_date=20151028&end_date=20151028&sort=newest&fl=headline%2Csnippet&page=0&api-key=";*/
-
     public NewsFragment() {}
 
-    String mApiKey;
     String mNewURL;
     String mGuardAPIKey;
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
 
         // Initialize Items
         mNewsSection = "world";
 
-        mNYTButton  = (ImageButton)view.findViewById(R.id.btnNYTbranding);
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
         mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
         mTxtHeadline3 = (TextView)view.findViewById(R.id.headline3);
@@ -92,32 +79,30 @@ public class NewsFragment extends Fragment {
         txtNewsDesk.setText(mNewsSection.toUpperCase());
 
         // set onClickListener
-        mNYTButton.setOnClickListener(new View.OnClickListener() {
+        mTxtHeadline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = getString(R.string.nyt_url);
-                Intent intntNYT = new Intent(Intent.ACTION_VIEW);
-                intntNYT.setData(Uri.parse(url));
-                startActivity(intntNYT);
+                Constants.mArticleFullBody = Constants.article[0];
+                mTxtHeadline.setText("");
+                mTxtHeadline2.setText("");
+                mTxtHeadline3.setText("");
+                mTxtHeadline4.setText("");
+                mTxtHeadline5.setText("");
+                mTxtHeadline6.setText("");
+                mTxtHeadline7.setText("");
+                mTxtHeadline8.setText("");
+                Fragment fragment = new NewsBodyFragment();
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .commit();
             }
         });
 
-
-        Bundle args = getArguments();
-        if (args != null) {
-            // Use initialisation data
-        }
-        mApiKey = getString(R.string.nyt_api_key); // nyt api key
         mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
-
-        String newsURL = this.getArguments().getString("url");
-        newsURL += mApiKey;
         updateNews(mDefaultGuardURL+mGuardAPIKey);
 
-        //updateNews(mNewsDefault+mNewsDesk+mPostURL+mApiKey);
-
         return view;
-
     }
 
 
@@ -160,8 +145,8 @@ public class NewsFragment extends Fragment {
     };
 
     /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
+     *  We're interested in the 'inputAction' intent, which carries any inputs send to
+     *  MainActivity from voice recognition, the remote control, etc.
      */
     @Override
     public void onResume(){
@@ -185,7 +170,7 @@ public class NewsFragment extends Fragment {
                     mHandler.post(new Runnable(){
                         public void run(){
                             Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.sports_error),
+                                    getActivity().getString(R.string.news_error),
                                     Toast.LENGTH_LONG).show();
                         }
                     });
@@ -212,20 +197,19 @@ public class NewsFragment extends Fragment {
             String webTitle = null;
 
             int i = 0;
-            int numItems = 8;
-            String hl[] = new String[numItems];
-            String snippets[] = new String[numItems];
-            String article[] = new String[numItems];
+
+            String hl[] = new String[Constants.numItems];
+            String snippets[] = new String[Constants.numItems];
 
 
-            while (i < numItems) {
+            while (i < Constants.numItems) {
                 response = json.getJSONObject("response");
                 results = response.getJSONArray("results").getJSONObject(i);
                 webTitle = results.getString("webTitle");
                 hl[i] = webTitle;
                 fields = results.getJSONObject("fields");
                 body = fields.getString("body");
-                article[i] = body;
+                Constants.article[i] = body;
                 trailText = fields.getString("trailText");
                 snippets[i] = trailText;
                 i++;
@@ -254,30 +238,6 @@ public class NewsFragment extends Fragment {
 
             String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + snippets[7] + "<br>";
             mTxtHeadline8.setText(Html.fromHtml(txt7));
-
-            /*String newsFeed[] = new String[10];
-            String hl[] = new String[10];
-
-            JSONObject response = null;
-            JSONObject docs = null;
-            String snippet = null;
-            JSONObject headline = null;
-
-            int i = 0;
-            int numFeeds = 8;
-            while (i < numFeeds) {
-                response = json.getJSONObject("response");
-                docs = response.getJSONArray("docs").getJSONObject(i);
-                snippet = docs.getString("snippet");
-                headline = docs.getJSONObject("headline");
-                hl[i] = headline.getString("main");
-                newsFeed[i] = snippet;
-                i++;
-            }*/
-
-
-            //mytextview.setText(Html.fromHtml(sourceString)); //format
-
 
 
         }catch(Exception e){

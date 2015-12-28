@@ -68,9 +68,6 @@ public class MainActivity extends AppCompatActivity
     private Sensor mLightSensor;
     private boolean mLightIsOff;
 
-    // News
-    public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-
     // Sleep state & wakelocks
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
@@ -401,9 +398,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.NEWS:
                 fragment = new NewsFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("url", mDefaultURL);
-                fragment.setArguments(bundle);
+                break;
+            case Constants.NEWS_BODY:
+                fragment = new NewsBodyFragment();
                 break;
             case Constants.NIGHT_LIGHT:
                 stopLightSensor();

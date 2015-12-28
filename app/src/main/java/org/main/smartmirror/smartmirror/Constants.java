@@ -28,6 +28,7 @@ public class Constants {
     public static final String SLEEP = "sleep";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
+    public static final String NEWS_BODY = "news body";
     public static final String SHOW_HELP = "show help";
     public static final String TRAFFIC = "traffic";
     public static final String NIGHT_LIGHT = "night light";
@@ -62,4 +63,8 @@ public class Constants {
     public static final String SCROLLUP="scroll up";
     public static final String SCROLLDOWN="scroll down";
 
+    //--------------NEWS--------------
+    public static String mArticleFullBody = "";
+    public static int numItems = 8;
+    public static String article[] = new String[numItems];
 }
