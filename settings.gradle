@@ -1,2 +1,3 @@
 include ':app', ':pocketsphinx-android-5prealpha-nolib'
 include 'json-simple-1.1.jar'
+include ':openCVLibrary310'
