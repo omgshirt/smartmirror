@@ -67,4 +67,10 @@ public class Constants {
     public static String mArticleFullBody = "";
     public static int numItems = 8;
     public static String article[] = new String[numItems];
+    public static String hl[] = new String[Constants.numItems];
+    public static String snippets[] = new String[Constants.numItems];
+    public static String body = "";
+    public static String trailText = "";
+    public static String webTitle = "";
+    public static String mHeadline = "";
 }

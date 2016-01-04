@@ -23,6 +23,7 @@ import org.json.JSONObject;
 public class NewsBodyFragment extends Fragment {
 
     TextView mTxtBody;
+    TextView mTxtHeadline;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_body_fragment, container, false);
@@ -30,6 +31,8 @@ public class NewsBodyFragment extends Fragment {
         // Initialize Items
         mTxtBody = (TextView)view.findViewById(R.id.txtNewsBody);
         mTxtBody.setText(Html.fromHtml(Constants.mArticleFullBody));
+        mTxtHeadline = (TextView)view.findViewById(R.id.txtHeadline);
+        mTxtHeadline.setText(Constants.mHeadline);
         return view;
     }
 

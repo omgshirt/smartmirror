@@ -6,13 +6,7 @@
     android:layout_height="wrap_content"
     android:padding="15dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="News Desk"
-        android:id="@+id/txtNewsDesk"
-        android:layout_gravity="center_horizontal" />
+
 
     <FrameLayout
         android:id="@+id/news_fragment_frame"
@@ -24,6 +18,14 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="News Desk"
+                android:id="@+id/txtNewsDesk"
+                android:layout_gravity="center_horizontal" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -72,6 +74,7 @@
                 android:layout_height="wrap_content"
                 android:text="New Text"
                 android:id="@+id/headline8" />
+
         </LinearLayout>
 
     </FrameLayout>

@@ -76,6 +76,7 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[0];
+                Constants.mHeadline = Constants.hl[0];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -88,6 +89,7 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[1];
+                Constants.mHeadline = Constants.hl[1];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -100,6 +102,7 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[2];
+                Constants.mHeadline = Constants.hl[2];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -112,6 +115,7 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[3];
+                Constants.mHeadline = Constants.hl[3];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -124,6 +128,7 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[4];
+                Constants.mHeadline = Constants.hl[4];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -136,6 +141,7 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[5];
+                Constants.mHeadline = Constants.hl[5];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -148,6 +154,7 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[6];
+                Constants.mHeadline = Constants.hl[6];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -160,6 +167,7 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[7];
+                Constants.mHeadline = Constants.hl[7];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -184,6 +192,7 @@ public class NewsFragment extends Fragment{
         mTxtHeadline6.setText("");
         mTxtHeadline7.setText("");
         mTxtHeadline8.setText("");
+        txtNewsDesk.setText("");
     }
 
 
@@ -273,51 +282,45 @@ public class NewsFragment extends Fragment{
             JSONObject response = null;
             JSONObject results = null;
             JSONObject fields = null;
-            String body = null;
-            String trailText = null;
-            String webTitle = null;
 
             int i = 0;
-
-            String hl[] = new String[Constants.numItems];
-            String snippets[] = new String[Constants.numItems];
 
 
             while (i < Constants.numItems) {
                 response = json.getJSONObject("response");
                 results = response.getJSONArray("results").getJSONObject(i);
-                webTitle = results.getString("webTitle");
-                hl[i] = webTitle;
+                Constants.webTitle = results.getString("webTitle");
+                Constants.hl[i] = Constants.webTitle;
                 fields = results.getJSONObject("fields");
-                body = fields.getString("body");
-                Constants.article[i] = body;
-                trailText = fields.getString("trailText");
-                snippets[i] = trailText;
+                Constants.body = fields.getString("body");
+                Constants.article[i] = Constants.body;
+                Constants.trailText = fields.getString("trailText");
+                Constants.snippets[i] = Constants.trailText;
                 i++;
             }
 
-            String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + snippets[0] + "<br>";
+            String txt0 = "<b>" + Constants.hl[0] + "</b> " + "<br>" + Constants.snippets[0] + "<br>";
             mTxtHeadline.setText(Html.fromHtml(txt0));
 
-            String txt1 = "<b>" + hl[1] + "</b> " + "<br>" + snippets[1] + "<br>";
+            String txt1 = "<b>" + Constants.hl[1] + "</b> " + "<br>" + Constants.snippets[1] + "<br>";
             mTxtHeadline2.setText(Html.fromHtml(txt1));
 
-            String txt2 = "<b>" + hl[2] + "</b> " + "<br>" + snippets[2] + "<br>";
+            String txt2 = "<b>" + Constants.hl[2] + "</b> " + "<br>" + Constants.snippets[2] + "<br>";
             mTxtHeadline3.setText(Html.fromHtml(txt2));
 
-            String txt3 = "<b>" + hl[3] + "</b> " + "<br>" + snippets[3] + "<br>";
+            String txt3 = "<b>" + Constants.hl[3] + "</b> " + "<br>" + Constants.snippets[3] + "<br>";
             mTxtHeadline4.setText(Html.fromHtml(txt3));
 
-            String txt4 = "<b>" + hl[4] + "</b> " + "<br>" + snippets[4] + "<br>";
+            String txt4 = "<b>" + Constants.hl[4] + "</b> " + "<br>" + Constants.snippets[4] + "<br>";
             mTxtHeadline5.setText(Html.fromHtml(txt4));
 
-            String txt5 = "<b>" + hl[5] + "</b> " + "<br>" + snippets[5] + "<br>";
+            String txt5 = "<b>" + Constants.hl[5] + "</b> " + "<br>" + Constants.snippets[5] + "<br>";
             mTxtHeadline6.setText(Html.fromHtml(txt5));
 
-            String txt6 = "<b>" + hl[6] + "</b> " + "<br>" + snippets[6] + "<br>";
+            String txt6 = "<b>" + Constants.hl[6] + "</b> " + "<br>" + Constants.snippets[6] + "<br>";
             mTxtHeadline7.setText(Html.fromHtml(txt6));
 
-            String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + snippets[7] + "<br>";
+            String txt7 = "<b>" + Constants.hl[7] + "</b> " + "<br>" + Constants.snippets[7] + "<br>";
             mTxtHeadline8.setText(Html.fromHtml(txt7));
 
 
