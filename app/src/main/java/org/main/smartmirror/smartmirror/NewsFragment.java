@@ -67,14 +67,7 @@ public class NewsFragment extends Fragment{
 
         txtNewsDesk = (TextView)view.findViewById(R.id.txtNewsDesk);
 
-        mTxtHeadline.setText("");
-        mTxtHeadline2.setText("");
-        mTxtHeadline3.setText("");
-        mTxtHeadline4.setText("");
-        mTxtHeadline5.setText("");
-        mTxtHeadline6.setText("");
-        mTxtHeadline7.setText("");
-        mTxtHeadline8.setText("");
+        clearLayout();
 
         txtNewsDesk.setText(mNewsSection.toUpperCase());
 
@@ -83,14 +76,91 @@ public class NewsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[0];
-                mTxtHeadline.setText("");
-                mTxtHeadline2.setText("");
-                mTxtHeadline3.setText("");
-                mTxtHeadline4.setText("");
-                mTxtHeadline5.setText("");
-                mTxtHeadline6.setText("");
-                mTxtHeadline7.setText("");
-                mTxtHeadline8.setText("");
+                clearLayout();
+                Fragment fragment = new NewsBodyFragment();
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .commit();
+            }
+        });
+        mTxtHeadline2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Constants.mArticleFullBody = Constants.article[1];
+                clearLayout();
+                Fragment fragment = new NewsBodyFragment();
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .commit();
+            }
+        });
+        mTxtHeadline3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Constants.mArticleFullBody = Constants.article[2];
+                clearLayout();
+                Fragment fragment = new NewsBodyFragment();
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .commit();
+            }
+        });
+        mTxtHeadline4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Constants.mArticleFullBody = Constants.article[3];
+                clearLayout();
+                Fragment fragment = new NewsBodyFragment();
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .commit();
+            }
+        });
+        mTxtHeadline5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Constants.mArticleFullBody = Constants.article[4];
+                clearLayout();
+                Fragment fragment = new NewsBodyFragment();
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .commit();
+            }
+        });
+        mTxtHeadline6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Constants.mArticleFullBody = Constants.article[5];
+                clearLayout();
+                Fragment fragment = new NewsBodyFragment();
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .commit();
+            }
+        });
+        mTxtHeadline7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Constants.mArticleFullBody = Constants.article[6];
+                clearLayout();
+                Fragment fragment = new NewsBodyFragment();
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .commit();
+            }
+        });
+        mTxtHeadline8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Constants.mArticleFullBody = Constants.article[7];
+                clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
                 fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
@@ -103,6 +173,17 @@ public class NewsFragment extends Fragment{
         updateNews(mDefaultGuardURL+mGuardAPIKey);
 
         return view;
+    }
+
+    private void clearLayout() {
+        mTxtHeadline.setText("");
+        mTxtHeadline2.setText("");
+        mTxtHeadline3.setText("");
+        mTxtHeadline4.setText("");
+        mTxtHeadline5.setText("");
+        mTxtHeadline6.setText("");
+        mTxtHeadline7.setText("");
+        mTxtHeadline8.setText("");
     }
 
 
