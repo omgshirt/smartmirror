@@ -160,32 +160,15 @@ public class MainActivity extends AppCompatActivity
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
 
-        // check for permission to write system settings on API 23 and greater.
-        // Leaving this in case we need the WRITE_SETTINGS permission later on.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(!Settings.System.canWrite( getApplicationContext() )) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                startActivityForResult(intent, 1);
-            }
-        }
-
-        // initialize TTS
-        mTTSHelper = new TTSHelper(this);
-
-        // Initialize WiFiP2P services
-        mWifiIntentFilter = new IntentFilter();
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
-        discoverPeers();
-
+        checkMarshmallowPermissions();
+        initializeWifiP2P();
+        discoverWifiP2pPeers();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
 
-        // Light Sensor for waking / sleeping
         initializeLightSensor();
+
+        // initialize TextToSpeech (TTS)
+        mTTSHelper = new TTSHelper(this);
 
         // Set up ScreenReceiver to hold screen on / off status
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
@@ -226,12 +209,27 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void checkMarshmallowPermissions() {
+        // check for permission to write system settings on API 23 and greater.
+        // Leaving this in case we need the WRITE_SETTINGS permission later on.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(!Settings.System.canWrite( getApplicationContext() )) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                startActivityForResult(intent, 1);
+            }
+        }
+    }
+
     public static Context getContextForApplication() {
         return mContext;
     }
 
     // -------------------------  LIFECYCLE CALLBACKS ----------------------------
 
+    /**
+     * If this is called by the device waking up, it will trigger a new call to displayView(),
+     * reloading the last visible fragment saved in mCurrentFragment
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -255,6 +253,7 @@ public class MainActivity extends AppCompatActivity
         mPreferences.resetScreenBrightness();
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
         if (ScreenReceiver.screenIsOn) {
+            // onResume the wifi heartbeat and light sensors are not needed
             stopWifiHeartbeat();
             stopLightSensor();
         }
@@ -297,7 +296,8 @@ public class MainActivity extends AppCompatActivity
     // ------------------------- Handle Inputs / Broadcasts --------------------------
 
     /**
-     * Broadcast a message on intentName
+     * Broadcast a message on intentName. This is used to send any command not related to starting
+     * a fragment to all listeners. The listeners can then take action if required by the command.
      * @param intentName intent name
      * @param msg String message to send
      */
@@ -309,6 +309,12 @@ public class MainActivity extends AppCompatActivity
 
     // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
 
+    /**
+     * Calling this will force the device to bypass the keyguard if enabled.
+     * It will not override password, pattern or biometric
+     * locks if enabled from the system settings. Acquiring the wakelock in this method will trigger
+     * the application to move from the onStop to onRestart.
+     */
     @SuppressWarnings("deprecation")
     protected void wakeScreen() {
         Log.i(Constants.TAG, "wakeScreen() called");
@@ -373,7 +379,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Handles which fragment will be displayed to the user
+     * Handles which fragment will be displayed to the user. If the screen is asleep, ignores commands
+     * except WAKE or NIGHT_LIGHT. HelpFragments (if visible) are dismissed and nav drawer is closed.
+     * The command is then processed.
      * @param viewName the name of the view to be displayed
      */
     public void displayView(String viewName){
@@ -459,7 +467,7 @@ public class MainActivity extends AppCompatActivity
                     mirrorSleepState = AWAKE;
                     displayView(mCurrentFragment);
                 } else {
-                    // displayView will be called again from onStart() with the fragment to show
+                    // displayView will be called again from onStart() once the device is woken from sleep & screen is on
                     wakeScreen();
                     return;
                 }
@@ -491,7 +499,7 @@ public class MainActivity extends AppCompatActivity
 
             if (!isFinishing()) {
                 ft.commit();
-                // Any command != SLEEP sets stores value as last visible frag
+                // Any command != SLEEP updates the value of mCurrentFragment
                 if ( !viewName.equals(Constants.SLEEP) ) {
                     mCurrentFragment = viewName;
                 }
@@ -653,7 +661,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Say a phrase using text to speech
-     * @param phrase the phrase to speak
+     * @param phrase to speak
      */
     public void startTTS(final String phrase){
         Thread mSpeechThread = new Thread(new Runnable() {
@@ -684,6 +692,19 @@ public class MainActivity extends AppCompatActivity
     // ------------------------------  WIFI P2P  ----------------------------------
 
     /**
+     * Create
+     */
+    private void initializeWifiP2P() {
+        mWifiIntentFilter = new IntentFilter();
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
+    }
+
+    /**
      * Callback from RemoteServerAsyncTask when a command is received from the remote control.
      * @param command String: received command
      */
@@ -697,7 +718,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // calls the P2pManager to refresh peer list
-    public void discoverPeers() {
+    public void discoverWifiP2pPeers() {
         mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
@@ -708,7 +729,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(int reasonCode) {
                 if (DEBUG)
-                    Log.i("Wifi", "discoverPeers failed: " + reasonCode);
+                    Log.i("Wifi", "discoverWifiP2pPeers failed: " + reasonCode);
             }
         });
     }
@@ -750,7 +771,7 @@ public class MainActivity extends AppCompatActivity
         if (isEnabled) {
             // if there's a connection established, ignore
             // otherwise, start peer discovery.
-            discoverPeers();
+            discoverWifiP2pPeers();
         } else {
             // if a connection exists, cancel and refuse further
             mServerTask.cancel(true);
@@ -771,8 +792,8 @@ public class MainActivity extends AppCompatActivity
         final Runnable heartbeatTask = new Runnable() {
             @Override
             public void run() {
-                discoverPeers();
-                Log.i("Wifi", "Heartbeat: discoverPeers()" );
+                discoverWifiP2pPeers();
+                Log.i("Wifi", "Heartbeat: discoverWifiP2pPeers()" );
             }
         };
         wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 360, 360,

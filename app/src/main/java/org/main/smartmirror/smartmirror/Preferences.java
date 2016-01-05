@@ -13,7 +13,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -29,7 +28,7 @@ import android.util.Log;
  * Access is by getters and setters, which also handle file storage:
  */
 public class Preferences implements LocationListener {
-
+    private final String TAG = "Preferences";
     private static Preferences mPreferences = null;
     private SharedPreferences mSharedPreferences;
     private Activity mActivity;
@@ -116,6 +115,9 @@ public class Preferences implements LocationListener {
     public static final String CMD_WEATHER_ENGLISH = "weather english";
     public static final String CMD_WEATHER_METRIC = "weather metric";
 
+    public static final String CMD_TIME_12HR = "time twelve hour";
+    public static final String CMD_TIME_24HR = "time twenty four hour";
+
     public static final String OFF = "off";
     public static final String ON = "on";
     public static final String ENGLISH = "imperial";
@@ -136,7 +138,9 @@ public class Preferences implements LocationListener {
     private float mMusicVolume;                     // music stream volume
 
     private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
-    private String mTimeFormat = "h:mm a";          // Default string for time display
+    private static final String TIME_FORMAT_24_HR = "k:mm";
+    private static final String TIME_FORMAT_12_HR = "h:mm a";
+    private String mTimeFormat;
     private String mWeatherUnits;                      // Weather display format (English / metric)
 
     private double mLatitude;
@@ -149,7 +153,7 @@ public class Preferences implements LocationListener {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            //Log.i("Preferences", "Got message:\"" + message + "\"");
+            // TODO: if SettingsFragment is visible should we bypass this method and handle commands there?
             handleSettingsCommand(context, message);
         }
     };
@@ -285,6 +289,13 @@ public class Preferences implements LocationListener {
                 setWeatherUnits(METRIC);
                 break;
 
+            // time display
+            case CMD_TIME_12HR:
+                setTimeFormat12hr();
+                break;
+            case CMD_TIME_24HR:
+                setTimeFormat24hr();
+                break;
             default:
                 break;
         }
@@ -307,6 +318,7 @@ public class Preferences implements LocationListener {
         mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);
         mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
+        mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
 
         // Find current lat and long positions.
         // This is not currently saved to the prefs file, system will re-discover location on start
@@ -391,7 +403,7 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
-    // private helper to set the vol to the given stream
+    // private helper sets vol for given stream
     // Gets the max volume allowed for this stream, then sets the volume
     private void setStreamVolume(float vol, int stream) {
         Context context = MainActivity.getContextForApplication();
@@ -416,6 +428,10 @@ public class Preferences implements LocationListener {
 
     public String getWeatherUnits(){
         return mWeatherUnits;
+    }
+
+    public boolean weatherIsEnglish() {
+        return mWeatherUnits.equals(ENGLISH);
     }
 
     /**
@@ -486,6 +502,18 @@ public class Preferences implements LocationListener {
 
     public String getTimeFormat() {
         return mTimeFormat;
+    }
+
+    public boolean timeFormatIs12hr() {
+        return mTimeFormat.equals(TIME_FORMAT_12_HR);
+    }
+
+    public void setTimeFormat24hr() {
+        setTimeFormat(TIME_FORMAT_24_HR);
+    }
+
+    public void setTimeFormat12hr() {
+        setTimeFormat(TIME_FORMAT_12_HR);
     }
 
     /**

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -46,7 +47,7 @@ public class WeatherFragment extends Fragment {
     private TextView txtDailyHigh;
     private TextView txtDailyLow;
     private TextView txtAlerts;
-    private TextView txtWeatherAlert;
+    private TextView txtAlertWarning;
 
     private static String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
     private String mLatitude = "0";
@@ -57,6 +58,9 @@ public class WeatherFragment extends Fragment {
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
     private DailyForecast forecasts[];              // summary of data for 3 days (including today)
+    private JSONArray mWeatherAlerts;
+
+    private boolean mShowFullAlerts = true;
 
     Handler mHandler = new Handler();
 
@@ -98,7 +102,7 @@ public class WeatherFragment extends Fragment {
         txtDailyHigh = (TextView)view.findViewById(R.id.daily_high);
         txtDailyLow = (TextView)view.findViewById(R.id.daily_low);
         txtAlerts = (TextView)view.findViewById(R.id.alert_text);
-        txtWeatherAlert = (TextView)view.findViewById(R.id.weather_alert);
+        txtAlertWarning = (TextView)view.findViewById(R.id.weather_alert_heading);
 
         txtCurrentTemp.setTypeface(weatherFont);
         txtDailyHigh.setTypeface(weatherFont);
@@ -317,27 +321,55 @@ public class WeatherFragment extends Fragment {
 
             // check for weather alerts.
             if (json.has("alerts")) {
-                JSONArray alerts = json.getJSONArray("alerts");
-                StringBuilder title = new StringBuilder();
-                int i = 0;
-                while (i < alerts.length()) {
-                    // Alert descriptions can get really long. Ignoring for now.
-                    //String description = alerts.getJSONObject(i).getString("description");
-                    String txtTemp = alerts.getJSONObject(i).getString("title") + "\n";
-                    title.append(txtTemp);
-                    txtWeatherAlert.setVisibility(View.VISIBLE);
-                    i++;
-                }
-                if (title.length() > 0) {
-                    //(((MainActivity) getActivity()).startTTS(title.toString());
-                    txtAlerts.setText(title.toString());
-                }
+                mWeatherAlerts = json.getJSONArray("alerts");
+                txtAlertWarning.setVisibility(View.VISIBLE);
+                txtAlerts.setText(getWeatherAlerts());
+                txtAlerts.setSelected(true);
             }
+
         }catch(Exception e){
             e.printStackTrace();
-            Log.e("SimpleWeather", "One or more fields not found in the JSON data");
+            Log.e("DarkSky", "One or more fields not found in the JSON data");
         }
     }
+
+    public String getWeatherAlerts(){
+        StringBuilder alertText = new StringBuilder();
+        int i = 0;
+        while (i < mWeatherAlerts.length()) {
+            alertText.append(getAlertTitle(i));
+            if (mShowFullAlerts) {
+                alertText.append(getAlertDescription(i));
+            }
+            i++;
+        }
+        return alertText.toString();
+    }
+
+    private String getAlertTitle(int index) {
+        // find expiration time for this alert
+        String title = "";
+        try {
+            long expirationEpochTime = Long.parseLong(mWeatherAlerts.getJSONObject(index).getString("expires"));
+            String expirationTime = new SimpleDateFormat(mPreferences.getTimeFormat()).format(new Date(expirationEpochTime));
+
+            title = mWeatherAlerts.getJSONObject(index).getString("title") + ". Expires " + expirationTime + "\n";
+        } catch (JSONException jse) {
+           Log.e("DarkSky", "alert index not found");
+        }
+        return title;
+    }
+
+    private String getAlertDescription(int index) {
+        String description = "";
+        try {
+            description = mWeatherAlerts.getJSONObject(index).getString("description") + "\n";
+        } catch (JSONException jse){
+            Log.e("DarkSky", "alert index not found");
+        }
+        return description;
+    }
+
 
     // choose weather icon based on iconType
     private void setWeatherIcon(TextView tv, String iconType, long sunrise, long sunset){
