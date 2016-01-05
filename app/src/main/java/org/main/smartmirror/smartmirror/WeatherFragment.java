@@ -53,12 +53,15 @@ public class WeatherFragment extends Fragment {
     private String mLatitude = "0";
     private String mLongitude = "0";
 
+    private final int UPDATE_FREQUENCY = 1;
+
     // default weather values
     private int mCurrentTemp = 0;
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
     private DailyForecast forecasts[];              // summary of data for 3 days (including today)
     private JSONArray mWeatherAlerts;
+    private static DataCache mWeatherCache = null;
 
     private boolean mShowFullAlerts = true;
 
@@ -77,7 +80,6 @@ public class WeatherFragment extends Fragment {
         // some static locations for now
         mLatitude = Double.toString(mPreferences.getLatitude());
         mLongitude = Double.toString(mPreferences.getLongitude());
-        startWeatherUpdate();
     }
 
     public void startWeatherUpdate(){
@@ -108,7 +110,11 @@ public class WeatherFragment extends Fragment {
         txtDailyHigh.setTypeface(weatherFont);
         txtDailyLow.setTypeface(weatherFont);
 
-        clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
+        if (mPreferences.timeFormatIs12hr()) {
+            clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
+        } else {
+            clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
+        }
         clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
 
         return view;
@@ -137,6 +143,25 @@ public class WeatherFragment extends Fragment {
             }
         }
     };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // check for any stashed weather data. Update if necessary.
+        if (mWeatherCache == null) {
+            Log.i("weather", "mWeatherCache null" );
+            startWeatherUpdate();
+        } else {
+            // render the weather quickly using available data, but start a refresh if the data is expired
+            Log.i("weather", "mWeatherCache exists, rendering..." );
+            renderWeather();
+            if (mWeatherCache.isExpired()) {
+                Log.i("weather", "mWeatherCache expired" );
+                startWeatherUpdate();
+            }
+        }
+    }
 
     /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
      *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
@@ -222,7 +247,8 @@ public class WeatherFragment extends Fragment {
                 } else {
                     mHandler.post(new Runnable(){
                         public void run(){
-                            renderWeather(json);
+                            updateWeatherCache(json);
+                            renderWeather();
                         }
                     });
                 }
@@ -230,8 +256,13 @@ public class WeatherFragment extends Fragment {
         }.start();
     }
 
-    private void renderWeather(JSONObject json){
+    private void updateWeatherCache(JSONObject data){
+        mWeatherCache = new DataCache(data, UPDATE_FREQUENCY);
+    }
+
+    private void renderWeather(){
         try {
+            JSONObject json = mWeatherCache.getData();
             // hourlyArray holds the next 24 hours of forecasts. Get index 0 for current temp data.
             JSONObject hourly = json.getJSONObject("hourly");
             JSONArray hourlyArray = hourly.getJSONArray("data");
