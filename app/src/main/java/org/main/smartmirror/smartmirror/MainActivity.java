@@ -38,6 +38,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity
     private Messenger mMessenger = new Messenger(new IHandler());
     private boolean mIsBound;
     private Messenger mService;
+    private ImageView mSpeechIcon;
 
     // Sound effects
     private MediaPlayer mFXPlayer;
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    // handles the messages from Service to this
+    // handles the messages from Service to this Activity
     public class IHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
@@ -145,6 +147,12 @@ public class MainActivity extends AppCompatActivity
                     if(DEBUG)
                         Log.i("MAIN", result);
                     handleVoiceCommand(result);
+                    break;
+                case VoiceService.SHOW_ICON:
+                    speechIconHandler(true);
+                    break;
+                case VoiceService.HIDE_ICON:
+                    speechIconHandler(false);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -195,6 +203,7 @@ public class MainActivity extends AppCompatActivity
 
         // Set up view and nav drawer
         setContentView(R.layout.activity_main);
+        mSpeechIcon = (ImageView)findViewById(R.id.speech_icon);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -223,7 +232,6 @@ public class MainActivity extends AppCompatActivity
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-
     }
 
     public static Context getContextForApplication() {
@@ -497,6 +505,19 @@ public class MainActivity extends AppCompatActivity
      */
     protected String getCurrentFragment() {
         return mCurrentFragment;
+    }
+
+    /**
+     * This method handles the speech icon indicator. It either hides
+     * or shows the icon based on the flag
+     * @param flag whether or not to show the icon
+     */
+    public void speechIconHandler(boolean flag){
+        if(flag) {
+            mSpeechIcon.setVisibility(View.VISIBLE);
+        } else {
+            mSpeechIcon.setVisibility(View.INVISIBLE);
+        }
     }
 
     // ----------------------- SPEECH RECOGNITION --------------------------

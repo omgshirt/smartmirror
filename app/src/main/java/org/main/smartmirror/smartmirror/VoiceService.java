@@ -36,6 +36,8 @@ public class VoiceService extends Service implements RecognitionListener{
     static final int START_SPEECH = 1;
     static final int RESULT_SPEECH = 2;
     public static final int INIT_SPEECH = 3;
+    static final int SHOW_ICON = 4;
+    static final int HIDE_ICON = 5;
     private String SMARTMIRROR_SEARCH = "mirrorSearch";
     private final String GRAMMAR_SEARCH = "grammarSearch";
     private final String MIRROR_KWS = "show";
@@ -78,6 +80,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     public void startVoice(){
         if(mSpeechInitialized) {
+            speechIcon(SHOW_ICON);
             mSpeechRecognizer.startListening(PRIMARY_SEARCH);
             //mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
         }
@@ -85,7 +88,28 @@ public class VoiceService extends Service implements RecognitionListener{
 
     public void stopVoice(){
         if (mSpeechInitialized) {
+            speechIcon(HIDE_ICON);
             mSpeechRecognizer.stop();
+        }
+    }
+
+    public void speechIcon(int flag){
+        Message msg = null;
+
+        switch(flag){
+            case SHOW_ICON:
+                msg = Message.obtain(null, SHOW_ICON);
+                break;
+            case HIDE_ICON:
+                msg = Message.obtain(null, HIDE_ICON);
+                break;
+        }
+
+        try {
+            mClients.get(0).send(msg);
+        } catch (RemoteException e) {
+            mClients.remove(msg);
+            e.printStackTrace();
         }
     }
 
