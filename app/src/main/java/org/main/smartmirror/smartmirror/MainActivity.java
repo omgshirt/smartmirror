@@ -38,6 +38,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -176,7 +177,7 @@ public class MainActivity extends AppCompatActivity
         mScreenReceiver = new ScreenReceiver();
         registerReceiver(mScreenReceiver, intentFilter);
 
-        // Set up view and nav drawer
+        // Set up views and nav drawer
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -187,8 +188,8 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
         // Hide UI and actionbar
         View decorView = getWindow().getDecorView();
@@ -295,7 +296,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "onDestroy");
     }
 
-    // ------------------------- Handle Inputs / Broadcasts --------------------------
+    // ------------------------- Broadcasts --------------------------
 
     /**
      * Broadcast a message on intentName. This is used to send any command not related to starting
@@ -363,7 +364,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -378,6 +378,15 @@ public class MainActivity extends AppCompatActivity
             mHelpFragment.dismiss();
             mHelpFragment = null;
         }
+    }
+
+    /**
+     * Show a toast
+     * @param text text to display
+     * @param duration int duration: ex. Toast.LENGTH_LONG
+     */
+    public void showToast(String text, int duration) {
+        Toast.makeText(this, text, duration).show();
     }
 
     /**
@@ -416,7 +425,7 @@ public class MainActivity extends AppCompatActivity
                     fragment = new CameraFragment();
                 }
                 else {
-                    Toast.makeText(this, "Camera Disabled. Please say 'Enable Camera' to change this setting.", Toast.LENGTH_LONG).show();
+                    showToast(getResources().getString(R.string.camera_disabled_toast), Toast.LENGTH_LONG);
                 }
                 break;
             case Constants.FACEBOOK:

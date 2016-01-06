@@ -307,9 +307,8 @@ public class Preferences implements LocationListener {
     }
 
     private Preferences(Activity activity) {
-        Context appContext = MainActivity.getContextForApplication();
         mActivity = activity;
-        mSharedPreferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        mSharedPreferences = mActivity.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
         mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
@@ -350,7 +349,7 @@ public class Preferences implements LocationListener {
         Log.d("Location","lat:" + Double.toString(mLatitude));
         Log.d("Location","long:" + Double.toString(mLongitude));
 
-        LocalBroadcastManager.getInstance(appContext).registerReceiver(mMessageReceiver,
+        LocalBroadcastManager.getInstance(mActivity.getApplicationContext()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
     }
 
