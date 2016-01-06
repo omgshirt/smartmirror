@@ -53,17 +53,17 @@ public class WeatherFragment extends Fragment {
     private String mLatitude = "0";
     private String mLongitude = "0";
 
-    private final int UPDATE_FREQUENCY = 1;
-
     // default weather values
     private int mCurrentTemp = 0;
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
-    private DailyForecast forecasts[];              // summary of data for 3 days (including today)
+    private DailyForecast dailyForecasts[];              // summary of data for 3 days (including today)
     private JSONArray mWeatherAlerts;
-    private static DataCache mWeatherCache = null;
-
     private boolean mShowFullAlerts = true;
+
+    // time in minutes before weather data is considered old and is discarded
+    private final int DATA_UPDATE_FREQUENCY = 10;
+    private static JSONDataCache mWeatherCache = null;
 
     Handler mHandler = new Handler();
 
@@ -75,7 +75,7 @@ public class WeatherFragment extends Fragment {
 
         mPreferences = Preferences.getInstance(getActivity());
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
-        forecasts = new DailyForecast[3];
+        dailyForecasts = new DailyForecast[3];
 
         // some static locations for now
         mLatitude = Double.toString(mPreferences.getLatitude());
@@ -148,16 +148,15 @@ public class WeatherFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // check for any stashed weather data. Update if necessary.
+        // Check for any cached weather data.
+        // If a cache exists, render it to the view.
+        // Update the cache if it has expired.
         if (mWeatherCache == null) {
-            Log.i("weather", "mWeatherCache null" );
             startWeatherUpdate();
         } else {
-            // render the weather quickly using available data, but start a refresh if the data is expired
-            Log.i("weather", "mWeatherCache exists, rendering..." );
             renderWeather();
             if (mWeatherCache.isExpired()) {
-                Log.i("weather", "mWeatherCache expired" );
+                Log.i("weather", "WeatherCache expired. Refreshing..." );
                 startWeatherUpdate();
             }
         }
@@ -175,6 +174,7 @@ public class WeatherFragment extends Fragment {
     }
 
     // when this goes out of view, halt listening
+    @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
@@ -184,11 +184,11 @@ public class WeatherFragment extends Fragment {
 
     private void speakCurrentConditions() {
 
-        if (forecasts == null) return;
+        if (dailyForecasts == null) return;
 
         String text = " Current temperature is " + mCurrentTemp + " degrees. " +
-                    " High today " + forecasts[0].maxTemp + ", " +
-                    " low " + forecasts[0].minTemp + ". "
+                    " High today " + dailyForecasts[0].maxTemp + ", " +
+                    " low " + dailyForecasts[0].minTemp + ". "
                     // "Current humidity " + mCurrentHumidity + " percent. "
                     ;
 
@@ -210,20 +210,20 @@ public class WeatherFragment extends Fragment {
     // compile and say weather forecast for the next 3 days
     private void speakWeatherForecast(){
 
-        if (forecasts == null) return;
+        if (dailyForecasts == null) return;
 
-        String today = "Today " + forecasts[0].summary + " high of " + forecasts[0].maxTemp +
-                " degrees, low tonight " + forecasts[0].minTemp;
+        String today = "Today " + dailyForecasts[0].summary + " high of " + dailyForecasts[0].maxTemp +
+                " degrees, low tonight " + dailyForecasts[0].minTemp;
 
-        String tomorrow = "Tomorrow " + forecasts[1].summary + " high of " + forecasts[1].maxTemp +
-                " degrees, low temperature " + forecasts[1].minTemp + " degrees";
+        String tomorrow = "Tomorrow " + dailyForecasts[1].summary + " high of " + dailyForecasts[1].maxTemp +
+                " degrees, low temperature " + dailyForecasts[1].minTemp + " degrees";
 
-        Date date = new Date(forecasts[2].forecastTime * 1000);
+        Date date = new Date(dailyForecasts[2].forecastTime * 1000);
         SimpleDateFormat sdf = new SimpleDateFormat("cccc", Locale.US);
         String dayThreeName = sdf.format(date);
 
-        String nextDay = dayThreeName + ", " + forecasts[2].summary + " high of " + forecasts[2].maxTemp +
-                ", low of " + forecasts[2].minTemp + " degrees ";
+        String nextDay = dayThreeName + ", " + dailyForecasts[2].summary + " high of " + dailyForecasts[2].maxTemp +
+                ", low of " + dailyForecasts[2].minTemp + " degrees ";
 
         String forecast = today + ". " + tomorrow + ". " + nextDay;
         if ( !forecast.equals("") ) {
@@ -247,6 +247,7 @@ public class WeatherFragment extends Fragment {
                 } else {
                     mHandler.post(new Runnable(){
                         public void run(){
+                            Log.i("weather", "New weather data downloaded");
                             updateWeatherCache(json);
                             renderWeather();
                         }
@@ -257,7 +258,7 @@ public class WeatherFragment extends Fragment {
     }
 
     private void updateWeatherCache(JSONObject data){
-        mWeatherCache = new DataCache(data, UPDATE_FREQUENCY);
+        mWeatherCache = new JSONDataCache(data, DATA_UPDATE_FREQUENCY);
     }
 
     private void renderWeather(){
@@ -298,25 +299,25 @@ public class WeatherFragment extends Fragment {
             JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
             for (int i = 0; i < 3; i++) {
                 JSONObject today = dailyData.getJSONObject(i);
-                forecasts[i] = new DailyForecast();
-                forecasts[i].maxTemp = (int)Math.round(today.getDouble("apparentTemperatureMax"));
-                forecasts[i].minTemp = (int)Math.round(today.getDouble("apparentTemperatureMin"));
-                forecasts[i].summary = today.getString("summary");
-                forecasts[i].sunrise = today.getLong("sunriseTime");
-                forecasts[i].sunset = today.getLong("sunsetTime");
-                forecasts[i].precipProbability = today.getDouble("precipProbability");
-                forecasts[i].windSpeed = (int)Math.round(today.getDouble("windSpeed"));
-                forecasts[i].forecastTime = today.getLong("time");
+                dailyForecasts[i] = new DailyForecast();
+                dailyForecasts[i].maxTemp = (int)Math.round(today.getDouble("apparentTemperatureMax"));
+                dailyForecasts[i].minTemp = (int)Math.round(today.getDouble("apparentTemperatureMin"));
+                dailyForecasts[i].summary = today.getString("summary");
+                dailyForecasts[i].sunrise = today.getLong("sunriseTime");
+                dailyForecasts[i].sunset = today.getLong("sunsetTime");
+                dailyForecasts[i].precipProbability = today.getDouble("precipProbability");
+                dailyForecasts[i].windSpeed = (int)Math.round(today.getDouble("windSpeed"));
+                dailyForecasts[i].forecastTime = today.getLong("time");
             }
 
             // set current weather icon
-            setWeatherIcon(txtWeatherIcon, currentHour.getString("icon"), forecasts[0].sunrise * 1000,
-                    forecasts[0].sunset * 1000 );
+            setWeatherIcon(txtWeatherIcon, currentHour.getString("icon"), dailyForecasts[0].sunrise * 1000,
+                    dailyForecasts[0].sunset * 1000 );
 
             // Set the dailyHigh and dailyLow
-            String maxIcon = getActivity().getString(R.string.weather_arrow_up) + forecasts[0].maxTemp;
+            String maxIcon = getActivity().getString(R.string.weather_arrow_up) + dailyForecasts[0].maxTemp;
             txtDailyHigh.setText(maxIcon);
-            String minIcon = getActivity().getString(R.string.weather_arrow_down) + forecasts[0].minTemp;
+            String minIcon = getActivity().getString(R.string.weather_arrow_down) + dailyForecasts[0].minTemp;
             txtDailyLow.setText(minIcon);
 
             // ----------------- 2-Hour forecasts -------------
@@ -327,24 +328,29 @@ public class WeatherFragment extends Fragment {
                 LinearLayout forecastLayout = (LinearLayout) getActivity().findViewById(layoutId);
                 JSONObject forecast = hourlyArray.getJSONObject(i*2);
 
+                // Forecast time
                 TextView timeForecast = (TextView)forecastLayout.findViewById(R.id.forecast_time);
                 Date date = new Date(forecast.getLong("time") * 1000);
-                SimpleDateFormat sdf = new SimpleDateFormat("ha", Locale.US);
+                String shortTimeFormat = mPreferences.getShortTimeFormat();
+                SimpleDateFormat sdf = new SimpleDateFormat(shortTimeFormat, Locale.US);
                 String time = sdf.format(date);
                 timeForecast.setText(time);
                 timeForecast.setTextSize(15);
 
+                // Forecast temp
                 TextView tempForecast = (TextView)forecastLayout.findViewById(R.id.forecast_temp);
                 String textTmp = (int)Math.round(forecast.getDouble("temperature")) + getResources().getString(R.string.weather_deg);
                 tempForecast.setText(textTmp);
                 tempForecast.setTypeface(weatherFont);
                 tempForecast.setTextSize(15);
 
+                // forecast icon
                 TextView iconForecast = (TextView)forecastLayout.findViewById(R.id.forecast_image);
                 String icon = forecast.getString("icon");
-                setWeatherIcon(iconForecast, icon, forecasts[0].sunrise, forecasts[0].sunset);
+                setWeatherIcon(iconForecast, icon, dailyForecasts[0].sunrise, dailyForecasts[0].sunset);
                 iconForecast.setTextSize(15);
 
+                // forecast chance of rain
                 TextView rainForecast = (TextView) forecastLayout.findViewById(R.id.forecast_rain);
                 String chanceOfRain = Integer.toString( (int)(forecast.getDouble("precipProbability") * 100)) + "%";
                 rainForecast.setText(chanceOfRain);
@@ -354,8 +360,12 @@ public class WeatherFragment extends Fragment {
             if (json.has("alerts")) {
                 mWeatherAlerts = json.getJSONArray("alerts");
                 txtAlertWarning.setVisibility(View.VISIBLE);
+                txtAlerts.setVisibility(View.VISIBLE);
                 txtAlerts.setText(getWeatherAlerts());
                 txtAlerts.setSelected(true);
+            } else {
+                txtAlertWarning.setVisibility(View.GONE);
+                txtAlerts.setVisibility(View.GONE);
             }
 
         }catch(Exception e){
@@ -460,7 +470,7 @@ public class WeatherFragment extends Fragment {
     }
 
     /**
-     * Given a wind bearing, returns the direction
+     * Given a wind bearing in degrees, returns the cardinal direction
      * @return String direction as abbreviation (NE, E, W...)
      */
     public static String getDirectionFromBearing(final int bearing){

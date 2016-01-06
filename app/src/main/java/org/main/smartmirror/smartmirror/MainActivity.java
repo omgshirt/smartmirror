@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity
     // -------------------------  LIFECYCLE CALLBACKS ----------------------------
 
     /**
-     * If this is called by the device waking up, it will trigger a new call to displayView(),
+     * If this is called by the device waking up, it will trigger a new call to handleCommand(),
      * reloading the last visible fragment saved in mCurrentFragment
      */
     @Override
@@ -238,10 +238,10 @@ public class MainActivity extends AppCompatActivity
         mirrorSleepState = AWAKE;
         // if there's a fragment pending to display, show it
         if (mCurrentFragment != null) {
-            displayView(mCurrentFragment);
+            handleCommand(mCurrentFragment);
         } else {
             // on first run mCurrentFragment isn't set: start with weather displayed
-            displayView(Constants.WEATHER);
+            handleCommand(Constants.WEATHER);
         }
     }
 
@@ -265,8 +265,9 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "onPause");
         Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
         unregisterReceiver(mWifiReceiver);
+        // If the screen is not turning off, the app is going into the background and shouldn't listen for these events.
+        // This is only for debugging purposes as the finished program should always be in foreground.
         if (!ScreenReceiver.screenIsOn) {
-            mirrorSleepState = SLEEPING;
             startWifiHeartbeat();
             startLightSensor();
         }
@@ -276,6 +277,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         Log.i(Constants.TAG, "onStop");
+        mirrorSleepState = SLEEPING;
     }
 
     @Override
@@ -355,7 +357,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            displayView(item.toString().toLowerCase(Locale.US));
+            handleCommand(item.toString().toLowerCase(Locale.US));
         }
 
         return super.onOptionsItemSelected(item);
@@ -367,7 +369,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         if(DEBUG)
             Log.i("item selected", item.toString());
-        displayView(item.toString().toLowerCase(Locale.US));
+        handleCommand(item.toString().toLowerCase(Locale.US));
         return true;
     }
 
@@ -382,14 +384,14 @@ public class MainActivity extends AppCompatActivity
      * Handles which fragment will be displayed to the user. If the screen is asleep, ignores commands
      * except WAKE or NIGHT_LIGHT. HelpFragments (if visible) are dismissed and nav drawer is closed.
      * The command is then processed.
-     * @param viewName the name of the view to be displayed
+     * @param command the name of the view to be displayed
      */
-    public void displayView(String viewName){
+    public void handleCommand(String command){
         Fragment fragment = null;
-        Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
+        Log.i("handleCommand", "status:" + mirrorSleepState + " command:\"" + command + "\"");
         // If sleeping, ignore commands except WAKE and NIGHT_LIGHT
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-            if (!viewName.equals(Constants.WAKE) && !viewName.equals(Constants.NIGHT_LIGHT)) return;
+            if (!command.equals(Constants.WAKE) && !command.equals(Constants.NIGHT_LIGHT)) return;
         }
 
         // help dismissed by all commands
@@ -398,13 +400,14 @@ public class MainActivity extends AppCompatActivity
         // 'menu' command toggles drawer open / close.
         // all other commands will close the drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (viewName.equals(Constants.MENU) && !drawer.isDrawerOpen(GravityCompat.START)) {
+        if (command.equals(Constants.MENU) && !drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.openDrawer(GravityCompat.START);
-        } else {
+            return;
+        } else if (drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
         }
 
-        switch (viewName) {
+        switch (command) {
             case Constants.CALENDAR:
                 fragment = new CalendarFragment();
                 break;
@@ -456,7 +459,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 break;
             case Constants.SLEEP:
-                fragment = new OffFragment();
+                fragment = new LightSleepFragment();
                 mirrorSleepState = LIGHT_SLEEP;
                 break;
             case Constants.TWITTER:
@@ -465,9 +468,9 @@ public class MainActivity extends AppCompatActivity
             case Constants.WAKE:
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
-                    displayView(mCurrentFragment);
+                    handleCommand(mCurrentFragment);
                 } else {
-                    // displayView will be called again from onStart() once the device is woken from sleep & screen is on
+                    // handleCommand will be called again from onStart() once the device is woken from sleep & screen is on
                     wakeScreen();
                     return;
                 }
@@ -481,35 +484,37 @@ public class MainActivity extends AppCompatActivity
                 break;
             default:
                 // The command isn't one of the view swap instructions,
-                // so broadcast the viewName (our input) to any listeners.
-                broadcastMessage("inputAction", viewName);
+                // so broadcast the command (our input) to any listeners.
+                broadcastMessage("inputAction", command);
                 break;
         }
 
         // If we're changing fragments set the wake state and do the transaction
         if(fragment != null){
             if(DEBUG) {
-                Log.i("displayView", "Displaying: " + viewName);
+                Log.i("handleCommand", "Displaying: " + command);
             }
-            // TODO: change this to Preferences.acknowledgeWithVoice / FX?
+
             playSound(R.raw.celeste_a);
-            //startTTS(viewName);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment);
+            //startTTS(command);
 
-            if (!isFinishing()) {
-                ft.commit();
-                // Any command != SLEEP updates the value of mCurrentFragment
-                if ( !viewName.equals(Constants.SLEEP) ) {
-                    mCurrentFragment = viewName;
-                }
-            } else {
-                Log.e("Fragments", "commit skipped. isFinishing() returned true");
+            // Any command other than SLEEP updates the value of mCurrentFragment
+            if ( !command.equals(Constants.SLEEP) ) {
+                mCurrentFragment = command;
             }
+            displayFragment(fragment);
         }
-
     }
 
+    private void displayFragment(Fragment fragment){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content_frame, fragment);
+        if (!isFinishing()) {
+            ft.commit();
+        } else {
+            Log.e("Fragments", "commit skipped. isFinishing() returned true");
+        }
+    }
 
     /**
      * Gets the fragment currently being viewed. If the mirror in SLEEP or LIGHT_SLEEP,
@@ -593,8 +598,7 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = Constants.WAKE;
                 break;
         }
-
-        displayView(voiceInput);
+        handleCommand(voiceInput);
     }
 
     public void initSpeechRecognition() {
@@ -710,7 +714,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleRemoteCommand(String command) {
         if (mPreferences.isRemoteEnabled())
-            displayView(command);
+            handleCommand(command);
         else {
             Log.i("Remote", "Disabled. ignored:\"" + command + "\"");
         }
@@ -839,7 +843,7 @@ public class MainActivity extends AppCompatActivity
             }
             if (currentLight > 3 && mLightIsOff ){
                 // the sensor sees some light. turn on the screen!
-                displayView(Constants.WAKE);
+                handleCommand(Constants.WAKE);
             }
         }
     }

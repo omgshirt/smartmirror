@@ -139,7 +139,11 @@ public class Preferences implements LocationListener {
 
     private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
+    private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
     private static final String TIME_FORMAT_12_HR = "h:mm a";
+    private static final String TIME_FORMAT_12_HR_SHORT = "ha";
+
+
     private String mTimeFormat;
     private String mWeatherUnits;                      // Weather display format (English / metric)
 
@@ -502,6 +506,10 @@ public class Preferences implements LocationListener {
 
     public String getTimeFormat() {
         return mTimeFormat;
+    }
+
+    public String getShortTimeFormat() {
+        return (timeFormatIs12hr()) ? TIME_FORMAT_12_HR_SHORT : TIME_FORMAT_24_HR_SHORT;
     }
 
     public boolean timeFormatIs12hr() {
