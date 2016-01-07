@@ -29,7 +29,6 @@ public class Constants {
     public static final String SLEEP = "sleep";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
-    public static final String SHOW_HELP = "show help";
     public static final String TRAFFIC = "traffic";
     public static final String NIGHT_LIGHT = "night light";
     public static final String LIGHT = "light";
@@ -37,7 +36,6 @@ public class Constants {
     //--------------HELP--------------
     public static final String HELP = "help";
     public static final String HIDE = "hide";
-    public static final String HIDE_HELP ="hide help";
 
     //--------------WEATHER--------------
     public static final String OPEN_WEATHER_MAP_API =

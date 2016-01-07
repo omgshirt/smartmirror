@@ -69,8 +69,9 @@ public class MainActivity extends AppCompatActivity
     // Light Sensor
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
-    private boolean mLightIsOff;
-
+    private long mLightSensorStartTime;
+    private final long LIGHT_WAKE_DELAY = 5000;   // time delay before screen will waken due to light changes
+    private RecentLightValues mRecentLightValues;
 
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
@@ -270,8 +271,6 @@ public class MainActivity extends AppCompatActivity
             // onResume the wifi heartbeat and light sensors are not needed
             stopWifiHeartbeat();
             stopLightSensor();
-            addScreenOnFlag();
-            startUITimer();
         }
     }
 
@@ -373,10 +372,11 @@ public class MainActivity extends AppCompatActivity
     // Start a timer to track interval between user interactions.
     // When expired, clear the screen on flag so the screen can time out per system settings.
     protected void startUITimer() {
-        Log.i(Constants.TAG, "Starting UI timer. " + UI_TIMEOUT_DELAY + " ms" );
-        addScreenOnFlag();
         stopUITimer();
+        addScreenOnFlag();
         mUITimer = new Timer();
+
+        Log.i(Constants.TAG, "Starting UI timer. " + UI_TIMEOUT_DELAY + " ms" );
         mUITimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -387,6 +387,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void stopUITimer(){
+        Log.i(Constants.TAG, "UI timer cancelled");
         if (mUITimer != null) mUITimer.cancel();
     }
 
@@ -463,10 +464,16 @@ public class MainActivity extends AppCompatActivity
         }
 
         startUITimer();
-        hideHelpFragment();
 
-        // 'menu' command toggles drawer open / close.
-        // all other commands will close the drawer
+        // All commands hide helpFragment except HELP
+        if (command.equals(Constants.HELP) && mHelpFragment == null) {
+            mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
+            mHelpFragment.show(getFragmentManager(), "HelpFragment");
+        } else {
+            hideHelpFragment();
+        }
+
+        // 'menu' command toggles menu drawer open / close. Other commands will close the drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (command.equals(Constants.MENU) && !drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.openDrawer(GravityCompat.START);
@@ -492,13 +499,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.GALLERY:
                 fragment = new GalleryFragment();
-                break;
-            case Constants.HELP:
-                // only display help if it is not already visible
-                if (mHelpFragment == null) {
-                    mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
-                    mHelpFragment.show(getFragmentManager(), "HelpFragment");
-                }
                 break;
             case Constants.NEWS:
                 fragment = new NewsFragment();
@@ -646,15 +646,10 @@ public class MainActivity extends AppCompatActivity
             case Constants.GO_TO_SLEEP:
                 voiceInput = Constants.SLEEP;
                 break;
-            case Constants.HIDE_HELP:
             case Constants.HIDE:
-                voiceInput = Constants.HIDE_HELP;
                 break;
             case Constants.OPTIONS:
                 voiceInput = Constants.SETTINGS;
-                break;
-            case Constants.SHOW_HELP:
-                voiceInput = Constants.HELP;
                 break;
             case Constants.WAKE_UP:
                 voiceInput = Constants.WAKE;
@@ -881,7 +876,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startLightSensor() {
-        mLightIsOff = false;
+        mRecentLightValues = new RecentLightValues();
+        mLightSensorStartTime = System.currentTimeMillis();
         mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -897,17 +893,41 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
+        mRecentLightValues.addValue(currentLight);
+        float recentLightAvg = mRecentLightValues.getAverage();
+
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(DEBUG) Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
-            if(currentLight < .1 ){
-                mLightIsOff = true;
-                Log.i(Constants.TAG, "light is off");
-            }
-            if (currentLight > 3 && mLightIsOff ){
-                // the sensor sees some light. turn on the screen!
+            Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
+            Log.i(Constants.TAG, "recent light avg: " + recentLightAvg);
+            if ( currentLight > recentLightAvg * 5 && lightWakeDelayExceeded() ){
+                // Stop any further callbacks from the sensor.
                 stopLightSensor();
                 handleCommand(Constants.WAKE);
             }
+        }
+    }
+
+    private boolean lightWakeDelayExceeded() {
+        return (System.currentTimeMillis() - mLightSensorStartTime > LIGHT_WAKE_DELAY);
+    }
+
+    // holds recent values reported by the light sensor to track ambient light changes.
+    private class RecentLightValues {
+        int index = 0;
+        int size = 20;
+        float[] recentValues = new float[size];
+
+        void addValue(float val) {
+            recentValues[index] = val;
+            index = (++index) % size;
+        }
+
+        float getAverage(){
+            float sum = 0;
+            for(float v : recentValues) {
+                sum += v;
+            }
+            return sum / recentValues.length;
         }
     }
 }

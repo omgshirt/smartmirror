@@ -128,7 +128,7 @@ public class WeatherFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            Log.d("Weather", "Got message:\"" + message +"\"");
+            Log.d(Constants.TAG, "Got message:\"" + message +"\"");
             switch (message) {
                 case Constants.FORECAST:
                     speakWeatherForecast();
@@ -156,7 +156,7 @@ public class WeatherFragment extends Fragment {
         } else {
             renderWeather();
             if (mWeatherCache.isExpired()) {
-                Log.i("weather", "WeatherCache expired. Refreshing..." );
+                Log.i(Constants.TAG, "WeatherCache expired. Refreshing..." );
                 startWeatherUpdate();
             }
         }
@@ -247,7 +247,7 @@ public class WeatherFragment extends Fragment {
                 } else {
                     mHandler.post(new Runnable(){
                         public void run(){
-                            Log.i("weather", "New weather data downloaded");
+                            Log.i(Constants.TAG, "New weather data downloaded");
                             updateWeatherCache(json);
                             renderWeather();
                         }
