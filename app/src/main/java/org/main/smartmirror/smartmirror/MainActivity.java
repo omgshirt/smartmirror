@@ -463,9 +463,10 @@ public class MainActivity extends AppCompatActivity
             if (!command.equals(Constants.WAKE) && !command.equals(Constants.NIGHT_LIGHT)) return;
         }
 
+        // start or reset the UITimer to track user interactions
         startUITimer();
 
-        // All commands hide helpFragment except HELP
+        // All commands hide helpFragment if visible. Constants.HELP shows HelpFragment
         if (command.equals(Constants.HELP) && mHelpFragment == null) {
             mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
             mHelpFragment.show(getFragmentManager(), "HelpFragment");
@@ -555,11 +556,9 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-        // If we're changing fragments set the wake state and do the transaction
         if(fragment != null){
             playSound(R.raw.celeste_a);
             //startTTS(command);
-
             // Any command other than SLEEP updates the value of mCurrentFragment
             if ( !command.equals(Constants.SLEEP) ) {
                 mCurrentFragment = command;
@@ -890,6 +889,11 @@ public class MainActivity extends AppCompatActivity
         //Do something here if sensor accuracy changes
     }
 
+    /**
+     * Light sensor tracks the last 20 light values. After an initial delay set by LIGHT_WAKE_DELAY,
+     * if it detects a sudden increase (4x) over the average value,a wake command is sent to the device.
+     * @param event light event
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
@@ -899,7 +903,7 @@ public class MainActivity extends AppCompatActivity
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
             Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
             Log.i(Constants.TAG, "recent light avg: " + recentLightAvg);
-            if ( currentLight > recentLightAvg * 5 && lightWakeDelayExceeded() ){
+            if ( currentLight > recentLightAvg * 4 && lightWakeDelayExceeded() ){
                 // Stop any further callbacks from the sensor.
                 stopLightSensor();
                 handleCommand(Constants.WAKE);
@@ -911,7 +915,7 @@ public class MainActivity extends AppCompatActivity
         return (System.currentTimeMillis() - mLightSensorStartTime > LIGHT_WAKE_DELAY);
     }
 
-    // holds recent values reported by the light sensor to track ambient light changes.
+    // holds values reported by the light sensor and reports their average
     private class RecentLightValues {
         int index = 0;
         int size = 20;
