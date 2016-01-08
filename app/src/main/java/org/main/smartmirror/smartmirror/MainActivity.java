@@ -203,7 +203,9 @@ public class MainActivity extends AppCompatActivity
 
         // Set up view and nav drawer
         setContentView(R.layout.activity_main);
+        // speech icon turn it off for now
         mSpeechIcon = (ImageView)findViewById(R.id.speech_icon);
+        mSpeechIcon.setVisibility(View.GONE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
