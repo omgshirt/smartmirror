@@ -43,7 +43,7 @@ public class QuotesFragment extends Fragment {
 
     private final int fadeInTime = 2500;
     private final int fadeOutTime = 2500;
-    private final int quoteDisplayLength = 6000;
+    private final int quoteDisplayLength = 10000;
     private final int totalDisplayTime = fadeInTime + quoteDisplayLength + fadeOutTime;
 
     @Override
@@ -164,7 +164,11 @@ public class QuotesFragment extends Fragment {
      * @param num the random number seed
      */
     public void getRandomQuote(int num){
-        //TODO make sure that the quotes are trully random (they don't repeat)
+        //TODO make sure that the quotes are truly random (they don't repeat)
+        /*
+            A simple solution is to cycle through all quotes from front to back. Save current position + 1
+            to preferences file when a new quote is displayed.
+         */
         Random quoteRandomizer = new Random();
         int randNum = quoteRandomizer.nextInt(num);
         mQuoteContent.setText(mQuotesList.get(randNum));

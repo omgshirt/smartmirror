@@ -6,6 +6,26 @@
 	android:padding="15dp"
 	android:orientation="vertical"
 	tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
+	<!-- Weather Alerts -->
+	<TextView
+		android:id="@+id/weather_alert_heading"
+		android:visibility="gone"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:text="@string/weather_alert_heading"
+		android:textColor="#FF0000"/>
+	<TextView
+		android:id="@+id/alert_text"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:singleLine="true"
+		android:scrollHorizontally="true"
+		android:marqueeRepeatLimit="marquee_forever"
+		android:ellipsize="marquee"
+		android:textColor="#FF0000"/>
+
 	<!-- Date and time -->
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -24,7 +44,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="10dp"
-			android:textSize="20sp"
+			android:textSize="26sp"
 			/>
 	</LinearLayout>
 	<!-- Current weather, temp and humidity-->
@@ -99,18 +119,5 @@
 		<include android:id="@+id/forecast_5" layout="@layout/weather_hourly_forecast"/>
 		<include android:id="@+id/forecast_6" layout="@layout/weather_hourly_forecast"/>
 	</LinearLayout>
-	<TextView
-		android:id="@+id/weather_alert"
-		android:visibility="gone"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center"
-		android:text="* WEATHER ALERT *"
-		android:textColor="#FF0000"/>
-	<TextView
-		android:id="@+id/alert_text"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center"
-		android:textColor="#FF0000"/>
+
 </LinearLayout>

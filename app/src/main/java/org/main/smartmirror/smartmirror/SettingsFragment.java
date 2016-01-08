@@ -29,6 +29,7 @@ public class SettingsFragment extends Fragment {
     private Switch swtRemoteEnabled;
     private Switch swtCameraEnabled;
     private Switch swtWeatherEnglish;
+    private Switch swtTimeFormat;
 
     public static SettingsFragment newInstance() {
         SettingsFragment fragment = new SettingsFragment();
@@ -306,7 +307,7 @@ public class SettingsFragment extends Fragment {
         swtRemoteEnabled.setChecked(mPreferences.isRemoteEnabled());
         setRemoteSwitchText();
 
-        swtWeatherEnglish = (Switch) view.findViewById(R.id.switch_weather_english);
+        swtWeatherEnglish = (Switch) view.findViewById(R.id.switch_weather_units);
         swtWeatherEnglish.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -318,9 +319,23 @@ public class SettingsFragment extends Fragment {
                 setWeatherSwitchText();
             }
         });
-        boolean isEnglish = ( mPreferences.getWeatherUnits().equals(Preferences.ENGLISH) ) ;
-        swtWeatherEnglish.setChecked(isEnglish);
+        swtWeatherEnglish.setChecked(mPreferences.weatherIsEnglish());
         setWeatherSwitchText();
+
+        swtTimeFormat = (Switch) view.findViewById(R.id.switch_time_format);
+        swtTimeFormat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mPreferences.setTimeFormat12hr();
+                } else {
+                    mPreferences.setTimeFormat24hr();
+                }
+                setTimeSwitchText();
+            }
+        });
+        swtTimeFormat.setChecked(mPreferences.timeFormatIs12hr());
+        setTimeSwitchText();
 
         return view;
     }
@@ -363,6 +378,12 @@ public class SettingsFragment extends Fragment {
                     swtWeatherEnglish.setChecked(checked);
                     setWeatherSwitchText();
                     break;
+
+                case Preferences.CMD_TIME_12HR:
+                    checked = true;
+                case Preferences.CMD_TIME_24HR:
+                    swtTimeFormat.setChecked(checked);
+                    setTimeSwitchText();
             }
         }
     };
@@ -394,6 +415,10 @@ public class SettingsFragment extends Fragment {
 
     private void setCameraSwitchText(){
         setSwitchText(swtCameraEnabled, "Camera: On", "Camera: Off" );
+    }
+
+    private void setTimeSwitchText() {
+        setSwitchText(swtTimeFormat , "Time Format: 12hr", "Time Format: 24hr");
     }
 
     private void setSwitchText(Switch switchWidget, String isCheckedText, String notCheckedText) {

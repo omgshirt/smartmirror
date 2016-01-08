@@ -41,6 +41,7 @@
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
+    <string name="weather_alert_heading">* WEATHER ALERT *</string>
 
     <string name="weather_sunny">\uf00d</string>
     <string name="weather_cloudy_day">\uf002</string>
@@ -97,4 +98,8 @@
     <string name="cmd_camera_off">Camera off</string>
     <string name="cmd_weather_english">Weather display English</string>
     <string name="cmd_weather_metric">Weather display metric</string>
+
+    <!-- Camera String -->
+    <string name="camera_disabled_toast">Camera Disabled. Say \'Enable Camera\' to change this setting.</string>
+
 </resources>

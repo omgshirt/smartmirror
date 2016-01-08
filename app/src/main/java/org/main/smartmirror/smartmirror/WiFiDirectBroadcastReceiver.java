@@ -71,7 +71,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 mManager.requestConnectionInfo(mChannel, mActivity);
             } else {
                 Toast.makeText(mActivity, "Cannot Connect to Remote" ,Toast.LENGTH_SHORT).show();
-                mActivity.discoverPeers();
+                mActivity.discoverWifiP2pPeers();
             }
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
