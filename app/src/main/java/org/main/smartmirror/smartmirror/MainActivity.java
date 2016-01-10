@@ -80,7 +80,10 @@ public class MainActivity extends AppCompatActivity
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
     private BroadcastReceiver mScreenReceiver;
-    private String mCurrentFragment = null;
+    private int defaultScreenTimeout;
+    private String mInitialFragment = Constants.WEATHER;
+    private String mCurrentFragment;
+    private String mPreviousFragment;
     private final int WAKELOCK_TIMEOUT = 100;
     private PowerManager.WakeLock mWakeLock;
     private Timer mUITimer;
@@ -185,6 +188,13 @@ public class MainActivity extends AppCompatActivity
         // start a screen timer to track user interactions
         startUITimer();
 
+        try {
+            defaultScreenTimeout = Settings.System.getInt(getContentResolver(),
+                    Settings.System.SCREEN_OFF_TIMEOUT);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+
         // Set up ScreenReceiver to hold screen on / off status
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -221,7 +231,6 @@ public class MainActivity extends AppCompatActivity
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-
     }
 
     private void checkMarshmallowPermissions() {
@@ -251,12 +260,12 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "onStart");
         mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mirrorSleepState = AWAKE;
-        // if there's a fragment pending to display, show it
-        if (mCurrentFragment != null) {
-            handleCommand(mCurrentFragment);
-        } else {
-            // on first run mCurrentFragment isn't set: start with weather displayed
-            handleCommand(Constants.WEATHER);
+        // if the system was put to sleep from LIGHT_SLEEP, get the previous data fragment and display
+        // on first load, show weather
+        if (mCurrentFragment == null)  {
+            handleCommand(mInitialFragment);
+        } else if ( mCurrentFragment.equals(Constants.LIGHT_SLEEP) ) {
+            handleCommand(mPreviousFragment);
         }
     }
 
@@ -281,7 +290,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
         unregisterReceiver(mWifiReceiver);
         // If the screen is not turning off, the app is going into the background and shouldn't listen for these events.
-        // This is only for debugging purposes as the finished program should always be in foreground.
+        // This is for debugging purposes as the finished program should always be in foreground.
         if (!ScreenReceiver.screenIsOn) {
             startWifiHeartbeat();
             startLightSensor();
@@ -343,12 +352,17 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
+
+        // sanity check to prevent screen lockout from super-short screen timeout settings.
+        if (defaultScreenTimeout < 1000) defaultScreenTimeout = 15000;
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, defaultScreenTimeout);
     }
 
     protected void enterLightSleep() {
         clearScreenOnFlag();
         stopUITimer();
         startLightSensor();
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 5000);
         mirrorSleepState = LIGHT_SLEEP;
     }
 
@@ -510,13 +524,12 @@ public class MainActivity extends AppCompatActivity
             case Constants.NIGHT_LIGHT:
             case Constants.LIGHT:
                 if (mirrorSleepState == SLEEPING) {
-                    mCurrentFragment = Constants.NIGHT_LIGHT;
                     wakeScreen();
                     return;
-                } else {
+                } else if (mirrorSleepState == LIGHT_SLEEP) {
                     exitLightSleep();
-                    fragment = new LightFragment();
                 }
+                fragment = new LightFragment();
                 break;
             case Constants.QUOTES:
                 fragment = new QuotesFragment();
@@ -528,26 +541,26 @@ public class MainActivity extends AppCompatActivity
             case Constants.SLEEP:
                 fragment = new LightSleepFragment();
                 enterLightSleep();
+                command = Constants.LIGHT_SLEEP;
                 break;
             case Constants.TWITTER:
                 fragment = new TwitterFragment();
                 break;
             case Constants.WAKE:
                 if (mirrorSleepState == LIGHT_SLEEP) {
-                    mirrorSleepState = AWAKE;
-                    handleCommand(mCurrentFragment);
-                } else {
-                    // handleCommand will be called again from onStart() once the device is woken from sleep & screen is on
+                    exitLightSleep();
+                    handleCommand(mPreviousFragment);
+                } else if (mirrorSleepState == SLEEPING){
+                    // handleCommand will be called again from onStart() once the device is woken
                     wakeScreen();
-                    return;
                 }
-                break;
+                return;
             case Constants.WEATHER:
                 fragment = new WeatherFragment();
                 break;
 
             case Constants.MAKEUP:
-                fragment =new MakeupFragment();
+                fragment = new MakeupFragment();
                 break;
             default:
                 // The command isn't one of the view swap instructions,
@@ -559,10 +572,10 @@ public class MainActivity extends AppCompatActivity
         if(fragment != null){
             playSound(R.raw.celeste_a);
             //startTTS(command);
-            // Any command other than SLEEP updates the value of mCurrentFragment
-            if ( !command.equals(Constants.SLEEP) ) {
-                mCurrentFragment = command;
-            }
+            mPreviousFragment = mCurrentFragment;
+            mCurrentFragment = command;
+            Log.i(Constants.TAG, "mPreviousFragment " + mPreviousFragment);
+            Log.i(Constants.TAG, "mCurrentFragment " + mCurrentFragment);
             displayFragment(fragment);
         }
     }
@@ -578,8 +591,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Gets the fragment currently being viewed. If the mirror in SLEEP or LIGHT_SLEEP,
-     * this will return the value of the previously-displayed fragment.
+     * Gets the fragment currently being viewed. If the mirror in SLEEP,
+     * this will return the value of the last-displayed fragment.
      * @return String fragment name
      */
     protected String getCurrentFragment() {
@@ -602,6 +615,10 @@ public class MainActivity extends AppCompatActivity
                 broadcastMessage("inputAction", voiceInput);
             }
             return;
+        }
+
+        if(voiceInput.contains(Constants.WAKE)) {
+            voiceInput = Constants.WAKE;
         }
 
         if(voiceInput.contains(Constants.NIGHT_LIGHT)) {
@@ -844,7 +861,7 @@ public class MainActivity extends AppCompatActivity
         mServerTask.execute();
     }
 
-    // OnStop, start a thread that keeps the wifip2p connection alive by pinging every 60 seconds
+    // Start a thread that keeps the wifip2p connection alive by performing network discovery.
     public void startWifiHeartbeat() {
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
                 Executors.newScheduledThreadPool(1);
@@ -875,9 +892,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startLightSensor() {
-        mRecentLightValues = new RecentLightValues();
-        mLightSensorStartTime = System.currentTimeMillis();
-        mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        try {
+            mRecentLightValues = new RecentLightValues();
+            mLightSensorStartTime = System.currentTimeMillis();
+            mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "startLightSensor exception. LightSensor may not be initialized");
+        }
     }
 
     public void stopLightSensor() {
@@ -891,7 +912,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Light sensor tracks the last 20 light values. After an initial delay set by LIGHT_WAKE_DELAY,
-     * if it detects a sudden increase (4x) over the average value,a wake command is sent to the device.
+     * if it detects a sudden increase (3x) over the average value,a wake command is sent to the device.
      * @param event light event
      */
     @Override
@@ -903,7 +924,7 @@ public class MainActivity extends AppCompatActivity
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
             Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
             Log.i(Constants.TAG, "recent light avg: " + recentLightAvg);
-            if ( currentLight > recentLightAvg * 4 && lightWakeDelayExceeded() ){
+            if ( currentLight > recentLightAvg * 3 && lightWakeDelayExceeded() ){
                 // Stop any further callbacks from the sensor.
                 stopLightSensor();
                 handleCommand(Constants.WAKE);

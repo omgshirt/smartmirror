@@ -15,9 +15,11 @@ public class JSONDataCache {
     private JSONObject data;
     private Date expirationTime;
     private Date creationTime;
+    private Boolean valid;
 
     public JSONDataCache() {
         data = null;
+        valid = true;
         expirationTime = new Date();
         creationTime = new Date(System.currentTimeMillis());
     }
@@ -63,6 +65,13 @@ public class JSONDataCache {
 
     public JSONObject getData() {
         return  data;
+    }
+
+    /**
+     * Calling invalidate sets the data to be considered expired.
+     */
+    public void invalidate() {
+        this.expirationTime = new Date(0);
     }
 
     public Date getCreationTime() {
