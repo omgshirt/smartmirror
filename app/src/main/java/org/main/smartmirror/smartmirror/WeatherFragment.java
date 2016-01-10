@@ -63,7 +63,7 @@ public class WeatherFragment extends Fragment {
 
     // time in minutes before weather data is considered old and is discarded
     private final int DATA_UPDATE_FREQUENCY = 10;
-    private static JSONDataCache mWeatherCache = null;
+    private static DataCache<JSONObject> mWeatherCache = null;
 
     Handler mHandler = new Handler();
 
@@ -256,7 +256,7 @@ public class WeatherFragment extends Fragment {
     }
 
     private void updateWeatherCache(JSONObject data){
-        mWeatherCache = new JSONDataCache(data, DATA_UPDATE_FREQUENCY);
+        mWeatherCache = new DataCache<>(data, DATA_UPDATE_FREQUENCY);
     }
 
     private void renderWeather(JSONObject json){

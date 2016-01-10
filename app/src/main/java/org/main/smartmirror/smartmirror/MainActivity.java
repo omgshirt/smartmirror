@@ -179,14 +179,10 @@ public class MainActivity extends AppCompatActivity
         initializeWifiP2P();
         discoverWifiP2pPeers();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
-
         initializeLightSensor();
 
         // initialize TextToSpeech (TTS)
         mTTSHelper = new TTSHelper(this);
-
-        // start a screen timer to track user interactions
-        startUITimer();
 
         try {
             defaultScreenTimeout = Settings.System.getInt(getContentResolver(),
@@ -260,11 +256,14 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "onStart");
         mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mirrorSleepState = AWAKE;
-        // if the system was put to sleep from LIGHT_SLEEP, get the previous data fragment and display
+        addScreenOnFlag();
+
         // on first load, show weather
         if (mCurrentFragment == null)  {
             handleCommand(mInitialFragment);
-        } else if ( mCurrentFragment.equals(Constants.LIGHT_SLEEP) ) {
+        }
+        // if the system was put to sleep from LIGHT_SLEEP, get the previous fragment and display
+        else if ( mCurrentFragment.equals(Constants.LIGHT_SLEEP) ) {
             handleCommand(mPreviousFragment);
         }
     }
@@ -387,9 +386,7 @@ public class MainActivity extends AppCompatActivity
     // When expired, clear the screen on flag so the screen can time out per system settings.
     protected void startUITimer() {
         stopUITimer();
-        addScreenOnFlag();
         mUITimer = new Timer();
-
         Log.i(Constants.TAG, "Starting UI timer. " + UI_TIMEOUT_DELAY + " ms" );
         mUITimer.schedule(new TimerTask() {
             @Override

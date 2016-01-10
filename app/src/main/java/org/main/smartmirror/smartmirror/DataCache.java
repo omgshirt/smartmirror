@@ -1,38 +1,57 @@
 package org.main.smartmirror.smartmirror;
 
-import org.json.JSONObject;
-
 import java.util.Date;
 
 /**
  * Created by Brian on 1/5/2016.
  *
- * Stash JSONObjects within an instance of JSONDataCache for later use.
+ * Stash data of the given type within an instance of DataCache for later use.
  *
  */
-public class JSONDataCache {
+public class DataCache<T> {
 
-    private JSONObject data;
+    private T data;
     private Date expirationTime;
     private Date creationTime;
-    private Boolean valid;
 
-    public JSONDataCache() {
+    public DataCache() {
         data = null;
-        valid = true;
         expirationTime = new Date();
         creationTime = new Date(System.currentTimeMillis());
     }
 
     /**
      *
-     * @param data JSONObject to store
-     * @param time expiration time in minutes
+     * @param data Data to store
+     * @param time expiration (in minutes) from current time
      */
-    public JSONDataCache(JSONObject data, int time) {
+    public DataCache(T data, int time) {
         expirationTime = new Date();
         creationTime = new Date(System.currentTimeMillis());
         setData(data, time);
+    }
+
+    /**
+     * Sets the data to never expire
+     */
+    public void setData(T data) {
+        this.expirationTime.setTime(Long.MAX_VALUE);
+        this.data = data;
+    }
+
+    /**
+     *
+     * @param data Data to store
+     * @param dataDuration time (in minutes) before the cache is considered expired
+     */
+    public void setData(T data, int dataDuration) {
+        this.data = data;
+        long now = System.currentTimeMillis();
+        expirationTime.setTime(now + (long)dataDuration * 60 * 1000);
+    }
+
+    public T getData() {
+        return  data;
     }
 
     public Date getExpirationTime() {
@@ -48,29 +67,12 @@ public class JSONDataCache {
         return (current > expirationTime.getTime());
     }
 
-    public void setData(JSONObject data) {
-        this.data = data;
-    }
-
     /**
-     *
-     * @param data JSON data to store
-     * @param dataDuration time (in minutes) before the cache is considered expired
-     */
-    public void setData(JSONObject data, int dataDuration) {
-        this.data = data;
-        long now = System.currentTimeMillis();
-        expirationTime.setTime(now + (long)dataDuration * 60 * 1000);
-    }
-
-    public JSONObject getData() {
-        return  data;
-    }
-
-    /**
-     * Calling invalidate sets the data to be considered expired.
+     * Invalidate resets the data
      */
     public void invalidate() {
+        this.data = null;
+        this.creationTime = new Date(0);
         this.expirationTime = new Date(0);
     }
 
