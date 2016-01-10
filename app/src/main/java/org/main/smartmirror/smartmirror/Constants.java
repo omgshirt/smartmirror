@@ -73,4 +73,20 @@ public class Constants {
     public static String trailText = "";
     public static String webTitle = "";
     public static String mHeadline = "";
+    public static final String ONE = "one";
+    public static final String FIRST = "first";
+    public static final String TWO = "two";
+    public static final String SECOND = "second";
+    public static final String THREE = "three";
+    public static final String THIRD = "third";
+    public static final String FOUR = "four";
+    public static final String FOURTH = "fourth";
+    public static final String FIVE = "five";
+    public static final String FIFTH = "fifth";
+    public static final String SIX = "six";
+    public static final String SIXTH = "sixth";
+    public static final String SEVEN = "seven";
+    public static final String SEVENTH = "seventh";
+    public static final String EIGHT = "eight";
+    public static final String EIGHTH = "eighth";
 }

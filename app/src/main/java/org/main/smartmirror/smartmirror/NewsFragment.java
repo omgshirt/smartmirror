@@ -210,6 +210,94 @@ public class NewsFragment extends Fragment{
                 case Constants.BACK:
                     getFragmentManager().popBackStack();
                     break;
+                case Constants.ONE:
+                case Constants.FIRST:
+                    Constants.mArticleFullBody = Constants.article[0];
+                    Constants.mHeadline = Constants.hl[0];
+                    clearLayout();
+                    //Fragment fragment = new NewsBodyFragment();
+                    //FragmentManager fm = getFragmentManager();
+                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .commit();
+                    break;
+                case Constants.TWO:
+                case Constants.SECOND:
+                    Constants.mArticleFullBody = Constants.article[1];
+                    Constants.mHeadline = Constants.hl[1];
+                    clearLayout();
+                    //Fragment fragment = new NewsBodyFragment();
+                    //FragmentManager fm = getFragmentManager();
+                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .commit();
+                    break;
+                case Constants.THREE:
+                case Constants.THIRD:
+                    Constants.mArticleFullBody = Constants.article[2];
+                    Constants.mHeadline = Constants.hl[2];
+                    clearLayout();
+                    //Fragment fragment = new NewsBodyFragment();
+                    //FragmentManager fm = getFragmentManager();
+                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .commit();
+                    break;
+                case Constants.FOUR:
+                case Constants.FOURTH:
+                    Constants.mArticleFullBody = Constants.article[3];
+                    Constants.mHeadline = Constants.hl[3];
+                    clearLayout();
+                    //Fragment fragment = new NewsBodyFragment();
+                    //FragmentManager fm = getFragmentManager();
+                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .commit();
+                    break;
+                case Constants.FIVE:
+                case Constants.FIFTH:
+                    Constants.mArticleFullBody = Constants.article[4];
+                    Constants.mHeadline = Constants.hl[4];
+                    clearLayout();
+                    //Fragment fragment = new NewsBodyFragment();
+                    //FragmentManager fm = getFragmentManager();
+                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .commit();
+                    break;
+                case Constants.SIX:
+                case Constants.SIXTH:
+                    Constants.mArticleFullBody = Constants.article[5];
+                    Constants.mHeadline = Constants.hl[5];
+                    clearLayout();
+                    //Fragment fragment = new NewsBodyFragment();
+                    //FragmentManager fm = getFragmentManager();
+                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .commit();
+                    break;
+                case Constants.SEVEN:
+                case Constants.SEVENTH:
+                    Constants.mArticleFullBody = Constants.article[6];
+                    Constants.mHeadline = Constants.hl[6];
+                    clearLayout();
+                    //Fragment fragment = new NewsBodyFragment();
+                    //FragmentManager fm = getFragmentManager();
+                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .commit();
+                    break;
+                case Constants.EIGHT:
+                case Constants.EIGHTH:
+                    Constants.mArticleFullBody = Constants.article[7];
+                    Constants.mHeadline = Constants.hl[7];
+                    clearLayout();
+                    //Fragment fragment = new NewsBodyFragment();
+                    //FragmentManager fm = getFragmentManager();
+                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .commit();
+                    break;
                 default:
                     String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
                     int i = 0;
