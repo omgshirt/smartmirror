@@ -157,8 +157,6 @@ public class MainActivity extends AppCompatActivity
             switch(msg.what){
                 case VoiceService.RESULT_SPEECH:
                     String result = msg.getData().getString("result");
-                    if(DEBUG)
-                        Log.i(Constants.TAG, result);
                     handleVoiceCommand(result);
                     break;
                 default:
@@ -529,7 +527,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new LightFragment();
                 break;
             case Constants.QUOTES:
-                fragment = new QuotesFragment();
+                fragment = new QuoteFragment();
                 break;
             case Constants.SETTINGS:
             case Constants.OPTIONS:
@@ -817,7 +815,7 @@ public class MainActivity extends AppCompatActivity
 
     /** called when a connection is made to this device
      *
-     * @param info
+     * @param info response info
      */
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {

@@ -49,7 +49,6 @@ public class WeatherFragment extends Fragment {
     private TextView txtAlerts;
     private TextView txtAlertWarning;
 
-    private static String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
     private String mLatitude = "0";
     private String mLongitude = "0";
 
@@ -63,7 +62,7 @@ public class WeatherFragment extends Fragment {
 
     // time in minutes before weather data is considered old and is discarded
     private final int DATA_UPDATE_FREQUENCY = 10;
-    private static DataCache<JSONObject> mWeatherCache = null;
+    public static DataCache<JSONObject> mWeatherCache = null;
 
     Handler mHandler = new Handler();
 
@@ -77,12 +76,12 @@ public class WeatherFragment extends Fragment {
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         dailyForecasts = new DailyForecast[3];
 
-        // some static locations for now
         mLatitude = Double.toString(mPreferences.getLatitude());
         mLongitude = Double.toString(mPreferences.getLongitude());
     }
 
     public void startWeatherUpdate(){
+        String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
         String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
         String weatherUnit = "si";
         if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
