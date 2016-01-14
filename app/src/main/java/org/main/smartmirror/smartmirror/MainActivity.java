@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
     private long mLightSensorStartTime;
-    private final long LIGHT_WAKE_DELAY = 5000;   // time delay before screen will waken due to light changes
+    private final long LIGHT_WAKE_DELAY = 4000;   // time delay before screen will waken due to light changes
     private RecentLightValues mRecentLightValues;
 
     // News
@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity
 
         // sanity check to prevent screen lockout from super-short screen timeout settings.
         if (defaultScreenTimeout < 1000) defaultScreenTimeout = 15000;
-        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, defaultScreenTimeout);
+        restoreDefaultScreenTimeout();
     }
 
     protected void enterLightSleep() {
@@ -365,7 +365,12 @@ public class MainActivity extends AppCompatActivity
 
     protected void exitLightSleep(){
         stopLightSensor();
+        restoreDefaultScreenTimeout();
         mirrorSleepState = AWAKE;
+    }
+
+    protected void restoreDefaultScreenTimeout() {
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, defaultScreenTimeout);
     }
 
     // Flags the system to keep the screen on indefinitely.

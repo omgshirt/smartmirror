@@ -349,7 +349,7 @@ public class Preferences implements LocationListener {
         Log.d("Location","lat:" + Double.toString(mLatitude));
         Log.d("Location","long:" + Double.toString(mLongitude));
 
-        LocalBroadcastManager.getInstance(mActivity.getApplicationContext()).registerReceiver(mMessageReceiver,
+        LocalBroadcastManager.getInstance(mActivity).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
     }
 
