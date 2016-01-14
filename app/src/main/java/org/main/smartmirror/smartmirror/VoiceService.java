@@ -28,13 +28,16 @@ public class VoiceService extends Service implements RecognitionListener{
 
     private ArrayList<Messenger> mClients = new ArrayList<>();
     private Messenger mMessenger = new Messenger( new IHandler());
+    private Message initMessage;
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
     private boolean mSpeechInitialized;
-    static final int STOP_SPEECH=0;
-    static final int START_SPEECH=1;
-    static final int RESULT_SPEECH=2;
-    private String SMARTMIRROR_SEARCH="mirrorSearch";
+    static final int STOP_SPEECH = 0;
+    static final int START_SPEECH = 1;
+    static final int RESULT_SPEECH = 2;
+    public static final int INIT_SPEECH = 3;
+    public static final int CANCEL_SPEECH = 4;
+    private String SMARTMIRROR_SEARCH = "mirrorSearch";
     private final String GRAMMAR_SEARCH = "grammarSearch";
     private final String MIRROR_KWS = "show";
     private final String PRIMARY_SEARCH = SMARTMIRROR_SEARCH;
@@ -90,12 +93,12 @@ public class VoiceService extends Service implements RecognitionListener{
     /**
      * Sends a message back to the Activity that started this service
      */
-    public void sendMessage(String message){
+    public void sendMessage(String message, int resultType){
         Bundle bundle = new Bundle();
         // key is result so the calling activity can handle the message
         bundle.putString("result", message);
         // used for the calling activity to check which message id to check
-        Message msg = Message.obtain(null, RESULT_SPEECH);
+        Message msg = Message.obtain(null, resultType);
         msg.setData(bundle);
         try {
             mClients.get(0).send(msg);
@@ -139,7 +142,7 @@ public class VoiceService extends Service implements RecognitionListener{
             String hypstr = hypothesis.getHypstr().trim();
             Log.i("VR", "onResult:\"" + hypstr + "\"");
             //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
-            sendMessage(hypstr);
+            sendMessage(hypstr, RESULT_SPEECH);
         }
         startVoice();
     }
@@ -208,10 +211,12 @@ public class VoiceService extends Service implements RecognitionListener{
             @Override
             protected void onPostExecute(Exception result) {
                 if (result != null) {
-                    Toast.makeText(VoiceService.this, "" + result, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VoiceService.this, result.toString(), Toast.LENGTH_SHORT).show();
                 }
                 else {
                     mSpeechInitialized = true;
+                    if (mClients.size() > 0)
+                       startVoice();
                 }
             }
         }.execute();
@@ -263,13 +268,18 @@ public class VoiceService extends Service implements RecognitionListener{
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what){
-                case START_SPEECH:
+                case INIT_SPEECH:
                     mClients.add(msg.replyTo);
+                    break;
+                case START_SPEECH:
+                    //mClients.add(msg.replyTo);
                     startVoice();
                     break;
+                case CANCEL_SPEECH:
                 case STOP_SPEECH:
-                    mClients.remove(msg.replyTo);
-                    //stopVoice(true);
+                    // We may want to discriminate between these options. Stop should process
+                    // any audio in the queue, while cancel throws out any pending results.
+                    //mClients.remove(msg.replyTo);
                     if(mSpeechInitialized)
                         mSpeechRecognizer.cancel();
                     break;

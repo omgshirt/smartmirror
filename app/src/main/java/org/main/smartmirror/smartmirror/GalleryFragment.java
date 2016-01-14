@@ -1,19 +1,16 @@
 package org.main.smartmirror.smartmirror;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,12 +25,93 @@ import java.util.TimerTask;
  */
 public class GalleryFragment extends Fragment {
 
+    private ArrayList<String> mImageFileNames;
     private ArrayList<String> mImageList;
     private Drawable mImageDrawable;
     private ImageView mGalleryItem;
     private Runnable mRunnable;
+    private String mArtist;
+    private String mTitle;
+    private String mYear;
+    private TextView mImageTitle;
+    private TextView mImageArtist;
+    private TextView mImageYear;
     private Timer mTimer;
     private TimerTask mTimerTask;
+
+    /**
+     * Taken from Apache Commons IO https://commons.apache.org/proper/commons-io/xref/org/apache/commons/io/FilenameUtils.html
+     * Gets the base name, minus the full path and extension, from a full filename.
+     * <p>
+     * This method will handle a file in either Unix or Windows format.
+     * The text after the last forward or backslash and before the last dot is returned.
+     <pre>
+     * a/b/c.txt --&gt; c
+     * a.txt     --&gt; a
+     * a/b/c     --&gt; c
+     * a/b/c/    --&gt; ""
+     * </pre>
+     * <p>
+     * The output will be the same irrespective of the machine that the code is running on.
+     *
+     * @param filename  the filename to query, null returns null
+     * @return the name of the file without the path, or an empty string if none exists
+     */
+
+    public static final char EXTENSION_SEPARATOR = '.';
+    private static final char UNIX_SEPARATOR = '/';
+    private static final char WINDOWS_SEPARATOR = '\\';
+
+    public static String getBaseName(final String filename) {
+        return removeExtension(getName(filename));
+    }
+    public static String getName(final String filename) {
+        if (filename == null) {
+            return null;
+        }
+        final int index = indexOfLastSeparator(filename);
+        return filename.substring(index + 1);
+    }
+
+    public static String removeExtension(final String filename) {
+        if (filename == null) {
+            return null;
+        }
+        final int index = indexOfExtension(filename);
+        if (index == -1) {
+            return filename;
+        } else {
+            return filename.substring(0, index);
+        }
+    }
+    public static int indexOfLastSeparator(final String filename) {
+        if (filename == null) {
+            return -1;
+        }
+        final int lastUnixPos = filename.lastIndexOf(UNIX_SEPARATOR);
+        final int lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
+        return Math.max(lastUnixPos, lastWindowsPos);
+    }
+
+    public static int indexOfExtension(final String filename) {
+        if (filename == null) {
+            return -1;
+        }
+        final int extensionPos = filename.lastIndexOf(EXTENSION_SEPARATOR);
+        final int lastSeparator = indexOfLastSeparator(filename);
+        return lastSeparator > extensionPos ? -1 : extensionPos;
+    }
+
+    public void startExtensionRemoval(){
+        for(int i=0; i<mImageList.size(); i++) {
+            mImageFileNames.add(getBaseName(mImageList.get(i)));
+            mImageFileNames.set(i, mImageFileNames.get(i).replace('_', ' '));
+            mImageFileNames.set(i, mImageFileNames.get(i).replace('-', '\n'));
+        }
+
+    }
+
+    // ---------------------------- FIle Extension Removal -------------------------------------//
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +125,7 @@ public class GalleryFragment extends Fragment {
             public void run() {
                 makeRandomImage(mImageList.size());
                 mGalleryItem.setImageDrawable(mImageDrawable);
+                mImageTitle.setText(mTitle);
             }
         };
         // initialize the timer task that will run on the UI
@@ -66,12 +145,17 @@ public class GalleryFragment extends Fragment {
         }
         // initialize the image list to be used throughout
         mImageList = new ArrayList<>(Arrays.asList(imageGalleryNames));
+        mImageFileNames = new ArrayList<>();
+
+        // remove image extensions
+        startExtensionRemoval();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.gallery_fragment, container, false);
         // initialize the ImageView
+        mImageTitle = (TextView) view.findViewById(R.id.image_facts);
         mGalleryItem = (ImageView) view.findViewById(R.id.gallery_item);
         // start the timer
         mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
@@ -94,50 +178,13 @@ public class GalleryFragment extends Fragment {
         //TODO make sure that the images are truly random (they don't repeat)
         Random imageRandomizer = new Random();
         int randomNumber = imageRandomizer.nextInt(num);
+        mTitle = mImageFileNames.get(randomNumber);
+        Log.i("IMG", mTitle);
         try {
             InputStream is = getContext().getAssets().open("gallery/" + mImageList.get(randomNumber));
             mImageDrawable = Drawable.createFromStream(is, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    // ----------------------- Local Broadcast Receiver -----------------------
-
-    // Create a handler for received Intents. This will be called whenever an Intent
-    // with an action named "inputAction" is broadcast.
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("message");
-            Log.d("News", "Got message:\"" + message + "\"");
-            switch(message){
-                case Constants.BACK:
-                    getFragmentManager().popBackStack();
-                    break;
-
-            }
-
-        }
-    };
-
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
-     */
-    @Override
-    public void onResume(){
-        super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-                new IntentFilter("inputAction"));
-    }
-
-    @Override
-    // when this goes out of view, halt listening
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 }

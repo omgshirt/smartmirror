@@ -9,9 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-/**
- * Dialog that handles all the help commands
- */
 public class HelpFragment extends DialogFragment {
     private AlertDialog.Builder builder;
 

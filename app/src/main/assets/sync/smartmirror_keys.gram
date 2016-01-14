@@ -1,30 +1,36 @@
-calendar /1e-3/
-camera /1e-3/
+calendar /1e-1/
+camera /1e-1/
+conditions /1e-8/
 enable camera /1e-3/
+enable remote /1e-3/
 disable camera /1e-3/
-conditions /1e-5/
-facebook /1e-2/
-forecast /1e-2/
+disable remote /1e-3/
+facebook /1e-5/
+forecast /1e-4/
 gallery /1e-2/
 go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
-show help /1e1/
-hide help /1e6/
-news /1e10/
-night light /1e-5/
+hide /1e-1/
+help /1e1/
+log me in /1e-3/
+makeup /1e7/
+menu /1e4/
+news /1e12/
+night light /1e-9/
 options /1e-2/
-quotes /1e5/
-enable remote /1e-3/
-disable remote /1e-3/
+quotes /1e4/
+refresh /1e-4/
 settings /1e-4/
 scroll up /1e10/
 scroll down /1e10/
-start listening /1e-5/
-stop listening /1e-5/
-take a picture /1e-2/
-traffic /1e5/
-twitter /1e5/
+sleep /1e12/
+start listening /1e-1/
+stop listening /1e-1/
+take a picture /1e-15/
+traffic /1e1/
+twitter /1e1/
+wake /1e3/
 wake up /1e-3/
 weather /1e5/
 weather english /1e2/
@@ -37,7 +43,6 @@ screen brightness very high /1e-5/
 sports /1e10/
 foreign /1e5/
 technology /1e-3/
-books /1e10/
 business /1e5/
 cars /1e10/
 education /1e1/
@@ -47,4 +52,4 @@ movies/1e10/
 politics /1e-1/
 science /1e3/
 television /1e-3/
-world /1e10/
+world /1e14/

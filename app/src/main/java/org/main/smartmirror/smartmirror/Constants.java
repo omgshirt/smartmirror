@@ -8,6 +8,7 @@ public class Constants {
     public static final String BACK = "back";
     public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
+    public static final String MENU = "menu";
     public static final String OFF = "off";
     public static final String ON = "on";
     public static final String OPTIONS = "options";
@@ -32,11 +33,12 @@ public class Constants {
     public static final String SHOW_HELP = "show help";
     public static final String TRAFFIC = "traffic";
     public static final String NIGHT_LIGHT = "night light";
+    public static final String LIGHT = "light";
+    public static final String LIGHT_SLEEP = "light sleep"; // Not a voice command - only used to track current fragment
 
     //--------------HELP--------------
     public static final String HELP = "help";
     public static final String HIDE = "hide";
-    public static final String HIDE_HELP ="hide help";
 
     //--------------WEATHER--------------
     public static final String OPEN_WEATHER_MAP_API =

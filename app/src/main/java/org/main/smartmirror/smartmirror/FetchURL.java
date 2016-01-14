@@ -5,8 +5,6 @@ package org.main.smartmirror.smartmirror;
 //api: http://api.nytimes.com/svc/search/v2/articlesearch
 //uri structure: http://api.nytimes.com/svc/search/v2/articlesearch.response-format?[q=search term&fq=filter-field:(filter-term)&additional-params=values]&api-key=####
 
-
-
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

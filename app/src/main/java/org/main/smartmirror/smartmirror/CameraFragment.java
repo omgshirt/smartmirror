@@ -1,7 +1,5 @@
 package org.main.smartmirror.smartmirror;
-/**
- * Created by Master N on 11/20/2015.
- */
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -71,6 +69,10 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+
+/**
+ * Fragment that handles the Camera taking and uploading functionality.
+ */
 @TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
 
@@ -769,12 +771,24 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private void takePicture() {
         cheeseHandler.postDelayed(new Runnable() {
             public void run() {
-                showToast("3");
-                showToast("2");
-                showToast("1");
-                showToast("CHEESE");
-                }
+                showToast("three");
+            }
         }, 0);
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                showToast("two");
+            }
+        }, 2000);
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                showToast("one");
+            }
+        }, 4000);
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                showToast("say cheese");
+            }
+        }, 6000);
         cheeseHandler.postDelayed(new Runnable() {
             public void run() {
                 lockFocus();
