@@ -32,6 +32,10 @@ public class NewsFragment extends Fragment{
     public static String mPostURL = "&api-key=";
     public static String mGuardURL = mPreURL + mNewsSection + mPostURL;
 
+    // time in minutes before news data is considered old and is discarded
+    private final int DATA_UPDATE_FREQUENCY = 10;
+    public static DataCache<JSONObject> mNewsCache = null;
+
     private TextView mTxtHeadline;
     private TextView mTxtHeadline2;
     private TextView mTxtHeadline3;
@@ -177,10 +181,12 @@ public class NewsFragment extends Fragment{
             }
         });
 
+        return view;
+    }
+
+    public void startNewsUpdate(){
         mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
         updateNews(mDefaultGuardURL+mGuardAPIKey);
-
-        return view;
     }
 
     private void clearLayout() {
@@ -322,6 +328,25 @@ public class NewsFragment extends Fragment{
         }
     };
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Check for any cached news data.
+        // If a cache exists, render it to the view.
+        // Update the cache if it has expired.
+        if (mNewsCache == null) {
+            Log.i(Constants.TAG,"NewsCache does not exist, updating");
+            startNewsUpdate();
+        } else {
+            renderNews(mNewsCache.getData());
+            if (mNewsCache.isExpired()) {
+                Log.i(Constants.TAG, "NewsCache expired. Refreshing..." );
+                startNewsUpdate();
+            }
+        }
+    }
+
     /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
      *  We're interested in the 'inputAction' intent, which carries any inputs send to
      *  MainActivity from voice recognition, the remote control, etc.
@@ -355,12 +380,16 @@ public class NewsFragment extends Fragment{
                 } else {
                     mHandler.post(new Runnable(){
                         public void run(){
+                            updateNewsCache(json);
                             renderNews(json);
                         }
                     });
                 }
             }
         }.start();
+    }
+    private void updateNewsCache(JSONObject data){
+        mNewsCache = new DataCache<>(data, DATA_UPDATE_FREQUENCY);
     }
 
 
