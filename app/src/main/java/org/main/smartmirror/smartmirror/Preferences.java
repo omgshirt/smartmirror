@@ -136,6 +136,8 @@ public class Preferences implements LocationListener {
 
     private float mSystemVolume;                    // control general system volume
     private float mMusicVolume;                     // music stream volume
+    private int mMusicVolumeHolder;
+    private int mSystemVolumeHolder;
 
     private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
@@ -312,8 +314,8 @@ public class Preferences implements LocationListener {
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
         mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
-        mMusicVolume = mSharedPreferences.getFloat(PREFS_MUSIC_VOL, VOL_VLOW);
-        mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_VLOW);
+        mMusicVolume = mSharedPreferences.getFloat(PREFS_MUSIC_VOL, VOL_LOW);
+        mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_LOW);
         mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
         mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
         mWeatherUnits = mSharedPreferences.getString(PREFS_WEATHER_UNIT, ENGLISH);
@@ -322,6 +324,14 @@ public class Preferences implements LocationListener {
         mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
         mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
+
+        // set brightness and volume to stored values
+        mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
+        mMusicVolumeHolder = getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        setSystemVolume(mSystemVolume);
+        setMusicVolume(mMusicVolume);
+        setScreenBrightness(mAppBrightness);
 
         // Find current lat and long positions.
         // This is not currently saved to the prefs file, system will re-discover location on start
@@ -357,6 +367,7 @@ public class Preferences implements LocationListener {
     public void destroy(){
         Context appContext = MainActivity.getContextForApplication();
         LocalBroadcastManager.getInstance(appContext).unregisterReceiver(mMessageReceiver);
+        setVolumesToSystemValues();
         mPreferences = null;
         mSharedPreferences = null;
         mActivity = null;
@@ -406,14 +417,29 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public void setVolumesToPrefValues() {
+        setStreamVolume(mSystemVolume, AudioManager.STREAM_SYSTEM);
+        setStreamVolume(mMusicVolume, AudioManager.STREAM_MUSIC);
+    }
+
+    public void setVolumesToSystemValues() {
+        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, mMusicVolumeHolder,  0);
+        am.setStreamVolume(AudioManager.STREAM_SYSTEM, mSystemVolumeHolder, 0);
+    }
+
     // private helper sets vol for given stream
     // Gets the max volume allowed for this stream, then sets the volume
     private void setStreamVolume(float vol, int stream) {
-        Context context = MainActivity.getContextForApplication();
-        AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
         int max = am.getStreamMaxVolume(stream);
         int setVol = (int)(vol * max);
         am.setStreamVolume(stream, setVol, 0);
+    }
+
+    private int getStreamVolume(int stream) {
+        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
+        return am.getStreamVolume(stream);
     }
 
     /** Sets weather display as english or metric
@@ -421,9 +447,7 @@ public class Preferences implements LocationListener {
      * @param unit Units to display
      */
     public void setWeatherUnits(String unit) {
-        if (unit.equals(mWeatherUnits))
-            return;
-        else if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
+        if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
             mWeatherUnits = unit;
             // (1/12/16) invalid the cache stored in WeatherFragment. Don't like this as it's too tightly coupled.
             if (WeatherFragment.mWeatherCache != null)
@@ -584,7 +608,6 @@ public class Preferences implements LocationListener {
 
     /**
      * Resets the application's current brightness to value stored in preferences
-     *  Requires Activity context
      */
     public void resetScreenBrightness() {
         setScreenBrightness(mAppBrightness);

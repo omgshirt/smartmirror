@@ -10,7 +10,7 @@ facebook /1e-5/
 forecast /1e-4/
 gallery /1e-2/
 gray /1e10/
-green /1e2/
+green /1e0/
 go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
@@ -42,7 +42,7 @@ wake up /1e-4/
 weather /1e4/
 weather english /1e2/
 weather metric /1e2/
-white /1e1/
+white /1e-1/
 yellow /1e-2/
 screen brightness very low /1e-5/
 screen brightness low /1e-5/

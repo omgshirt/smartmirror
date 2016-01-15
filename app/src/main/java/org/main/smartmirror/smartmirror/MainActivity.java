@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity
     // Sleep state & wakelocks
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
-    private BroadcastReceiver mScreenReceiver;
     private int defaultScreenTimeout;
     private String mInitialFragment = Constants.WEATHER;
     private String mCurrentFragment;
@@ -87,7 +86,9 @@ public class MainActivity extends AppCompatActivity
     private final int WAKELOCK_TIMEOUT = 100;
     private PowerManager.WakeLock mWakeLock;
     private Timer mUITimer;
-    private final long UI_TIMEOUT_DELAY = 1000 * 60 * 5; // interactions extend visibility for 5 minutes
+    private final long UI_TIMEOUT_DELAY = 1000 * 20 * 1; // User interactions reset screen on timer to 5 minutes
+    private final int SCREEN_OFF_TIMEOUT = 5000;
+    private PowerManager mPowerManager;
 
     // WiFiP2p
     private WifiP2pManager mWifiManager;
@@ -172,6 +173,7 @@ public class MainActivity extends AppCompatActivity
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
+        mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
         checkMarshmallowPermissions();
         initializeWifiP2P();
@@ -192,8 +194,6 @@ public class MainActivity extends AppCompatActivity
         // Set up ScreenReceiver to hold screen on / off status
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        mScreenReceiver = new ScreenReceiver();
-        registerReceiver(mScreenReceiver, intentFilter);
 
         // Set up views and nav drawer
         setContentView(R.layout.activity_main);
@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity
         decorView.setSystemUiVisibility(uiOptions);
 
         try {
+            //noinspection ConstantConditions
             getSupportActionBar().hide();
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -255,6 +256,7 @@ public class MainActivity extends AppCompatActivity
         mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mirrorSleepState = AWAKE;
         addScreenOnFlag();
+        setDefaultScreenTimeout();
 
         // on first load, show weather
         if (mCurrentFragment == null)  {
@@ -266,32 +268,39 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onResume(){
         super.onResume();
         Log.i(Constants.TAG, "onResume");
-        Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
-        mPreferences.resetScreenBrightness();
-        registerReceiver(mWifiReceiver, mWifiIntentFilter);
-        if (ScreenReceiver.screenIsOn) {
-            // onResume the wifi heartbeat and light sensors are not needed
-            stopWifiHeartbeat();
-            stopLightSensor();
+
+        if (mPowerManager.isScreenOn()) {
+            mPreferences.resetScreenBrightness();
         }
+        mPreferences.setVolumesToPrefValues();
+        stopWifiHeartbeat();
+        stopLightSensor();
+        startSpeechRecognition();
+        registerReceiver(mWifiReceiver, mWifiIntentFilter);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onPause(){
         super.onPause();
         Log.i(Constants.TAG, "onPause");
-        Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
-        unregisterReceiver(mWifiReceiver);
-        // If the screen is not turning off, the app is going into the background and shouldn't listen for these events.
-        // This is for debugging purposes as the finished program should always be in foreground.
-        if (!ScreenReceiver.screenIsOn) {
+       // If the screen is not turning off, the app is going into the background: speech recognition is stopped.
+        // This is (mostly) for debugging purposes as the finished program should always be in foreground.
+        if (mPowerManager.isScreenOn()) {
+            stopSpeechRecognition();
+            mPreferences.setVolumesToSystemValues();
+        } else {
+            // Otherwise the screen is turning off: start Light Sensor and maintain Wifi connection
             startWifiHeartbeat();
             startLightSensor();
         }
+        restoreDefaultScreenTimeout();
+        unregisterReceiver(mWifiReceiver);
     }
 
     @Override
@@ -305,13 +314,13 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mTTSHelper.destroy();
+        mMessenger = null;
         mPreferences.destroy();
         if (wifiHeartbeat != null) {
             wifiHeartbeat.cancel(true);
             wifiHeartbeat = null;
         }
         unbindService(mConnection);
-        unregisterReceiver(mScreenReceiver);
         mIsBound = false;
         Log.i(Constants.TAG, "onDestroy");
     }
@@ -345,32 +354,33 @@ public class MainActivity extends AppCompatActivity
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
         kl.disableKeyguard();
 
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
 
         // sanity check to prevent screen lockout from super-short screen timeout settings.
         if (defaultScreenTimeout < 1000) defaultScreenTimeout = 15000;
-        restoreDefaultScreenTimeout();
     }
 
     protected void enterLightSleep() {
         clearScreenOnFlag();
         stopUITimer();
         startLightSensor();
-        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 5000);
+        setDefaultScreenTimeout();
         mirrorSleepState = LIGHT_SLEEP;
     }
 
     protected void exitLightSleep(){
         stopLightSensor();
-        restoreDefaultScreenTimeout();
         mirrorSleepState = AWAKE;
     }
 
     protected void restoreDefaultScreenTimeout() {
         Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, defaultScreenTimeout);
+    }
+
+    protected void setDefaultScreenTimeout() {
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SCREEN_OFF_TIMEOUT);
     }
 
     // Flags the system to keep the screen on indefinitely.
@@ -689,7 +699,7 @@ public class MainActivity extends AppCompatActivity
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
-        if(mTTSHelper.isSpeaking()) return;
+        if(mTTSHelper.isSpeaking() || mService == null) return;
         try {
             //Log.i("VR", "startSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.START_SPEECH);
@@ -704,8 +714,9 @@ public class MainActivity extends AppCompatActivity
      * Stops the current speech recognition object
      */
     public void stopSpeechRecognition(){
+        Log.i("VR", "stopSpeechRecognition()");
+        if (mService == null) return;
         try {
-            //Log.i("VR", "stopSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);

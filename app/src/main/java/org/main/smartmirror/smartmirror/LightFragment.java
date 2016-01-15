@@ -14,12 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.HashMap;
+
 public class LightFragment extends Fragment {
 
     private final String LIGHT_PREFS = "light preferences";
     private final String LIGHT_COLOR = "light color";
     private int mColor;
-    private String[] colorNames;
+    private HashMap<String, Integer> colorMap;
 
     // Handle any messages sent from MainActivity
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -36,7 +38,12 @@ public class LightFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        colorNames = getResources().getStringArray(R.array.color_names);
+        String[] colorNames = getResources().getStringArray(R.array.color_names);
+        colorMap = new HashMap<>();
+        for (String color : colorNames) {
+            int colorResId = getResources().getIdentifier(color, "color", getActivity().getPackageName());
+            colorMap.put(color, colorResId);
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -80,20 +87,15 @@ public class LightFragment extends Fragment {
 
     @SuppressWarnings("deprecation")
     private void handleCommand(String command) {
-        for (String color : colorNames) {
-            // if the command is one of our colors
-            if (command.equals(color)) {
-                // find the color resource and show that as the background
-                int colorId = getResources().getIdentifier(color, "color", getActivity().getPackageName());
-                Log.i(Constants.TAG, "showing colorId :: " + colorId);
-                View view = getView();
-                try {
-                    mColor = getResources().getColor(colorId);
-                    view.setBackgroundColor(mColor);
-                    saveColor(mColor);
-                } catch (NullPointerException npe) {
-                    npe.printStackTrace();
-                }
+        if (colorMap.containsKey(command)) {
+            int colorId = colorMap.get(command);
+            View view = getView();
+            try {
+                mColor = getResources().getColor(colorId);
+                view.setBackgroundColor(mColor);
+                saveColor(mColor);
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
             }
         }
     }

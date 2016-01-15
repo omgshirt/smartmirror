@@ -28,13 +28,12 @@ public class VoiceService extends Service implements RecognitionListener{
 
     private ArrayList<Messenger> mClients = new ArrayList<>();
     private Messenger mMessenger = new Messenger( new IHandler());
-    private Message initMessage;
     private String mSpokenCommand;
     private SpeechRecognizer mSpeechRecognizer;
     private boolean mSpeechInitialized;
-    static final int STOP_SPEECH = 0;
-    static final int START_SPEECH = 1;
-    static final int RESULT_SPEECH = 2;
+    public static final int STOP_SPEECH = 0;
+    public static final int START_SPEECH = 1;
+    public static final int RESULT_SPEECH = 2;
     public static final int INIT_SPEECH = 3;
     public static final int CANCEL_SPEECH = 4;
     private String SMARTMIRROR_SEARCH = "mirrorSearch";
