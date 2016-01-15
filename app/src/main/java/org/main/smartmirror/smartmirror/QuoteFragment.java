@@ -22,6 +22,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
@@ -41,6 +42,8 @@ public class QuoteFragment extends Fragment {
     private TimerTask mTimerTask;
     private Typeface mQuoteFont;
 
+    // mAvailableQuotes holds quotes that have yet to be shown. Once all are used, list is refreshed.
+    private int nextQuote = 0;
     private ArrayList<Integer> mAvailableQuotes;
     private final int fadeInTime = 2500;
     private final int fadeOutTime = 2500;
@@ -75,19 +78,20 @@ public class QuoteFragment extends Fragment {
         // Get the quotes as an array list
         // mQuoteList = new ArrayList<>(Arrays.asList(getQuotes()));
         setUpQuotes();
-        initializeAvailableQuotes();
+        refreshAvailableQuotes();
 
         // Set the runnable
         mRunnable = new Runnable() {
             @Override
             public void run() {
                 // Set the Random quote in the Text View
-                int index = getRandomQuote();
-                txtQuoteContent.setText(mQuoteList.get(index));
-                txtQuoteAuthor.setText(mQuoteAuthor.get(index));
+                txtQuoteContent.setText(mQuoteList.get(nextQuote));
+                txtQuoteAuthor.setText(mQuoteAuthor.get(nextQuote));
                 // Start the animation
                 txtQuoteAuthor.startAnimation(animation);
                 txtQuoteContent.startAnimation(animation);
+
+                nextQuote = (++nextQuote) % mQuoteList.size();
             }
         };
 
@@ -158,28 +162,12 @@ public class QuoteFragment extends Fragment {
         }
     }
 
-    public void initializeAvailableQuotes() {
-        mAvailableQuotes = new ArrayList<>();
-        refreshAvailableQuotes();
-    }
-
     private void refreshAvailableQuotes() {
+        mAvailableQuotes = new ArrayList<>();
         for (int i = 0; i < mQuoteList.size(); i++) {
             mAvailableQuotes.add(i);
         }
-    }
-
-    /**
-     * Method that handles the picking a random quote based on
-     * a given number
-     */
-    public int getRandomQuote(){
-        Random rand = new Random();
-        if (mAvailableQuotes.isEmpty()) refreshAvailableQuotes();
-        int index = rand.nextInt(mAvailableQuotes.size());
-        int quote = mAvailableQuotes.get(index);
-        mAvailableQuotes.remove(index);
-        return quote;
+        Collections.shuffle(mAvailableQuotes);
     }
 
     // ----------------------- Local Broadcast Receiver -----------------------

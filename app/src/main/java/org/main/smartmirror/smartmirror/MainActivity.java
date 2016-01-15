@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
     private long mLightSensorStartTime;
-    private final long LIGHT_WAKE_DELAY = 4000;   // time delay before screen will waken due to light changes
+    private final long LIGHT_WAKE_DELAY = 4000;   // time delay before screen will wake due to light changes
     private RecentLightValues mRecentLightValues;
 
     // News
@@ -83,11 +83,11 @@ public class MainActivity extends AppCompatActivity
     private String mInitialFragment = Constants.WEATHER;
     private String mCurrentFragment;
     private String mPreviousFragment;
-    private final int WAKELOCK_TIMEOUT = 100;
+    private final int WAKELOCK_TIMEOUT = 100;            // Wakelock should be held only briefly to trigger screen wake
     private PowerManager.WakeLock mWakeLock;
     private Timer mUITimer;
-    private final long UI_TIMEOUT_DELAY = 1000 * 20 * 1; // User interactions reset screen on timer to 5 minutes
-    private final int SCREEN_OFF_TIMEOUT = 5000;
+    private final long UI_TIMEOUT_DELAY = 1000 * 60 * 5; // User interactions reset screen on timer to 5 minutes
+    private final int SCREEN_OFF_TIMEOUT = 5000;         // Timeout for lightSleep -> sleep transition
     private PowerManager mPowerManager;
 
     // WiFiP2p
@@ -277,6 +277,7 @@ public class MainActivity extends AppCompatActivity
         if (mPowerManager.isScreenOn()) {
             mPreferences.resetScreenBrightness();
         }
+        startUITimer();
         mPreferences.setVolumesToPrefValues();
         stopWifiHeartbeat();
         stopLightSensor();
@@ -299,6 +300,7 @@ public class MainActivity extends AppCompatActivity
             startWifiHeartbeat();
             startLightSensor();
         }
+        stopUITimer();
         restoreDefaultScreenTimeout();
         unregisterReceiver(mWifiReceiver);
     }
@@ -357,9 +359,6 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = mPowerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
-
-        // sanity check to prevent screen lockout from super-short screen timeout settings.
-        if (defaultScreenTimeout < 1000) defaultScreenTimeout = 15000;
     }
 
     protected void enterLightSleep() {
@@ -376,6 +375,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void restoreDefaultScreenTimeout() {
+        // sanity check to prevent screen lockout from super-short screen timeout settings.
+        if (defaultScreenTimeout < 1000) defaultScreenTimeout = 10000;
         Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, defaultScreenTimeout);
     }
 
