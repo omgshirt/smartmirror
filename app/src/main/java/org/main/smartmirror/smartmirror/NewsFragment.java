@@ -58,7 +58,7 @@ public class NewsFragment extends Fragment{
         View view = inflater.inflate(R.layout.news_fragment, container, false);
 
         // Initialize Items
-        mNewsSection = "world";
+        //mNewsSection = "world";
 
         mTxtHeadline = (TextView)view.findViewById(R.id.headline);
         mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
@@ -307,6 +307,7 @@ public class NewsFragment extends Fragment{
                 default:
                     String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
                     int i = 0;
+
                     while (i < urlArr.length) {
                         if (message.contains(urlArr[i])) {
                             mNewsSection = urlArr[i];
@@ -321,6 +322,9 @@ public class NewsFragment extends Fragment{
                             i++;
                             Log.i("I heard: ", message);
                         }
+                    }
+                    if(message.contains(Constants.HELP) || message.contains(Constants.HIDE)) {
+                        txtNewsDesk.setText(mNewsSection.toUpperCase());
                     }
                     Log.d("News", "Got message:\"" + message + "\"");
                     break;
