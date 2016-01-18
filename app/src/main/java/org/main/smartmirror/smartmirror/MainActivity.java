@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity
     private static Context mContext;
     private Preferences mPreferences;
 
-    public static final int SLEEPING = 0;
+    public static final int ASLEEP = 0;
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
 
     // Sleep state & wakelocks
-    // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
+    // mirrorSleepState can be ASLEEP, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
     private int defaultScreenTimeout;
     private String mInitialFragment = Constants.WEATHER;
@@ -260,11 +260,11 @@ public class MainActivity extends AppCompatActivity
 
         // on first load, show weather
         if (mCurrentFragment == null)  {
-            handleCommand(mInitialFragment);
+            wakeScreenAndDisplay(mInitialFragment);
         }
         // if the system was put to sleep from LIGHT_SLEEP, get the previous fragment and display
         else if ( mCurrentFragment.equals(Constants.LIGHT_SLEEP) ) {
-            handleCommand(mPreviousFragment);
+            wakeScreenAndDisplay(mPreviousFragment);
         }
     }
 
@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         Log.i(Constants.TAG, "onStop");
-        mirrorSleepState = SLEEPING;
+        mirrorSleepState = ASLEEP;
     }
 
     @Override
@@ -344,14 +344,14 @@ public class MainActivity extends AppCompatActivity
     // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
 
     /**
-     * Calling this will force the device to bypass the keyguard if enabled.
+     * Calling forces device to bypass keyguard if enabled.
      * It will not override password, pattern or biometric
      * locks if enabled from the system settings. Acquiring the wakelock in this method will trigger
      * the application to move from the onStop to onRestart.
      */
     @SuppressWarnings("deprecation")
-    protected void wakeScreen() {
-        Log.i(Constants.TAG, "wakeScreen() called");
+    protected void exitSleep() {
+        Log.i(Constants.TAG, "exitSleep() called");
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
         kl.disableKeyguard();
@@ -361,17 +361,19 @@ public class MainActivity extends AppCompatActivity
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
     }
 
+    protected void exitLightSleep(){
+        addScreenOnFlag();
+        startUITimer();
+        stopLightSensor();
+        mirrorSleepState = AWAKE;
+    }
+
     protected void enterLightSleep() {
         clearScreenOnFlag();
         stopUITimer();
         startLightSensor();
-        setDefaultScreenTimeout();
+        //setDefaultScreenTimeout();
         mirrorSleepState = LIGHT_SLEEP;
-    }
-
-    protected void exitLightSleep(){
-        stopLightSensor();
-        mirrorSleepState = AWAKE;
     }
 
     protected void restoreDefaultScreenTimeout() {
@@ -475,21 +477,44 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Handles which fragment will be displayed to the user. If the screen is asleep, ignores commands
-     * except WAKE or NIGHT_LIGHT. HelpFragments (if visible) are dismissed and nav drawer is closed.
-     * The command is then processed.
-     * @param command the name of the view to be displayed
+     * Entry point for commands from the user to be processed.
+     * This will change sleep state based on input. If sleeping, ignore commands except those which cause transition
+     * from sleep / light_sleep to awake. If command should wake the application, trigger proper state change and handle command.
+     * @param command input command
      */
-    public void handleCommand(String command){
+    public void wakeScreenAndDisplay(String command) {
+        if (mirrorSleepState == AWAKE) {
+            startUITimer();
+            handleCommand(command);
+        } else if (commandWakesFromSleep(command)) {
+            if (mirrorSleepState == ASLEEP ) {
+                exitSleep();
+            } else {
+                exitLightSleep();
+                if (command.equals(Constants.NIGHT_LIGHT)) {
+                    // show previous fragment instead of current SleepFragment
+                    handleCommand(command);
+                } else {
+                    handleCommand(mPreviousFragment);
+                }
+            }
+        }
+    }
+
+    public boolean commandWakesFromSleep(String command) {
+        return (command.equals(Constants.WAKE) || command.equals(Constants.LIGHT));
+    }
+
+    /**
+     * Called from wakeScreenAndDisplay. At this point the screen is on and app is AWAKE.
+     * This will determine which fragment to show, or broadcast a command to listeners if no fragment
+     * change is necessary.
+     * Additionally, it will dismiss any HelpFragments and close the nav drawer.
+     * @param command command to process
+     */
+    private void handleCommand(String command){
         Fragment fragment = null;
         Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
-        // If sleeping, ignore commands except WAKE and NIGHT_LIGHT
-        if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-            if (!command.equals(Constants.WAKE) && !command.equals(Constants.NIGHT_LIGHT)) return;
-        }
-
-        // start or reset the UITimer to track user interactions
-        startUITimer();
 
         // All commands hide helpFragment if visible. Constants.HELP shows HelpFragment
         if (command.equals(Constants.HELP) && mHelpFragment == null) {
@@ -508,6 +533,7 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         }
 
+        // Create fragment
         switch (command) {
             case Constants.CALENDAR:
                 fragment = new CalendarFragment();
@@ -534,12 +560,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.NIGHT_LIGHT:
             case Constants.LIGHT:
-                if (mirrorSleepState == SLEEPING) {
-                    wakeScreen();
-                    return;
-                } else if (mirrorSleepState == LIGHT_SLEEP) {
-                    exitLightSleep();
-                }
                 fragment = new LightFragment();
                 break;
             case Constants.QUOTES:
@@ -558,18 +578,10 @@ public class MainActivity extends AppCompatActivity
                 fragment = new TwitterFragment();
                 break;
             case Constants.WAKE:
-                if (mirrorSleepState == LIGHT_SLEEP) {
-                    exitLightSleep();
-                    handleCommand(mPreviousFragment);
-                } else if (mirrorSleepState == SLEEPING){
-                    // handleCommand will be called again from onStart() once the device is woken
-                    wakeScreen();
-                }
-                return;
+                break;
             case Constants.WEATHER:
                 fragment = new WeatherFragment();
                 break;
-
             case Constants.MAKEUP:
                 fragment = new MakeupFragment();
                 break;
@@ -682,7 +694,7 @@ public class MainActivity extends AppCompatActivity
                 voiceInput = Constants.WAKE;
                 break;
         }
-        handleCommand(voiceInput);
+        wakeScreenAndDisplay(voiceInput);
     }
 
     public void initSpeechRecognition() {
@@ -799,7 +811,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleRemoteCommand(String command) {
         if (mPreferences.isRemoteEnabled())
-            handleCommand(command);
+            wakeScreenAndDisplay(command);
         else {
             Log.i(Constants.TAG, "Remote Disabled. Command ignored: \"" + command + "\"");
         }
@@ -934,12 +946,12 @@ public class MainActivity extends AppCompatActivity
         float recentLightAvg = mRecentLightValues.getAverage();
 
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
-            Log.i(Constants.TAG, "recent light avg: " + recentLightAvg);
+            //Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
+            //Log.i(Constants.TAG, "recent light avg: " + recentLightAvg);
             if ( currentLight > recentLightAvg * 3 && lightWakeDelayExceeded() ){
                 // Stop any further callbacks from the sensor.
                 stopLightSensor();
-                handleCommand(Constants.WAKE);
+                wakeScreenAndDisplay(Constants.WAKE);
             }
         }
     }

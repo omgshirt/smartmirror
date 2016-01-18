@@ -54,8 +54,6 @@ public class QuoteFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //instantiate the timer object
-        mTimer = new Timer();
         // Loading Font Face
         mQuoteFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/DancingScript-Regular.otf");
 
@@ -95,13 +93,15 @@ public class QuoteFragment extends Fragment {
             }
         };
 
-        // Set the timer task
+        //instantiate the timer to cycle quotes
+        mTimer = new Timer();
         mTimerTask  = new TimerTask() {
             @Override
             public void run() {
                 getActivity().runOnUiThread(mRunnable);
             }
         };
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
     }
 
     @Override
@@ -112,8 +112,6 @@ public class QuoteFragment extends Fragment {
         txtQuoteContent = (TextView) view.findViewById(R.id.quote_content);
         // Apply the font
         txtQuoteContent.setTypeface(mQuoteFont);
-        // Start the timer
-        mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
         return view;
     }
 
@@ -162,12 +160,13 @@ public class QuoteFragment extends Fragment {
         }
     }
 
+    // randomize quote order
     private void refreshAvailableQuotes() {
         mAvailableQuotes = new ArrayList<>();
         for (int i = 0; i < mQuoteList.size(); i++) {
             mAvailableQuotes.add(i);
         }
-        Collections.shuffle(mAvailableQuotes);
+        Collections.shuffle(mAvailableQuotes, new Random());
     }
 
     // ----------------------- Local Broadcast Receiver -----------------------
@@ -200,7 +199,6 @@ public class QuoteFragment extends Fragment {
     }
 
     @Override
-    // when this goes out of view, halt listening
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
