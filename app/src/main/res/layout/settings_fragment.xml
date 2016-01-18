@@ -292,12 +292,23 @@
 
         <!-- weather display units -->
         <Switch
-            android:id="@+id/switch_weather_english"
+            android:id="@+id/switch_weather_units"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:switchTextAppearance="@color/white"
             android:text="Weather Units: English"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <!-- time format toggle 12/24 hour -->
+        <Switch
+            android:id="@+id/switch_time_format"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:switchTextAppearance="@color/white"
+            android:text="Time Display: 12hr"
             android:textColor="@color/white"
             android:textSize="20sp" />
     </LinearLayout>

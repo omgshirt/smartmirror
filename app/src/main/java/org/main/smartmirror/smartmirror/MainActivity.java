@@ -11,9 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
+import android.media.MediaPlayer;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -40,10 +38,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.util.Calendar;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -69,7 +70,9 @@ public class MainActivity extends AppCompatActivity
     // Light Sensor
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
-    private boolean mLightIsOff;
+    private long mLightSensorStartTime;
+    private final long LIGHT_WAKE_DELAY = 5000;   // time delay before screen will waken due to light changes
+    private RecentLightValues mRecentLightValues;
 
     // News
     public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
@@ -77,10 +80,12 @@ public class MainActivity extends AppCompatActivity
     // Sleep state & wakelocks
     // mirrorSleepState can be SLEEPING, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
+    private BroadcastReceiver mScreenReceiver;
     private String mCurrentFragment = null;
-    private final int WAKELOCK_TIMEOUT = 1000;
+    private final int WAKELOCK_TIMEOUT = 100;
     private PowerManager.WakeLock mWakeLock;
-
+    private Timer mUITimer;
+    private final long UI_TIMEOUT_DELAY = 1000 * 60 * 5; // interactions extend visibility for 5 minutes
 
     // WiFiP2p
     private WifiP2pManager mWifiManager;
@@ -101,13 +106,24 @@ public class MainActivity extends AppCompatActivity
     private Messenger mMessenger = new Messenger(new IHandler());
     private boolean mIsBound;
     private Messenger mService;
+    private ImageView mSpeechIcon;
+
+    // Sound effects
+    private MediaPlayer mFXPlayer;
+
+    private Runnable uiTimerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            clearScreenOnFlag();
+        }
+    };
 
     // used to establish a service connection
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = new Messenger(service);
-
+            initSpeechRecognition();
             // not sure if I need this keep me
             /*try {
                 Message msg = Message.obtain(null, VoiceService.REGISTER_SERV);
@@ -133,7 +149,7 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    // handles the messages from Service to this
+    // handles the messages from Service to this Activity
     public class IHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
@@ -141,9 +157,14 @@ public class MainActivity extends AppCompatActivity
                 case VoiceService.RESULT_SPEECH:
                     String result = msg.getData().getString("result");
                     if(DEBUG)
-                        Log.i("MAIN", result);
-                    speechResult(result);
-                    playSuccessSound();
+                        Log.i(Constants.TAG, result);
+                    handleVoiceCommand(result);
+                    break;
+                case VoiceService.SHOW_ICON:
+                    speechIconHandler(true);
+                    break;
+                case VoiceService.HIDE_ICON:
+                    speechIconHandler(false);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -159,39 +180,30 @@ public class MainActivity extends AppCompatActivity
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
 
-        // check for permission to write system settings on API 23 and greater.
-        // Leaving this in case we need the WRITE_SETTINGS permission later on.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(!Settings.System.canWrite( getApplicationContext() )) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                startActivityForResult(intent, 1);
-            }
-        }
+        checkMarshmallowPermissions();
+        initializeWifiP2P();
+        discoverWifiP2pPeers();
+        mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
 
-        // initialize TTS
+        initializeLightSensor();
+
+        // initialize TextToSpeech (TTS)
         mTTSHelper = new TTSHelper(this);
 
-        // Initialize WiFiP2P services
-        mWifiIntentFilter = new IntentFilter();
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
-        discoverPeers();
-
-        // Light Sensor for waking / sleeping
-        initializeLightSensor();
+        // start a screen timer to track user interactions
+        startUITimer();
 
         // Set up ScreenReceiver to hold screen on / off status
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        BroadcastReceiver screenReceiver = new ScreenReceiver();
-        registerReceiver(screenReceiver, intentFilter);
+        mScreenReceiver = new ScreenReceiver();
+        registerReceiver(mScreenReceiver, intentFilter);
 
-        // Set up view and nav drawer
+        // Set up views and nav drawer
         setContentView(R.layout.activity_main);
+        // speech icon turn it off for now
+        mSpeechIcon = (ImageView)findViewById(R.id.speech_icon);
+        mSpeechIcon.setVisibility(View.GONE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -201,8 +213,8 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
         // Hide UI and actionbar
         View decorView = getWindow().getDecorView();
@@ -220,6 +232,18 @@ public class MainActivity extends AppCompatActivity
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void checkMarshmallowPermissions() {
+        // check for permission to write system settings on API 23 and greater.
+        // Leaving this in case we need the WRITE_SETTINGS permission later on.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(!Settings.System.canWrite( getApplicationContext() )) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                startActivityForResult(intent, 1);
+            }
+        }
     }
 
     public static Context getContextForApplication() {
@@ -228,6 +252,10 @@ public class MainActivity extends AppCompatActivity
 
     // -------------------------  LIFECYCLE CALLBACKS ----------------------------
 
+    /**
+     * If this is called by the device waking up, it will trigger a new call to handleCommand(),
+     * reloading the last visible fragment saved in mCurrentFragment
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -236,10 +264,10 @@ public class MainActivity extends AppCompatActivity
         mirrorSleepState = AWAKE;
         // if there's a fragment pending to display, show it
         if (mCurrentFragment != null) {
-            displayView(mCurrentFragment);
+            handleCommand(mCurrentFragment);
         } else {
             // on first run mCurrentFragment isn't set: start with weather displayed
-            displayView(Constants.WEATHER);
+            handleCommand(Constants.WEATHER);
         }
     }
 
@@ -247,11 +275,11 @@ public class MainActivity extends AppCompatActivity
     public void onResume(){
         super.onResume();
         Log.i(Constants.TAG, "onResume");
-        Log.i(Constants.TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
+        Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
         mPreferences.resetScreenBrightness();
-        mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
         if (ScreenReceiver.screenIsOn) {
+            // onResume the wifi heartbeat and light sensors are not needed
             stopWifiHeartbeat();
             stopLightSensor();
         }
@@ -261,10 +289,11 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         Log.i(Constants.TAG, "onPause");
-        Log.i(Constants.TAG,"ScreenIsOn:" + ScreenReceiver.screenIsOn);
+        Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
         unregisterReceiver(mWifiReceiver);
+        // If the screen is not turning off, the app is going into the background and shouldn't listen for these events.
+        // This is only for debugging purposes as the finished program should always be in foreground.
         if (!ScreenReceiver.screenIsOn) {
-            mirrorSleepState = SLEEPING;
             startWifiHeartbeat();
             startLightSensor();
         }
@@ -274,6 +303,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         Log.i(Constants.TAG, "onStop");
+        mirrorSleepState = SLEEPING;
     }
 
     @Override
@@ -286,14 +316,16 @@ public class MainActivity extends AppCompatActivity
             wifiHeartbeat = null;
         }
         unbindService(mConnection);
-        mIsBound=false;
+        unregisterReceiver(mScreenReceiver);
+        mIsBound = false;
         Log.i(Constants.TAG, "onDestroy");
     }
 
-    // ------------------------- Handle Inputs / Broadcasts --------------------------
+    // ------------------------- Broadcasts --------------------------
 
     /**
-     * Broadcast a message on intentName
+     * Broadcast a message on intentName. This is used to send any command not related to starting
+     * a fragment to all listeners. The listeners can then take action if required by the command.
      * @param intentName intent name
      * @param msg String message to send
      */
@@ -305,6 +337,13 @@ public class MainActivity extends AppCompatActivity
 
     // -------------------------- SCREEN WAKE / SLEEP ---------------------------------
 
+    /**
+     * Calling this will force the device to bypass the keyguard if enabled.
+     * It will not override password, pattern or biometric
+     * locks if enabled from the system settings. Acquiring the wakelock in this method will trigger
+     * the application to move from the onStop to onRestart.
+     */
+    @SuppressWarnings("deprecation")
     protected void wakeScreen() {
         Log.i(Constants.TAG, "wakeScreen() called");
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
@@ -315,6 +354,52 @@ public class MainActivity extends AppCompatActivity
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "MyWakeLock");
         mWakeLock.acquire(WAKELOCK_TIMEOUT);
+    }
+
+    protected void enterLightSleep() {
+        clearScreenOnFlag();
+        stopUITimer();
+        startLightSensor();
+        mirrorSleepState = LIGHT_SLEEP;
+    }
+
+    protected void exitLightSleep(){
+        stopLightSensor();
+        mirrorSleepState = AWAKE;
+    }
+
+    // Flags the system to keep the screen on indefinitely.
+    protected void addScreenOnFlag(){
+        Log.i(Constants.TAG, "Adding FLAG_KEEP_SCREEN_ON" );
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    // Removes the KEEP_SCREEN_ON flag, allowing the screen to timeout normally.
+    protected void clearScreenOnFlag() {
+        Log.i(Constants.TAG, "clearing FLAG_KEEP_SCREEN_ON" );
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    // Start a timer to track interval between user interactions.
+    // When expired, clear the screen on flag so the screen can time out per system settings.
+    protected void startUITimer() {
+        stopUITimer();
+        addScreenOnFlag();
+        mUITimer = new Timer();
+
+        Log.i(Constants.TAG, "Starting UI timer. " + UI_TIMEOUT_DELAY + " ms" );
+        mUITimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.i(Constants.TAG, "UI timeout reached at " + UI_TIMEOUT_DELAY + " ms");
+                MainActivity.this.runOnUiThread(uiTimerRunnable);
+            }
+        }, UI_TIMEOUT_DELAY);
+    }
+
+    protected void stopUITimer(){
+        Log.i(Constants.TAG, "UI timer cancelled");
+        if (mUITimer != null) mUITimer.cancel();
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -344,38 +429,72 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            displayView(item.toString().toLowerCase(Locale.US));
+            handleCommand(item.toString().toLowerCase(Locale.US));
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         if(DEBUG)
-            Log.i("item selected", item.toString());
-        displayView(item.toString().toLowerCase(Locale.US));
+            Log.i(Constants.TAG, "NavigationItemSelected: " + item.toString());
+        handleCommand(item.toString().toLowerCase(Locale.US));
         return true;
     }
 
+    public void hideHelpFragment() {
+        if (mHelpFragment != null) {
+            mHelpFragment.dismiss();
+            mHelpFragment = null;
+        }
+    }
+
     /**
-     * Handles which fragment will be displayed to the user
-     * @param viewName the name of the view to be displayed
+     * Show a toast
+     * @param text text to display
+     * @param duration int duration: ex. Toast.LENGTH_LONG
      */
-    public void displayView(String viewName){
+    public void showToast(String text, int duration) {
+        Toast.makeText(this, text, duration).show();
+    }
+
+    /**
+     * Handles which fragment will be displayed to the user. If the screen is asleep, ignores commands
+     * except WAKE or NIGHT_LIGHT. HelpFragments (if visible) are dismissed and nav drawer is closed.
+     * The command is then processed.
+     * @param command the name of the view to be displayed
+     */
+    public void handleCommand(String command){
         Fragment fragment = null;
-        Log.i("displayView", "status:" + mirrorSleepState + " command:\"" + viewName + "\"");
+        Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         // If sleeping, ignore commands except WAKE and NIGHT_LIGHT
         if (mirrorSleepState == SLEEPING || mirrorSleepState == LIGHT_SLEEP) {
-            if (!viewName.equals(Constants.WAKE) && !viewName.equals(Constants.NIGHT_LIGHT)) return;
+            if (!command.equals(Constants.WAKE) && !command.equals(Constants.NIGHT_LIGHT)) return;
         }
 
-        // TODO: At this point we can play a sound effect to indicate that a command has been received and is being processed.
-        // See line 184 & 525
+        // start or reset the UITimer to track user interactions
+        startUITimer();
 
-        switch (viewName) {
+        // All commands hide helpFragment if visible. Constants.HELP shows HelpFragment
+        if (command.equals(Constants.HELP) && mHelpFragment == null) {
+            mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
+            mHelpFragment.show(getFragmentManager(), "HelpFragment");
+        } else {
+            hideHelpFragment();
+        }
+
+        // 'menu' command toggles menu drawer open / close. Other commands will close the drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (command.equals(Constants.MENU) && !drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.openDrawer(GravityCompat.START);
+            return;
+        } else if (drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        }
+
+        switch (command) {
             case Constants.CALENDAR:
                 fragment = new CalendarFragment();
                 break;
@@ -384,7 +503,7 @@ public class MainActivity extends AppCompatActivity
                     fragment = new CameraFragment();
                 }
                 else {
-                    Toast.makeText(this, "Camera Disabled. Please say 'Enable Camera' to change this setting.", Toast.LENGTH_LONG).show();
+                    showToast(getResources().getString(R.string.camera_disabled_toast), Toast.LENGTH_LONG);
                 }
                 break;
             case Constants.FACEBOOK:
@@ -393,17 +512,6 @@ public class MainActivity extends AppCompatActivity
             case Constants.GALLERY:
                 fragment = new GalleryFragment();
                 break;
-            case Constants.HELP:
-                mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
-                mHelpFragment.show(getFragmentManager(), "HelpFragment");
-                break;
-            case Constants.HIDE_HELP:
-                if (mHelpFragment != null) {
-                    // call dismiss on fragment?
-                    mHelpFragment.dismiss();
-                    mHelpFragment = null;
-                }
-                break;
             case Constants.NEWS:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
@@ -411,14 +519,13 @@ public class MainActivity extends AppCompatActivity
                 fragment.setArguments(bundle);
                 break;
             case Constants.NIGHT_LIGHT:
-                stopLightSensor();
-                stopWifiHeartbeat();
+            case Constants.LIGHT:
                 if (mirrorSleepState == SLEEPING) {
                     mCurrentFragment = Constants.NIGHT_LIGHT;
                     wakeScreen();
                     return;
                 } else {
-                    mirrorSleepState = AWAKE;
+                    exitLightSleep();
                     fragment = new LightFragment();
                 }
                 break;
@@ -430,8 +537,8 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 break;
             case Constants.SLEEP:
-                fragment = new OffFragment();
-                mirrorSleepState = LIGHT_SLEEP;
+                fragment = new LightSleepFragment();
+                enterLightSleep();
                 break;
             case Constants.TWITTER:
                 fragment = new TwitterFragment();
@@ -439,9 +546,9 @@ public class MainActivity extends AppCompatActivity
             case Constants.WAKE:
                 if (mirrorSleepState == LIGHT_SLEEP) {
                     mirrorSleepState = AWAKE;
-                    displayView(mCurrentFragment);
+                    handleCommand(mCurrentFragment);
                 } else {
-                    // displayView will be called again from onStart() with the fragment to show
+                    // handleCommand will be called again from onStart() once the device is woken from sleep & screen is on
                     wakeScreen();
                     return;
                 }
@@ -455,43 +562,29 @@ public class MainActivity extends AppCompatActivity
                 break;
             default:
                 // The command isn't one of the view swap instructions,
-                // so broadcast the viewName (our input) to any listeners.
-                broadcastMessage("inputAction", viewName);
+                // so broadcast the command (our input) to any listeners.
+                broadcastMessage("inputAction", command);
                 break;
         }
 
-        // If we're changing fragments set the wake state and do the transaction
         if(fragment != null){
-            if(DEBUG) {
-                Log.i("displayView", "Displaying: " + viewName);
-                startTTS(viewName);
+            playSound(R.raw.celeste_a);
+            //startTTS(command);
+            // Any command other than SLEEP updates the value of mCurrentFragment
+            if ( !command.equals(Constants.SLEEP) ) {
+                mCurrentFragment = command;
             }
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment);
-
-            if (!isFinishing()) {
-                ft.commit();
-                // Any command != SLEEP sets stores value as last visible frag
-                if ( !viewName.equals(Constants.SLEEP) ) {
-                    mCurrentFragment = viewName;
-                }
-            } else {
-                Log.e("Fragments", "commit skipped. isFinishing() returned true");
-            }
+            displayFragment(fragment);
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
     }
 
-    public void playSuccessSound(){
-        try {
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
-            ringtone.play();
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void displayFragment(Fragment fragment){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content_frame, fragment);
+        if (!isFinishing()) {
+            ft.commit();
+        } else {
+            Log.e(Constants.TAG, "commit skipped. isFinishing() returned true");
         }
     }
 
@@ -504,6 +597,19 @@ public class MainActivity extends AppCompatActivity
         return mCurrentFragment;
     }
 
+    /**
+     * This method handles the speech icon indicator. It either hides
+     * or shows the icon based on the flag
+     * @param flag whether or not to show the icon
+     */
+    public void speechIconHandler(boolean flag){
+        if(flag) {
+            mSpeechIcon.setVisibility(View.VISIBLE);
+        } else {
+            mSpeechIcon.setVisibility(View.INVISIBLE);
+        }
+    }
+
     // ----------------------- SPEECH RECOGNITION --------------------------
 
     /**
@@ -511,9 +617,9 @@ public class MainActivity extends AppCompatActivity
      * used by the remote.
      * @param input the command the user gave
      */
-    public void speechResult(String input) {
+    public void handleVoiceCommand(String input) {
         String voiceInput = input.trim();
-        Log.i("VR", "speechResult:"+input);
+        Log.i(Constants.TAG, "handleVoiceCommand:"+input);
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
@@ -563,29 +669,36 @@ public class MainActivity extends AppCompatActivity
             case Constants.GO_TO_SLEEP:
                 voiceInput = Constants.SLEEP;
                 break;
-            case Constants.HIDE_HELP:
             case Constants.HIDE:
-                voiceInput = Constants.HIDE_HELP;
                 break;
             case Constants.OPTIONS:
                 voiceInput = Constants.SETTINGS;
-                break;
-            case Constants.SHOW_HELP:
-                voiceInput = Constants.HELP;
                 break;
             case Constants.WAKE_UP:
                 voiceInput = Constants.WAKE;
                 break;
         }
+        handleCommand(voiceInput);
+    }
 
-        displayView(voiceInput);
+    public void initSpeechRecognition() {
+        try {
+            //Log.i(Constants.TAG, "initSpeechRecognition()");
+            Message msg = Message.obtain(null, VoiceService.INIT_SPEECH);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
+        if(mTTSHelper.isSpeaking()) return;
         try {
+            //Log.i("VR", "startSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.START_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
@@ -599,7 +712,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void stopSpeechRecognition(){
         try {
-            Log.i("VR", "stopSpeechRecognition()");
+            //Log.i("VR", "stopSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
@@ -608,12 +721,31 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // --------------------------------- Sound Effects Playback -----------------------------
+
+    /**
+     * Plays the sound resource located in /res/raw
+     * @param _id sound resource to play
+     */
+    public void playSound(int _id)
+    {
+        if(mFXPlayer != null)
+        {
+            mFXPlayer.reset();
+            mFXPlayer.release();
+        }
+        mFXPlayer = MediaPlayer.create(this, _id);
+        if(mFXPlayer != null) {
+            mFXPlayer.start();
+        }
+    }
+
     // --------------------------------- Text to Speech (TTS) ---------------------------------
 
 
     /**
      * Say a phrase using text to speech
-     * @param phrase the phrase to speak
+     * @param phrase to speak
      */
     public void startTTS(final String phrase){
         Thread mSpeechThread = new Thread(new Runnable() {
@@ -644,31 +776,44 @@ public class MainActivity extends AppCompatActivity
     // ------------------------------  WIFI P2P  ----------------------------------
 
     /**
+     * Create
+     */
+    private void initializeWifiP2P() {
+        mWifiIntentFilter = new IntentFilter();
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
+    }
+
+    /**
      * Callback from RemoteServerAsyncTask when a command is received from the remote control.
      * @param command String: received command
      */
     public void handleRemoteCommand(String command) {
         if (mPreferences.isRemoteEnabled())
-            displayView(command);
+            handleCommand(command);
         else {
-            Log.i("Remote", "Disabled. ignored:\"" + command + "\"");
+            Log.i(Constants.TAG, "Remote Disabled. Command ignored: \"" + command + "\"");
         }
 
     }
 
     // calls the P2pManager to refresh peer list
-    public void discoverPeers() {
+    public void discoverWifiP2pPeers() {
         mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 if (DEBUG)
-                    Log.i("Wifi", "Peer discovery successful");
+                    Log.i(Constants.TAG, "Peer discovery successful");
             }
 
             @Override
             public void onFailure(int reasonCode) {
                 if (DEBUG)
-                    Log.i("Wifi", "discoverPeers failed: " + reasonCode);
+                    Log.i(Constants.TAG, "discoverWifiP2pPeers failed: " + reasonCode);
             }
         });
     }
@@ -688,16 +833,16 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
         // make this the group owner and start the server to listen for commands
         if(DEBUG)
-            Log.i("Wifi", "Connection info: " + info.toString());
+            Log.i(Constants.TAG, "Connection info: " + info.toString());
         mWifiInfo = info;
         WifiP2pConfig config = new WifiP2pConfig();
         config.groupOwnerIntent = 15;
         if (info.groupFormed && info.isGroupOwner) {
             if(DEBUG)
-                Log.i("Wifi", "onConnectionInfo is starting server...");
+                Log.i(Constants.TAG, "onConnectionInfo is starting server...");
             startRemoteServer();
         } else if (info.groupFormed){
-            Log.i("Wifi", "group exists, mirror is not owner");
+            Log.i(Constants.TAG, "group exists, mirror is not owner");
         }
     }
 
@@ -710,7 +855,7 @@ public class MainActivity extends AppCompatActivity
         if (isEnabled) {
             // if there's a connection established, ignore
             // otherwise, start peer discovery.
-            discoverPeers();
+            discoverWifiP2pPeers();
         } else {
             // if a connection exists, cancel and refuse further
             mServerTask.cancel(true);
@@ -731,8 +876,8 @@ public class MainActivity extends AppCompatActivity
         final Runnable heartbeatTask = new Runnable() {
             @Override
             public void run() {
-                discoverPeers();
-                Log.i("Wifi", "Heartbeat: discoverPeers()" );
+                discoverWifiP2pPeers();
+                Log.i(Constants.TAG, "Heartbeat: discoverWifiP2pPeers()" );
             }
         };
         wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 360, 360,
@@ -754,7 +899,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startLightSensor() {
-        mLightIsOff = false;
+        mRecentLightValues = new RecentLightValues();
+        mLightSensorStartTime = System.currentTimeMillis();
         mSensorManager.registerListener(this, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -767,19 +913,49 @@ public class MainActivity extends AppCompatActivity
         //Do something here if sensor accuracy changes
     }
 
+    /**
+     * Light sensor tracks the last 20 light values. After an initial delay set by LIGHT_WAKE_DELAY,
+     * if it detects a sudden increase (4x) over the average value,a wake command is sent to the device.
+     * @param event light event
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
         float currentLight = event.values[0];
+        mRecentLightValues.addValue(currentLight);
+        float recentLightAvg = mRecentLightValues.getAverage();
+
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(DEBUG) Log.i("LightSensor", Float.toString(currentLight) );
-            if(currentLight < .1 ){
-                mLightIsOff = true;
-                Log.i("LightSensor", "light is off");
+            Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
+            Log.i(Constants.TAG, "recent light avg: " + recentLightAvg);
+            if ( currentLight > recentLightAvg * 4 && lightWakeDelayExceeded() ){
+                // Stop any further callbacks from the sensor.
+                stopLightSensor();
+                handleCommand(Constants.WAKE);
             }
-            if (currentLight > 3 && mLightIsOff ){
-                // the sensor sees some light. turn on the screen!
-                displayView(Constants.WAKE);
+        }
+    }
+
+    private boolean lightWakeDelayExceeded() {
+        return (System.currentTimeMillis() - mLightSensorStartTime > LIGHT_WAKE_DELAY);
+    }
+
+    // holds values reported by the light sensor and reports their average
+    private class RecentLightValues {
+        int index = 0;
+        int size = 20;
+        float[] recentValues = new float[size];
+
+        void addValue(float val) {
+            recentValues[index] = val;
+            index = (++index) % size;
+        }
+
+        float getAverage(){
+            float sum = 0;
+            for(float v : recentValues) {
+                sum += v;
             }
+            return sum / recentValues.length;
         }
     }
 }

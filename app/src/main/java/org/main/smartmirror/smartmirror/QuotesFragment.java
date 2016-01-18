@@ -41,6 +41,11 @@ public class QuotesFragment extends Fragment {
     private TimerTask mTimerTask;
     private Typeface mQuoteFont;
 
+    private final int fadeInTime = 2500;
+    private final int fadeOutTime = 2500;
+    private final int quoteDisplayLength = 10000;
+    private final int totalDisplayTime = fadeInTime + quoteDisplayLength + fadeOutTime;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +58,13 @@ public class QuotesFragment extends Fragment {
         // Set-up the fade in
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setInterpolator(new DecelerateInterpolator());
-        fadeIn.setDuration(5000);
+        fadeIn.setDuration(fadeInTime);
 
         // Set-up the fade out
         Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
-        fadeOut.setStartOffset(8000);
-        fadeOut.setDuration(5000);
+        fadeOut.setStartOffset(fadeInTime + quoteDisplayLength);
+        fadeOut.setDuration(fadeOutTime);
 
         // Create our animation
         final AnimationSet animation = new AnimationSet(false);
@@ -100,7 +105,7 @@ public class QuotesFragment extends Fragment {
         // Apply the font
         mQuoteContent.setTypeface(mQuoteFont);
         // Start the timer
-        mTimer.scheduleAtFixedRate(mTimerTask, 0, 10000);
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
         return view;
     }
 
@@ -159,7 +164,11 @@ public class QuotesFragment extends Fragment {
      * @param num the random number seed
      */
     public void getRandomQuote(int num){
-        //TODO make sure that the quotes are trully random (they don't repeat)
+        //TODO make sure that the quotes are truly random (they don't repeat)
+        /*
+            A simple solution is to cycle through all quotes from front to back. Save current position + 1
+            to preferences file when a new quote is displayed.
+         */
         Random quoteRandomizer = new Random();
         int randNum = quoteRandomizer.nextInt(num);
         mQuoteContent.setText(mQuotesList.get(randNum));
