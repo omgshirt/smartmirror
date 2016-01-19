@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +24,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
@@ -38,6 +41,8 @@ public class WeatherFragment extends Fragment {
     Typeface weatherFont;
     Preferences mPreferences;
 
+    private LinearLayout layTimeLayout;
+    private LinearLayout layWeatherLayout;
     private TextView txtWeatherIcon;
     private TextClock clkTextClock;
     private TextClock clkDateClock;
@@ -47,7 +52,6 @@ public class WeatherFragment extends Fragment {
     private TextView txtDailyHigh;
     private TextView txtDailyLow;
     private TextView txtAlerts;
-    private TextView txtAlertWarning;
 
     private String mLatitude = "0";
     private String mLongitude = "0";
@@ -56,7 +60,7 @@ public class WeatherFragment extends Fragment {
     private int mCurrentTemp = 0;
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
-    private DailyForecast dailyForecasts[];              // summary of data for 3 days (including today)
+    private DailyForecast dailyForecasts[];          // summary of data for 3 days (including today)
     private JSONArray mWeatherAlerts;
     private boolean mShowFullAlerts = true;
 
@@ -94,8 +98,8 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.weather_fragment, container, false);
 
-        clkTextClock = (TextClock)view.findViewById(R.id.time_clock);
-        clkDateClock = (TextClock)view.findViewById(R.id.date_clock);
+        layTimeLayout = (LinearLayout)view.findViewById(R.id.layout_time);
+        layWeatherLayout = (LinearLayout)view.findViewById(R.id.layout_weather);
         txtCurrentHumidity = (TextView)view.findViewById(R.id.current_humidity);
         txtCurrentTemp = (TextView)view.findViewById(R.id.current_temp);
         txtCurrentWind = (TextView)view.findViewById(R.id.current_wind);
@@ -103,12 +107,13 @@ public class WeatherFragment extends Fragment {
         txtDailyHigh = (TextView)view.findViewById(R.id.daily_high);
         txtDailyLow = (TextView)view.findViewById(R.id.daily_low);
         txtAlerts = (TextView)view.findViewById(R.id.alert_text);
-        txtAlertWarning = (TextView)view.findViewById(R.id.weather_alert_heading);
 
         txtCurrentTemp.setTypeface(weatherFont);
         txtDailyHigh.setTypeface(weatherFont);
         txtDailyLow.setTypeface(weatherFont);
 
+        clkTextClock = (TextClock)view.findViewById(R.id.time_clock);
+        clkDateClock = (TextClock)view.findViewById(R.id.date_clock);
         clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
         clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
         clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
@@ -136,6 +141,11 @@ public class WeatherFragment extends Fragment {
                 case Preferences.CMD_WEATHER_ENGLISH:
                 case Preferences.CMD_WEATHER_METRIC:
                     startWeatherUpdate();
+                    break;
+                case Constants.TIME:
+                    speakTime();
+                    break;
+                default:
                     break;
             }
         }
@@ -179,6 +189,43 @@ public class WeatherFragment extends Fragment {
 
     // ----------------------- TTS Feedback -------------------------
 
+    private void speakTime() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        String strMinute, strHour, strHourEnding;
+
+
+        int hourMode = Calendar.HOUR_OF_DAY;
+        if (mPreferences.isTimeFormat12hr()) {
+            hourMode = Calendar.HOUR;
+        }
+        int hour = calendar.get(hourMode);
+        strHour = Integer.toString(hour);
+        int minute = calendar.get(Calendar.MINUTE);
+        strMinute = Integer.toString(minute);
+
+        // handle times > :00 and < :10
+        if (minute > 0 && minute < 10) {
+            strMinute = ":0" + strMinute;
+        } else if (minute == 0) {
+            strMinute = " ";
+        } else {
+            strMinute = ":" + strMinute;
+        }
+
+        // add AM / PM as necessary
+        if (mPreferences.isTimeFormat12hr()) {
+            String AM_PM = " A M";
+            if (calendar.get(Calendar.AM_PM) == 1){
+                AM_PM = " P M";
+            }
+            strMinute = strMinute + AM_PM;
+        }
+
+        String result = "the time is " + strHour + strMinute;
+        Log.i(Constants.TAG,"time: " + result);
+        speakText(result);
+    }
+
     private void speakCurrentConditions() {
 
         if (dailyForecasts == null) return;
@@ -200,7 +247,7 @@ public class WeatherFragment extends Fragment {
         }
 
         if ( !text.equals("") ) {
-            ((MainActivity) getActivity()).startTTS(text);
+            speakText(text);
         }
     }
 
@@ -224,8 +271,12 @@ public class WeatherFragment extends Fragment {
 
         String forecast = today + ". " + tomorrow + ". " + nextDay;
         if ( !forecast.equals("") ) {
-            ((MainActivity) getActivity()).startTTS(forecast);
+            speakText(forecast);
         }
+    }
+
+    private void speakText(String text){
+        ((MainActivity) getActivity()).startTTS(text);
     }
 
     // Get weather data from API and display
@@ -355,12 +406,10 @@ public class WeatherFragment extends Fragment {
             // check for weather alerts.
             if (json.has("alerts")) {
                 mWeatherAlerts = json.getJSONArray("alerts");
-                txtAlertWarning.setVisibility(View.VISIBLE);
                 txtAlerts.setVisibility(View.VISIBLE);
                 txtAlerts.setText(getWeatherAlerts());
                 txtAlerts.setSelected(true);
             } else {
-                txtAlertWarning.setVisibility(View.GONE);
                 txtAlerts.setVisibility(View.GONE);
             }
 

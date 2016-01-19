@@ -83,8 +83,9 @@ public class QuoteFragment extends Fragment {
             @Override
             public void run() {
                 // Set the Random quote in the Text View
-                txtQuoteContent.setText(mQuoteList.get(nextQuote));
-                txtQuoteAuthor.setText(mQuoteAuthor.get(nextQuote));
+                int randomQuote = mAvailableQuotes.get(nextQuote);
+                txtQuoteContent.setText(mQuoteList.get(randomQuote));
+                txtQuoteAuthor.setText(mQuoteAuthor.get(randomQuote));
                 // Start the animation
                 txtQuoteAuthor.startAnimation(animation);
                 txtQuoteContent.startAnimation(animation);
@@ -166,7 +167,7 @@ public class QuoteFragment extends Fragment {
         for (int i = 0; i < mQuoteList.size(); i++) {
             mAvailableQuotes.add(i);
         }
-        Collections.shuffle(mAvailableQuotes, new Random());
+        Collections.shuffle(mAvailableQuotes);
     }
 
     // ----------------------- Local Broadcast Receiver -----------------------

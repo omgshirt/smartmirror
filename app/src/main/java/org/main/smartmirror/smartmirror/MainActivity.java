@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity
     // mirrorSleepState can be ASLEEP, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
     private int defaultScreenTimeout;
-    private String mInitialFragment = Constants.WEATHER;
+    private String mInitialFragment = Constants.CALENDAR;
     private String mCurrentFragment;
     private String mPreviousFragment;
     private final int WAKELOCK_TIMEOUT = 100;            // Wakelock should be held only briefly to trigger screen wake
@@ -249,14 +249,27 @@ public class MainActivity extends AppCompatActivity
      * If this is called by the device waking up, it will trigger a new call to handleCommand(),
      * reloading the last visible fragment saved in mCurrentFragment
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected void onStart() {
         super.onStart();
         Log.i(Constants.TAG, "onStart");
-        mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         mirrorSleepState = AWAKE;
+
+        mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         addScreenOnFlag();
-        setDefaultScreenTimeout();
+        setScreenOffTimeout();
+        startUITimer();
+
+        if (mPowerManager.isScreenOn()) {
+            mPreferences.resetScreenBrightness();
+        }
+
+        mPreferences.setVolumesToPrefValues();
+        stopWifiHeartbeat();
+        stopLightSensor();
+        startSpeechRecognition();
+        registerReceiver(mWifiReceiver, mWifiIntentFilter);
 
         // on first load, show weather
         if (mCurrentFragment == null)  {
@@ -268,21 +281,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onResume(){
         super.onResume();
         Log.i(Constants.TAG, "onResume");
-
-        if (mPowerManager.isScreenOn()) {
-            mPreferences.resetScreenBrightness();
-        }
-        startUITimer();
-        mPreferences.setVolumesToPrefValues();
-        stopWifiHeartbeat();
-        stopLightSensor();
-        startSpeechRecognition();
-        registerReceiver(mWifiReceiver, mWifiIntentFilter);
     }
 
     @SuppressWarnings("deprecation")
@@ -301,7 +303,7 @@ public class MainActivity extends AppCompatActivity
             startLightSensor();
         }
         stopUITimer();
-        restoreDefaultScreenTimeout();
+        setDefaultScreenOffTimeout();
         unregisterReceiver(mWifiReceiver);
     }
 
@@ -372,17 +374,17 @@ public class MainActivity extends AppCompatActivity
         clearScreenOnFlag();
         stopUITimer();
         startLightSensor();
-        //setDefaultScreenTimeout();
         mirrorSleepState = LIGHT_SLEEP;
     }
 
-    protected void restoreDefaultScreenTimeout() {
+    protected void setDefaultScreenOffTimeout() {
         // sanity check to prevent screen lockout from super-short screen timeout settings.
         if (defaultScreenTimeout < 1000) defaultScreenTimeout = 10000;
+        Log.i(Constants.TAG, "setting screen timeout: " + defaultScreenTimeout + " ms");
         Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, defaultScreenTimeout);
     }
 
-    protected void setDefaultScreenTimeout() {
+    protected void setScreenOffTimeout() {
         Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SCREEN_OFF_TIMEOUT);
     }
 
@@ -414,8 +416,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void stopUITimer(){
-        Log.i(Constants.TAG, "UI timer cancelled");
-        if (mUITimer != null) mUITimer.cancel();
+        if (mUITimer != null) {
+            Log.i(Constants.TAG, "UI timer cancelled");
+            mUITimer.cancel();
+        }
     }
 
     // -------------------------- DRAWER AND INTERFACE ---------------------------------
@@ -477,9 +481,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Entry point for commands from the user to be processed.
-     * This will change sleep state based on input. If sleeping, ignore commands except those which cause transition
-     * from sleep / light_sleep to awake. If command should wake the application, trigger proper state change and handle command.
+     * Entry point for processing user commands. This will change sleep state based on input.
+     * If sleeping, it will ignore commands except those which cause a state transition to awake.
+     * If command would wake the application, trigger proper state change and then handles the command.
      * @param command input command
      */
     public void wakeScreenAndDisplay(String command) {
@@ -491,10 +495,10 @@ public class MainActivity extends AppCompatActivity
                 exitSleep();
             } else {
                 exitLightSleep();
-                if (command.equals(Constants.NIGHT_LIGHT)) {
-                    // show previous fragment instead of current SleepFragment
+                if (command.equals(Constants.LIGHT)) {
                     handleCommand(command);
                 } else {
+                    // in LIGHT_SLEEP we're showing a black, empty fragment. Instead show the last
                     handleCommand(mPreviousFragment);
                 }
             }
@@ -506,10 +510,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Called from wakeScreenAndDisplay. At this point the screen is on and app is AWAKE.
-     * This will determine which fragment to show, or broadcast a command to listeners if no fragment
-     * change is necessary.
-     * Additionally, it will dismiss any HelpFragments and close the nav drawer.
+     * Show a fragment or broadcast a command to listeners.
+     * Do not call this method directly, instead use wakeScreenAndDisplay, which will make sure
+     * the application is in the appropriate sleep state.
      * @param command command to process
      */
     private void handleCommand(String command){
@@ -558,7 +561,6 @@ public class MainActivity extends AppCompatActivity
                 bundle.putString("url", mDefaultURL);
                 fragment.setArguments(bundle);
                 break;
-            case Constants.NIGHT_LIGHT:
             case Constants.LIGHT:
                 fragment = new LightFragment();
                 break;
@@ -645,7 +647,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(voiceInput.contains(Constants.NIGHT_LIGHT)) {
-            voiceInput = Constants.NIGHT_LIGHT;
+            voiceInput = Constants.LIGHT;
         }
 
         if(voiceInput.contains(Constants.SLEEP)) {
@@ -936,7 +938,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Light sensor tracks the last 20 light values. After an initial delay set by LIGHT_WAKE_DELAY,
-     * if it detects a sudden increase (3x) over the average value,a wake command is sent to the device.
+     * if it detects a sudden increase over the running average, a wake command is sent to the device.
      * @param event light event
      */
     @Override
