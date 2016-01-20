@@ -440,11 +440,12 @@ public class NewsFragment extends Fragment{
             /*URL url = new URL(Constants.thumbs[0]);
             Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
             img1.setImageBitmap(bmp);*/
-            Picasso.with(getContext()).load(Constants.thumbs[0]).into(img1);
 
             String txt0 = "<b>" + Constants.hl[0] + "</b> " + "<br>" + Constants.snippets[0] + "<br>";
             //String txt0 = "<img src=" + Constants.thumbs[0] + ">";
             mTxtHeadline.setText(Html.fromHtml(txt0));
+
+            Picasso.with(getContext()).load(Constants.thumbs[0]).fit().centerInside().into(img1);
 
             String txt1 = "<b>" + Constants.hl[1] + "</b> " + "<br>" + Constants.snippets[1] + "<br>";
             mTxtHeadline2.setText(Html.fromHtml(txt1));

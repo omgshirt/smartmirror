@@ -7,7 +7,6 @@
     android:padding="15dp">
 
 
-
     <FrameLayout
         android:id="@+id/news_fragment_frame"
         android:layout_width="match_parent"
@@ -27,17 +26,30 @@
                 android:id="@+id/txtNewsDesk"
                 android:layout_gravity="center_horizontal" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/img1"
-                android:layout_gravity="center_horizontal" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New Text"
-                android:id="@+id/headline" />
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/img1"
+                    android:src="@drawable/tw__ic_logo_blue"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="right" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="New Text"
+                    android:id="@+id/headline"
+                    android:layout_gravity="left"
+                    android:layout_toEndOf="@+id/img1"
+                    android:paddingLeft="10dp" />
+
+            </LinearLayout>
+
 
             <TextView
                 android:layout_width="wrap_content"
