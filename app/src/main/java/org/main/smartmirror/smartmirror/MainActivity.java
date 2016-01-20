@@ -258,7 +258,6 @@ public class MainActivity extends AppCompatActivity
 
         mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         addScreenOnFlag();
-        setScreenOffTimeout();
         startUITimer();
 
         if (mPowerManager.isScreenOn()) {
@@ -271,7 +270,7 @@ public class MainActivity extends AppCompatActivity
         startSpeechRecognition();
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
 
-        // on first load, show weather
+        // on first load show initialFragment
         if (mCurrentFragment == null)  {
             wakeScreenAndDisplay(mInitialFragment);
         }
@@ -297,13 +296,13 @@ public class MainActivity extends AppCompatActivity
         if (mPowerManager.isScreenOn()) {
             stopSpeechRecognition();
             mPreferences.setVolumesToSystemValues();
+            setDefaultScreenOffTimeout();
         } else {
             // Otherwise the screen is turning off: start Light Sensor and maintain Wifi connection
             startWifiHeartbeat();
             startLightSensor();
         }
         stopUITimer();
-        setDefaultScreenOffTimeout();
         unregisterReceiver(mWifiReceiver);
     }
 
@@ -364,6 +363,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void exitLightSleep(){
+        setDefaultScreenOffTimeout();
         addScreenOnFlag();
         startUITimer();
         stopLightSensor();
@@ -372,6 +372,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void enterLightSleep() {
         clearScreenOnFlag();
+        setScreenOffTimeout();
         stopUITimer();
         startLightSensor();
         mirrorSleepState = LIGHT_SLEEP;
@@ -481,9 +482,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Entry point for processing user commands. This will change sleep state based on input.
-     * If sleeping, it will ignore commands except those which cause a state transition to awake.
-     * If command would wake the application, trigger proper state change and then handles the command.
+     * Entry point for processing user commands.
+     * If sleeping, this will ignore commands except those which cause a state transition to "awake".
+     * If command would wake the application, trigger proper state change and handle the command.
      * @param command input command
      */
     public void wakeScreenAndDisplay(String command) {
@@ -495,10 +496,13 @@ public class MainActivity extends AppCompatActivity
                 exitSleep();
             } else {
                 exitLightSleep();
+                // change from LIGHT_SLEEP -> AWAKE. LIGHT_SLEEP only lasts ~10 seconds, so these cases
+                // are not very common.
                 if (command.equals(Constants.LIGHT)) {
                     handleCommand(command);
                 } else {
-                    // in LIGHT_SLEEP we're showing a black, empty fragment. Instead show the last
+                    // in LIGHT_SLEEP we're showing a black, empty fragment. Instead, display the last
+                    // fragment shown before SleepFragment.
                     handleCommand(mPreviousFragment);
                 }
             }
@@ -517,7 +521,11 @@ public class MainActivity extends AppCompatActivity
      */
     private void handleCommand(String command){
         Fragment fragment = null;
-        Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
+
+        if (DEBUG) {
+            Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
+            showToast(command, Toast.LENGTH_SHORT);
+        }
 
         // All commands hide helpFragment if visible. Constants.HELP shows HelpFragment
         if (command.equals(Constants.HELP) && mHelpFragment == null) {

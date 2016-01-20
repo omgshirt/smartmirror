@@ -37,6 +37,7 @@ public class VoiceService extends Service implements RecognitionListener{
     public static final int INIT_SPEECH = 3;
     public static final int CANCEL_SPEECH = 4;
     private String SMARTMIRROR_SEARCH = "mirrorSearch";
+    private final String NGRAM_SEARCH = "ngramSearch";
     private final String GRAMMAR_SEARCH = "grammarSearch";
     private final String MIRROR_KWS = "show";
     private final String PRIMARY_SEARCH = SMARTMIRROR_SEARCH;
@@ -117,7 +118,7 @@ public class VoiceService extends Service implements RecognitionListener{
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
             hypothesis.delete();
-            //Log.i("VR", "onPartialResult: " + text);
+            Log.i("VR", "onPartialResult: \"" + text + "\"");
 
             /*if (text.equals("set speech frequency")) {
                 switchSearch(FREQUENCY_GRAMMAR);

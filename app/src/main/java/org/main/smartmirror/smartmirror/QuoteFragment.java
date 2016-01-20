@@ -45,9 +45,9 @@ public class QuoteFragment extends Fragment {
     // mAvailableQuotes holds quotes that have yet to be shown. Once all are used, list is refreshed.
     private int nextQuote = 0;
     private ArrayList<Integer> mAvailableQuotes;
-    private final int fadeInTime = 2500;
-    private final int fadeOutTime = 2500;
-    private final int quoteDisplayLength = 10000;
+    private final int fadeInTime = 3000;
+    private final int fadeOutTime = 3000;
+    private final int quoteDisplayLength = 30000;
     private final int totalDisplayTime = fadeInTime + quoteDisplayLength + fadeOutTime;
 
     @Override

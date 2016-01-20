@@ -58,12 +58,14 @@
 				<TextView
 					android:id="@+id/current_humidity"
 					android:textSize="15sp"
+					android:text="Humidity"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content" />
             <!-- current wind -->
 				<TextView
 					android:id="@+id/current_wind"
 					android:textSize="15sp"
+					android:text="Wind"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content" />
 		</LinearLayout>

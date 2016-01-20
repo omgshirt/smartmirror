@@ -191,15 +191,14 @@ public class WeatherFragment extends Fragment {
 
     private void speakTime() {
         GregorianCalendar calendar = new GregorianCalendar();
-        String strMinute, strHour, strHourEnding;
-
+        String strMinute, strHour;
 
         int hourMode = Calendar.HOUR_OF_DAY;
         if (mPreferences.isTimeFormat12hr()) {
             hourMode = Calendar.HOUR;
         }
-        int hour = calendar.get(hourMode);
-        strHour = Integer.toString(hour);
+        strHour = Integer.toString(calendar.get(hourMode));
+
         int minute = calendar.get(Calendar.MINUTE);
         strMinute = Integer.toString(minute);
 
