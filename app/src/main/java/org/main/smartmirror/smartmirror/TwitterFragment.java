@@ -14,9 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -48,6 +50,8 @@ public class TwitterFragment extends Fragment {
     private TextView mStatus9;
     private TextView mStatus10;
     private TextView mStatus11;
+
+    private ImageView mPP1;
 
     private Button mTwitterLogin;
     private Button mTwitterButton;
@@ -105,6 +109,8 @@ public class TwitterFragment extends Fragment {
         mStatus9 = (TextView)view.findViewById(R.id.status9);
         mStatus10 = (TextView)view.findViewById(R.id.status10);
         mStatus11 = (TextView)view.findViewById(R.id.status11);
+
+        mPP1 = (ImageView)view.findViewById(R.id.pp1);
 
         mStatus1.setText("");
         mStatus2.setText("");
@@ -205,6 +211,9 @@ public class TwitterFragment extends Fragment {
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
+
+        //mPP1.setImageURI(Constants.mUrl[1]);
+        Picasso.with(getContext()).load(Constants.mUrl[0]).into(mPP1);
 
         String txt0 = "<b>" + Constants.mUser[0] + "</b> " + "<br>" + Constants.mStatus[0] + "<br>";
         mStatus1.setText(Html.fromHtml(txt0));
