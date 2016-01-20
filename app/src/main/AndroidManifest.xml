@@ -45,20 +45,6 @@
             </intent-filter>
         </activity>
 
-        <!-- OpenCV Facial Recognition Testing -->
-        <activity
-            android:name=".FacialRecognitionActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <!-- End OpenCV Facial Recognition Testing -->
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
