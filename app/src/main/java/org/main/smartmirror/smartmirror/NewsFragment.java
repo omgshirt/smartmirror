@@ -58,6 +58,13 @@ public class NewsFragment extends Fragment{
     private TextView txtNewsDesk;
 
     private ImageView img1;
+    private ImageView img2;
+    private ImageView img3;
+    private ImageView img4;
+    private ImageView img5;
+    private ImageView img6;
+    private ImageView img7;
+    private ImageView img8;
 
 
     Handler mHandler = new Handler();
@@ -86,6 +93,13 @@ public class NewsFragment extends Fragment{
         txtNewsDesk = (TextView)view.findViewById(R.id.txtNewsDesk);
 
         img1 = (ImageView)view.findViewById(R.id.img1);
+        img2 = (ImageView)view.findViewById(R.id.img2);
+        img3 = (ImageView)view.findViewById(R.id.img3);
+        img4 = (ImageView)view.findViewById(R.id.img4);
+        img5 = (ImageView)view.findViewById(R.id.img5);
+        img6 = (ImageView)view.findViewById(R.id.img6);
+        img7 = (ImageView)view.findViewById(R.id.img7);
+        img8 = (ImageView)view.findViewById(R.id.img8);
 
         clearLayout();
 
@@ -432,41 +446,48 @@ public class NewsFragment extends Fragment{
                 Constants.article[i] = Constants.body;
                 Constants.trailText = fields.getString("trailText");
                 Constants.snippets[i] = Constants.trailText;
-                Constants.thumbnail = fields.getString("thumbnail");
-                Constants.thumbs[i] = Constants.thumbnail;
+                try {
+                    Constants.thumbnail = fields.getString("thumbnail");
+                    Constants.thumbs[i] = Constants.thumbnail;
+                }
+                catch (Exception e) {
+                    Constants.thumbs[i] = "@drawable/guardian";
+                }
                 i++;
             }
 
-            /*URL url = new URL(Constants.thumbs[0]);
-            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            img1.setImageBitmap(bmp);*/
 
             String txt0 = "<b>" + Constants.hl[0] + "</b> " + "<br>" + Constants.snippets[0] + "<br>";
-            //String txt0 = "<img src=" + Constants.thumbs[0] + ">";
             mTxtHeadline.setText(Html.fromHtml(txt0));
-
             Picasso.with(getContext()).load(Constants.thumbs[0]).fit().centerInside().into(img1);
 
             String txt1 = "<b>" + Constants.hl[1] + "</b> " + "<br>" + Constants.snippets[1] + "<br>";
             mTxtHeadline2.setText(Html.fromHtml(txt1));
+            Picasso.with(getContext()).load(Constants.thumbs[1]).fit().centerInside().into(img2);
 
             String txt2 = "<b>" + Constants.hl[2] + "</b> " + "<br>" + Constants.snippets[2] + "<br>";
             mTxtHeadline3.setText(Html.fromHtml(txt2));
+            Picasso.with(getContext()).load(Constants.thumbs[2]).fit().centerInside().into(img3);
 
             String txt3 = "<b>" + Constants.hl[3] + "</b> " + "<br>" + Constants.snippets[3] + "<br>";
             mTxtHeadline4.setText(Html.fromHtml(txt3));
+            Picasso.with(getContext()).load(Constants.thumbs[3]).fit().centerInside().into(img4);
 
             String txt4 = "<b>" + Constants.hl[4] + "</b> " + "<br>" + Constants.snippets[4] + "<br>";
             mTxtHeadline5.setText(Html.fromHtml(txt4));
+            Picasso.with(getContext()).load(Constants.thumbs[4]).fit().centerInside().into(img5);
 
             String txt5 = "<b>" + Constants.hl[5] + "</b> " + "<br>" + Constants.snippets[5] + "<br>";
             mTxtHeadline6.setText(Html.fromHtml(txt5));
+            Picasso.with(getContext()).load(Constants.thumbs[5]).fit().centerInside().into(img6);
 
             String txt6 = "<b>" + Constants.hl[6] + "</b> " + "<br>" + Constants.snippets[6] + "<br>";
             mTxtHeadline7.setText(Html.fromHtml(txt6));
+            Picasso.with(getContext()).load(Constants.thumbs[6]).fit().centerInside().into(img7);
 
             String txt7 = "<b>" + Constants.hl[7] + "</b> " + "<br>" + Constants.snippets[7] + "<br>";
             mTxtHeadline8.setText(Html.fromHtml(txt7));
+            Picasso.with(getContext()).load(Constants.thumbs[7]).fit().centerInside().into(img8);
 
         }catch(Exception e){
             Log.e("NEWS ERROR", e.toString());
