@@ -1,6 +1,13 @@
 package org.main.smartmirror.smartmirror;
 
 
+import android.net.Uri;
+
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URL;
+
 public class Constants {
 
     //--------------CONSTANTS--------------
@@ -57,6 +64,7 @@ public class Constants {
     public static String mUser[] = new String[100];
     public static String mStatus[] = new String[100];
     public static String mUserAt[] = new String[100];
+    public static Uri mUrl[] = new Uri[100]; // profile image url
     public static final String mLogin= "log me in";
     public static final String mGet= "get";
     public static final String mRefresh= "refresh";
@@ -67,10 +75,12 @@ public class Constants {
 
     //--------------NEWS--------------
     public static String mArticleFullBody = "";
-    public static int numItems = 8;
+    public static int numItems = 10;
     public static String article[] = new String[numItems];
-    public static String hl[] = new String[Constants.numItems];
-    public static String snippets[] = new String[Constants.numItems];
+    public static String hl[] = new String[numItems];
+    public static String snippets[] = new String[numItems];
+    public static String thumbs[] = new String[numItems];
+    public static String thumbnail = "";
     public static String body = "";
     public static String trailText = "";
     public static String webTitle = "";

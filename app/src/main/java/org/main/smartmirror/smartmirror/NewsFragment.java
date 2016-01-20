@@ -1,6 +1,8 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,15 +20,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URL;
 
 public class NewsFragment extends Fragment{
 
     // the guardian api
     public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
             "all&order-by=newest&q=world&api-key=";
+    /*public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
+            "thumbnail&order-by=newest&q=sports&api-key=";*/
     public static String mNewsSection = "world";
     public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&q=";
     public static String mPostURL = "&api-key=";
@@ -45,6 +56,9 @@ public class NewsFragment extends Fragment{
     private TextView mTxtHeadline7;
     private TextView mTxtHeadline8;
     private TextView txtNewsDesk;
+
+    private ImageView img1;
+
 
     Handler mHandler = new Handler();
 
@@ -70,6 +84,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
 
         txtNewsDesk = (TextView)view.findViewById(R.id.txtNewsDesk);
+
+        img1 = (ImageView)view.findViewById(R.id.img1);
 
         clearLayout();
 
@@ -385,6 +401,7 @@ public class NewsFragment extends Fragment{
                     mHandler.post(new Runnable(){
                         public void run(){
                             updateNewsCache(json);
+                            Log.i("NEWS ", json.toString());
                             renderNews(json);
                         }
                     });
@@ -396,7 +413,6 @@ public class NewsFragment extends Fragment{
         mNewsCache = new DataCache<>(data, DATA_UPDATE_FREQUENCY);
     }
 
-
     private void renderNews(JSONObject json){
         try {
             //Log.i("NEWS JSON", json.toString());
@@ -405,7 +421,6 @@ public class NewsFragment extends Fragment{
             JSONObject fields = null;
 
             int i = 0;
-
 
             while (i < Constants.numItems) {
                 response = json.getJSONObject("response");
@@ -417,10 +432,18 @@ public class NewsFragment extends Fragment{
                 Constants.article[i] = Constants.body;
                 Constants.trailText = fields.getString("trailText");
                 Constants.snippets[i] = Constants.trailText;
+                Constants.thumbnail = fields.getString("thumbnail");
+                Constants.thumbs[i] = Constants.thumbnail;
                 i++;
             }
 
+            /*URL url = new URL(Constants.thumbs[0]);
+            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            img1.setImageBitmap(bmp);*/
+            Picasso.with(getContext()).load(Constants.thumbs[0]).into(img1);
+
             String txt0 = "<b>" + Constants.hl[0] + "</b> " + "<br>" + Constants.snippets[0] + "<br>";
+            //String txt0 = "<img src=" + Constants.thumbs[0] + ">";
             mTxtHeadline.setText(Html.fromHtml(txt0));
 
             String txt1 = "<b>" + Constants.hl[1] + "</b> " + "<br>" + Constants.snippets[1] + "<br>";
@@ -443,7 +466,6 @@ public class NewsFragment extends Fragment{
 
             String txt7 = "<b>" + Constants.hl[7] + "</b> " + "<br>" + Constants.snippets[7] + "<br>";
             mTxtHeadline8.setText(Html.fromHtml(txt7));
-
 
         }catch(Exception e){
             Log.e("NEWS ERROR", e.toString());
