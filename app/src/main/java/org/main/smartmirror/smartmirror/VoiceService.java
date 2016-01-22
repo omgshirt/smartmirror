@@ -90,12 +90,21 @@ public class VoiceService extends Service implements RecognitionListener{
         }
     }
 
+    /**
+     * Stops voice capture
+     */
+
     public void stopVoice(){
         if (mSpeechInitialized) {
             speechIcon(HIDE_ICON);
             mSpeechRecognizer.stop();
         }
     }
+
+    /**
+     * Handles the displaying of the speech icon
+     * @param flag determines whether to show icon or not
+     */
 
     public void speechIcon(int flag){
         Message msg = null;
@@ -108,25 +117,30 @@ public class VoiceService extends Service implements RecognitionListener{
                 msg = Message.obtain(null, HIDE_ICON);
                 break;
         }
-
-        try {
-            mClients.get(0).send(msg);
-        } catch (RemoteException e) {
-            mClients.remove(msg);
-            e.printStackTrace();
-        }
+        // send the message
+        sendMessage(msg);
     }
 
     /**
-     * Sends a message back to the Activity that started this service
+     * Handles the speech results and prepares them to send them to calling activity
+     * @param message the voice capture
+     * @param resultType the result type
      */
-    public void sendMessage(String message, int resultType){
+    public void speechResults(String message, int resultType){
         Bundle bundle = new Bundle();
         // key is result so the calling activity can handle the message
         bundle.putString("result", message);
         // used for the calling activity to check which message id to check
         Message msg = Message.obtain(null, resultType);
         msg.setData(bundle);
+        // send the message
+        sendMessage(msg);
+    }
+
+    /**
+     * Sends a message back to the Activity that started this service
+     */
+    public void sendMessage(Message msg){
         try {
             mClients.get(0).send(msg);
         } catch (RemoteException e) {
@@ -169,7 +183,7 @@ public class VoiceService extends Service implements RecognitionListener{
             String hypstr = hypothesis.getHypstr().trim();
             Log.i("VR", "onResult:\"" + hypstr + "\"");
             //if (hypothesis.getHypstr().equals(MIRROR_KWS)) return;
-            sendMessage(hypstr, RESULT_SPEECH);
+            speechResults(hypstr, RESULT_SPEECH);
         }
         startVoice();
     }
