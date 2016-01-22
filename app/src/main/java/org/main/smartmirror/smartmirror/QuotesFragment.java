@@ -19,6 +19,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

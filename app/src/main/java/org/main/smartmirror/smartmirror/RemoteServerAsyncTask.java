@@ -4,10 +4,8 @@ package org.main.smartmirror.smartmirror;
  * Created by Brian on 11/3/2015.
  */
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

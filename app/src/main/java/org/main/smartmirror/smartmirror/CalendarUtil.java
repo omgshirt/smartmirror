@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

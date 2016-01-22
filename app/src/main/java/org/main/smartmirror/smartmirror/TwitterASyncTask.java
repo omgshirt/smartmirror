@@ -3,7 +3,6 @@ package org.main.smartmirror.smartmirror;
 import android.os.AsyncTask;
 import android.util.Log;
 
-
 import java.util.List;
 
 import twitter4j.Paging;
