@@ -3,11 +3,6 @@ package org.main.smartmirror.smartmirror;
 
 import android.net.Uri;
 
-import org.json.JSONObject;
-
-import java.net.URI;
-import java.net.URL;
-
 public class Constants {
 
     //--------------CONSTANTS--------------
