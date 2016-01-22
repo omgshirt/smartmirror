@@ -14,7 +14,7 @@ green /1e4/
 go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
-help /1e3/
+help /1e6/
 log me in /1e-3/
 makeup /1e7/
 magenta /1e-4/
@@ -33,8 +33,8 @@ settings /1e-4/
 scroll up /1e6/
 scroll down /1e6/
 sleep /1e12/
-start listening /1e-5/
-stop listening /1e-5/
+start listening /1e-6/
+stop listening /1e-6/
 take a picture /1e-15/
 time/1e8/
 show time/1e-3/

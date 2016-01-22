@@ -138,6 +138,11 @@ public class Preferences implements LocationListener {
     private float mMusicVolume;                     // music stream volume
     private int mMusicVolumeHolder;
     private int mSystemVolumeHolder;
+    private String mTimeFormat;
+    private String mWeatherUnits;                      // Weather display format (English / metric)
+
+    private double mLatitude;
+    private double mLongitude;
 
     private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
@@ -146,11 +151,7 @@ public class Preferences implements LocationListener {
     private static final String TIME_FORMAT_12_HR_SHORT = "ha";
 
 
-    private String mTimeFormat;
-    private String mWeatherUnits;                      // Weather display format (English / metric)
 
-    private double mLatitude;
-    private double mLongitude;
 
 
     // Handle any messages sent from MainActivity
