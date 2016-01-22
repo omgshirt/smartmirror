@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string-array name="guardian_sections">
+        <item>world</item>
+        <item>sports</item>
+        <item>business</item>
+        <item>technology</item>
+        <item>science</item>
+        <item>media</item>
+        <item>travel</item>
+    </string-array>
+
     <string-array name="nyt_news_desk">
         <item>sports</item>
         <item>foreign</item>

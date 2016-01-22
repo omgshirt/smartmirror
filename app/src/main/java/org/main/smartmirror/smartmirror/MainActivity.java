@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -73,9 +74,6 @@ public class MainActivity extends AppCompatActivity
     private final long LIGHT_WAKE_DELAY = 4000;   // time delay before screen will wake due to light changes
     private RecentLightValues mRecentLightValues;
 
-    // News
-    public static String mDefaultURL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq=news_desk%3AU.S.&sort=newest&api-key=";
-
     // Sleep state & wakelocks
     // mirrorSleepState can be ASLEEP, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
@@ -108,6 +106,7 @@ public class MainActivity extends AppCompatActivity
     private Messenger mMessenger = new Messenger(new IHandler());
     private boolean mIsBound;
     private Messenger mService;
+    private ImageView mSpeechIcon;
 
     // Sound effects
     private MediaPlayer mFXPlayer;
@@ -125,32 +124,15 @@ public class MainActivity extends AppCompatActivity
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = new Messenger(service);
             initSpeechRecognition();
-            // not sure if I need this keep me
-            /*try {
-                Message msg = Message.obtain(null, VoiceService.REGISTER_SERV);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }*/
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mService = null;
-
-            // not sure if I need this keep me
-            /*try {
-                Message msg = Message.obtain(null, VoiceService.UNREGISTER_SERV);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }*/
         }
     };
 
-    // handles the messages from Service to this
+    // handles the messages from Service to this Activity
     public class IHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
@@ -158,6 +140,12 @@ public class MainActivity extends AppCompatActivity
                 case VoiceService.RESULT_SPEECH:
                     String result = msg.getData().getString("result");
                     handleVoiceCommand(result);
+                    break;
+                case VoiceService.SHOW_ICON:
+                    showSpeechIcon(true);
+                    break;
+                case VoiceService.HIDE_ICON:
+                    showSpeechIcon(false);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -196,6 +184,10 @@ public class MainActivity extends AppCompatActivity
 
         // Set up views and nav drawer
         setContentView(R.layout.activity_main);
+        // speech icon turn it off for now
+        mSpeechIcon = (ImageView)findViewById(R.id.speech_icon);
+        mSpeechIcon.setVisibility(View.INVISIBLE);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -578,9 +570,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.NEWS:
                 fragment = new NewsFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("url", mDefaultURL);
-                fragment.setArguments(bundle);
+                break;
+            case Constants.NEWS_BODY:
+                fragment = new NewsBodyFragment();
                 break;
             case Constants.LIGHT:
                 fragment = new LightFragment();
@@ -630,6 +622,19 @@ public class MainActivity extends AppCompatActivity
         return mCurrentFragment;
     }
 
+    /**
+     * This method handles the speech icon indicator. It either hides
+     * or shows the icon based on the flag
+     * @param flag whether or not to show the icon
+     */
+    public void showSpeechIcon(boolean flag){
+        if(flag) {
+            mSpeechIcon.setVisibility(View.VISIBLE);
+        } else {
+            mSpeechIcon.setVisibility(View.INVISIBLE);
+        }
+    }
+
     // ----------------------- SPEECH RECOGNITION --------------------------
 
     /**
@@ -647,6 +652,7 @@ public class MainActivity extends AppCompatActivity
 
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
+            showSpeechIcon(false);
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
                 broadcastMessage("inputAction", voiceInput);
             }

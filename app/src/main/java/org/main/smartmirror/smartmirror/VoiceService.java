@@ -39,6 +39,8 @@ public class VoiceService extends Service implements RecognitionListener{
     public static final int RESULT_SPEECH = 2;
     public static final int INIT_SPEECH = 3;
     public static final int CANCEL_SPEECH = 4;
+    public static final int SHOW_ICON = 5;
+    public static final int HIDE_ICON = 6;
     private final String KEYWORD_SEARCH = "smartmirror_keys";
     private final String NGRAM_SEARCH = "ngramSearch";
     private final String GRAMMAR_SEARCH = "grammarSearch";
@@ -82,26 +84,62 @@ public class VoiceService extends Service implements RecognitionListener{
     public void startVoice(){
         if(mSpeechInitialized) {
             Log.i("VR", "startVoice()");
+            speechIcon(SHOW_ICON);
             mSpeechRecognizer.startListening(KEYWORD_SEARCH);
         }
     }
 
+    /**
+     * Stops voice capture
+     */
+
     public void stopVoice(){
         if (mSpeechInitialized) {
+            speechIcon(HIDE_ICON);
             mSpeechRecognizer.stop();
         }
     }
 
     /**
-     * Sends a message back to the Activity that started this service
+     * Handles the displaying of the speech icon
+     * @param flag determines whether to show icon or not
      */
-    public void sendMessage(String message, int resultType){
+
+    public void speechIcon(int flag){
+        Message msg = null;
+
+        switch(flag){
+            case SHOW_ICON:
+                msg = Message.obtain(null, SHOW_ICON);
+                break;
+            case HIDE_ICON:
+                msg = Message.obtain(null, HIDE_ICON);
+                break;
+        }
+        // send the message
+        sendMessage(msg);
+    }
+
+    /**
+     * Handles the speech results and prepares them to send them to calling activity
+     * @param message the voice capture
+     * @param resultType the result type
+     */
+    public void speechResults(String message, int resultType){
         Bundle bundle = new Bundle();
         // key is result so the calling activity can handle the message
         bundle.putString("result", message);
         // used for the calling activity to check which message id to check
         Message msg = Message.obtain(null, resultType);
         msg.setData(bundle);
+        // send the message
+        sendMessage(msg);
+    }
+
+    /**
+     * Sends a message back to the Activity that started this service
+     */
+    public void sendMessage(Message msg){
         try {
             mClients.get(0).send(msg);
         } catch (RemoteException e) {
@@ -132,7 +170,7 @@ public class VoiceService extends Service implements RecognitionListener{
             String hypstr = hypothesis.getHypstr().trim();
             Log.i("VR", "onResult:\"" + hypstr + "\"");
             //if (hypothesis.getHypstr().equals(MIRROR_KPS)) return;
-            sendMessage(hypstr, RESULT_SPEECH);
+            speechResults(hypstr, RESULT_SPEECH);
         } else {
             Log.i("VR", "onResult(), hypothesis null");
         }
