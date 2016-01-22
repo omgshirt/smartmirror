@@ -9,11 +9,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main"
     tools:context=".MainActivity">
-    <fragment
-        android:name="org.main.smartmirror.smartmirror.WeatherFragment"
-        android:id="@+id/time_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"></fragment>
 
     <ImageView
         android:id="@+id/speech_icon"
@@ -21,6 +16,12 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:src="@mipmap/ic_action_microphone"/>
+
+    <fragment
+        android:name="org.main.smartmirror.smartmirror.WeatherFragment"
+        android:id="@+id/time_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></fragment>
 
     <FrameLayout
         android:layout_width="match_parent"

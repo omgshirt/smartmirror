@@ -170,7 +170,7 @@ public class VoiceService extends Service implements RecognitionListener{
             String hypstr = hypothesis.getHypstr().trim();
             Log.i("VR", "onResult:\"" + hypstr + "\"");
             //if (hypothesis.getHypstr().equals(MIRROR_KPS)) return;
-            sendMessage(hypstr, RESULT_SPEECH);
+            speechResults(hypstr, RESULT_SPEECH);
         } else {
             Log.i("VR", "onResult(), hypothesis null");
         }
