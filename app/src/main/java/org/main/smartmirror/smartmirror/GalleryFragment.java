@@ -116,7 +116,8 @@ public class GalleryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // instantiate the timer object
+
+        // start the timer
         mTimer = new Timer();
 
         // initialize the runnable that will handle the task
@@ -128,13 +129,7 @@ public class GalleryFragment extends Fragment {
                 mImageTitle.setText(mTitle);
             }
         };
-        // initialize the timer task that will run on the UI
-        mTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(mRunnable);
-            }
-        };
+
         // get the assets
         String[] imageGalleryNames = null;
         AssetManager assetManager = getContext().getAssets();
@@ -157,16 +152,29 @@ public class GalleryFragment extends Fragment {
         // initialize the ImageView
         mImageTitle = (TextView) view.findViewById(R.id.image_facts);
         mGalleryItem = (ImageView) view.findViewById(R.id.gallery_item);
-        // start the timer
+
+        // initialize the timer task that will run on the UI
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(mRunnable);
+            }
+        };
         mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
+
         return view;
     }
 
     @Override
-    public void onDestroy() {
+    public void onStop(){
+        super.onStop();
+        mTimerTask.cancel();
+    }
+
+    @Override
+    public void onDestroy(){
         super.onDestroy();
-        // kill the timer
-        mTimer.cancel();
+        mTimerTask.cancel();
     }
 
     /**

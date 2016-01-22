@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,10 +113,7 @@ public class WeatherFragment extends Fragment {
 
         clkTextClock = (TextClock)view.findViewById(R.id.time_clock);
         clkDateClock = (TextClock)view.findViewById(R.id.date_clock);
-        clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
-        clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
-        clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
-        clkDateClock.setFormat24Hour(mPreferences.getDateFormat());
+        updateTimeDisplay();
 
         return view;
     }
@@ -132,9 +128,7 @@ public class WeatherFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d(Constants.TAG, "Got message:\"" + message +"\"");
             switch (message) {
-                case Constants.FORECAST:
-                    speakWeatherForecast();
-                    break;
+
                 case Constants.CONDITIONS:
                     speakCurrentConditions();
                     break;
@@ -142,8 +136,33 @@ public class WeatherFragment extends Fragment {
                 case Preferences.CMD_WEATHER_METRIC:
                     startWeatherUpdate();
                     break;
+                case Preferences.CMD_TIME_12HR:
+                case Preferences.CMD_TIME_24HR:
+                    updateTimeDisplay();
+                    break;
+                case Constants.FORECAST:
+                    speakWeatherForecast();
+                    break;
+                case Constants.HIDE_TIME:
+                    hideTime();
+                    break;
+                case Constants.HIDE_WEATHER:
+                    hideWeather();
+                    break;
+                case Constants.SHOW_TIME:
+                    showTime();
+                    break;
+                case Constants.SHOW_WEATHER:
+                    showWeather();
+                    break;
                 case Constants.TIME:
                     speakTime();
+                    break;
+                case Constants.WEATHER:
+                    startWeatherUpdate();
+                    updateTimeDisplay();    // doing this to
+                    // refresh clock on 12/24 format changes. Otherwise not needed.
+                    speakText("Updating weather.");
                     break;
                 default:
                     break;
@@ -185,6 +204,30 @@ public class WeatherFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    // Refresh time and date displays to current preference setting
+    public void updateTimeDisplay(){
+        clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
+        clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
+        clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
+        clkDateClock.setFormat24Hour(mPreferences.getDateFormat());
+    }
+
+    public void hideTime() {
+        layTimeLayout.setVisibility(View.GONE);
+    }
+
+    public void showTime() {
+        layTimeLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void hideWeather() {
+        layWeatherLayout.setVisibility(View.GONE);
+    }
+
+    public void showWeather() {
+        layWeatherLayout.setVisibility(View.VISIBLE);
     }
 
     // ----------------------- TTS Feedback -------------------------

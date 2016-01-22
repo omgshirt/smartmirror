@@ -19,12 +19,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,6 +53,7 @@ public class QuoteFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mTimer = new Timer();
         // Loading Font Face
         mQuoteFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/DancingScript-Regular.otf");
 
@@ -93,9 +93,12 @@ public class QuoteFragment extends Fragment {
                 nextQuote = (++nextQuote) % mQuoteList.size();
             }
         };
+    }
 
-        //instantiate the timer to cycle quotes
-        mTimer = new Timer();
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.quotes_fragment, container, false);
+
         mTimerTask  = new TimerTask() {
             @Override
             public void run() {
@@ -103,11 +106,7 @@ public class QuoteFragment extends Fragment {
             }
         };
         mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.quotes_fragment, container, false);
         // Set-up the text views
         txtQuoteAuthor = (TextView) view.findViewById(R.id.quote_author);
         txtQuoteContent = (TextView) view.findViewById(R.id.quote_content);
@@ -202,13 +201,13 @@ public class QuoteFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        mTimerTask.cancel();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // kill the timer
-        mTimer.cancel();
+        mTimerTask.cancel();
     }
 }

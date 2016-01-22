@@ -44,6 +44,10 @@ public class Constants {
             "http://api.openweathermap.org/data/2.5/weather?id=%s&units=%s";
     public static final String CONDITIONS = "conditions";
     public static final String FORECAST = "forecast";
+    public static final String SHOW_WEATHER = "show weather";
+    public static final String HIDE_WEATHER = "hide weather";
+    public static final String SHOW_TIME = "show time";
+    public static final String HIDE_TIME = "hide time";
 
     //--------------CAMERA--------------
     public static final String TAKE_PICTURE="take a picture";
@@ -51,8 +55,8 @@ public class Constants {
     //--------------TWITTER--------------
     public static final String TWITTER_CONSUMER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx";
     public static final String TWITTER_CONSUMER_SECRET= "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt";
-    public static final String TWITTER_ACCESS_TOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
-    public static final String TWITTER_ACCESS_SECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
+    public static String TWITTER_ACCESS_TOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
+    public static String TWITTER_ACCESS_SECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
     public static String mUser[] = new String[100];
     public static String mStatus[] = new String[100];
     public static String mUserAt[] = new String[100];

@@ -25,9 +25,9 @@ import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity
     private int defaultScreenTimeout;
     private String mInitialFragment = Constants.CALENDAR;
     private String mCurrentFragment;
-    private String mPreviousFragment;
     private final int WAKELOCK_TIMEOUT = 100;            // Wakelock should be held only briefly to trigger screen wake
     private PowerManager.WakeLock mWakeLock;
     private Timer mUITimer;
@@ -274,9 +273,9 @@ public class MainActivity extends AppCompatActivity
         if (mCurrentFragment == null)  {
             wakeScreenAndDisplay(mInitialFragment);
         }
-        // if the system was put to sleep from LIGHT_SLEEP, get the previous fragment and display
+        // if the system was put to sleep from LIGHT_SLEEP, pop SleepFragment off
         else if ( mCurrentFragment.equals(Constants.LIGHT_SLEEP) ) {
-            wakeScreenAndDisplay(mPreviousFragment);
+            getSupportFragmentManager().popBackStack();
         }
     }
 
@@ -465,6 +464,17 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void displayFragment(Fragment fragment){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content_frame, fragment);
+        if (!isFinishing()) {
+            ft.addToBackStack(null);
+            ft.commit();
+        } else {
+            Log.e(Constants.TAG, "commit skipped. isFinishing() returned true");
+        }
+    }
+
     public void hideHelpFragment() {
         if (mHelpFragment != null) {
             mHelpFragment.dismiss();
@@ -503,7 +513,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     // in LIGHT_SLEEP we're showing a black, empty fragment. Instead, display the last
                     // fragment shown before SleepFragment.
-                    handleCommand(mPreviousFragment);
+                    getSupportFragmentManager().popBackStack();
                 }
             }
         }
@@ -524,7 +534,6 @@ public class MainActivity extends AppCompatActivity
 
         if (DEBUG) {
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
-            showToast(command, Toast.LENGTH_SHORT);
         }
 
         // All commands hide helpFragment if visible. Constants.HELP shows HelpFragment
@@ -563,6 +572,10 @@ public class MainActivity extends AppCompatActivity
             case Constants.GALLERY:
                 fragment = new GalleryFragment();
                 break;
+            case Constants.GO_BACK:
+                Log.i(Constants.TAG, "popping back stack");
+                getSupportFragmentManager().popBackStack();
+                break;
             case Constants.NEWS:
                 fragment = new NewsFragment();
                 Bundle bundle = new Bundle();
@@ -589,9 +602,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.WAKE:
                 break;
-            case Constants.WEATHER:
-                fragment = new WeatherFragment();
-                break;
             case Constants.MAKEUP:
                 fragment = new MakeupFragment();
                 break;
@@ -605,21 +615,9 @@ public class MainActivity extends AppCompatActivity
         if(fragment != null){
             playSound(R.raw.celeste_a);
             //startTTS(command);
-            mPreviousFragment = mCurrentFragment;
             mCurrentFragment = command;
-            Log.i(Constants.TAG, "mPreviousFragment " + mPreviousFragment);
             Log.i(Constants.TAG, "mCurrentFragment " + mCurrentFragment);
             displayFragment(fragment);
-        }
-    }
-
-    private void displayFragment(Fragment fragment){
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_frame, fragment);
-        if (!isFinishing()) {
-            ft.commit();
-        } else {
-            Log.e(Constants.TAG, "commit skipped. isFinishing() returned true");
         }
     }
 
@@ -641,7 +639,12 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleVoiceCommand(String input) {
         String voiceInput = input.trim();
-        Log.i(Constants.TAG, "handleVoiceCommand:"+input);
+        Log.i(Constants.TAG, "handleVoiceCommand:\""+input+"\"");
+
+        if (mPowerManager.isScreenOn() ) {
+            showToast(input, Toast.LENGTH_LONG);
+        }
+
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
@@ -654,6 +657,29 @@ public class MainActivity extends AppCompatActivity
             voiceInput = Constants.WAKE;
         }
 
+        // time
+        if(voiceInput.contains(Constants.SHOW_TIME)) {
+            voiceInput = Constants.SHOW_TIME;
+        } else if (voiceInput.contains(Constants.HIDE_TIME)) {
+            voiceInput = Constants.HIDE_TIME;
+        } else if (voiceInput.contains(Constants.TIME)) {
+            voiceInput = Constants.TIME;
+        }
+
+        // weather
+        if(voiceInput.contains(Constants.HIDE_WEATHER)) {
+            voiceInput = Constants.HIDE_WEATHER;
+        } else if (voiceInput.contains(Constants.SHOW_WEATHER)) {
+            voiceInput = Constants.SHOW_WEATHER;
+        } else if (voiceInput.contains(Preferences.CMD_WEATHER_ENGLISH)) {
+            voiceInput = Preferences.CMD_WEATHER_ENGLISH;
+        } else if (voiceInput.contains(Preferences.CMD_WEATHER_METRIC)) {
+            voiceInput = Preferences.CMD_WEATHER_METRIC;
+        } else if (voiceInput.contains(Constants.WEATHER)) {
+            voiceInput = Constants.WEATHER;
+        }
+
+
         if(voiceInput.contains(Constants.NIGHT_LIGHT)) {
             voiceInput = Constants.LIGHT;
         }
@@ -662,14 +688,6 @@ public class MainActivity extends AppCompatActivity
             voiceInput = Constants.SLEEP;
         }
 
-        // Some silliness to solve "weather" showing up too many times
-        if(voiceInput.contains(Constants.WEATHER)) {
-            if (voiceInput.contains("english")) {
-                voiceInput = Preferences.CMD_WEATHER_ENGLISH;
-            } else if (voiceInput.contains("metric")) {
-                voiceInput = Preferences.CMD_WEATHER_METRIC;
-            }
-        }
         // Junk fix for remote
         if(voiceInput.contains(Constants.REMOTE)) {
             if (voiceInput.contains("enable")) {
@@ -689,9 +707,6 @@ public class MainActivity extends AppCompatActivity
 
         // Normalize speech commands to match remote control versions.
         switch (voiceInput) {
-            case Constants.GO_BACK:
-                voiceInput = Constants.BACK;
-                break;
             case Constants.GO_TO_SLEEP:
                 voiceInput = Constants.SLEEP;
                 break;

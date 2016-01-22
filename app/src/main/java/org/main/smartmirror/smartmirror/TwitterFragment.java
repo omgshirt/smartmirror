@@ -20,6 +20,11 @@ import android.widget.Toast;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.tweetui.TweetView;
+
+import java.util.ArrayList;
+
+import io.fabric.sdk.android.Fabric;
+
 /*
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -28,12 +33,6 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.tweetui.TweetUtils;
 */
-
-
-
-import org.json.JSONObject;
-
-import io.fabric.sdk.android.Fabric;
 
 public class TwitterFragment extends Fragment {
 
@@ -97,6 +96,7 @@ public class TwitterFragment extends Fragment {
                 twitterLogin();
             }
         });*/
+
 
         mStatus1 = (TextView)view.findViewById(R.id.status1);
         mStatus2 = (TextView)view.findViewById(R.id.status2);
@@ -209,6 +209,13 @@ public class TwitterFragment extends Fragment {
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
+
+        /* do this once you build txtListTweets
+        for (int i=0; i <= 10; i++) {
+            String txt = "<b>" + Constants.mUser[i] + "</b> " + "<br>" + Constants.mStatus[i] + "<br>";
+            txtListTweets.get(i).setText(Html.fromHtml(txt));
+        }
+        */
 
         String txt0 = "<b>" + Constants.mUser[0] + "</b> " + "<br>" + Constants.mStatus[0] + "<br>";
         mStatus1.setText(Html.fromHtml(txt0));
