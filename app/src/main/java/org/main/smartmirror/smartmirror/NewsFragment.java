@@ -229,6 +229,15 @@ public class NewsFragment extends Fragment{
         mTxtHeadline7.setText("");
         mTxtHeadline8.setText("");
         txtNewsDesk.setText("");
+
+        img1.setImageResource(android.R.color.transparent);
+        img2.setImageResource(android.R.color.transparent);
+        img3.setImageResource(android.R.color.transparent);
+        img4.setImageResource(android.R.color.transparent);
+        img5.setImageResource(android.R.color.transparent);
+        img6.setImageResource(android.R.color.transparent);
+        img7.setImageResource(android.R.color.transparent);
+        img8.setImageResource(android.R.color.transparent);
     }
 
 
