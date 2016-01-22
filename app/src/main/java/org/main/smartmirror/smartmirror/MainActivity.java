@@ -124,28 +124,11 @@ public class MainActivity extends AppCompatActivity
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = new Messenger(service);
             initSpeechRecognition();
-            // not sure if I need this keep me
-            /*try {
-                Message msg = Message.obtain(null, VoiceService.REGISTER_SERV);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }*/
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mService = null;
-
-            // not sure if I need this keep me
-            /*try {
-                Message msg = Message.obtain(null, VoiceService.UNREGISTER_SERV);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }*/
         }
     };
 
@@ -161,10 +144,10 @@ public class MainActivity extends AppCompatActivity
                     handleVoiceCommand(result);
                     break;
                 case VoiceService.SHOW_ICON:
-                    speechIconHandler(true);
+                    showSpeechIcon(true);
                     break;
                 case VoiceService.HIDE_ICON:
-                    speechIconHandler(false);
+                    showSpeechIcon(false);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -203,7 +186,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         // speech icon turn it off for now
         mSpeechIcon = (ImageView)findViewById(R.id.speech_icon);
-        mSpeechIcon.setVisibility(View.GONE);
+        mSpeechIcon.setVisibility(View.INVISIBLE);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -602,7 +586,7 @@ public class MainActivity extends AppCompatActivity
      * or shows the icon based on the flag
      * @param flag whether or not to show the icon
      */
-    public void speechIconHandler(boolean flag){
+    public void showSpeechIcon(boolean flag){
         if(flag) {
             mSpeechIcon.setVisibility(View.VISIBLE);
         } else {
@@ -622,6 +606,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "handleVoiceCommand:"+input);
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
+            showSpeechIcon(false);
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
                 broadcastMessage("inputAction", voiceInput);
             }

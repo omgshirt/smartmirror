@@ -84,7 +84,7 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     public void startVoice(){
         if(mSpeechInitialized) {
-//            speechIcon(SHOW_ICON);
+            speechIcon(SHOW_ICON);
             mSpeechRecognizer.startListening(PRIMARY_SEARCH);
             //mSpeechRecognizer.startListening(SMARTMIRROR_SEARCH);
         }
@@ -92,7 +92,7 @@ public class VoiceService extends Service implements RecognitionListener{
 
     public void stopVoice(){
         if (mSpeechInitialized) {
-//            speechIcon(HIDE_ICON);
+            speechIcon(HIDE_ICON);
             mSpeechRecognizer.stop();
         }
     }
