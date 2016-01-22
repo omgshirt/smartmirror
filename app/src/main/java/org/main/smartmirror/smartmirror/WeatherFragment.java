@@ -49,7 +49,6 @@ public class WeatherFragment extends Fragment {
     private TextView txtAlerts;
     private TextView txtAlertWarning;
 
-    private static String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
     private String mLatitude = "0";
     private String mLongitude = "0";
 
@@ -63,7 +62,7 @@ public class WeatherFragment extends Fragment {
 
     // time in minutes before weather data is considered old and is discarded
     private final int DATA_UPDATE_FREQUENCY = 10;
-    private static JSONDataCache mWeatherCache = null;
+    public static DataCache<JSONObject> mWeatherCache = null;
 
     Handler mHandler = new Handler();
 
@@ -77,12 +76,12 @@ public class WeatherFragment extends Fragment {
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         dailyForecasts = new DailyForecast[3];
 
-        // some static locations for now
         mLatitude = Double.toString(mPreferences.getLatitude());
         mLongitude = Double.toString(mPreferences.getLongitude());
     }
 
     public void startWeatherUpdate(){
+        String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
         String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
         String weatherUnit = "si";
         if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
@@ -110,12 +109,10 @@ public class WeatherFragment extends Fragment {
         txtDailyHigh.setTypeface(weatherFont);
         txtDailyLow.setTypeface(weatherFont);
 
-        if (mPreferences.timeFormatIs12hr()) {
-            clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
-        } else {
-            clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
-        }
+        clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
+        clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
         clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
+        clkDateClock.setFormat24Hour(mPreferences.getDateFormat());
 
         return view;
     }
@@ -154,7 +151,7 @@ public class WeatherFragment extends Fragment {
         if (mWeatherCache == null) {
             startWeatherUpdate();
         } else {
-            renderWeather();
+            renderWeather(mWeatherCache.getData());
             if (mWeatherCache.isExpired()) {
                 Log.i(Constants.TAG, "WeatherCache expired. Refreshing..." );
                 startWeatherUpdate();
@@ -249,7 +246,7 @@ public class WeatherFragment extends Fragment {
                         public void run(){
                             Log.i(Constants.TAG, "New weather data downloaded");
                             updateWeatherCache(json);
-                            renderWeather();
+                            renderWeather(json);
                         }
                     });
                 }
@@ -258,12 +255,11 @@ public class WeatherFragment extends Fragment {
     }
 
     private void updateWeatherCache(JSONObject data){
-        mWeatherCache = new JSONDataCache(data, DATA_UPDATE_FREQUENCY);
+        mWeatherCache = new DataCache<>(data, DATA_UPDATE_FREQUENCY);
     }
 
-    private void renderWeather(){
+    private void renderWeather(JSONObject json){
         try {
-            JSONObject json = mWeatherCache.getData();
             // hourlyArray holds the next 24 hours of forecasts. Get index 0 for current temp data.
             JSONObject hourly = json.getJSONObject("hourly");
             JSONArray hourlyArray = hourly.getJSONArray("data");
@@ -322,8 +318,8 @@ public class WeatherFragment extends Fragment {
 
             // ----------------- 2-Hour forecasts -------------
             for (int i = 1; i <= 6; i++) {
-                String template = "forecast_" + i;
-                int layoutId = getContext().getResources().getIdentifier(template, "id" ,
+                String resourceName = "forecast_" + i;
+                int layoutId = getContext().getResources().getIdentifier(resourceName, "id" ,
                         getActivity().getPackageName() );
                 LinearLayout forecastLayout = (LinearLayout) getActivity().findViewById(layoutId);
                 JSONObject forecast = hourlyArray.getJSONObject(i*2);

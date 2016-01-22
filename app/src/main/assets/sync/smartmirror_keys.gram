@@ -11,8 +11,8 @@ gallery /1e-2/
 go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
-hide /1e-4/
-help /1e-4/
+hide /1e-1/
+help /1e1/
 log me in /1e-3/
 makeup /1e7/
 menu /1e4/
@@ -24,12 +24,13 @@ refresh /1e-4/
 settings /1e-4/
 scroll up /1e10/
 scroll down /1e10/
-sleep /1e15/
+sleep /1e12/
 start listening /1e-1/
 stop listening /1e-1/
 take a picture /1e-15/
 traffic /1e1/
 twitter /1e1/
+wake /1e3/
 wake up /1e-3/
 weather /1e5/
 weather english /1e2/

@@ -120,7 +120,7 @@ public class Preferences implements LocationListener {
 
     public static final String OFF = "off";
     public static final String ON = "on";
-    public static final String ENGLISH = "imperial";
+    public static final String ENGLISH = "english";
     public static final String METRIC = "metric";
 
     public static final String MPH = "mph";
@@ -418,11 +418,16 @@ public class Preferences implements LocationListener {
 
     /** Sets weather display as english or metric
      *
-     * @param unit Units to display ( 1=English / 0=Metric)
+     * @param unit Units to display
      */
     public void setWeatherUnits(String unit) {
-        if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
+        if (unit.equals(mWeatherUnits))
+            return;
+        else if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
             mWeatherUnits = unit;
+            // (1/12/16) invalid the cache stored in WeatherFragment. Don't like this as it's too tightly coupled.
+            if (WeatherFragment.mWeatherCache != null)
+                WeatherFragment.mWeatherCache.invalidate();
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putString(PREFS_WEATHER_UNIT, mWeatherUnits);
             edit.apply();
@@ -508,10 +513,10 @@ public class Preferences implements LocationListener {
     }
 
     public String getShortTimeFormat() {
-        return (timeFormatIs12hr()) ? TIME_FORMAT_12_HR_SHORT : TIME_FORMAT_24_HR_SHORT;
+        return (isTimeFormat12hr()) ? TIME_FORMAT_12_HR_SHORT : TIME_FORMAT_24_HR_SHORT;
     }
 
-    public boolean timeFormatIs12hr() {
+    public boolean isTimeFormat12hr() {
         return mTimeFormat.equals(TIME_FORMAT_12_HR);
     }
 

@@ -1,6 +1,13 @@
 package org.main.smartmirror.smartmirror;
 
 
+import android.net.Uri;
+
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URL;
+
 public class Constants {
 
     //--------------CONSTANTS--------------
@@ -29,9 +36,12 @@ public class Constants {
     public static final String SLEEP = "sleep";
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
+    public static final String NEWS_BODY = "news body";
+    //public static final String SHOW_HELP = "show help";
     public static final String TRAFFIC = "traffic";
     public static final String NIGHT_LIGHT = "night light";
     public static final String LIGHT = "light";
+    public static final String LIGHT_SLEEP = "light sleep"; // Not a voice command - only used to track current fragment
 
     //--------------HELP--------------
     public static final String HELP = "help";
@@ -54,6 +64,7 @@ public class Constants {
     public static String mUser[] = new String[100];
     public static String mStatus[] = new String[100];
     public static String mUserAt[] = new String[100];
+    public static Uri mUrl[] = new Uri[100]; // profile image url
     public static final String mLogin= "log me in";
     public static final String mGet= "get";
     public static final String mRefresh= "refresh";
@@ -62,4 +73,32 @@ public class Constants {
     public static final String SCROLLUP="scroll up";
     public static final String SCROLLDOWN="scroll down";
 
+    //--------------NEWS--------------
+    public static String mArticleFullBody = "";
+    public static int numItems = 10;
+    public static String article[] = new String[numItems];
+    public static String hl[] = new String[numItems];
+    public static String snippets[] = new String[numItems];
+    public static String thumbs[] = new String[numItems];
+    public static String thumbnail = "";
+    public static String body = "";
+    public static String trailText = "";
+    public static String webTitle = "";
+    public static String mHeadline = "";
+    public static final String ONE = "one";
+    public static final String FIRST = "first";
+    public static final String TWO = "two";
+    public static final String SECOND = "second";
+    public static final String THREE = "three";
+    public static final String THIRD = "third";
+    public static final String FOUR = "four";
+    public static final String FOURTH = "fourth";
+    public static final String FIVE = "five";
+    public static final String FIFTH = "fifth";
+    public static final String SIX = "six";
+    public static final String SIXTH = "sixth";
+    public static final String SEVEN = "seven";
+    public static final String SEVENTH = "seventh";
+    public static final String EIGHT = "eight";
+    public static final String EIGHTH = "eighth";
 }
