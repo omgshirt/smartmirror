@@ -224,6 +224,13 @@ public class TwitterFragment extends Fragment {
             Thread.currentThread().interrupt();
         }
 
+        /* do this once you build txtListTweets
+        for (int i=0; i <= 10; i++) {
+            String txt = "<b>" + Constants.mUser[i] + "</b> " + "<br>" + Constants.mStatus[i] + "<br>";
+            txtListTweets.get(i).setText(Html.fromHtml(txt));
+        }
+        */
+
         String txt0 = "<b>" + Constants.mUser[0] + "</b> " + "<br>" + Constants.mStatus[0] + "<br>";
         mStatus1.setText(Html.fromHtml(txt0));
         Picasso.with(getContext()).load(Constants.mUrl[0]).fit().centerInside().into(mPP1);

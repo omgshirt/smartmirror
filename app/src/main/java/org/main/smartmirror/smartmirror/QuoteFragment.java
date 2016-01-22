@@ -23,7 +23,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,17 +41,18 @@ public class QuoteFragment extends Fragment {
     private TimerTask mTimerTask;
     private Typeface mQuoteFont;
 
+    // mAvailableQuotes holds quotes that have yet to be shown. Once all are used, list is refreshed.
+    private int nextQuote = 0;
     private ArrayList<Integer> mAvailableQuotes;
-    private final int fadeInTime = 2500;
-    private final int fadeOutTime = 2500;
-    private final int quoteDisplayLength = 10000;
+    private final int fadeInTime = 3000;
+    private final int fadeOutTime = 3000;
+    private final int quoteDisplayLength = 30000;
     private final int totalDisplayTime = fadeInTime + quoteDisplayLength + fadeOutTime;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //instantiate the timer object
         mTimer = new Timer();
         // Loading Font Face
         mQuoteFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/DancingScript-Regular.otf");
@@ -75,27 +76,21 @@ public class QuoteFragment extends Fragment {
         // Get the quotes as an array list
         // mQuoteList = new ArrayList<>(Arrays.asList(getQuotes()));
         setUpQuotes();
-        initializeAvailableQuotes();
+        refreshAvailableQuotes();
 
         // Set the runnable
         mRunnable = new Runnable() {
             @Override
             public void run() {
                 // Set the Random quote in the Text View
-                int index = getRandomQuote();
-                txtQuoteContent.setText(mQuoteList.get(index));
-                txtQuoteAuthor.setText(mQuoteAuthor.get(index));
+                int randomQuote = mAvailableQuotes.get(nextQuote);
+                txtQuoteContent.setText(mQuoteList.get(randomQuote));
+                txtQuoteAuthor.setText(mQuoteAuthor.get(randomQuote));
                 // Start the animation
                 txtQuoteAuthor.startAnimation(animation);
                 txtQuoteContent.startAnimation(animation);
-            }
-        };
 
-        // Set the timer task
-        mTimerTask  = new TimerTask() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(mRunnable);
+                nextQuote = (++nextQuote) % mQuoteList.size();
             }
         };
     }
@@ -103,13 +98,20 @@ public class QuoteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.quotes_fragment, container, false);
+
+        mTimerTask  = new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(mRunnable);
+            }
+        };
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
+
         // Set-up the text views
         txtQuoteAuthor = (TextView) view.findViewById(R.id.quote_author);
         txtQuoteContent = (TextView) view.findViewById(R.id.quote_content);
         // Apply the font
         txtQuoteContent.setTypeface(mQuoteFont);
-        // Start the timer
-        mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
         return view;
     }
 
@@ -158,28 +160,13 @@ public class QuoteFragment extends Fragment {
         }
     }
 
-    public void initializeAvailableQuotes() {
-        mAvailableQuotes = new ArrayList<>();
-        refreshAvailableQuotes();
-    }
-
+    // randomize quote order
     private void refreshAvailableQuotes() {
+        mAvailableQuotes = new ArrayList<>();
         for (int i = 0; i < mQuoteList.size(); i++) {
             mAvailableQuotes.add(i);
         }
-    }
-
-    /**
-     * Method that handles the picking a random quote based on
-     * a given number
-     */
-    public int getRandomQuote(){
-        Random rand = new Random();
-        if (mAvailableQuotes.isEmpty()) refreshAvailableQuotes();
-        int index = rand.nextInt(mAvailableQuotes.size());
-        int quote = mAvailableQuotes.get(index);
-        mAvailableQuotes.remove(index);
-        return quote;
+        Collections.shuffle(mAvailableQuotes);
     }
 
     // ----------------------- Local Broadcast Receiver -----------------------
@@ -212,16 +199,15 @@ public class QuoteFragment extends Fragment {
     }
 
     @Override
-    // when this goes out of view, halt listening
     public void onPause() {
         super.onPause();
+        mTimerTask.cancel();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // kill the timer
-        mTimer.cancel();
+        mTimerTask.cancel();
     }
 }

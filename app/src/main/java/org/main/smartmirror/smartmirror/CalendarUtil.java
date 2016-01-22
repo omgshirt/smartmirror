@@ -39,6 +39,10 @@ public class CalendarUtil extends Activity {
         //Day, Month, Year, Hour, Minute formatting
         ArrayList nameOfEvent = new ArrayList();
         Calendar beginTime = Calendar.getInstance();
+
+        // Is this necessary? beginTime is already set to current time on construction...
+
+        /*
         DateFormat sdfy = new SimpleDateFormat("yyyy");
         int year = Integer.valueOf(sdfy.format(beginTime.getTime()));
         DateFormat sdfm = new SimpleDateFormat("MM");
@@ -49,8 +53,9 @@ public class CalendarUtil extends Activity {
         int hour = Integer.valueOf(sdfhr.format(beginTime.getTime()));
         DateFormat sdfmin = new SimpleDateFormat("mm");
         int min = Integer.valueOf(sdfmin.format(beginTime.getTime()));
-
         beginTime.set(year, month, day, hour, min);
+        */
+
         long startMillis = beginTime.getTimeInMillis();
         long endMillis = startMillis + 36000000 ;
         Cursor cursor = null;
