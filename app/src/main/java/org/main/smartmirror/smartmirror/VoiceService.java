@@ -84,7 +84,6 @@ public class VoiceService extends Service implements RecognitionListener{
     public void startVoice(){
         if(mSpeechInitialized) {
             Log.i("VR", "startVoice()");
-            speechIcon(SHOW_ICON);
             mSpeechRecognizer.startListening(KEYWORD_SEARCH);
         }
     }
@@ -95,29 +94,8 @@ public class VoiceService extends Service implements RecognitionListener{
 
     public void stopVoice(){
         if (mSpeechInitialized) {
-            speechIcon(HIDE_ICON);
             mSpeechRecognizer.stop();
         }
-    }
-
-    /**
-     * Handles the displaying of the speech icon
-     * @param flag determines whether to show icon or not
-     */
-
-    public void speechIcon(int flag){
-        Message msg = null;
-
-        switch(flag){
-            case SHOW_ICON:
-                msg = Message.obtain(null, SHOW_ICON);
-                break;
-            case HIDE_ICON:
-                msg = Message.obtain(null, HIDE_ICON);
-                break;
-        }
-        // send the message
-        sendMessage(msg);
     }
 
     /**

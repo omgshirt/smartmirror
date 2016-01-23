@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    // handles the messages from Service to this Activity
+    // handles the messages from VoiceService to this Activity
     public class IHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
@@ -140,12 +140,6 @@ public class MainActivity extends AppCompatActivity
                 case VoiceService.RESULT_SPEECH:
                     String result = msg.getData().getString("result");
                     handleVoiceCommand(result);
-                    break;
-                case VoiceService.SHOW_ICON:
-                    showSpeechIcon(true);
-                    break;
-                case VoiceService.HIDE_ICON:
-                    showSpeechIcon(false);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -187,6 +181,9 @@ public class MainActivity extends AppCompatActivity
         // speech icon turn it off for now
         mSpeechIcon = (ImageView)findViewById(R.id.speech_icon);
         mSpeechIcon.setVisibility(View.INVISIBLE);
+        if (mPreferences.isVoiceEnabled()) {
+            mSpeechIcon.setVisibility(View.VISIBLE);
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -397,7 +394,7 @@ public class MainActivity extends AppCompatActivity
     protected void startUITimer() {
         stopUITimer();
         mUITimer = new Timer();
-        Log.i(Constants.TAG, "Starting UI timer. " + UI_TIMEOUT_DELAY + " ms" );
+        Log.i(Constants.TAG, "UI timer start. " + UI_TIMEOUT_DELAY + " ms" );
         mUITimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -608,7 +605,7 @@ public class MainActivity extends AppCompatActivity
             playSound(R.raw.celeste_a);
             //startTTS(command);
             mCurrentFragment = command;
-            Log.i(Constants.TAG, "mCurrentFragment " + mCurrentFragment);
+            //Log.i(Constants.TAG, "mCurrentFragment " + mCurrentFragment);
             displayFragment(fragment);
         }
     }
@@ -630,7 +627,7 @@ public class MainActivity extends AppCompatActivity
     public void showSpeechIcon(boolean flag){
         if(flag) {
             mSpeechIcon.setVisibility(View.VISIBLE);
-        } else {
+        } else if (mSpeechIcon.getVisibility() == View.VISIBLE) {
             mSpeechIcon.setVisibility(View.INVISIBLE);
         }
     }
@@ -652,7 +649,6 @@ public class MainActivity extends AppCompatActivity
 
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
-            showSpeechIcon(false);
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
                 broadcastMessage("inputAction", voiceInput);
             }
@@ -743,12 +739,14 @@ public class MainActivity extends AppCompatActivity
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
+        Log.i(Constants.TAG, "startSpeechRecognition()");
         if(mTTSHelper.isSpeaking() || mService == null) return;
         try {
             //Log.i("VR", "startSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.START_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
+            showSpeechIcon(mPreferences.isVoiceEnabled());
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -758,12 +756,13 @@ public class MainActivity extends AppCompatActivity
      * Stops the current speech recognition object
      */
     public void stopSpeechRecognition(){
-        Log.i("VR", "stopSpeechRecognition()");
+        Log.i(Constants.TAG, "stopSpeechRecognition()");
         if (mService == null) return;
         try {
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
+            showSpeechIcon(false);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -801,7 +800,6 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
-                    //Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

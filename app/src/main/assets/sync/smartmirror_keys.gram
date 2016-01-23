@@ -34,7 +34,7 @@ scroll up /1e6/
 scroll down /1e6/
 sleep /1e12/
 start listening /1e-6/
-stop listening /1e-6/
+stop listening /1e-8/
 take a picture /1e-15/
 time/1e8/
 show time/1e-3/

@@ -648,6 +648,7 @@ public class Preferences implements LocationListener {
      */
     public void setVoiceEnabled(boolean voiceEnabled) {
         this.mVoiceEnabled = voiceEnabled;
+        ((MainActivity)mActivity).showSpeechIcon(voiceEnabled);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
         edit.apply();
