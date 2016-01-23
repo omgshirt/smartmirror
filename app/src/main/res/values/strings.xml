@@ -105,4 +105,7 @@
     <!-- Camera String -->
     <string name="camera_disabled_toast">Camera Disabled. Say \'Enable Camera\' to change this setting.</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

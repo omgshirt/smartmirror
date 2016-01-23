@@ -3,11 +3,6 @@ package org.main.smartmirror.smartmirror;
 
 import android.net.Uri;
 
-import org.json.JSONObject;
-
-import java.net.URI;
-import java.net.URL;
-
 public class Constants {
 
     //--------------CONSTANTS--------------
@@ -39,6 +34,7 @@ public class Constants {
     public static final String NEWS_BODY = "news body";
     //public static final String SHOW_HELP = "show help";
     public static final String TRAFFIC = "traffic";
+    public static final String TIME = "time";
     public static final String NIGHT_LIGHT = "night light";
     public static final String LIGHT = "light";
     public static final String LIGHT_SLEEP = "light sleep"; // Not a voice command - only used to track current fragment
@@ -52,6 +48,10 @@ public class Constants {
             "http://api.openweathermap.org/data/2.5/weather?id=%s&units=%s";
     public static final String CONDITIONS = "conditions";
     public static final String FORECAST = "forecast";
+    public static final String SHOW_WEATHER = "show weather";
+    public static final String HIDE_WEATHER = "hide weather";
+    public static final String SHOW_TIME = "show time";
+    public static final String HIDE_TIME = "hide time";
 
     //--------------CAMERA--------------
     public static final String TAKE_PICTURE="take a picture";

@@ -1,123 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:padding="15dp"
-	android:orientation="vertical"
-	tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
-	<!-- Weather Alerts -->
-	<TextView
-		android:id="@+id/weather_alert_heading"
-		android:visibility="gone"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center"
-		android:text="@string/weather_alert_heading"
-		android:textColor="#FF0000"/>
-	<TextView
-		android:id="@+id/alert_text"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center"
-		android:singleLine="true"
-		android:scrollHorizontally="true"
-		android:marqueeRepeatLimit="marquee_forever"
-		android:ellipsize="marquee"
-		android:textColor="#FF0000"/>
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
+    <!-- Date and time -->
+    <LinearLayout
+        android:id="@+id/layout_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-	<!-- Date and time -->
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal">
+        <TextClock
+            android:id="@+id/time_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30sp" />
 
-		<TextClock
-			android:id="@+id/time_clock"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textSize="30sp"
-			/>
+        <TextClock
+            android:id="@+id/date_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textSize="26sp" />
+    </LinearLayout>
+    <!-- WeatherLayout: Current weather and hourly forecasts -->
+    <LinearLayout
+        android:id="@+id/layout_weather"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-		<TextClock
-			android:id="@+id/date_clock"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="10dp"
-			android:textSize="26sp"
-			/>
-	</LinearLayout>
-	<!-- Current weather, temp and humidity-->
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal">
-		<TextView
-			android:id="@+id/weather_icon"
-			android:textSize="30sp"
-			android:layout_marginRight="10dp"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-		<!-- current temp -->
-		<TextView
-			android:id="@+id/current_temp"
-			android:textSize="30sp"
-			android:layout_marginRight="10dp"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
+        <!-- Current weather, temp and humidity-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-		<LinearLayout
-			android:layout_width="wrap_content"
-			android:layout_height="match_parent"
-			android:layout_marginStart="10dp"
-			android:layout_gravity="center_vertical"
-			android:orientation="vertical">
-            <!-- current humidity -->
-				<TextView
-					android:id="@+id/current_humidity"
-					android:textSize="15sp"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content" />
-            <!-- current wind -->
-				<TextView
-					android:id="@+id/current_wind"
-					android:textSize="15sp"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content" />
-		</LinearLayout>
-		<LinearLayout
-			android:layout_width="wrap_content"
-			android:layout_height="match_parent"
-			android:layout_marginStart="20dp"
-			android:layout_gravity="center_vertical"
-			android:orientation="vertical">
-			<!-- daily high -->
-			<TextView
-				android:id="@+id/daily_high"
-				android:textSize="15sp"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/weather_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:textSize="30sp" />
+            <!-- current temp -->
+            <TextView
+                android:id="@+id/current_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:textSize="30sp" />
 
-			<!-- daily low -->
-			<TextView
-				android:id="@+id/daily_low"
-				android:textSize="15sp"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-		</LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:orientation="vertical">
+                <!-- current humidity -->
+                <TextView
+                    android:id="@+id/current_humidity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Humidity"
+                    android:textSize="15sp" />
+                <!-- current wind -->
+                <TextView
+                    android:id="@+id/current_wind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wind"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
-	</LinearLayout>
-	<!-- weather forecast for upcoming hours // removed for now -->
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal">
-		<include android:id="@+id/forecast_1" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_2" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_3" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_4" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_5" layout="@layout/weather_hourly_forecast"/>
-		<include android:id="@+id/forecast_6" layout="@layout/weather_hourly_forecast"/>
-	</LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:orientation="vertical">
+                <!-- daily high -->
+                <TextView
+                    android:id="@+id/daily_high"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp" />
 
+                <!-- daily low -->
+                <TextView
+                    android:id="@+id/daily_low"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+        <!-- weather forecast -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <include
+                android:id="@+id/forecast_1"
+                layout="@layout/weather_hourly_forecast" />
+
+            <include
+                android:id="@+id/forecast_2"
+                layout="@layout/weather_hourly_forecast" />
+
+            <include
+                android:id="@+id/forecast_3"
+                layout="@layout/weather_hourly_forecast" />
+
+            <include
+                android:id="@+id/forecast_4"
+                layout="@layout/weather_hourly_forecast" />
+
+            <include
+                android:id="@+id/forecast_5"
+                layout="@layout/weather_hourly_forecast" />
+
+            <include
+                android:id="@+id/forecast_6"
+                layout="@layout/weather_hourly_forecast" />
+        </LinearLayout>
+
+        <!-- Weather Alerts -->
+        <TextView
+            android:id="@+id/alert_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textColor="#DD0000" />
+    </LinearLayout>
 </LinearLayout>
