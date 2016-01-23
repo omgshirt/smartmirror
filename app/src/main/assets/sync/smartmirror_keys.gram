@@ -41,7 +41,6 @@ screen brightness medium /1e-5/
 screen brightness high /1e-5/
 screen brightness very high /1e-5/
 sports /1e10/
-foreign /1e5/
 technology /1e-3/
 business /1e5/
 cars /1e10/
@@ -53,3 +52,11 @@ politics /1e-1/
 science /1e3/
 television /1e-3/
 world /1e14/
+first /1e6/
+second /1e4/
+third /1e6/
+fourth /1e14/
+fifth /1e2/
+sixth /1e2/
+seventh /1e2/
+eighth /1e2/
