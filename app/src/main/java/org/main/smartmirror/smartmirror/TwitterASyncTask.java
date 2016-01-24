@@ -30,8 +30,8 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     cb.setOAuthAccessToken(Constants.TWITTER_ACCESS_TOKEN);
                     cb.setOAuthAccessTokenSecret(Constants.TWITTER_ACCESS_SECRET);
                     cb.setJSONStoreEnabled(true);
-                    //.setOAuthAccessToken(TwitterAct.mAuthToken)
-                    //.setOAuthAccessTokenSecret(TwitterAct.mAuthToken);
+                    //.setOAuthAccessToken(TwitterActivity.mAuthToken)
+                    //.setOAuthAccessTokenSecret(TwitterActivity.mAuthToken);
 
 
             AccessToken accessToken = new AccessToken(Constants.TWITTER_ACCESS_TOKEN, Constants.TWITTER_ACCESS_SECRET);

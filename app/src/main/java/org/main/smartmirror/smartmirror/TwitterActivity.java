@@ -17,7 +17,7 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import io.fabric.sdk.android.Fabric;
 
 
-public class TwitterAct extends Activity{
+public class TwitterActivity extends Activity{
 
     private TwitterLoginButton mTwitterLoginButton;
     private TextView mStatus;

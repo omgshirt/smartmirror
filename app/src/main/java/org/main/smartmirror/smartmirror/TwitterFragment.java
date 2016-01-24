@@ -211,7 +211,7 @@ public class TwitterFragment extends Fragment {
 
     //to twitter login activity
     public void twitterLogin() {
-        Intent intent = new Intent(getContext(), TwitterAct.class);
+        Intent intent = new Intent(getContext(), TwitterActivity.class);
         startActivity(intent);
     }
 
