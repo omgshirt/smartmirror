@@ -27,8 +27,6 @@ public class NewsFragment extends Fragment{
     // the guardian api
     public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
             "all&order-by=newest&q=world&api-key=";
-    /*public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
-            "thumbnail&order-by=newest&q=sports&api-key=";*/
     public static String mNewsSection = "world";
     public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&q=";
     public static String mPostURL = "&api-key=";
@@ -56,6 +54,18 @@ public class NewsFragment extends Fragment{
     private ImageView img6;
     private ImageView img7;
     private ImageView img8;
+
+    public static String mArticleFullBody = "";
+    public static int numItems = 10;
+    public static String article[] = new String[numItems];
+    public static String hl[] = new String[numItems];
+    public static String snippets[] = new String[numItems];
+    public static String thumbs[] = new String[numItems];
+    public static String thumbnail = "";
+    public static String body = "";
+    public static String trailText = "";
+    public static String webTitle = "";
+    public static String mHeadline = "";
 
 
     Handler mHandler = new Handler();
@@ -100,8 +110,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Constants.mArticleFullBody = Constants.article[0];
-                Constants.mHeadline = Constants.hl[0];
+                mArticleFullBody = article[0];
+                mHeadline = hl[0];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -113,8 +123,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Constants.mArticleFullBody = Constants.article[1];
-                Constants.mHeadline = Constants.hl[1];
+                mArticleFullBody = article[1];
+                mHeadline = hl[1];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -126,8 +136,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Constants.mArticleFullBody = Constants.article[2];
-                Constants.mHeadline = Constants.hl[2];
+                mArticleFullBody = article[2];
+                mHeadline = hl[2];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -139,8 +149,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Constants.mArticleFullBody = Constants.article[3];
-                Constants.mHeadline = Constants.hl[3];
+                mArticleFullBody = article[3];
+                mHeadline = hl[3];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -152,8 +162,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Constants.mArticleFullBody = Constants.article[4];
-                Constants.mHeadline = Constants.hl[4];
+                mArticleFullBody = article[4];
+                mHeadline = hl[4];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -165,8 +175,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Constants.mArticleFullBody = Constants.article[5];
-                Constants.mHeadline = Constants.hl[5];
+                mArticleFullBody = article[5];
+                mHeadline = hl[5];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -178,8 +188,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Constants.mArticleFullBody = Constants.article[6];
-                Constants.mHeadline = Constants.hl[6];
+                mArticleFullBody = article[6];
+                mHeadline = hl[6];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -191,8 +201,8 @@ public class NewsFragment extends Fragment{
         mTxtHeadline8.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Constants.mArticleFullBody = Constants.article[7];
-                Constants.mHeadline = Constants.hl[7];
+                mArticleFullBody = article[7];
+                mHeadline = hl[7];
                 clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
@@ -248,8 +258,8 @@ public class NewsFragment extends Fragment{
                     break;
                 case Constants.ONE:
                 case Constants.FIRST:
-                    Constants.mArticleFullBody = Constants.article[0];
-                    Constants.mHeadline = Constants.hl[0];
+                    mArticleFullBody = article[0];
+                    mHeadline = hl[0];
                     clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
@@ -259,8 +269,8 @@ public class NewsFragment extends Fragment{
                     break;
                 case Constants.TWO:
                 case Constants.SECOND:
-                    Constants.mArticleFullBody = Constants.article[1];
-                    Constants.mHeadline = Constants.hl[1];
+                    mArticleFullBody = article[1];
+                    mHeadline = hl[1];
                     clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
@@ -270,8 +280,8 @@ public class NewsFragment extends Fragment{
                     break;
                 case Constants.THREE:
                 case Constants.THIRD:
-                    Constants.mArticleFullBody = Constants.article[2];
-                    Constants.mHeadline = Constants.hl[2];
+                    mArticleFullBody = article[2];
+                    mHeadline = hl[2];
                     clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
@@ -281,8 +291,8 @@ public class NewsFragment extends Fragment{
                     break;
                 case Constants.FOUR:
                 case Constants.FOURTH:
-                    Constants.mArticleFullBody = Constants.article[3];
-                    Constants.mHeadline = Constants.hl[3];
+                    mArticleFullBody = article[3];
+                    mHeadline = hl[3];
                     clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
@@ -292,8 +302,8 @@ public class NewsFragment extends Fragment{
                     break;
                 case Constants.FIVE:
                 case Constants.FIFTH:
-                    Constants.mArticleFullBody = Constants.article[4];
-                    Constants.mHeadline = Constants.hl[4];
+                    mArticleFullBody = article[4];
+                    mHeadline = hl[4];
                     clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
@@ -303,8 +313,8 @@ public class NewsFragment extends Fragment{
                     break;
                 case Constants.SIX:
                 case Constants.SIXTH:
-                    Constants.mArticleFullBody = Constants.article[5];
-                    Constants.mHeadline = Constants.hl[5];
+                    mArticleFullBody = article[5];
+                    mHeadline = hl[5];
                     clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
@@ -314,8 +324,8 @@ public class NewsFragment extends Fragment{
                     break;
                 case Constants.SEVEN:
                 case Constants.SEVENTH:
-                    Constants.mArticleFullBody = Constants.article[6];
-                    Constants.mHeadline = Constants.hl[6];
+                    mArticleFullBody = article[6];
+                    mHeadline = hl[6];
                     clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
@@ -325,8 +335,8 @@ public class NewsFragment extends Fragment{
                     break;
                 case Constants.EIGHT:
                 case Constants.EIGHTH:
-                    Constants.mArticleFullBody = Constants.article[7];
-                    Constants.mHeadline = Constants.hl[7];
+                    mArticleFullBody = article[7];
+                    mHeadline = hl[7];
                     clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
@@ -436,58 +446,58 @@ public class NewsFragment extends Fragment{
 
             int i = 0;
 
-            while (i < Constants.numItems) {
+            while (i < numItems) {
                 response = json.getJSONObject("response");
                 results = response.getJSONArray("results").getJSONObject(i);
-                Constants.webTitle = results.getString("webTitle");
-                Constants.hl[i] = Constants.webTitle;
+                webTitle = results.getString("webTitle");
+                hl[i] = webTitle;
                 fields = results.getJSONObject("fields");
-                Constants.body = fields.getString("body");
-                Constants.article[i] = Constants.body;
-                Constants.trailText = fields.getString("trailText");
-                Constants.snippets[i] = Constants.trailText;
+                body = fields.getString("body");
+                article[i] = body;
+                trailText = fields.getString("trailText");
+                snippets[i] = trailText;
                 try {
-                    Constants.thumbnail = fields.getString("thumbnail");
-                    Constants.thumbs[i] = Constants.thumbnail;
+                    thumbnail = fields.getString("thumbnail");
+                    thumbs[i] = thumbnail;
                 }
                 catch (Exception e) {
-                    Constants.thumbs[i] = "@drawable/guardian";
+                    thumbs[i] = "@drawable/guardian";
                 }
                 i++;
             }
 
 
-            String txt0 = "<b>" + Constants.hl[0] + "</b> " + "<br>" + Constants.snippets[0] + "<br>";
+            String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + snippets[0] + "<br>";
             mTxtHeadline.setText(Html.fromHtml(txt0));
-            Picasso.with(getContext()).load(Constants.thumbs[0]).fit().centerInside().into(img1);
+            Picasso.with(getContext()).load(thumbs[0]).fit().centerInside().into(img1);
 
-            String txt1 = "<b>" + Constants.hl[1] + "</b> " + "<br>" + Constants.snippets[1] + "<br>";
+            String txt1 = "<b>" + hl[1] + "</b> " + "<br>" + snippets[1] + "<br>";
             mTxtHeadline2.setText(Html.fromHtml(txt1));
-            Picasso.with(getContext()).load(Constants.thumbs[1]).fit().centerInside().into(img2);
+            Picasso.with(getContext()).load(thumbs[1]).fit().centerInside().into(img2);
 
-            String txt2 = "<b>" + Constants.hl[2] + "</b> " + "<br>" + Constants.snippets[2] + "<br>";
+            String txt2 = "<b>" + hl[2] + "</b> " + "<br>" + snippets[2] + "<br>";
             mTxtHeadline3.setText(Html.fromHtml(txt2));
-            Picasso.with(getContext()).load(Constants.thumbs[2]).fit().centerInside().into(img3);
+            Picasso.with(getContext()).load(thumbs[2]).fit().centerInside().into(img3);
 
-            String txt3 = "<b>" + Constants.hl[3] + "</b> " + "<br>" + Constants.snippets[3] + "<br>";
+            String txt3 = "<b>" + hl[3] + "</b> " + "<br>" + snippets[3] + "<br>";
             mTxtHeadline4.setText(Html.fromHtml(txt3));
-            Picasso.with(getContext()).load(Constants.thumbs[3]).fit().centerInside().into(img4);
+            Picasso.with(getContext()).load(thumbs[3]).fit().centerInside().into(img4);
 
-            String txt4 = "<b>" + Constants.hl[4] + "</b> " + "<br>" + Constants.snippets[4] + "<br>";
+            String txt4 = "<b>" + hl[4] + "</b> " + "<br>" + snippets[4] + "<br>";
             mTxtHeadline5.setText(Html.fromHtml(txt4));
-            Picasso.with(getContext()).load(Constants.thumbs[4]).fit().centerInside().into(img5);
+            Picasso.with(getContext()).load(thumbs[4]).fit().centerInside().into(img5);
 
-            String txt5 = "<b>" + Constants.hl[5] + "</b> " + "<br>" + Constants.snippets[5] + "<br>";
+            String txt5 = "<b>" + hl[5] + "</b> " + "<br>" + snippets[5] + "<br>";
             mTxtHeadline6.setText(Html.fromHtml(txt5));
-            Picasso.with(getContext()).load(Constants.thumbs[5]).fit().centerInside().into(img6);
+            Picasso.with(getContext()).load(thumbs[5]).fit().centerInside().into(img6);
 
-            String txt6 = "<b>" + Constants.hl[6] + "</b> " + "<br>" + Constants.snippets[6] + "<br>";
+            String txt6 = "<b>" + hl[6] + "</b> " + "<br>" + snippets[6] + "<br>";
             mTxtHeadline7.setText(Html.fromHtml(txt6));
-            Picasso.with(getContext()).load(Constants.thumbs[6]).fit().centerInside().into(img7);
+            Picasso.with(getContext()).load(thumbs[6]).fit().centerInside().into(img7);
 
-            String txt7 = "<b>" + Constants.hl[7] + "</b> " + "<br>" + Constants.snippets[7] + "<br>";
+            String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + snippets[7] + "<br>";
             mTxtHeadline8.setText(Html.fromHtml(txt7));
-            Picasso.with(getContext()).load(Constants.thumbs[7]).fit().centerInside().into(img8);
+            Picasso.with(getContext()).load(thumbs[7]).fit().centerInside().into(img8);
 
         }catch(Exception e){
             Log.e("NEWS ERROR", e.toString());

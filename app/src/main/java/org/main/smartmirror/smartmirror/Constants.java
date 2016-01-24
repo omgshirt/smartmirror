@@ -68,17 +68,6 @@ public class Constants {
     public static final String SCROLLDOWN="scroll down";
 
     //--------------NEWS--------------
-    public static String mArticleFullBody = "";
-    public static int numItems = 10;
-    public static String article[] = new String[numItems];
-    public static String hl[] = new String[numItems];
-    public static String snippets[] = new String[numItems];
-    public static String thumbs[] = new String[numItems];
-    public static String thumbnail = "";
-    public static String body = "";
-    public static String trailText = "";
-    public static String webTitle = "";
-    public static String mHeadline = "";
     public static final String ONE = "one";
     public static final String FIRST = "first";
     public static final String TWO = "two";
