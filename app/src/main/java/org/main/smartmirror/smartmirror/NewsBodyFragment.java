@@ -23,9 +23,9 @@ public class NewsBodyFragment extends Fragment {
 
         // Initialize Items
         mTxtBody = (TextView)view.findViewById(R.id.txtNewsBody);
-        mTxtBody.setText(Html.fromHtml(Constants.mArticleFullBody));
+        mTxtBody.setText(Html.fromHtml(NewsFragment.mArticleFullBody));
         mTxtHeadline = (TextView)view.findViewById(R.id.txtHeadline);
-        mTxtHeadline.setText(Constants.mHeadline);
+        mTxtHeadline.setText(NewsFragment.mHeadline);
         return view;
     }
 
