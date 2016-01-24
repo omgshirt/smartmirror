@@ -62,8 +62,8 @@ public class TwitterActivity extends Activity{
                 mAuthSecret = result.data.getAuthToken().secret;
                 Log.i("auth token ", mAuthToken);
                 Log.i("auth token ", mAuthSecret);
-                Constants.TWITTER_ACCESS_TOKEN = mAuthToken;
-                Constants.TWITTER_ACCESS_SECRET = mAuthSecret;
+                TwitterASyncTask.TWITTER_ACCESS_TOKEN = mAuthToken;
+                TwitterASyncTask.TWITTER_ACCESS_SECRET = mAuthSecret;
                 finish();
             }
 
