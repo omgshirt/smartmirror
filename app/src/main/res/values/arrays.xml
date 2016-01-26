@@ -74,7 +74,6 @@
         <item>\"Settings\"</item>
         <item>\"Twitter\"</item>
         <item>\"Weather\"</item>
-
     </string-array>
 
     <string-array name="General_help_array2">
@@ -91,8 +90,6 @@
         <item>SmartMirror Settings</item>
         <item>Twitter</item>
         <item>Current Weather</item>
-
-
     </string-array>
 
     <string-array name="news_settings">
@@ -105,6 +102,7 @@
         <item>Foreign</item>
         <item>Health</item>
     </string-array>
+
     <string-array name="news_settings2">
         <item>  </item>
         <item>Movies</item>
