@@ -33,6 +33,11 @@ public class Preferences implements LocationListener {
     private SharedPreferences mSharedPreferences;
     private Activity mActivity;
 
+    //Google Account Email Preference
+    //public static final String PREFS_GMAIL = "GMAIL_PREF_ACCOUNT";
+    //Google Account Email String
+    //private static String mUserAccountPref = null;
+
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
     public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
@@ -322,6 +327,9 @@ public class Preferences implements LocationListener {
         mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
         mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
+
+        //Gmail Account
+        //mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, mUserAccountPref);
 
         // Find current lat and long positions.
         // This is not currently saved to the prefs file, system will re-discover location on start
@@ -679,4 +687,24 @@ public class Preferences implements LocationListener {
     public void onProviderDisabled(String provider) {
 
     }
+
+    //Get User Gmail Account to be used in other fragments
+    //public static String getUserAccountPref(){return mUserAccountPref;}
+
+    //Set User Account if null
+//    public void setUserAccountPref(String userAcc) {
+//        if(userAcc == null){
+//            //Prompt user to pick account
+//            //... at some point userAcc = account selected by user
+//            userAcc = "smartmirrortesting@gmail.com";
+//            mUserAccountPref = userAcc;
+//            SharedPreferences.Editor edit = mSharedPreferences.edit();
+//            edit.putString(PREFS_GMAIL, mUserAccountPref);
+//            edit.apply();
+//        }
+////        else{
+////            mUserAccountPref = userAcc;
+////        }
+//    }
+
 }
