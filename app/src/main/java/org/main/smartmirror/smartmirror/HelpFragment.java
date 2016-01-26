@@ -30,7 +30,6 @@ public class HelpFragment extends DialogFragment {
         String name = getArguments().getString("name");
         Resources res = getResources();
 
-
         mAlertDialogBuilder = new AlertDialog.Builder(getActivity(),R.style.MyDialog);
         String title = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase() + " - Help";
         View vewHelp = inflater.inflate(R.layout.help_fragment,null);
@@ -53,6 +52,7 @@ public class HelpFragment extends DialogFragment {
                 txtCol2.setText(strColumn2);
                 break;
 
+            // settings
             case "settings":
                 arrayColumn1 = res.getStringArray(R.array.help_settings);
                 arrayColumn2 = res.getStringArray(R.array.help_settings2);
@@ -62,6 +62,7 @@ public class HelpFragment extends DialogFragment {
                 txtCol2.setText(strColumn2);
                 break;
 
+            // default help
             default:
                 arrayColumn1 = res.getStringArray(R.array.General_help_array);
                 arrayColumn2 = res.getStringArray(R.array.General_help_array2);
@@ -74,14 +75,9 @@ public class HelpFragment extends DialogFragment {
         return mAlertDialogBuilder.create();
     }
 
-    public void change_message(String s) {
-        mAlertDialogBuilder = new AlertDialog.Builder(getActivity());
-        mAlertDialogBuilder.setMessage(s);
-    }
-
     public String stringSpace(String[] string){
         String str = "";
-        for(int i = 0;i<string.length;i++){
+        for(int i = 0; i<string.length; i++){
             str += string[i]+"\n";
         }
         return str;

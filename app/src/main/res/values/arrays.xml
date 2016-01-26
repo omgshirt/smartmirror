@@ -10,24 +10,7 @@
         <item>media</item>
         <item>travel</item>
     </string-array>
-
-    <string-array name="nyt_news_desk">
-        <item>sports</item>
-        <item>foreign</item>
-        <item>technology</item>
-        <item>books</item>
-        <item>business</item>
-        <item>cars</item>
-        <item>education</item>
-        <item>food</item>
-        <item>health</item>
-        <item>movies</item>
-        <item>politics</item>
-        <item>science</item>
-        <item>television</item>
-        <item>world</item>
-    </string-array>
-
+    
     <string-array name="help_settings">
         <item>Mirror Brightness</item>
         <item>Night Light Brightness</item>
