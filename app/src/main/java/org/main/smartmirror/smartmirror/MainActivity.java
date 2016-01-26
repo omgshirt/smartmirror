@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         Log.i(Constants.TAG, "onPause");
-       // If the screen is not turning off, the app is going into the background: speech recognition is stopped.
+        // If the screen is not turning off, the app is going into the background: speech recognition is stopped.
         // This is (mostly) for debugging purposes as the finished program should always be in foreground.
         if (mPowerManager.isScreenOn()) {
             stopSpeechRecognition();
@@ -366,6 +366,7 @@ public class MainActivity extends AppCompatActivity
         mirrorSleepState = LIGHT_SLEEP;
     }
 
+	// Restores the screen off to the duration set when the application first ran.
     protected void setDefaultScreenOffTimeout() {
         // sanity check to prevent screen lockout from super-short screen timeout settings.
         if (defaultScreenTimeout < 1000) defaultScreenTimeout = 10000;
@@ -464,13 +465,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void hideHelpFragment() {
-        if (mHelpFragment != null) {
-            mHelpFragment.dismiss();
-            mHelpFragment = null;
-        }
-    }
-
     /**
      * Show a toast
      * @param text text to display
@@ -489,16 +483,16 @@ public class MainActivity extends AppCompatActivity
     public void wakeScreenAndDisplay(String command) {
         if (mirrorSleepState == AWAKE) {
             startUITimer();
-            handleCommand(command);
+            hideHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP ) {
                 exitSleep();
             } else {
-                exitLightSleep();
-                // change from LIGHT_SLEEP -> AWAKE. LIGHT_SLEEP only lasts ~10 seconds, so these cases
-                // are not very common.
+				// change from LIGHT_SLEEP -> AWAKE. LIGHT_SLEEP only lasts ~10 seconds, 
+                // so these cases are not common.
+                exitLightSleep();                
                 if (command.equals(Constants.LIGHT)) {
-                    handleCommand(command);
+                    hideHelpFragment(command);
                 } else {
                     // in LIGHT_SLEEP we're showing a black, empty fragment. Instead, display the last
                     // fragment shown before SleepFragment.
@@ -513,6 +507,45 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * "help" displays the helpFragment. All other commands dismiss it.
+     * @param command
+     */
+    public void hideHelpFragment(String command) {
+
+        if (command.equals(Constants.HELP) && mHelpFragment == null) {
+            mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
+            mHelpFragment.show(getFragmentManager(), "HelpFragment");
+        }
+
+        if (mHelpFragment != null) {
+            mHelpFragment.dismiss();
+            mHelpFragment = null;
+        }
+
+        closeMenuDrawer(command);
+    }
+
+    /**
+     * Close the MenuDrawer if it is open. Open it on "Drawer" command
+     * @param command command to be executed
+     */
+    public void closeMenuDrawer(String command) {
+        // 'menu' command toggles menu drawer open / close. Other commands will close the drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (command.equals(Constants.MENU) && !drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.openDrawer(GravityCompat.START);
+            return;
+        }
+
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+
+        handleCommand(command);
+    }
+
+
+    /**
      * Show a fragment or broadcast a command to listeners.
      * Do not call this method directly, instead use wakeScreenAndDisplay, which will make sure
      * the application is in the appropriate sleep state.
@@ -525,29 +558,14 @@ public class MainActivity extends AppCompatActivity
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         }
 
-        // All commands hide helpFragment if visible. Constants.HELP shows HelpFragment
-        if (command.equals(Constants.HELP) && mHelpFragment == null) {
-            mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
-            mHelpFragment.show(getFragmentManager(), "HelpFragment");
-        } else {
-            hideHelpFragment();
-        }
-
-        // 'menu' command toggles menu drawer open / close. Other commands will close the drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (command.equals(Constants.MENU) && !drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.openDrawer(GravityCompat.START);
-            return;
-        } else if (drawer.isDrawerOpen(GravityCompat.START)){
-            drawer.closeDrawer(GravityCompat.START);
-        }
-
-        // Create fragment
+        // Create fragment based on the command. If the input string is not a fragment,
+        // broadcast the command to all registered receivers for evaluation.
         switch (command) {
             case Constants.CALENDAR:
                 fragment = new CalendarFragment();
                 break;
             case Constants.CAMERA:
+                // TODO: can we handle this disabling within the CameraFragment instead?
                 if(mPreferences.isCameraEnabled()) {
                     fragment = new CameraFragment();
                 }
@@ -562,7 +580,6 @@ public class MainActivity extends AppCompatActivity
                 fragment = new GalleryFragment();
                 break;
             case Constants.GO_BACK:
-                Log.i(Constants.TAG, "popping back stack");
                 getSupportFragmentManager().popBackStack();
                 break;
             case Constants.NEWS:
@@ -595,8 +612,6 @@ public class MainActivity extends AppCompatActivity
                 fragment = new MakeupFragment();
                 break;
             default:
-                // The command isn't one of the view swap instructions,
-                // so broadcast the command (our input) to any listeners.
                 broadcastMessage("inputAction", command);
                 break;
         }
@@ -605,7 +620,6 @@ public class MainActivity extends AppCompatActivity
             playSound(R.raw.celeste_a);
             //startTTS(command);
             mCurrentFragment = command;
-            //Log.i(Constants.TAG, "mCurrentFragment " + mCurrentFragment);
             displayFragment(fragment);
         }
     }
