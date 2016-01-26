@@ -50,13 +50,6 @@ weather english/1e2/
 weather metric/1e2/
 white/1e-1/
 yellow/1e2/
-sports/1e10/
-technology/1e-3/
-business/1e5/
-cars/1e10/
-education/1e1/
-food/1e10/
-health/1e20/
 traffic /1e1/
 twitter /1e1/
 wake /1e3/
@@ -70,21 +63,12 @@ screen brightness medium /1e-5/
 screen brightness high /1e-5/
 screen brightness very high /1e-5/
 sports /1e10/
-technology /1e-3/
+technology /1e3/
 business /1e5/
-cars /1e10/
-education /1e1/
-food /1e10/
-health /1e20/
-movies/1e10/
-politics/1e-1/
-science/1e3/
-television/1e-3/
-world/1e14/
-politics /1e-1/
+world /1e2/
 science /1e3/
-television /1e-3/
-world /1e14/
+travel /1e4/
+media /1e4/
 first /1e6/
 second /1e4/
 third /1e6/
