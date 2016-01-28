@@ -14,6 +14,7 @@ import android.widget.TextView;
  */
 public class HelpFragment extends DialogFragment {
     private AlertDialog.Builder mAlertDialogBuilder;
+    private static final String TITLE="Available Commands";
 
     //used as the constructor to get the new instance of Helper dialogue
     public static HelpFragment newInstance(String name) {
@@ -27,50 +28,49 @@ public class HelpFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
+        View vewHelp = inflater.inflate(R.layout.help_fragment, null);
         String name = getArguments().getString("name");
         Resources res = getResources();
 
         mAlertDialogBuilder = new AlertDialog.Builder(getActivity(),R.style.MyDialog);
-        String title = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase() + " - Help";
-        View vewHelp = inflater.inflate(R.layout.help_fragment,null);
-        mAlertDialogBuilder.setTitle(title);
-        mAlertDialogBuilder.setView((vewHelp));
-        TextView txtCol1 = (TextView)vewHelp.findViewById(R.id.General_Help_Content);
-        TextView txtCol2 = (TextView)vewHelp.findViewById(R.id.General_Help_content2);
+        mAlertDialogBuilder.setTitle(TITLE);
+        mAlertDialogBuilder.setView(vewHelp);
+        TextView txtHelpHeader = (TextView)vewHelp.findViewById(R.id.help_header);
+        TextView txtHelpContent = (TextView)vewHelp.findViewById(R.id.help_content);
 
-        String strColumn1;
-        String strColumn2;
+        String strContent;
 
         switch (name) {
 
+            // night light
+            case Constants.NIGHT_LIGHT:
+                String[] arrayContent = res.getStringArray(R.array.color_names);
+                strContent = stringSpace(arrayContent);
+                txtHelpHeader.setText("Color Options:");
+                txtHelpContent.setText(strContent);
+                break;
             // news
-            case "news":
-                String[] arrayColumn1 = res.getStringArray(R.array.news_settings);
-                String[] arrayColumn2 = res.getStringArray(R.array.news_settings2);
-                strColumn1 = stringSpace(arrayColumn1);
-                strColumn2 = stringSpace(arrayColumn2);
-                txtCol1.setText(strColumn1);
-                txtCol2.setText(strColumn2);
+            case Constants.NEWS:
+                arrayContent = res.getStringArray(R.array.guardian_sections);
+                strContent = stringSpace(arrayContent);
+                txtHelpHeader.setText("Choose a news section:");
+                txtHelpContent.setText(strContent);
                 break;
 
             // settings
-            case "settings":
-                arrayColumn1 = res.getStringArray(R.array.help_settings);
-                arrayColumn2 = res.getStringArray(R.array.help_settings2);
-                strColumn1 = stringSpace(arrayColumn1);
-                strColumn2 = stringSpace(arrayColumn2);
-                txtCol1.setText(strColumn1);
-                txtCol2.setText(strColumn2);
+            case Constants.SETTINGS:
+                arrayContent = res.getStringArray(R.array.help_settings2);
+                strContent = stringSpace(arrayContent);
+                txtHelpHeader.setText("General Settings:");
+                txtHelpContent.setText(strContent);
                 break;
 
             // default help
             default:
-                arrayColumn1 = res.getStringArray(R.array.General_help_array);
-                arrayColumn2 = res.getStringArray(R.array.General_help_array2);
-                strColumn1 = stringSpace(arrayColumn1);
-                strColumn2 = stringSpace(arrayColumn2);
-                txtCol1.setText(strColumn1);
-                txtCol2.setText(strColumn2);
+                arrayContent = res.getStringArray(R.array.general_help);
+                strContent = stringSpace(arrayContent);
+                txtHelpHeader.setText("Choose a View");
+                txtHelpContent.setText(strContent);
                 break;
         }
         return mAlertDialogBuilder.create();
@@ -78,8 +78,8 @@ public class HelpFragment extends DialogFragment {
 
     public String stringSpace(String[] string){
         String str = "";
-        for(int i = 0; i<string.length; i++){
-            str += string[i]+"\n";
+        for(int i = 0; i < string.length; i++){
+            str += string[i] + "\n";
         }
         return str;
     }

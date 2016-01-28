@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/weather_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:paddingTop="20sp"
-        android:text="New Text"
-        android:id="@+id/General_Help_Content" />
+        android:textAlignment="center"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/weather_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/help_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10sp"
+        android:textAlignment="center" />
 
 
     <TextView
+        android:id="@+id/help_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="20sp"
-        android:paddingRight="10sp"
-        android:text="New Text"
-        android:id="@+id/General_Help_content2"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/General_Help_Content"
-        android:layout_marginStart="5dp" />
+        android:layout_below="@+id/help_header"
+        android:paddingLeft="20sp" />
 
 
 </RelativeLayout>
