@@ -106,8 +106,9 @@ public class NewsFragment extends Fragment{
 
         mNewsSection = getArguments().getString("arrI");
         //mGuardURL = mGuardURL + mGuardAPIKey;
+        mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
         mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
-        updateNews(mGuardURL);
+        //updateNews(mGuardURL);
 
         txtNewsDesk.setText(mNewsSection.toUpperCase());
 
@@ -175,8 +176,8 @@ public class NewsFragment extends Fragment{
     }
 
     public void startNewsUpdate(){
-        mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
-        updateNews(mDefaultGuardURL+mGuardAPIKey);
+
+        updateNews(mGuardURL);
     }
 
     private void clearLayout() {
