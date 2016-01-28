@@ -72,8 +72,8 @@ public class NewsFragment extends Fragment{
 
     public NewsFragment() {}
 
-    String mNewURL;
-    String mGuardAPIKey;
+    static String mNewURL;
+    static String mGuardAPIKey;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -240,24 +240,6 @@ public class NewsFragment extends Fragment{
                     toNewsBodyFragment(7);
                     break;
                 default:
-                    String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
-                    int i = 0;
-
-                    while (i < urlArr.length) {
-                        if (message.contains(urlArr[i])) {
-                            mNewsSection = urlArr[i];
-                            mGuardURL = mPreURL + mNewsSection + mPostURL;
-                            mNewURL = mGuardURL + mGuardAPIKey;
-                            Log.i("news desk: ", urlArr[i]);
-                            txtNewsDesk.setText(mNewsSection.toUpperCase());
-                            updateNews(mNewURL);
-                            Log.i("url ", mNewURL);
-                            break;
-                        } else {
-                            i++;
-                            Log.i("I heard: ", message);
-                        }
-                    }
                     if(message.contains(Constants.HELP) || message.contains(Constants.HIDE)) {
                         txtNewsDesk.setText(mNewsSection.toUpperCase());
                     }

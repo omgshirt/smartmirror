@@ -545,6 +545,28 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         }
 
+        String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
+        int i = 0;
+
+        try {
+            while (i < urlArr.length) {
+                if (command.contains(urlArr[i])) {
+                    NewsFragment.mNewsSection = urlArr[i];
+                    NewsFragment.mGuardURL = NewsFragment.mPreURL + NewsFragment.mNewsSection + NewsFragment.mPostURL;
+                    NewsFragment.mNewURL = NewsFragment.mGuardURL + NewsFragment.mGuardAPIKey;
+                    Log.i("news desk: ", urlArr[i]);
+                    //txtNewsDesk.setText(mNewsSection.toUpperCase());
+                    //updateNews(mNewURL);
+                    //Log.i("url ", mNewURL);
+
+                } else {
+                    i++;
+                    Log.i("I heard: ", command);
+                }
+            }
+        } catch (Exception e){System.out.println("Didn't catch that");}
+
+
         // Create fragment
         switch (command) {
             case Constants.CALENDAR:
