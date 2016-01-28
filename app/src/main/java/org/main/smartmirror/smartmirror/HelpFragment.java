@@ -43,6 +43,7 @@ public class HelpFragment extends DialogFragment {
 
         switch (name) {
 
+            // news
             case "news":
                 String[] arrayColumn1 = res.getStringArray(R.array.news_settings);
                 String[] arrayColumn2 = res.getStringArray(R.array.news_settings2);

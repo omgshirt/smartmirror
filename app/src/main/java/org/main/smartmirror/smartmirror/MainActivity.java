@@ -568,14 +568,17 @@ public class MainActivity extends AppCompatActivity
                 Log.i(Constants.TAG, "popping back stack");
                 getSupportFragmentManager().popBackStack();
                 break;
+            case Constants.LIGHT:
+                fragment = new LightFragment();
+                break;
+            case Constants.MAKEUP:
+                fragment = new MakeupFragment();
+                break;
             case Constants.NEWS:
                 fragment = new NewsFragment();
                 break;
             case Constants.NEWS_BODY:
                 fragment = new NewsBodyFragment();
-                break;
-            case Constants.LIGHT:
-                fragment = new LightFragment();
                 break;
             case Constants.QUOTES:
                 fragment = new QuoteFragment();
@@ -589,13 +592,13 @@ public class MainActivity extends AppCompatActivity
                 enterLightSleep();
                 command = Constants.LIGHT_SLEEP;
                 break;
+            case Constants.TRAFFIC:
+                fragment = new TrafficFragment();
+                break;
             case Constants.TWITTER:
                 fragment = new TwitterFragment();
                 break;
             case Constants.WAKE:
-                break;
-            case Constants.MAKEUP:
-                fragment = new MakeupFragment();
                 break;
             default:
                 // The command isn't one of the view swap instructions,

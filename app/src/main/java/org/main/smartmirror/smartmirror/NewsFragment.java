@@ -234,9 +234,6 @@ public class NewsFragment extends Fragment{
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             switch (message) {
-                case Constants.BACK:
-                    getFragmentManager().popBackStack();
-                    break;
                 case Constants.ONE:
                 case Constants.FIRST:
                     Constants.mArticleFullBody = Constants.article[0];

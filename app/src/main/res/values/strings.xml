@@ -2,12 +2,9 @@
 <resources>
     <string name="app_name">SmartMirror</string>
 
-    <string name="open_weather_map_api_key">74ab1bfc0374c634c12dedf9c12b1c03</string>
+    <!-- api keys -->
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
-
-    <string name="nyt_api_key">89899870d1024b962dc582806e3e9c34:3:73303333</string>
-    <string name="nyt_url">http://developer.nytimes.com/</string>
-
+    <string name="google_maps_key">AIzaSyCjZB-kBmT0AA3rVqAj-TLcXKDTxCJ-8ls</string>
     <string name="guardian_api_key">c6ed3edf-b0c6-4669-8e5c-ba32ba96a65f</string>
     <string name="news_error">Error with News Data</string>
 
@@ -32,18 +29,18 @@
     <string name="title_camera">Camera</string>
     <string name="title_facebook">Facebook</string>
     <string name="title_gallery">Gallery</string>
+    <string name="title_help">Help</string>
+    <string name="title_hide_help">Hide_Help</string>
     <string name="title_light">Light</string>
+    <string name="title_makeup">Makeup</string>
     <string name="title_news">News</string>
+    <string name="title_newsBody">News Body</string>
     <string name="title_music">Music</string>
     <string name="title_quotes">Quotes</string>
     <string name="title_settings">Settings</string>
     <string name="title_traffic">Traffic</string>
-    <string name="title_weather">Weather</string>
     <string name="title_twitter">Twitter</string>
-    <string name="title_help">Help</string>
-    <string name="title_hide_help">Hide_Help</string>
-    <string name="title_makeup">Makeup</string>
-    <string name="title_newsBody">News Body</string>
+    <string name="title_weather">Weather</string>
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>

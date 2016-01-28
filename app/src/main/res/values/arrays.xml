@@ -10,7 +10,7 @@
         <item>media</item>
         <item>travel</item>
     </string-array>
-    
+
     <string-array name="help_settings">
         <item>Mirror Brightness</item>
         <item>Night Light Brightness</item>
