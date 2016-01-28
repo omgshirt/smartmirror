@@ -102,7 +102,12 @@ public class NewsFragment extends Fragment{
         img7 = (ImageView)view.findViewById(R.id.img7);
         img8 = (ImageView)view.findViewById(R.id.img8);
 
-        //clearLayout();
+        clearLayout();
+
+        mNewsSection = getArguments().getString("arrI");
+        //mGuardURL = mGuardURL + mGuardAPIKey;
+        mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
+        updateNews(mGuardURL);
 
         txtNewsDesk.setText(mNewsSection.toUpperCase());
 
@@ -174,7 +179,7 @@ public class NewsFragment extends Fragment{
         updateNews(mDefaultGuardURL+mGuardAPIKey);
     }
 
-    /*private void clearLayout() {
+    private void clearLayout() {
         mTxtHeadline1.setText("");
         mTxtHeadline2.setText("");
         mTxtHeadline3.setText("");
@@ -193,7 +198,7 @@ public class NewsFragment extends Fragment{
         img6.setImageResource(android.R.color.transparent);
         img7.setImageResource(android.R.color.transparent);
         img8.setImageResource(android.R.color.transparent);
-    }*/
+    }
 
 
     // ----------------------- Local Broadcast Receiver -----------------------
