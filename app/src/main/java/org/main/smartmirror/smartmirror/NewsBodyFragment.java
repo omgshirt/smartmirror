@@ -11,12 +11,14 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class NewsBodyFragment extends Fragment {
 
     TextView mTxtBody;
     TextView mTxtHeadline;
+    ScrollView mScrollView;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_body_fragment, container, false);
@@ -26,6 +28,7 @@ public class NewsBodyFragment extends Fragment {
         mTxtBody.setText(Html.fromHtml(NewsFragment.mArticleFullBody));
         mTxtHeadline = (TextView)view.findViewById(R.id.txtHeadline);
         mTxtHeadline.setText(NewsFragment.mHeadline);
+        mScrollView = (ScrollView)view.findViewById(R.id.scrollView);
         return view;
     }
 
@@ -37,7 +40,11 @@ public class NewsBodyFragment extends Fragment {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            String message = intent.getStringExtra("message");
+            if(message.contains(Constants.SCROLLDOWN))
+                mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
+            else if(!message.contains(Constants.SCROLLDOWN) && message.contains(Constants.SCROLLUP))
+                mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
         }
     };
 

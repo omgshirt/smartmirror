@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,6 +68,8 @@ public class NewsFragment extends Fragment{
     public static String webTitle = "";
     public static String mHeadline = "";
 
+    ScrollView mScrollView;
+
 
     Handler mHandler = new Handler();
 
@@ -101,6 +104,8 @@ public class NewsFragment extends Fragment{
         img6 = (ImageView)view.findViewById(R.id.img6);
         img7 = (ImageView)view.findViewById(R.id.img7);
         img8 = (ImageView)view.findViewById(R.id.img8);
+
+        mScrollView = (ScrollView)view.findViewById(R.id.scrollView2);
 
         clearLayout();
 
@@ -245,13 +250,17 @@ public class NewsFragment extends Fragment{
                 case Constants.EIGHTH:
                     toNewsBodyFragment(7);
                     break;
-                default:
+                /*default:
                     if(message.contains(Constants.HELP) || message.contains(Constants.HIDE)) {
                         txtNewsDesk.setText(mNewsSection.toUpperCase());
                     }
                     Log.d("News", "Got message:\"" + message + "\"");
-                    break;
+                    break;*/
             }
+            if(message.contains(Constants.SCROLLDOWN))
+                mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
+            else if(!message.contains(Constants.SCROLLDOWN) && message.contains(Constants.SCROLLUP))
+                mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
         }
     };
 
