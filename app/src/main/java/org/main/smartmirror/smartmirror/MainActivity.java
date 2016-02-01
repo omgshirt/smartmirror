@@ -199,6 +199,12 @@ public class MainActivity extends AppCompatActivity
         mScreenReceiver = new ScreenReceiver();
         registerReceiver(mScreenReceiver, intentFilter);
 
+        //Google Account Picker
+        if(mPreferences.getUserAccountName() == "") {
+            Intent gAccPick = new Intent(MainActivity.this, GetAccountsOnDevice.class);
+            startActivity(gAccPick);
+        }
+        Log.i(Constants.TAG, mPreferences.getUserAccountName());
         // Set up views and nav drawer
         setContentView(R.layout.activity_main);
         // speech icon turn it off for now
@@ -276,6 +282,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         Log.i(Constants.TAG, "onResume");
         Log.i(Constants.TAG, "ScreenIsOn:" + ScreenReceiver.screenIsOn);
+        Log.i(Constants.TAG, mPreferences.getUserAccountName() + " TESTNG");
         mPreferences.resetScreenBrightness();
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
         if (ScreenReceiver.screenIsOn) {
