@@ -37,7 +37,7 @@ import java.util.Set;
  *              "forecast" speaks the 3-day forecast
  *              "conditions" speaks the current conditions
  */
-public class WeatherFragment extends Fragment {
+public class WeatherFragment extends Fragment implements CacheManager.CacheListener {
 
     Typeface weatherFont;
     Preferences mPreferences;
@@ -71,9 +71,10 @@ public class WeatherFragment extends Fragment {
     private JSONArray mWeatherAlerts;
     private boolean mShowFullAlerts = true;
 
-    // time in minutes before weather data is considered old and is discarded
+    private CacheManager mCacheManager = null;
+    // time in minutes before weather data expires
     private final int DATA_UPDATE_FREQUENCY = 10;
-    public static DataCache<JSONObject> mWeatherCache = null;
+    public static final String WEATHER_CACHE = "weather cache";
 
     Handler mHandler = new Handler();
 
@@ -84,6 +85,7 @@ public class WeatherFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mPreferences = Preferences.getInstance(getActivity());
+        mCacheManager = CacheManager.getInstance();
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         dailyForecasts = new DailyForecast[3];
 
@@ -108,6 +110,8 @@ public class WeatherFragment extends Fragment {
         txtCurrentTemp.setTypeface(weatherFont);
         txtDailyHigh.setTypeface(weatherFont);
         txtDailyLow.setTypeface(weatherFont);
+        txtCurrentHumidity.setTypeface(weatherFont);
+        txtCurrentWind.setTypeface(weatherFont);
 
         SharedPreferences mSharedPreferences = getActivity().getSharedPreferences(Preferences.PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -197,11 +201,11 @@ public class WeatherFragment extends Fragment {
         // Check for any cached weather data.
         // If a cache exists, render it to the view.
         // Update the cache if it has expired.
-        if (mWeatherCache == null) {
+        if (!mCacheManager.containsKey(WEATHER_CACHE)) {
             startWeatherUpdate();
         } else {
-            renderWeather(mWeatherCache.getData());
-            if (mWeatherCache.isExpired()) {
+            renderWeather( (JSONObject)mCacheManager.get(WEATHER_CACHE) );
+            if (mCacheManager.isExpired(WEATHER_CACHE)) {
                 Log.i(Constants.TAG, "WeatherCache expired. Refreshing..." );
                 startWeatherUpdate();
             }
@@ -217,6 +221,7 @@ public class WeatherFragment extends Fragment {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
+        mCacheManager.registerCacheListener(WEATHER_CACHE, this);
     }
 
     // when this goes out of view, halt listening
@@ -224,6 +229,7 @@ public class WeatherFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+        mCacheManager.unRegisterCacheListener(WEATHER_CACHE, this);
     }
 
     // Refresh time and date displays to current preference setting
@@ -383,7 +389,8 @@ public class WeatherFragment extends Fragment {
     }
 
     private void updateWeatherCache(JSONObject data){
-        mWeatherCache = new DataCache<>(data, DATA_UPDATE_FREQUENCY);
+        // Update the WEATHER_CACHE stored in cacheManager or create new if it doesn't exist.
+        mCacheManager.addCache(WEATHER_CACHE, data, DATA_UPDATE_FREQUENCY);
     }
 
     private void renderWeather(JSONObject json){
@@ -400,7 +407,7 @@ public class WeatherFragment extends Fragment {
 
             // set humidity
             mCurrentHumidity = (int) Math.round((currentHour.getDouble("humidity") * 100));
-            String humidityText = "Humidity " + mCurrentHumidity + "%";
+            String humidityText = mCurrentHumidity + " " + getActivity().getString(R.string.weather_humidity);
             txtCurrentHumidity.setText(humidityText);
 
             // set Wind Speed & Direction
@@ -415,7 +422,8 @@ public class WeatherFragment extends Fragment {
             if (currentHour.has("windBearing")) {
                 windBearing = getDirectionFromBearing(currentHour.getInt("windBearing"));
             }
-            String windSpeed = "Wind " + windBearing + " " + mCurrentWind + " " + windFormat;
+            String windSpeed =  windBearing + " " + getActivity().getString(R.string.weather_wind_strong) +
+                    " " + mCurrentWind + " " + windFormat;
             txtCurrentWind.setText(windSpeed);
 
 
@@ -445,7 +453,7 @@ public class WeatherFragment extends Fragment {
             txtDailyLow.setText(minIcon);
 
             // ----------------- 2-Hour forecasts -------------
-            for (int i = 1; i <= 6; i++) {
+            for (int i = 1; i <= 7; i++) {
                 String resourceName = "forecast_" + i;
                 int layoutId = getContext().getResources().getIdentifier(resourceName, "id" ,
                         getActivity().getPackageName() );
@@ -459,20 +467,17 @@ public class WeatherFragment extends Fragment {
                 SimpleDateFormat sdf = new SimpleDateFormat(shortTimeFormat, Locale.US);
                 String time = sdf.format(date);
                 timeForecast.setText(time);
-                timeForecast.setTextSize(15);
 
                 // Forecast temp
                 TextView tempForecast = (TextView)forecastLayout.findViewById(R.id.forecast_temp);
                 String textTmp = (int)Math.round(forecast.getDouble("temperature")) + getResources().getString(R.string.weather_deg);
                 tempForecast.setText(textTmp);
                 tempForecast.setTypeface(weatherFont);
-                tempForecast.setTextSize(15);
 
                 // forecast icon
                 TextView iconForecast = (TextView)forecastLayout.findViewById(R.id.forecast_image);
                 String icon = forecast.getString("icon");
                 setWeatherIcon(iconForecast, icon, dailyForecasts[0].sunrise, dailyForecasts[0].sunset);
-                iconForecast.setTextSize(15);
 
                 // forecast chance of rain
                 TextView rainForecast = (TextView) forecastLayout.findViewById(R.id.forecast_rain);
@@ -576,6 +581,18 @@ public class WeatherFragment extends Fragment {
 
         tv.setText(icon);
         tv.setTypeface(weatherFont);
+    }
+
+    /** Callback from CacheManager */
+    @Override
+    public void onCacheExpired(String cacheName) {
+        if (cacheName.equals(WEATHER_CACHE)) startWeatherUpdate();
+    }
+
+    /** Callback from CacheManager */
+    @Override
+    public void onCacheChanged(String cacheName) {
+        // In this case we do nothing, as calling startWeatherUpdate() will refresh the views.
     }
 
 

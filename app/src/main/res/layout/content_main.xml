@@ -12,8 +12,8 @@
 
     <ImageView
         android:id="@+id/speech_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:background="@android:color/transparent"
@@ -21,13 +21,13 @@
 
     <fragment
         android:name="org.main.smartmirror.smartmirror.WeatherFragment"
-        android:id="@+id/time_fragment"
+        android:id="@+id/weather_fragment"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <FrameLayout
-        android:layout_below="@+id/time_fragment"
+        android:layout_below="@+id/weather_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/content_frame">

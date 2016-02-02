@@ -450,9 +450,8 @@ public class Preferences implements LocationListener {
     public void setWeatherUnits(String unit) {
         if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
             mWeatherUnits = unit;
-            // (1/12/16) invalid the cache stored in WeatherFragment. Don't like this as it's too tightly coupled.
-            if (WeatherFragment.mWeatherCache != null)
-                WeatherFragment.mWeatherCache.invalidate();
+            // Invalidate the WEATHER_CACHE
+            CacheManager.getInstance().deleteCache(WeatherFragment.WEATHER_CACHE);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putString(PREFS_WEATHER_UNIT, mWeatherUnits);
             edit.apply();

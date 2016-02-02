@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="15dp"
+    android:padding="16dp"
     tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
     <!-- Date and time -->
     <LinearLayout
@@ -17,14 +17,14 @@
             android:id="@+id/time_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30sp" />
+            android:textSize="60sp" />
 
         <TextClock
             android:id="@+id/date_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:textSize="26sp" />
+            android:textSize="50sp" />
     </LinearLayout>
     <!-- WeatherLayout: Current weather and hourly forecasts -->
     <LinearLayout
@@ -44,14 +44,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
-                android:textSize="30sp" />
+                android:textSize="70sp" />
             <!-- current temp -->
             <TextView
                 android:id="@+id/current_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
-                android:textSize="30sp" />
+                android:textSize="70sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -64,15 +64,13 @@
                     android:id="@+id/current_humidity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Humidity"
-                    android:textSize="15sp" />
+                    android:textSize="30sp" />
                 <!-- current wind -->
                 <TextView
                     android:id="@+id/current_wind"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Wind"
-                    android:textSize="15sp" />
+                    android:textSize="30sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -86,14 +84,14 @@
                     android:id="@+id/daily_high"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp" />
+                    android:textSize="30sp" />
 
                 <!-- daily low -->
                 <TextView
                     android:id="@+id/daily_low"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp" />
+                    android:textSize="30sp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -101,6 +99,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:weightSum="6"
             android:orientation="horizontal">
 
             <include
@@ -126,6 +125,10 @@
             <include
                 android:id="@+id/forecast_6"
                 layout="@layout/weather_hourly_forecast" />
+
+            <include
+                android:id="@+id/forecast_7"
+                layout="@layout/weather_hourly_forecast" />
         </LinearLayout>
 
         <!-- Weather Alerts -->
@@ -137,6 +140,7 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
+            android:textSize="24sp"
             android:textColor="#DD0000" />
     </LinearLayout>
 </LinearLayout>

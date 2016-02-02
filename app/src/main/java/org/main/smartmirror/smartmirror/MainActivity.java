@@ -185,12 +185,9 @@ public class MainActivity extends AppCompatActivity
             mSpeechIcon.setVisibility(View.VISIBLE);
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, null, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -307,6 +304,7 @@ public class MainActivity extends AppCompatActivity
         mTTSHelper.destroy();
         mMessenger = null;
         mPreferences.destroy();
+        CacheManager.destroy();
         if (wifiHeartbeat != null) {
             wifiHeartbeat.cancel(true);
             wifiHeartbeat = null;
@@ -557,6 +555,7 @@ public class MainActivity extends AppCompatActivity
         if (DEBUG) {
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         }
+        playSound(R.raw.celeste_a);
 
         // Create fragment based on the command. If the input string is not a fragment,
         // broadcast the command to all registered receivers for evaluation.
@@ -617,7 +616,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(fragment != null){
-            playSound(R.raw.celeste_a);
             //startTTS(command);
             mCurrentFragment = command;
             displayFragment(fragment);
