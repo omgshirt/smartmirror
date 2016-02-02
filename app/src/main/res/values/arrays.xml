@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <array name="color_names">
         <item>black</item>
         <item>blue</item>
@@ -56,12 +57,12 @@
     </string-array>
 
     <string-array name="general_help">
+        <item>Back</item>
         <item>Calendar</item>
         <item>Camera</item>
         <item>Facebook</item>
         <item>Gallery</item>
         <item>Show Help</item>
-        <item>Hide Help</item>
         <item>Night Light</item>
         <item>Makeup</item>
         <item>News</item>
@@ -70,5 +71,10 @@
         <item>Twitter</item>
         <item>Traffic</item>
         <item>Weather</item>
+    </string-array>
+
+    <string-array name="weather_help">
+        <item>conditions</item>
+        <item>forecast</item>
     </string-array>
 </resources>

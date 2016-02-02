@@ -3,21 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- current fragment -->
     <TextView
-        android:id="@+id/weather_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/weather_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/help_header"
+        android:id="@+id/fragment_help_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="10sp"
@@ -25,11 +13,39 @@
 
 
     <TextView
-        android:id="@+id/help_content"
+        android:id="@+id/fragment_help_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/help_header"
+        android:layout_below="@+id/fragment_help_header"
         android:paddingLeft="20sp" />
 
+    <!-- global commands -->
+    <TextView
+        android:id="@+id/general_help_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_below="@id/fragment_help_content" />
+
+    <TextView
+        android:id="@+id/general_help_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20sp"
+        android:layout_below="@id/general_help_header" />
+
+    <!-- weather commands -->
+    <TextView
+        android:id="@+id/weather_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_below="@id/fragment_help_content" />
+
+    <TextView
+        android:id="@+id/weather_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/weather_header" />
 
 </RelativeLayout>
