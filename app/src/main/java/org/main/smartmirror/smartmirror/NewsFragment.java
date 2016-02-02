@@ -109,10 +109,10 @@ public class NewsFragment extends Fragment{
             public void onClick(View v) {
                 Constants.mArticleFullBody = Constants.article[0];
                 Constants.mHeadline = Constants.hl[0];
-                clearLayout();
+                //clearLayout();
                 Fragment fragment = new NewsBodyFragment();
                 FragmentManager fm = getFragmentManager();
-                fm.beginTransaction().replace(R.id.news_fragment_frame, fragment)
+                fm.beginTransaction().replace(R.id.content_frame, fragment)
                         .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                         .commit();
             }
@@ -241,17 +241,14 @@ public class NewsFragment extends Fragment{
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             switch (message) {
-                case Constants.BACK:
-                    getFragmentManager().popBackStack();
-                    break;
                 case Constants.ONE:
                 case Constants.FIRST:
                     Constants.mArticleFullBody = Constants.article[0];
                     Constants.mHeadline = Constants.hl[0];
-                    clearLayout();
+                    //clearLayout();
                     //Fragment fragment = new NewsBodyFragment();
                     //FragmentManager fm = getFragmentManager();
-                    getFragmentManager().beginTransaction().replace(R.id.news_fragment_frame, new NewsBodyFragment())
+                    getFragmentManager().beginTransaction().replace(R.id.content_frame, new NewsBodyFragment())
                             .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                             .commit();
                     break;
@@ -333,6 +330,7 @@ public class NewsFragment extends Fragment{
                             .commit();
                     break;
                 default:
+                    /*
                     String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
                     int i = 0;
 
@@ -355,6 +353,7 @@ public class NewsFragment extends Fragment{
                         txtNewsDesk.setText(mNewsSection.toUpperCase());
                     }
                     Log.d("News", "Got message:\"" + message + "\"");
+                    */
                     break;
             }
         }

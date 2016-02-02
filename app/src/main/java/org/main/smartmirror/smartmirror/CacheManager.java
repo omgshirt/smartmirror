@@ -32,6 +32,7 @@ public class CacheManager {
     }
 
     private CacheManager() {
+        Log.i(Constants.TAG, "Creating CacheManager");
         cacheMap = new HashMap<>();
         mListenersMap = new HashMap<>();
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
@@ -135,6 +136,7 @@ public class CacheManager {
      *  Checks all caches for expiration & notifies attached listeners
      */
     public void checkCacheExpirations() {
+        if (mListenersMap.isEmpty()) return;
         for(String s : mListenersMap.keySet()) {
             if (cacheMap.get(s).isExpired()) {
                 for(CacheListener cl : mListenersMap.get(s)) {
@@ -150,6 +152,7 @@ public class CacheManager {
      * @param cacheName name of the updated cache.
      */
     public void notifyCacheChanged(String cacheName) {
+        if (!mListenersMap.containsKey(cacheName)) return;
         for(CacheListener cl : mListenersMap.get(cacheName)) {
             cl.onCacheChanged(cacheName);
         }

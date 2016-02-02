@@ -667,10 +667,6 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if(voiceInput.contains(Constants.WAKE)) {
-            voiceInput = Constants.WAKE;
-        }
-
         // time
         if(voiceInput.contains(Constants.SHOW_TIME)) {
             voiceInput = Constants.SHOW_TIME;
@@ -693,6 +689,9 @@ public class MainActivity extends AppCompatActivity
             voiceInput = Constants.WEATHER;
         }
 
+        if(voiceInput.contains(Constants.WAKE)) {
+            voiceInput = Constants.WAKE;
+        }
 
         if(voiceInput.contains(Constants.NIGHT_LIGHT)) {
             voiceInput = Constants.LIGHT;
@@ -723,8 +722,6 @@ public class MainActivity extends AppCompatActivity
         switch (voiceInput) {
             case Constants.GO_TO_SLEEP:
                 voiceInput = Constants.SLEEP;
-                break;
-            case Constants.HIDE:
                 break;
             case Constants.OPTIONS:
                 voiceInput = Constants.SETTINGS;
