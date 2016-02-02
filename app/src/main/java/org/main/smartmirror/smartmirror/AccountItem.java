@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 /**
  * Created by Master N on 1/29/2016.
  */
+
 public class AccountItem {
 
     private String value;

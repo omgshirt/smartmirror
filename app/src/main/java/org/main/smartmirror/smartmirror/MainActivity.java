@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity
 
         //Google Account Picker
         if(mPreferences.getUserAccountName() == "") {
-            Intent gAccPick = new Intent(MainActivity.this, GetAccountsOnDevice.class);
+            Intent gAccPick = new Intent(MainActivity.this, AccountPickerActivity.class);
             startActivity(gAccPick);
         }
         Log.i(Constants.TAG, mPreferences.getUserAccountName() + " TESTING ONCREATE");

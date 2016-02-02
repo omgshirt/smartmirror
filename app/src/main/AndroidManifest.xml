@@ -47,7 +47,7 @@
 
         <!-- Google Account Setup Activity -->
         <activity
-            android:name=".GetAccountsOnDevice"
+            android:name=".AccountPickerActivity"
             android:label="@string/app_name"
             android:parentActivityName=".MainActivity" >
             android:theme="@style/AppTheme.NoActionBar"

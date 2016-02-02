@@ -7,20 +7,19 @@ package org.main.smartmirror.smartmirror;
 import java.util.ArrayList;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.view.View;
 
-public class GetAccountsOnDevice extends FragmentActivity {
+//AccountPickerActivity creates DialogFragment through AccountPickerDialogFragment using AccountItem objects
+
+public class AccountPickerActivity extends FragmentActivity {
+
     public static ArrayList<AccountItem> list = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account_picker_dialog);
-    }
-
-    public void selectAccount(View v){
-        SingleChoiceAccountPicker my_dialog = new SingleChoiceAccountPicker();
+        //Dialog for choosing account
+        AccountPickerDialogFragment my_dialog = new AccountPickerDialogFragment();
         my_dialog.show(getFragmentManager(), "my_dialog");
-
     }
 }

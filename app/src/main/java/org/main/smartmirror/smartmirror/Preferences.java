@@ -721,21 +721,12 @@ public class Preferences implements LocationListener {
     public static String getUserAccountName(){
         return mUserAccountPref;
     }
-//
-//    //Set User Account if null
+
+    //Set User Account if null
     public void setUserAccountName(String userAcc) {
-        //if(userAcc == null){
-            //Prompt user to pick account
-            //... at some point userAcc = account selected by user
-            //userAcc = GoogleAccountSetup.mUserAcc;
             mUserAccountPref = userAcc;
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putString(PREFS_GMAIL, userAcc);
             edit.apply();
         }
-//        else{
-//            mUserAccountPref = userAcc;
-//        }
-//    }
-
 }
