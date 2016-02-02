@@ -125,7 +125,7 @@ public class Preferences implements LocationListener {
 
     public static final String OFF = "off";
     public static final String ON = "on";
-    public static final String ENGLISH = "imperial";
+    public static final String ENGLISH = "english";
     public static final String METRIC = "metric";
 
     public static final String MPH = "mph";
@@ -141,6 +141,8 @@ public class Preferences implements LocationListener {
 
     private float mSystemVolume;                    // control general system volume
     private float mMusicVolume;                     // music stream volume
+    private int mMusicVolumeHolder;
+    private int mSystemVolumeHolder;
 
     private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
@@ -317,8 +319,8 @@ public class Preferences implements LocationListener {
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
         mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
-        mMusicVolume = mSharedPreferences.getFloat(PREFS_MUSIC_VOL, VOL_VLOW);
-        mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_VLOW);
+        mMusicVolume = mSharedPreferences.getFloat(PREFS_MUSIC_VOL, VOL_LOW);
+        mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_LOW);
         mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
         mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
         mWeatherUnits = mSharedPreferences.getString(PREFS_WEATHER_UNIT, ENGLISH);
@@ -331,6 +333,14 @@ public class Preferences implements LocationListener {
         //Google Account Email Preferences
         mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
 
+
+        // set brightness and volume to stored values
+        mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
+        mMusicVolumeHolder = getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        setSystemVolume(mSystemVolume);
+        setMusicVolume(mMusicVolume);
+        setScreenBrightness(mAppBrightness);
 
         // Find current lat and long positions.
         // This is not currently saved to the prefs file, system will re-discover location on start
@@ -358,7 +368,7 @@ public class Preferences implements LocationListener {
         Log.d("Location","lat:" + Double.toString(mLatitude));
         Log.d("Location","long:" + Double.toString(mLongitude));
 
-        LocalBroadcastManager.getInstance(mActivity.getApplicationContext()).registerReceiver(mMessageReceiver,
+        LocalBroadcastManager.getInstance(mActivity).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
     }
 
@@ -366,6 +376,7 @@ public class Preferences implements LocationListener {
     public void destroy(){
         Context appContext = MainActivity.getContextForApplication();
         LocalBroadcastManager.getInstance(appContext).unregisterReceiver(mMessageReceiver);
+        setVolumesToSystemValues();
         mPreferences = null;
         mSharedPreferences = null;
         mActivity = null;
@@ -415,23 +426,41 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public void setVolumesToPrefValues() {
+        setStreamVolume(mSystemVolume, AudioManager.STREAM_SYSTEM);
+        setStreamVolume(mMusicVolume, AudioManager.STREAM_MUSIC);
+    }
+
+    public void setVolumesToSystemValues() {
+        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, mMusicVolumeHolder,  0);
+        am.setStreamVolume(AudioManager.STREAM_SYSTEM, mSystemVolumeHolder, 0);
+    }
+
     // private helper sets vol for given stream
     // Gets the max volume allowed for this stream, then sets the volume
     private void setStreamVolume(float vol, int stream) {
-        Context context = MainActivity.getContextForApplication();
-        AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
         int max = am.getStreamMaxVolume(stream);
         int setVol = (int)(vol * max);
         am.setStreamVolume(stream, setVol, 0);
     }
 
+    private int getStreamVolume(int stream) {
+        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
+        return am.getStreamVolume(stream);
+    }
+
     /** Sets weather display as english or metric
      *
-     * @param unit Units to display ( 1=English / 0=Metric)
+     * @param unit Units to display
      */
     public void setWeatherUnits(String unit) {
         if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
             mWeatherUnits = unit;
+            // (1/12/16) invalid the cache stored in WeatherFragment. Don't like this as it's too tightly coupled.
+            if (WeatherFragment.mWeatherCache != null)
+                WeatherFragment.mWeatherCache.invalidate();
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putString(PREFS_WEATHER_UNIT, mWeatherUnits);
             edit.apply();
@@ -517,10 +546,10 @@ public class Preferences implements LocationListener {
     }
 
     public String getShortTimeFormat() {
-        return (timeFormatIs12hr()) ? TIME_FORMAT_12_HR_SHORT : TIME_FORMAT_24_HR_SHORT;
+        return (isTimeFormat12hr()) ? TIME_FORMAT_12_HR_SHORT : TIME_FORMAT_24_HR_SHORT;
     }
 
-    public boolean timeFormatIs12hr() {
+    public boolean isTimeFormat12hr() {
         return mTimeFormat.equals(TIME_FORMAT_12_HR);
     }
 
@@ -588,7 +617,6 @@ public class Preferences implements LocationListener {
 
     /**
      * Resets the application's current brightness to value stored in preferences
-     *  Requires Activity context
      */
     public void resetScreenBrightness() {
         setScreenBrightness(mAppBrightness);

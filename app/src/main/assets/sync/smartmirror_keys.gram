@@ -1,3 +1,4 @@
+blue /1e4/
 calendar /1e-1/
 camera /1e-1/
 conditions /1e-8/
@@ -8,47 +9,57 @@ disable remote /1e-3/
 facebook /1e-5/
 forecast /1e-4/
 gallery /1e-2/
+gray /1e10/
+green /1e4/
 go to sleep /1e-21/
 go back /1e10/
 hangman /1e1/
-hide /1e-4/
-help /1e-4/
+help /1e3/
 log me in /1e-3/
 makeup /1e7/
+magenta /1e-4/
 menu /1e4/
 news /1e12/
 night light /1e-9/
+orange /1.0/
 options /1e-2/
+power off /1e-2/
+power on /1e-2/
+purple /1e0/
 quotes /1e4/
 refresh /1e-4/
+red /1e12/
 settings /1e-4/
-scroll up /1e10/
-scroll down /1e10/
-sleep /1e15/
-start listening /1e-1/
-stop listening /1e-1/
+scroll up /1e6/
+scroll down /1e6/
+sleep /1e12/
+start listening /1e-5/
+stop listening /1e-5/
 take a picture /1e-15/
-traffic /1e1/
-twitter /1e1/
-wake up /1e-3/
-weather /1e5/
-weather english /1e2/
-weather metric /1e2/
-screen brightness very low /1e-5/
-screen brightness low /1e-5/
-screen brightness medium /1e-5/
-screen brightness high /1e-5/
-screen brightness very high /1e-5/
-sports /1e10/
-foreign /1e5/
-technology /1e-3/
-business /1e5/
-cars /1e10/
-education /1e1/
-food /1e10/
-health /1e20/
+time/1e8/
+show time/1e-3/
+hide time/1e-2/
+traffic/1e1/
+twitter/1e1/
+wake/1e6/
+wake up/1e-4/
+weather/1e4/
+show weather/1e8/
+hide weather/1e8/
+weather english/1e2/
+weather metric/1e2/
+white/1e-1/
+yellow/1e2/
+sports/1e10/
+foreign/1e7/
+technology/1e-3/
+business/1e5/
+cars/1e10/
+education/1e1/
+food/1e10/
+health/1e20/
 movies/1e10/
-politics /1e-1/
-science /1e3/
-television /1e-3/
-world /1e14/
+politics/1e-1/
+science/1e3/
+television/1e-3/
+world/1e14/

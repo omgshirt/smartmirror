@@ -17,6 +17,12 @@
         android:background="@android:color/transparent"
         android:src="@mipmap/ic_action_microphone"/>
 
+    <fragment
+        android:name="org.main.smartmirror.smartmirror.WeatherFragment"
+        android:id="@+id/time_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></fragment>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

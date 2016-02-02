@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SmartMirror</string>
+
     <string name="open_weather_map_api_key">74ab1bfc0374c634c12dedf9c12b1c03</string>
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
+
     <string name="nyt_api_key">89899870d1024b962dc582806e3e9c34:3:73303333</string>
     <string name="nyt_url">http://developer.nytimes.com/</string>
+
+    <string name="guardian_api_key">c6ed3edf-b0c6-4669-8e5c-ba32ba96a65f</string>
+    <string name="news_error">Error with News Data</string>
 
     <string name="twitter_api_key">mQ51h9ZbAz9Xk2AZtsUBJAGlx</string>
     <string name="twitter_secret">uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt</string>
@@ -38,6 +43,7 @@
     <string name="title_help">Help</string>
     <string name="title_hide_help">Hide_Help</string>
     <string name="title_makeup">Makeup</string>
+    <string name="title_newsBody">News Body</string>
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
@@ -83,9 +89,6 @@
     <string name="settings_vhigh">Very High</string>
     <string name="settings_max">Max</string>
 
-    <!-- Sports Strings -->
-    <string name="sports_error">Error with Sports Data</string>
-
     <!-- WiFi P2P strings -->
     <string name="wifi_not_enabled">Wifi Not Enabled</string>
 
@@ -101,5 +104,8 @@
 
     <!-- Camera String -->
     <string name="camera_disabled_toast">Camera Disabled. Say \'Enable Camera\' to change this setting.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

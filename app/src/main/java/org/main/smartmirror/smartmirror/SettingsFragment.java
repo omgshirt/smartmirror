@@ -334,7 +334,7 @@ public class SettingsFragment extends Fragment {
                 setTimeSwitchText();
             }
         });
-        swtTimeFormat.setChecked(mPreferences.timeFormatIs12hr());
+        swtTimeFormat.setChecked(mPreferences.isTimeFormat12hr());
         setTimeSwitchText();
 
         return view;

@@ -23,7 +23,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
@@ -38,6 +40,8 @@ public class WeatherFragment extends Fragment {
     Typeface weatherFont;
     Preferences mPreferences;
 
+    private LinearLayout layTimeLayout;
+    private LinearLayout layWeatherLayout;
     private TextView txtWeatherIcon;
     private TextClock clkTextClock;
     private TextClock clkDateClock;
@@ -47,9 +51,7 @@ public class WeatherFragment extends Fragment {
     private TextView txtDailyHigh;
     private TextView txtDailyLow;
     private TextView txtAlerts;
-    private TextView txtAlertWarning;
 
-    private static String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
     private String mLatitude = "0";
     private String mLongitude = "0";
 
@@ -57,13 +59,13 @@ public class WeatherFragment extends Fragment {
     private int mCurrentTemp = 0;
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
-    private DailyForecast dailyForecasts[];              // summary of data for 3 days (including today)
+    private DailyForecast dailyForecasts[];          // summary of data for 3 days (including today)
     private JSONArray mWeatherAlerts;
     private boolean mShowFullAlerts = true;
 
     // time in minutes before weather data is considered old and is discarded
     private final int DATA_UPDATE_FREQUENCY = 10;
-    private static JSONDataCache mWeatherCache = null;
+    public static DataCache<JSONObject> mWeatherCache = null;
 
     Handler mHandler = new Handler();
 
@@ -77,12 +79,12 @@ public class WeatherFragment extends Fragment {
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         dailyForecasts = new DailyForecast[3];
 
-        // some static locations for now
         mLatitude = Double.toString(mPreferences.getLatitude());
         mLongitude = Double.toString(mPreferences.getLongitude());
     }
 
     public void startWeatherUpdate(){
+        String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
         String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
         String weatherUnit = "si";
         if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
@@ -95,8 +97,8 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.weather_fragment, container, false);
 
-        clkTextClock = (TextClock)view.findViewById(R.id.time_clock);
-        clkDateClock = (TextClock)view.findViewById(R.id.date_clock);
+        layTimeLayout = (LinearLayout)view.findViewById(R.id.layout_time);
+        layWeatherLayout = (LinearLayout)view.findViewById(R.id.layout_weather);
         txtCurrentHumidity = (TextView)view.findViewById(R.id.current_humidity);
         txtCurrentTemp = (TextView)view.findViewById(R.id.current_temp);
         txtCurrentWind = (TextView)view.findViewById(R.id.current_wind);
@@ -104,18 +106,14 @@ public class WeatherFragment extends Fragment {
         txtDailyHigh = (TextView)view.findViewById(R.id.daily_high);
         txtDailyLow = (TextView)view.findViewById(R.id.daily_low);
         txtAlerts = (TextView)view.findViewById(R.id.alert_text);
-        txtAlertWarning = (TextView)view.findViewById(R.id.weather_alert_heading);
 
         txtCurrentTemp.setTypeface(weatherFont);
         txtDailyHigh.setTypeface(weatherFont);
         txtDailyLow.setTypeface(weatherFont);
 
-        if (mPreferences.timeFormatIs12hr()) {
-            clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
-        } else {
-            clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
-        }
-        clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
+        clkTextClock = (TextClock)view.findViewById(R.id.time_clock);
+        clkDateClock = (TextClock)view.findViewById(R.id.date_clock);
+        updateTimeDisplay();
 
         return view;
     }
@@ -130,15 +128,43 @@ public class WeatherFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d(Constants.TAG, "Got message:\"" + message +"\"");
             switch (message) {
-                case Constants.FORECAST:
-                    speakWeatherForecast();
-                    break;
+
                 case Constants.CONDITIONS:
                     speakCurrentConditions();
                     break;
                 case Preferences.CMD_WEATHER_ENGLISH:
                 case Preferences.CMD_WEATHER_METRIC:
                     startWeatherUpdate();
+                    break;
+                case Preferences.CMD_TIME_12HR:
+                case Preferences.CMD_TIME_24HR:
+                    updateTimeDisplay();
+                    break;
+                case Constants.FORECAST:
+                    speakWeatherForecast();
+                    break;
+                case Constants.HIDE_TIME:
+                    hideTime();
+                    break;
+                case Constants.HIDE_WEATHER:
+                    hideWeather();
+                    break;
+                case Constants.SHOW_TIME:
+                    showTime();
+                    break;
+                case Constants.SHOW_WEATHER:
+                    showWeather();
+                    break;
+                case Constants.TIME:
+                    speakTime();
+                    break;
+                case Constants.WEATHER:
+                    startWeatherUpdate();
+                    updateTimeDisplay();    // doing this to
+                    // refresh clock on 12/24 format changes. Otherwise not needed.
+                    speakText("Updating weather.");
+                    break;
+                default:
                     break;
             }
         }
@@ -154,7 +180,7 @@ public class WeatherFragment extends Fragment {
         if (mWeatherCache == null) {
             startWeatherUpdate();
         } else {
-            renderWeather();
+            renderWeather(mWeatherCache.getData());
             if (mWeatherCache.isExpired()) {
                 Log.i(Constants.TAG, "WeatherCache expired. Refreshing..." );
                 startWeatherUpdate();
@@ -180,7 +206,67 @@ public class WeatherFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
+    // Refresh time and date displays to current preference setting
+    public void updateTimeDisplay(){
+        clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
+        clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
+        clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
+        clkDateClock.setFormat24Hour(mPreferences.getDateFormat());
+    }
+
+    public void hideTime() {
+        layTimeLayout.setVisibility(View.GONE);
+    }
+
+    public void showTime() {
+        layTimeLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void hideWeather() {
+        layWeatherLayout.setVisibility(View.GONE);
+    }
+
+    public void showWeather() {
+        layWeatherLayout.setVisibility(View.VISIBLE);
+    }
+
     // ----------------------- TTS Feedback -------------------------
+
+    private void speakTime() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        String strMinute, strHour;
+
+        int hourMode = Calendar.HOUR_OF_DAY;
+        if (mPreferences.isTimeFormat12hr()) {
+            hourMode = Calendar.HOUR;
+        }
+        strHour = Integer.toString(calendar.get(hourMode));
+
+        int minute = calendar.get(Calendar.MINUTE);
+        strMinute = Integer.toString(minute);
+
+        // handle times > :00 and < :10
+        if (minute > 0 && minute < 10) {
+            strMinute = ":0" + strMinute;
+        } else if (minute == 0) {
+            strMinute = " ";
+        } else {
+            strMinute = ":" + strMinute;
+        }
+
+        // add AM / PM as necessary
+        if (mPreferences.isTimeFormat12hr()) {
+            String AM_PM = " A M";
+            if (calendar.get(Calendar.AM_PM) == 1){
+                AM_PM = " P M";
+            }
+            strMinute = strMinute + AM_PM;
+        }
+
+        String result = "the time is " + strHour + strMinute;
+        Log.i(Constants.TAG,"time: " + result);
+        speakText(result);
+    }
 
     private void speakCurrentConditions() {
 
@@ -203,7 +289,7 @@ public class WeatherFragment extends Fragment {
         }
 
         if ( !text.equals("") ) {
-            ((MainActivity) getActivity()).startTTS(text);
+            speakText(text);
         }
     }
 
@@ -227,8 +313,12 @@ public class WeatherFragment extends Fragment {
 
         String forecast = today + ". " + tomorrow + ". " + nextDay;
         if ( !forecast.equals("") ) {
-            ((MainActivity) getActivity()).startTTS(forecast);
+            speakText(forecast);
         }
+    }
+
+    private void speakText(String text){
+        ((MainActivity) getActivity()).startTTS(text);
     }
 
     // Get weather data from API and display
@@ -249,7 +339,7 @@ public class WeatherFragment extends Fragment {
                         public void run(){
                             Log.i(Constants.TAG, "New weather data downloaded");
                             updateWeatherCache(json);
-                            renderWeather();
+                            renderWeather(json);
                         }
                     });
                 }
@@ -258,12 +348,11 @@ public class WeatherFragment extends Fragment {
     }
 
     private void updateWeatherCache(JSONObject data){
-        mWeatherCache = new JSONDataCache(data, DATA_UPDATE_FREQUENCY);
+        mWeatherCache = new DataCache<>(data, DATA_UPDATE_FREQUENCY);
     }
 
-    private void renderWeather(){
+    private void renderWeather(JSONObject json){
         try {
-            JSONObject json = mWeatherCache.getData();
             // hourlyArray holds the next 24 hours of forecasts. Get index 0 for current temp data.
             JSONObject hourly = json.getJSONObject("hourly");
             JSONArray hourlyArray = hourly.getJSONArray("data");
@@ -322,8 +411,8 @@ public class WeatherFragment extends Fragment {
 
             // ----------------- 2-Hour forecasts -------------
             for (int i = 1; i <= 6; i++) {
-                String template = "forecast_" + i;
-                int layoutId = getContext().getResources().getIdentifier(template, "id" ,
+                String resourceName = "forecast_" + i;
+                int layoutId = getContext().getResources().getIdentifier(resourceName, "id" ,
                         getActivity().getPackageName() );
                 LinearLayout forecastLayout = (LinearLayout) getActivity().findViewById(layoutId);
                 JSONObject forecast = hourlyArray.getJSONObject(i*2);
@@ -359,12 +448,10 @@ public class WeatherFragment extends Fragment {
             // check for weather alerts.
             if (json.has("alerts")) {
                 mWeatherAlerts = json.getJSONArray("alerts");
-                txtAlertWarning.setVisibility(View.VISIBLE);
                 txtAlerts.setVisibility(View.VISIBLE);
                 txtAlerts.setText(getWeatherAlerts());
                 txtAlerts.setSelected(true);
             } else {
-                txtAlertWarning.setVisibility(View.GONE);
                 txtAlerts.setVisibility(View.GONE);
             }
 
