@@ -23,6 +23,8 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
+import java.util.EnumSet;
+
 public class NewsFragment extends Fragment{
 
     // the guardian api

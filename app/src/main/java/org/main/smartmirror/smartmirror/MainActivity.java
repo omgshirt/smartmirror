@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    // handles the messages from Service to this Activity
+    // handles the messages from VoiceService to this Activity
     public class IHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
@@ -140,12 +140,6 @@ public class MainActivity extends AppCompatActivity
                 case VoiceService.RESULT_SPEECH:
                     String result = msg.getData().getString("result");
                     handleVoiceCommand(result);
-                    break;
-                case VoiceService.SHOW_ICON:
-                    showSpeechIcon(true);
-                    break;
-                case VoiceService.HIDE_ICON:
-                    showSpeechIcon(false);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -187,6 +181,9 @@ public class MainActivity extends AppCompatActivity
         // speech icon turn it off for now
         mSpeechIcon = (ImageView)findViewById(R.id.speech_icon);
         mSpeechIcon.setVisibility(View.INVISIBLE);
+        if (mPreferences.isVoiceEnabled()) {
+            mSpeechIcon.setVisibility(View.VISIBLE);
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -282,7 +279,7 @@ public class MainActivity extends AppCompatActivity
     public void onPause(){
         super.onPause();
         Log.i(Constants.TAG, "onPause");
-       // If the screen is not turning off, the app is going into the background: speech recognition is stopped.
+        // If the screen is not turning off, the app is going into the background: speech recognition is stopped.
         // This is (mostly) for debugging purposes as the finished program should always be in foreground.
         if (mPowerManager.isScreenOn()) {
             stopSpeechRecognition();
@@ -369,6 +366,7 @@ public class MainActivity extends AppCompatActivity
         mirrorSleepState = LIGHT_SLEEP;
     }
 
+	// Restores the screen off to the duration set when the application first ran.
     protected void setDefaultScreenOffTimeout() {
         // sanity check to prevent screen lockout from super-short screen timeout settings.
         if (defaultScreenTimeout < 1000) defaultScreenTimeout = 10000;
@@ -397,7 +395,7 @@ public class MainActivity extends AppCompatActivity
     protected void startUITimer() {
         stopUITimer();
         mUITimer = new Timer();
-        Log.i(Constants.TAG, "Starting UI timer. " + UI_TIMEOUT_DELAY + " ms" );
+        Log.i(Constants.TAG, "UI timer start. " + UI_TIMEOUT_DELAY + " ms" );
         mUITimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -467,13 +465,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void hideHelpFragment() {
-        if (mHelpFragment != null) {
-            mHelpFragment.dismiss();
-            mHelpFragment = null;
-        }
-    }
-
     /**
      * Show a toast
      * @param text text to display
@@ -492,16 +483,16 @@ public class MainActivity extends AppCompatActivity
     public void wakeScreenAndDisplay(String command) {
         if (mirrorSleepState == AWAKE) {
             startUITimer();
-            handleCommand(command);
+            hideHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP ) {
                 exitSleep();
             } else {
+				// change from LIGHT_SLEEP -> AWAKE. LIGHT_SLEEP only lasts ~10 seconds,
+                // so these cases are not common.
                 exitLightSleep();
-                // change from LIGHT_SLEEP -> AWAKE. LIGHT_SLEEP only lasts ~10 seconds, so these cases
-                // are not very common.
                 if (command.equals(Constants.LIGHT)) {
-                    handleCommand(command);
+                    hideHelpFragment(command);
                 } else {
                     // in LIGHT_SLEEP we're showing a black, empty fragment. Instead, display the last
                     // fragment shown before SleepFragment.
@@ -516,32 +507,37 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Show a fragment or broadcast a command to listeners.
-     * Do not call this method directly, instead use wakeScreenAndDisplay, which will make sure
-     * the application is in the appropriate sleep state.
-     * @param command command to process
+     * "help" displays the helpFragment. All other commands dismiss it.
+     * @param command
      */
-    private void handleCommand(String command){
-        Fragment fragment = null;
+    public void hideHelpFragment(String command) {
 
-        if (DEBUG) {
-            Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
-        }
-
-        // All commands hide helpFragment if visible. Constants.HELP shows HelpFragment
         if (command.equals(Constants.HELP) && mHelpFragment == null) {
             mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
             mHelpFragment.show(getFragmentManager(), "HelpFragment");
-        } else {
-            hideHelpFragment();
         }
 
+        if (mHelpFragment != null) {
+            mHelpFragment.dismiss();
+            mHelpFragment = null;
+        }
+
+        closeMenuDrawer(command);
+    }
+
+    /**
+     * Close the MenuDrawer if it is open. Open it on "Drawer" command
+     * @param command command to be executed
+     */
+    public void closeMenuDrawer(String command) {
         // 'menu' command toggles menu drawer open / close. Other commands will close the drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (command.equals(Constants.MENU) && !drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.openDrawer(GravityCompat.START);
             return;
-        } else if (drawer.isDrawerOpen(GravityCompat.START)){
+        }
+
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
 
@@ -567,11 +563,31 @@ public class MainActivity extends AppCompatActivity
 
 
         // Create fragment
+        handleCommand(command);
+    }
+
+
+    /**
+     * Show a fragment or broadcast a command to listeners.
+     * Do not call this method directly, instead use wakeScreenAndDisplay, which will make sure
+     * the application is in the appropriate sleep state.
+     * @param command command to process
+     */
+    private void handleCommand(String command){
+        Fragment fragment = null;
+
+        if (DEBUG) {
+            Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
+        }
+
+        // Create fragment based on the command. If the input string is not a fragment,
+        // broadcast the command to all registered receivers for evaluation.
         switch (command) {
             case Constants.CALENDAR:
                 fragment = new CalendarFragment();
                 break;
             case Constants.CAMERA:
+                // TODO: can we handle this disabling within the CameraFragment instead?
                 if(mPreferences.isCameraEnabled()) {
                     fragment = new CameraFragment();
                 }
@@ -586,7 +602,6 @@ public class MainActivity extends AppCompatActivity
                 fragment = new GalleryFragment();
                 break;
             case Constants.GO_BACK:
-                Log.i(Constants.TAG, "popping back stack");
                 getSupportFragmentManager().popBackStack();
                 break;
             case Constants.NEWS:
@@ -623,8 +638,6 @@ public class MainActivity extends AppCompatActivity
                 fragment = new MakeupFragment();
                 break;
             default:
-                // The command isn't one of the view swap instructions,
-                // so broadcast the command (our input) to any listeners.
                 broadcastMessage("inputAction", command);
                 break;
         }
@@ -633,7 +646,6 @@ public class MainActivity extends AppCompatActivity
             playSound(R.raw.celeste_a);
             //startTTS(command);
             mCurrentFragment = command;
-            Log.i(Constants.TAG, "mCurrentFragment " + mCurrentFragment);
             displayFragment(fragment);
         }
     }
@@ -655,7 +667,7 @@ public class MainActivity extends AppCompatActivity
     public void showSpeechIcon(boolean flag){
         if(flag) {
             mSpeechIcon.setVisibility(View.VISIBLE);
-        } else {
+        } else if (mSpeechIcon.getVisibility() == View.VISIBLE) {
             mSpeechIcon.setVisibility(View.INVISIBLE);
         }
     }
@@ -677,7 +689,6 @@ public class MainActivity extends AppCompatActivity
 
         // if voice is disabled, ignore everything except "start listening" command
         if (!mPreferences.isVoiceEnabled()) {
-            showSpeechIcon(false);
             if (voiceInput.equals(Preferences.CMD_VOICE_ON) ) {
                 broadcastMessage("inputAction", voiceInput);
             }
@@ -768,12 +779,14 @@ public class MainActivity extends AppCompatActivity
      * Start the speech recognizer
      */
     public void startSpeechRecognition(){
+        Log.i(Constants.TAG, "startSpeechRecognition()");
         if(mTTSHelper.isSpeaking() || mService == null) return;
         try {
             //Log.i("VR", "startSpeechRecognition()");
             Message msg = Message.obtain(null, VoiceService.START_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
+            showSpeechIcon(mPreferences.isVoiceEnabled());
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -783,12 +796,13 @@ public class MainActivity extends AppCompatActivity
      * Stops the current speech recognition object
      */
     public void stopSpeechRecognition(){
-        Log.i("VR", "stopSpeechRecognition()");
+        Log.i(Constants.TAG, "stopSpeechRecognition()");
         if (mService == null) return;
         try {
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
             msg.replyTo = mMessenger;
             mService.send(msg);
+            showSpeechIcon(false);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -826,7 +840,6 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 try {
                     mTTSHelper.speakText(phrase);
-                    //Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

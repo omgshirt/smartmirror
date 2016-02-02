@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Fragment that displays the weather information
@@ -54,6 +56,12 @@ public class WeatherFragment extends Fragment {
 
     private String mLatitude = "0";
     private String mLongitude = "0";
+
+    private final String TIME_VISIBLE_PREF = "time visible";
+    private final String WEATHER_VISIBLE_PREF = "weather visible";
+
+    private int mWeatherVisible = View.VISIBLE;
+    private int mTimeVisible = View.VISIBLE;
 
     // default weather values
     private int mCurrentTemp = 0;
@@ -83,16 +91,6 @@ public class WeatherFragment extends Fragment {
         mLongitude = Double.toString(mPreferences.getLongitude());
     }
 
-    public void startWeatherUpdate(){
-        String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
-        String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
-        String weatherUnit = "si";
-        if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
-            weatherUnit = "us";
-        }
-        updateWeatherData(String.format(darkSkyRequest, darkSkyKey, mLatitude, mLongitude, weatherUnit));
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.weather_fragment, container, false);
@@ -111,11 +109,33 @@ public class WeatherFragment extends Fragment {
         txtDailyHigh.setTypeface(weatherFont);
         txtDailyLow.setTypeface(weatherFont);
 
+        SharedPreferences mSharedPreferences = getActivity().getSharedPreferences(Preferences.PREFS_NAME, Context.MODE_PRIVATE);
+
+        int timeVisible = mSharedPreferences.getInt(TIME_VISIBLE_PREF, View.VISIBLE);
+        if (timeVisible == View.GONE) {
+            hideTime();
+        }
+        int weatherVisible = mSharedPreferences.getInt(WEATHER_VISIBLE_PREF, View.VISIBLE);
+        if (weatherVisible == View.GONE) {
+            hideWeather();
+        }
+
+
         clkTextClock = (TextClock)view.findViewById(R.id.time_clock);
         clkDateClock = (TextClock)view.findViewById(R.id.date_clock);
         updateTimeDisplay();
 
         return view;
+    }
+
+    public void startWeatherUpdate(){
+        String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
+        String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
+        String weatherUnit = "si";
+        if (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) {
+            weatherUnit = "us";
+        }
+        updateWeatherData(String.format(darkSkyRequest, darkSkyKey, mLatitude, mLongitude, weatherUnit));
     }
 
     // ----------------------- Local Broadcast Receiver -----------------------
@@ -215,19 +235,34 @@ public class WeatherFragment extends Fragment {
     }
 
     public void hideTime() {
-        layTimeLayout.setVisibility(View.GONE);
+        mTimeVisible = View.GONE;
+        layTimeLayout.setVisibility(mTimeVisible);
+        saveVisibilityPreference(TIME_VISIBLE_PREF, mTimeVisible);
     }
 
     public void showTime() {
-        layTimeLayout.setVisibility(View.VISIBLE);
+        mTimeVisible = View.VISIBLE;
+        layTimeLayout.setVisibility(mTimeVisible);
+        saveVisibilityPreference(TIME_VISIBLE_PREF, mTimeVisible);
     }
 
     public void hideWeather() {
-        layWeatherLayout.setVisibility(View.GONE);
+        mWeatherVisible = View.GONE;
+        layWeatherLayout.setVisibility(mWeatherVisible);
+        saveVisibilityPreference(WEATHER_VISIBLE_PREF, mWeatherVisible);
     }
 
     public void showWeather() {
-        layWeatherLayout.setVisibility(View.VISIBLE);
+        mWeatherVisible = View.VISIBLE;
+        layWeatherLayout.setVisibility(mWeatherVisible);
+        saveVisibilityPreference(WEATHER_VISIBLE_PREF, mWeatherVisible);
+    }
+
+    private void saveVisibilityPreference(String prefName, int value) {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Preferences.PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putInt(prefName, value);
+        edit.apply();
     }
 
     // ----------------------- TTS Feedback -------------------------
