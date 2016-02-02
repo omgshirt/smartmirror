@@ -28,10 +28,11 @@ public class NewsFragment extends Fragment{
     // the guardian api
     public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
             "all&order-by=newest&q=world&api-key=";
-    public static String mNewsSection = "world";
+    public static String mDefNewsSection = "world";
     public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&q=";
     public static String mPostURL = "&api-key=";
-    public static String mGuardURL = mPreURL + mNewsSection + mPostURL;
+    public static String mGuardURL = mPreURL + mDefNewsSection + mPostURL;
+    public static String mNewsSection;
 
     // time in minutes before news data is considered old and is discarded
     private final int DATA_UPDATE_FREQUENCY = 10;
@@ -275,7 +276,14 @@ public class NewsFragment extends Fragment{
             Log.i(Constants.TAG,"NewsCache does not exist, updating");
             startNewsUpdate();
         } else {
-            renderNews(mNewsCache.getData());
+            if (mNewsSection == mDefNewsSection) {
+                renderNews(mNewsCache.getData());
+                mDefNewsSection = mNewsSection;
+            } else {
+                Log.i(Constants.TAG, "New News Section");
+                startNewsUpdate();
+            }
+
             if (mNewsCache.isExpired()) {
                 Log.i(Constants.TAG, "NewsCache expired. Refreshing..." );
                 startNewsUpdate();
