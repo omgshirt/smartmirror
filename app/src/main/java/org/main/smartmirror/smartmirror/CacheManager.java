@@ -45,6 +45,8 @@ public class CacheManager {
                 Log.i(Constants.TAG, "CacheManager: checking for expired caches");
             }
         };
+
+        // set a thread to check for expired caches.
         cacheScheduler = scheduler.scheduleAtFixedRate(expirationChecker, 31, 31,
                 TimeUnit.SECONDS);
     }
@@ -74,7 +76,7 @@ public class CacheManager {
     }
 
     /**
-        Returns the data passed in by the given key.
+        Get data by key value.
      */
     public Object get(String key) {
         if (cacheMap.containsKey(key)) {
@@ -90,7 +92,7 @@ public class CacheManager {
     /**
      * Delete the cache object given by 'key'
      * @param key key to delete
-     * @return TRUE if cache was deleted, FALSE if it didn't exist
+     * @return returns TRUE if cache was deleted, FALSE if key doesn't exist
      */
     public boolean deleteCache(String key) {
         if (cacheMap.containsKey(key)) {
@@ -100,6 +102,7 @@ public class CacheManager {
         return false;
     }
 
+
     public boolean isExpired(String key) {
         if (cacheMap.containsKey(key)) {
             return cacheMap.get(key).isExpired();
@@ -108,7 +111,7 @@ public class CacheManager {
     }
 
     /**
-     * Register to listen for updates to cacheName. This currently does nothing.
+     * Register to listen for updates to cacheName.
      * @param cacheName name of the cache
      * @param newListener CacheListener to call back
      */
@@ -125,10 +128,29 @@ public class CacheManager {
         }
     }
 
+    /**
+     * Unregister the listener for the cache given by key, if it is registered
+     * @param key cache name to unregister
+     * @param listener listener to unregister
+     */
     public void unRegisterCacheListener(String key, CacheListener listener) {
         if(mListenersMap.containsKey(key)) {
             Log.i(Constants.TAG, "CacheManager removing :: " + listener);
             mListenersMap.get(key).remove(listener);
+        }
+    }
+
+    /**
+     * Unregister listener from all cache notifications
+     * @param listener listener object to unregister
+     */
+    public void unRegisterCacheListener(CacheListener listener){
+        if(mListenersMap.containsValue(listener)) {
+            for(String key : mListenersMap.keySet()){
+                if(mListenersMap.get(key).contains(listener)) {
+                    mListenersMap.get(key).remove(listener);
+                }
+            }
         }
     }
 

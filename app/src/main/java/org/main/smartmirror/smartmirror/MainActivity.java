@@ -441,7 +441,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            handleCommand(item.toString().toLowerCase(Locale.US));
+            wakeScreenAndDisplay(item.toString().toLowerCase(Locale.US));
         }
 
         return super.onOptionsItemSelected(item);
@@ -452,7 +452,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         if(DEBUG)
             Log.i(Constants.TAG, "NavigationItemSelected: " + item.toString());
-        handleCommand(item.toString().toLowerCase(Locale.US));
+        wakeScreenAndDisplay(item.toString().toLowerCase(Locale.US));
         return true;
     }
 
@@ -468,11 +468,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Show a toast
+     * Show a toast centered on the bottom of the screen
      * @param text text to display
      * @param duration int duration: ex. Toast.LENGTH_LONG
      */
     public void showToast(String text, int duration) {
+        showToast(text, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, duration);
+    }
+
+    /**
+     * Show a toast, specifying the gravity for the display
+     */
+    public void showToast(String text, int gravity, int duration){
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.toast_layout,
                 (ViewGroup) findViewById(R.id.toast_layout_root));
@@ -481,7 +488,7 @@ public class MainActivity extends AppCompatActivity
         txtLayout.setText(text);
 
         Toast toast = new Toast(getApplicationContext());
-        toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+        toast.setGravity(gravity, 0, 0);
         toast.setDuration(duration);
         toast.setView(layout);
         toast.show();
@@ -638,8 +645,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Gets the fragment currently being viewed. If the mirror in SLEEP,
-     * this will return the value of the last-displayed fragment.
+     * Gets the fragment currently being viewed.
      * @return String fragment name
      */
     protected String getCurrentFragment() {
@@ -647,9 +653,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * This method handles the speech icon indicator. It either hides
-     * or shows the icon based on the flag
-     * @param flag whether or not to show the icon
+     * Show or hide the speech icon
+     * @param flag true to display icon, false to hide
      */
     public void showSpeechIcon(boolean flag){
         if(flag) {
@@ -662,7 +667,7 @@ public class MainActivity extends AppCompatActivity
     // ----------------------- SPEECH RECOGNITION --------------------------
 
     /**
-     * Handles the result of the speech input. Conform voice inputs into standard commands
+     * Handle the result of speech input. Conform voice inputs into standard commands
      * used by the remote.
      * @param input the command the user gave
      */
