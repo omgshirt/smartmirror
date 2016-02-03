@@ -120,7 +120,7 @@ public class NewsFragment extends Fragment{
         mNewsSection = getArguments().getString("arrI");
         //mGuardURL = mGuardURL + mGuardAPIKey;
         mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
-        mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
+
         //updateNews(mGuardURL);
 
         txtNewsDesk.setText(mNewsSection.toUpperCase());
@@ -190,6 +190,7 @@ public class NewsFragment extends Fragment{
 
     public void startNewsUpdate(){
 
+        mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
         updateNews(mGuardURL);
     }
 
@@ -283,7 +284,7 @@ public class NewsFragment extends Fragment{
             Log.i(Constants.TAG,"NewsCache does not exist, updating");
             startNewsUpdate();
         } else {
-            if (mNewsSection == mDefNewsSection) {
+            /*if (mNewsSection == mDefNewsSection) {
                 renderNews(mNewsCache.getData());
                 mDefNewsSection = mNewsSection;
             } else {
@@ -292,11 +293,12 @@ public class NewsFragment extends Fragment{
             }
 
             if (mNewsCache.isExpired()) {
-            renderNews( (JSONObject)mCacheManager.get(NEWS_CACHE) );
-            if (mCacheManager.isExpired(NEWS_CACHE)) {
-                Log.i(Constants.TAG, "NewsCache expired. Refreshing..." );
-                startNewsUpdate();
-            }
+                renderNews((JSONObject) mCacheManager.get(NEWS_CACHE));
+                if (mCacheManager.isExpired(NEWS_CACHE)) {
+                    Log.i(Constants.TAG, "NewsCache expired. Refreshing...");
+                    startNewsUpdate();
+                }
+            }*/
         }
     }
 
