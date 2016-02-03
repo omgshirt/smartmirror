@@ -26,7 +26,7 @@ import org.json.JSONObject;
 
 import java.util.EnumSet;
 
-public class NewsFragment extends Fragment{
+public class NewsFragment extends Fragment implements CacheManager.CacheListener{
 
     // the guardian api
     public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
@@ -42,7 +42,7 @@ public class NewsFragment extends Fragment{
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
     public static final String NEWS_CACHE = "news cache";
-    private CacheManager mCacheManager;
+    private CacheManager mCacheManager = null;
 
     private TextView mTxtHeadline1;
     private TextView mTxtHeadline2;
@@ -284,20 +284,17 @@ public class NewsFragment extends Fragment{
             Log.i(Constants.TAG,"NewsCache does not exist, updating");
             startNewsUpdate();
         } else {
+            renderNews((JSONObject) mCacheManager.get(NEWS_CACHE));
+            if (mCacheManager.isExpired(NEWS_CACHE)) {
+                Log.i(Constants.TAG, "NewsCache expired. Refreshing...");
+                startNewsUpdate();
+            }
             /*if (mNewsSection == mDefNewsSection) {
                 renderNews(mNewsCache.getData());
                 mDefNewsSection = mNewsSection;
             } else {
                 Log.i(Constants.TAG, "New News Section");
                 startNewsUpdate();
-            }
-
-            if (mNewsCache.isExpired()) {
-                renderNews((JSONObject) mCacheManager.get(NEWS_CACHE));
-                if (mCacheManager.isExpired(NEWS_CACHE)) {
-                    Log.i(Constants.TAG, "NewsCache expired. Refreshing...");
-                    startNewsUpdate();
-                }
             }*/
         }
     }
@@ -311,12 +308,14 @@ public class NewsFragment extends Fragment{
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
+        mCacheManager.registerCacheListener(NEWS_CACHE, this);
     }
 
     // when this goes out of view, halt listening
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+        mCacheManager.registerCacheListener(NEWS_CACHE, this);
     }
 
     // Get news headlines from api and display
@@ -413,6 +412,18 @@ public class NewsFragment extends Fragment{
         }catch(Exception e){
             Log.e("NEWS ERROR", e.toString());
         }
+    }
+
+    /** Callback from CacheManager */
+    @Override
+    public void onCacheExpired(String cacheName) {
+        if (cacheName.equals(NEWS_CACHE)) startNewsUpdate();
+    }
+
+    /** Callback from CacheManager */
+    @Override
+    public void onCacheChanged(String cacheName) {
+        // In this case we do nothing, as calling startWeatherUpdate() will refresh the views.
     }
 
 }

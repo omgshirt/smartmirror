@@ -561,27 +561,6 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         }
 
-        String mGuardSection;
-        String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
-        int i = 0;
-        try {
-            while (i < urlArr.length) {
-                if (command.contains(urlArr[i])) {
-                    mGuardSection = urlArr[i];
-                    Bundle bundle = new Bundle();
-                    bundle.putString("arrI", mGuardSection);
-                    fragment = new NewsFragment();
-                    fragment.setArguments(bundle);
-                    break;
-                } else {
-                    i++;
-                    Log.i("I heard: ", command);
-                }
-            }
-        }catch (Exception e) {}
-
-
-
         // Create fragment
         handleCommand(command);
     }
@@ -600,6 +579,25 @@ public class MainActivity extends AppCompatActivity
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         }
         playSound(R.raw.celeste_a);
+
+        String mGuardSection;
+        String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
+        int i = 0;
+        try {
+            while (i < urlArr.length) {
+                if (command.contains(urlArr[i])) {
+                    mGuardSection = urlArr[i];
+                    Bundle bundle = new Bundle();
+                    bundle.putString("arrI", mGuardSection);
+                    fragment = new NewsFragment();
+                    fragment.setArguments(bundle);
+                    break;
+                } else {
+                    i++;
+                    Log.i("I heard: ", command);
+                }
+            }
+        }catch (Exception e) {}
 
         // Create fragment based on the command. If the input string is not a fragment,
         // broadcast the command to all registered receivers for evaluation.
