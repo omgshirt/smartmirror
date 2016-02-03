@@ -8,9 +8,15 @@
     tools:context="org.main.smartmirror.smartmirror.TrafficFragment">
 
     <TextView
-        android:id="@+id/traffic_details"
+        android:id="@+id/traffic_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/traffic_current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <TextView
         android:id="@+id/traffic_delay"
         android:layout_width="wrap_content"

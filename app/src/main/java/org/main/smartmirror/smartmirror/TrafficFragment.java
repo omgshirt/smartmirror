@@ -3,14 +3,12 @@ package org.main.smartmirror.smartmirror;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,7 +21,8 @@ public class TrafficFragment extends Fragment {
     private String mCurrentLong;
     private String mWorkLat;
     private String mWorkLong;
-    private TextView txtDetails;
+    private TextView txtDistance;
+    private TextView txtCurrent;
     private TextView txtDelays;
 
 
@@ -35,15 +34,21 @@ public class TrafficFragment extends Fragment {
         mPreferance = Preferences.getInstance(getActivity());
         mCurrentLat = Double.toString(mPreferance.getLatitude());
         mCurrentLong = Double.toString(mPreferance.getLongitude());
+
         //csun
         mWorkLat = "34.2370851";
         mWorkLong = "-118.5272547";
+
+        //somewhere in la
+        mWorkLat = "34.051144";
+        mWorkLong = "-118.2366286";
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.traffic_fragment, container, false);
-        txtDetails = (TextView) view.findViewById(R.id.traffic_details);
+        txtDistance = (TextView) view.findViewById(R.id.traffic_distance);
+        txtCurrent = (TextView) view.findViewById(R.id.traffic_current);
         txtDelays = (TextView) view.findViewById(R.id.traffic_delay);
         return view;
     }
@@ -67,9 +72,15 @@ public class TrafficFragment extends Fragment {
 
     private void renderTraffic(JSONObject json){
         try {
-            JSONArray data = json.getJSONArray("rows");
-            Log.d("traffic", data.toString());
-
+            JSONObject data = json.getJSONArray("rows")
+                    .getJSONObject(0)
+                    .getJSONArray("elements")
+                    .getJSONObject(0);
+            double tripTime = Double.parseDouble(data.getJSONObject("duration").getString("text").substring(0, 2));
+            double tripTimeTraffic = Double.parseDouble(data.getJSONObject("duration_in_traffic").getString("text").substring(0,2));
+            txtDistance.setText("Distance to work: " + data.getJSONObject("distance").getString("text").substring(0,2) + " miles");
+            txtCurrent.setText("Normal travel time: " + tripTime + " minutes");
+            txtDelays.setText("Current travel time: " + tripTimeTraffic + " minutes");
         } catch (JSONException e) {
             e.printStackTrace();
         }
