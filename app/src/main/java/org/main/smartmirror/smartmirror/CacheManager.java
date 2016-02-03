@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit;
 public class CacheManager {
 
     private static CacheManager mCacheManager;
-    private HashMap<String, DataCache> cacheMap;
-    private HashMap<String, List<CacheListener>> mListenersMap;
+    private static HashMap<String, DataCache> cacheMap;
+    private static HashMap<String, List<CacheListener>> mListenersMap;
 
     private ScheduledFuture<?> cacheScheduler;
 

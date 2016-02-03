@@ -5,19 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/content_frame_holder"
-    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main"
     tools:context=".MainActivity">
 
     <ImageView
         android:id="@+id/speech_icon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
         android:background="@android:color/transparent"
-        android:src="@mipmap/ic_action_microphone"/>
+        android:visibility="gone"
+        android:src="@drawable/ic_action_microphone"/>
 
     <fragment
         android:name="org.main.smartmirror.smartmirror.WeatherFragment"

@@ -144,10 +144,10 @@ public class Preferences implements LocationListener {
     private double mLatitude;
     private double mLongitude;
 
-    private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
+    private String mDateFormat = "EEEE LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
     private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
-    private static final String TIME_FORMAT_12_HR = "h:mm a";
+    private static final String TIME_FORMAT_12_HR = "h:mm";
     private static final String TIME_FORMAT_12_HR_SHORT = "ha";
 
 

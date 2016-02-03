@@ -84,9 +84,11 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPreferences = Preferences.getInstance(getActivity());
-        mCacheManager = CacheManager.getInstance();
-        weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
+        if (savedInstanceState == null) {
+            mPreferences = Preferences.getInstance(getActivity());
+            mCacheManager = CacheManager.getInstance();
+            weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
+        }
         dailyForecasts = new DailyForecast[3];
 
         mLatitude = Double.toString(mPreferences.getLatitude());
@@ -412,12 +414,14 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
             // set Wind Speed & Direction
             mCurrentWind = (int)Math.round(currentHour.getDouble("windSpeed"));
-            String windFormat;
+            String windFormat = "";
+            /*
             if (mPreferences.getWeatherUnits().equals(Preferences.METRIC) ) {
-                windFormat = "kph";
+                windFormat = "k";
             } else {
-                windFormat = "mph";
+                windFormat = "m";
             }
+            */
             String windBearing = "";
             if (currentHour.has("windBearing")) {
                 windBearing = getDirectionFromBearing(currentHour.getInt("windBearing"));
@@ -479,10 +483,25 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 String icon = forecast.getString("icon");
                 setWeatherIcon(iconForecast, icon, dailyForecasts[0].sunrise, dailyForecasts[0].sunset);
 
-                // forecast chance of rain
+                TextView txtUmbrella = (TextView) forecastLayout.findViewById(R.id.forecast_umbrella);
                 TextView rainForecast = (TextView) forecastLayout.findViewById(R.id.forecast_rain);
-                String chanceOfRain = Integer.toString( (int)(forecast.getDouble("precipProbability") * 100)) + "%";
-                rainForecast.setText(chanceOfRain);
+
+                int rainProb = (int)(forecast.getDouble("precipProbability") * 100);
+                if (rainProb > 10) {
+
+                    // umbrella icon
+                    txtUmbrella.setTypeface(weatherFont);
+                    txtUmbrella.setText(getActivity().getResources().getString(R.string.weather_umbrella));
+                    txtUmbrella.setVisibility(View.VISIBLE);
+
+                    // forecast chance of rain
+                    String chanceOfRain = Integer.toString(rainProb) + "%";
+                    rainForecast.setText(chanceOfRain);
+                    rainForecast.setVisibility(View.VISIBLE);
+                } else {
+                    txtUmbrella.setVisibility(View.GONE);
+                    rainForecast.setVisibility(View.GONE);
+                }
             }
 
             // check for weather alerts.

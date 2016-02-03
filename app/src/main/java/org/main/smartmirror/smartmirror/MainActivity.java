@@ -35,11 +35,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -469,7 +473,18 @@ public class MainActivity extends AppCompatActivity
      * @param duration int duration: ex. Toast.LENGTH_LONG
      */
     public void showToast(String text, int duration) {
-        Toast.makeText(this, text, duration).show();
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_layout,
+                (ViewGroup) findViewById(R.id.toast_layout_root));
+
+        TextView txtLayout = (TextView) layout.findViewById(R.id.text);
+        txtLayout.setText(text);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+        toast.setDuration(duration);
+        toast.setView(layout);
+        toast.show();
     }
 
     /**

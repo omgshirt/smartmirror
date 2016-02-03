@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
     tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
     <!-- Date and time -->
     <LinearLayout
@@ -17,7 +18,7 @@
             android:id="@+id/time_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="60sp" />
+            android:textSize="70sp" />
 
         <TextClock
             android:id="@+id/date_clock"
