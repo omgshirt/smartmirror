@@ -144,10 +144,10 @@ public class Preferences implements LocationListener {
     private double mLatitude;
     private double mLongitude;
 
-    private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
+    private String mDateFormat = "EEEE LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
     private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
-    private static final String TIME_FORMAT_12_HR = "h:mm a";
+    private static final String TIME_FORMAT_12_HR = "h:mm";
     private static final String TIME_FORMAT_12_HR_SHORT = "ha";
 
 
@@ -450,9 +450,8 @@ public class Preferences implements LocationListener {
     public void setWeatherUnits(String unit) {
         if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
             mWeatherUnits = unit;
-            // (1/12/16) invalid the cache stored in WeatherFragment. Don't like this as it's too tightly coupled.
-            if (WeatherFragment.mWeatherCache != null)
-                WeatherFragment.mWeatherCache.invalidate();
+            // Invalidate the WEATHER_CACHE
+            CacheManager.getInstance().deleteCache(WeatherFragment.WEATHER_CACHE);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putString(PREFS_WEATHER_UNIT, mWeatherUnits);
             edit.apply();

@@ -19,6 +19,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Cache;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
@@ -38,7 +39,10 @@ public class NewsFragment extends Fragment{
 
     // time in minutes before news data is considered old and is discarded
     private final int DATA_UPDATE_FREQUENCY = 10;
-    public static DataCache<JSONObject> mNewsCache = null;
+
+    // I've updated NewsFragment to show the DataManager class. Create items as required.
+    public static final String NEWS_CACHE = "news cache";
+    private CacheManager mCacheManager;
 
     private TextView mTxtHeadline1;
     private TextView mTxtHeadline2;
@@ -84,7 +88,8 @@ public class NewsFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
-
+        mCacheManager = CacheManager.getInstance();
+        //
         // Initialize Items
         // mNewsSection = "world";
 
@@ -274,7 +279,7 @@ public class NewsFragment extends Fragment{
         // Check for any cached news data.
         // If a cache exists, render it to the view.
         // Update the cache if it has expired.
-        if (mNewsCache == null) {
+        if (!mCacheManager.containsKey(NEWS_CACHE)) {
             Log.i(Constants.TAG,"NewsCache does not exist, updating");
             startNewsUpdate();
         } else {
@@ -287,6 +292,8 @@ public class NewsFragment extends Fragment{
             }
 
             if (mNewsCache.isExpired()) {
+            renderNews( (JSONObject)mCacheManager.get(NEWS_CACHE) );
+            if (mCacheManager.isExpired(NEWS_CACHE)) {
                 Log.i(Constants.TAG, "NewsCache expired. Refreshing..." );
                 startNewsUpdate();
             }
@@ -336,7 +343,7 @@ public class NewsFragment extends Fragment{
         }.start();
     }
     private void updateNewsCache(JSONObject data){
-        mNewsCache = new DataCache<>(data, DATA_UPDATE_FREQUENCY);
+        mCacheManager.addCache(NEWS_CACHE, data, DATA_UPDATE_FREQUENCY);
     }
 
     private void renderNews(JSONObject json){

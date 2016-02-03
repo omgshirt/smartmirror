@@ -35,11 +35,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -185,12 +189,9 @@ public class MainActivity extends AppCompatActivity
             mSpeechIcon.setVisibility(View.VISIBLE);
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, null, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -307,6 +308,7 @@ public class MainActivity extends AppCompatActivity
         mTTSHelper.destroy();
         mMessenger = null;
         mPreferences.destroy();
+        CacheManager.destroy();
         if (wifiHeartbeat != null) {
             wifiHeartbeat.cancel(true);
             wifiHeartbeat = null;
@@ -439,7 +441,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            handleCommand(item.toString().toLowerCase(Locale.US));
+            wakeScreenAndDisplay(item.toString().toLowerCase(Locale.US));
         }
 
         return super.onOptionsItemSelected(item);
@@ -450,7 +452,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         if(DEBUG)
             Log.i(Constants.TAG, "NavigationItemSelected: " + item.toString());
-        handleCommand(item.toString().toLowerCase(Locale.US));
+        wakeScreenAndDisplay(item.toString().toLowerCase(Locale.US));
         return true;
     }
 
@@ -466,12 +468,30 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Show a toast
+     * Show a toast centered on the bottom of the screen
      * @param text text to display
      * @param duration int duration: ex. Toast.LENGTH_LONG
      */
     public void showToast(String text, int duration) {
-        Toast.makeText(this, text, duration).show();
+        showToast(text, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, duration);
+    }
+
+    /**
+     * Show a toast, specifying the gravity for the display
+     */
+    public void showToast(String text, int gravity, int duration){
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_layout,
+                (ViewGroup) findViewById(R.id.toast_layout_root));
+
+        TextView txtLayout = (TextView) layout.findViewById(R.id.text);
+        txtLayout.setText(text);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setGravity(gravity, 0, 0);
+        toast.setDuration(duration);
+        toast.setView(layout);
+        toast.show();
     }
 
     /**
@@ -579,6 +599,7 @@ public class MainActivity extends AppCompatActivity
         if (DEBUG) {
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         }
+        playSound(R.raw.celeste_a);
 
         // Create fragment based on the command. If the input string is not a fragment,
         // broadcast the command to all registered receivers for evaluation.
@@ -643,7 +664,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(fragment != null){
-            playSound(R.raw.celeste_a);
             //startTTS(command);
             mCurrentFragment = command;
             displayFragment(fragment);
@@ -651,8 +671,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Gets the fragment currently being viewed. If the mirror in SLEEP,
-     * this will return the value of the last-displayed fragment.
+     * Gets the fragment currently being viewed.
      * @return String fragment name
      */
     protected String getCurrentFragment() {
@@ -660,9 +679,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * This method handles the speech icon indicator. It either hides
-     * or shows the icon based on the flag
-     * @param flag whether or not to show the icon
+     * Show or hide the speech icon
+     * @param flag true to display icon, false to hide
      */
     public void showSpeechIcon(boolean flag){
         if(flag) {
@@ -675,7 +693,7 @@ public class MainActivity extends AppCompatActivity
     // ----------------------- SPEECH RECOGNITION --------------------------
 
     /**
-     * Handles the result of the speech input. Conform voice inputs into standard commands
+     * Handle the result of speech input. Conform voice inputs into standard commands
      * used by the remote.
      * @param input the command the user gave
      */
@@ -693,10 +711,6 @@ public class MainActivity extends AppCompatActivity
                 broadcastMessage("inputAction", voiceInput);
             }
             return;
-        }
-
-        if(voiceInput.contains(Constants.WAKE)) {
-            voiceInput = Constants.WAKE;
         }
 
         // time
@@ -721,6 +735,9 @@ public class MainActivity extends AppCompatActivity
             voiceInput = Constants.WEATHER;
         }
 
+        if(voiceInput.contains(Constants.WAKE)) {
+            voiceInput = Constants.WAKE;
+        }
 
         if(voiceInput.contains(Constants.NIGHT_LIGHT)) {
             voiceInput = Constants.LIGHT;
@@ -751,8 +768,6 @@ public class MainActivity extends AppCompatActivity
         switch (voiceInput) {
             case Constants.GO_TO_SLEEP:
                 voiceInput = Constants.SLEEP;
-                break;
-            case Constants.HIDE:
                 break;
             case Constants.OPTIONS:
                 voiceInput = Constants.SETTINGS;
