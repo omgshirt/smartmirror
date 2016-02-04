@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,7 +17,8 @@ import org.json.JSONObject;
  * Fragment that handles the traffic information
  */
 public class TrafficFragment extends Fragment {
-    private Preferences mPreferance;
+    private ImageView imgTrafficIcon;
+    private Preferences mPreference;
     private String mCurrentLat;
     private String mCurrentLong;
     private String mWorkLat;
@@ -31,9 +33,9 @@ public class TrafficFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPreferance = Preferences.getInstance(getActivity());
-        mCurrentLat = Double.toString(mPreferance.getLatitude());
-        mCurrentLong = Double.toString(mPreferance.getLongitude());
+        mPreference = Preferences.getInstance(getActivity());
+        mCurrentLat = Double.toString(mPreference.getLatitude());
+        mCurrentLong = Double.toString(mPreference.getLongitude());
 
         //csun
         mWorkLat = "34.2370851";
@@ -47,6 +49,7 @@ public class TrafficFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.traffic_fragment, container, false);
+        imgTrafficIcon = (ImageView) view.findViewById(R.id.traffic_icon);
         txtDistance = (TextView) view.findViewById(R.id.traffic_distance);
         txtCurrent = (TextView) view.findViewById(R.id.traffic_current);
         txtDelays = (TextView) view.findViewById(R.id.traffic_delay);
@@ -59,32 +62,71 @@ public class TrafficFragment extends Fragment {
         startTrafficUpdate();
     }
 
+    /**
+     * Prepares the JSON request to get the current traffic information
+     */
+
     private void startTrafficUpdate(){
-        String distanceMatrixRequest = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s,%s&destinations=%s,%s&departure_time=now&traffic_model=best_guess&units=%s&key=%s";
-        String distanceMatrixKey = "AIzaSyBumZObXEyI5_7Ie0u8ZnrRKAXzojKpDw8";
+        String distanceMatrixKey = getActivity().getResources().getString(R.string.distance_matrix_api_key);
         String distanceMatrixUnit = "metric";
-        if(mPreferance.getWeatherUnits().equals(Preferences.ENGLISH)){
+        if(mPreference.getWeatherUnits().equals(Preferences.ENGLISH)){
             distanceMatrixUnit = "imperial";
         }
-        updateTrafficData(String.format(distanceMatrixRequest, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
+        updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
 
     }
 
+    /**
+     * Renders the traffic information that we got from the successful JSON
+     * request
+     * @param json the JSONObject we receive upon successful request
+     */
     private void renderTraffic(JSONObject json){
         try {
             JSONObject data = json.getJSONArray("rows")
                     .getJSONObject(0)
                     .getJSONArray("elements")
                     .getJSONObject(0);
-            double tripTime = Double.parseDouble(data.getJSONObject("duration").getString("text").substring(0, 2));
-            double tripTimeTraffic = Double.parseDouble(data.getJSONObject("duration_in_traffic").getString("text").substring(0,2));
-            txtDistance.setText("Distance to work: " + data.getJSONObject("distance").getString("text").substring(0,2) + " miles");
-            txtCurrent.setText("Normal travel time: " + tripTime + " minutes");
-            txtDelays.setText("Current travel time: " + tripTimeTraffic + " minutes");
+            double tripTime = Double.parseDouble(splitString(data.getJSONObject("duration").getString("text")));
+            double tripTimeTraffic = Double.parseDouble(splitString(data.getJSONObject("duration_in_traffic").getString("text")));
+            double tripDistance = Double.parseDouble(splitString(data.getJSONObject("distance").getString("text")));
+            double delay=0.0;
+            String units = "kilometers";
+            if(mPreference.getWeatherUnits().equals(Preferences.ENGLISH)){
+                units = "miles";
+            }
+
+            String travelFlow = "faster";
+            if(tripTimeTraffic - tripTime > 0){
+                delay = tripTimeTraffic-tripTime;
+                travelFlow = "slower";
+            } else if(tripTimeTraffic - tripTime < 0){
+                delay = Math.abs(tripTimeTraffic-tripTime);
+            }
+
+            txtDistance.setText("Distance to work: " + tripDistance + " " + units);
+            txtCurrent.setText("Current travel time: " + tripTimeTraffic + " minutes");
+            txtDelays.setText("Traffic delay " + travelFlow + " by " + delay + " minutes");
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Splits the string up using Space as the string delimiter and
+     * returns the first string post split.
+     * @param str the string we want to split up
+     * @return the first string post split
+     */
+    private String splitString(String str){
+        String[] token = str.split(" ");
+        return token[0];
+    }
+
+    /**
+     * Updates the traffic data upon a successful JSON fetch reques
+     * @param request the JSON request that we want to fetch
+     */
 
     private void updateTrafficData(final String request){
         new Thread(){

@@ -571,9 +571,6 @@ public class MainActivity extends AppCompatActivity
             case Constants.LIGHT:
                 fragment = new LightFragment();
                 break;
-            case Constants.MAKEUP:
-                fragment = new MakeupFragment();
-                break;
             case Constants.NEWS:
                 fragment = new NewsFragment();
                 break;

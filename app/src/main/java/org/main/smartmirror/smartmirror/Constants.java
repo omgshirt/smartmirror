@@ -5,7 +5,7 @@ import android.net.Uri;
 
 public class Constants {
 
-    //--------------CONSTANTS--------------
+    //--------------CONSTANTS------------
     public static final String TAG = "SmartMirror";
     public static final String BACK = "back";
     public static final String GO_BACK = "go back";
@@ -18,28 +18,26 @@ public class Constants {
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
 
-    //--------------FRAGMENTS--------------
+    //--------------FRAGMENTS------------
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
-    public static final String TWITTER = "twitter";
-    public static final String WEATHER = "weather";
-    public static final String QUOTES = "quotes";
-    public static final String MAKEUP= "makeup";
-    public static final String SETTINGS = "settings";
-    public static final String SLEEP = "sleep";
+    public static final String LIGHT = "light";
+    public static final String LIGHT_SLEEP = "light sleep"; // Not a voice command - only used to track current fragment
     public static final String MUSIC = "music";
     public static final String NEWS = "news";
     public static final String NEWS_BODY = "news body";
-    //public static final String SHOW_HELP = "show help";
-    public static final String TRAFFIC = "traffic";
-    public static final String TIME = "time";
     public static final String NIGHT_LIGHT = "night light";
-    public static final String LIGHT = "light";
-    public static final String LIGHT_SLEEP = "light sleep"; // Not a voice command - only used to track current fragment
+    public static final String QUOTES = "quotes";
+    public static final String SETTINGS = "settings";
+    public static final String SLEEP = "sleep";
+    public static final String TIME = "time";
+    public static final String TRAFFIC = "traffic";
+    public static final String TWITTER = "twitter";
+    public static final String WEATHER = "weather";
 
-    //--------------HELP--------------
+    //--------------HELP-----------------
     public static final String HELP = "help";
     public static final String HIDE = "hide";
 
@@ -53,7 +51,7 @@ public class Constants {
     public static final String SHOW_TIME = "show time";
     public static final String HIDE_TIME = "hide time";
 
-    //--------------CAMERA--------------
+    //--------------CAMERA---------------
     public static final String TAKE_PICTURE="take a picture";
 
     //--------------TWITTER--------------
@@ -69,11 +67,11 @@ public class Constants {
     public static final String mGet= "get";
     public static final String mRefresh= "refresh";
 
-    //--------------FACEBOOK--------------
+    //--------------FACEBOOK-------------
     public static final String SCROLLUP="scroll up";
     public static final String SCROLLDOWN="scroll down";
 
-    //--------------NEWS--------------
+    //--------------NEWS-----------------
     public static String mArticleFullBody = "";
     public static int numItems = 10;
     public static String article[] = new String[numItems];
@@ -101,4 +99,8 @@ public class Constants {
     public static final String SEVENTH = "seventh";
     public static final String EIGHT = "eight";
     public static final String EIGHTH = "eighth";
+
+    //--------------TRAFFIC--------------
+    public static final String DISTANCE_MATRIX_API =
+            "https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s,%s&destinations=%s,%s&departure_time=now&traffic_model=best_guess&units=%s&key=%s";
 }

@@ -4,7 +4,7 @@
 
     <!-- api keys -->
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
-    <string name="google_maps_key">AIzaSyCjZB-kBmT0AA3rVqAj-TLcXKDTxCJ-8ls</string>
+    <string name="distance_matrix_api_key">AIzaSyBumZObXEyI5_7Ie0u8ZnrRKAXzojKpDw8</string>
     <string name="guardian_api_key">c6ed3edf-b0c6-4669-8e5c-ba32ba96a65f</string>
     <string name="news_error">Error with News Data</string>
 

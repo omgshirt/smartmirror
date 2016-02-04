@@ -37,7 +37,7 @@ public class HelpFragment extends DialogFragment {
         Resources res = getResources();
 
         mAlertDialogBuilder = new AlertDialog.Builder(getActivity(),R.style.MyDialog);
-        mAlertDialogBuilder.setTitle(name + " - " + DIALOG_TITLE);
+        mAlertDialogBuilder.setTitle((name.substring(0,1).toUpperCase() + name.substring(1)) + " - " + DIALOG_TITLE);
         mAlertDialogBuilder.setView(vewHelp);
         TextView txtCurrentHelpHeader = (TextView)vewHelp.findViewById(R.id.fragment_help_header);
         TextView txtCurrentHelpContent = (TextView)vewHelp.findViewById(R.id.fragment_help_content);
