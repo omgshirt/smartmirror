@@ -1,10 +1,12 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.ImageFormat;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,7 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Set;
+
 
 /**
  * Fragment that displays the weather information
@@ -67,13 +69,14 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     private int mCurrentTemp = 0;
     private int mCurrentHumidity = 0;
     private int mCurrentWind = 0;
-    private DailyForecast dailyForecasts[];          // summary of data for 3 days (including today)
+
+    private DailyForecast forecastToday;
     private JSONArray mWeatherAlerts;
     private boolean mShowFullAlerts = true;
 
     private CacheManager mCacheManager = null;
     // time in minutes before weather data expires
-    private final int DATA_UPDATE_FREQUENCY = 10;
+    private final int DATA_UPDATE_FREQUENCY = 1;
     public static final String WEATHER_CACHE = "weather cache";
 
     Handler mHandler = new Handler();
@@ -89,7 +92,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             mCacheManager = CacheManager.getInstance();
             weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         }
-        dailyForecasts = new DailyForecast[3];
+        //dailyForecasts = new DailyForecast[3];
 
         mLatitude = Double.toString(mPreferences.getLatitude());
         mLongitude = Double.toString(mPreferences.getLongitude());
@@ -165,9 +168,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 case Preferences.CMD_TIME_12HR:
                 case Preferences.CMD_TIME_24HR:
                     updateTimeDisplay();
-                    break;
-                case Constants.FORECAST:
-                    speakWeatherForecast();
                     break;
                 case Constants.HIDE_TIME:
                     hideTime();
@@ -313,11 +313,11 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     private void speakCurrentConditions() {
 
-        if (dailyForecasts == null) return;
+        if (forecastToday == null) return;
 
         String text = " Current temperature is " + mCurrentTemp + " degrees. " +
-                    " High today " + dailyForecasts[0].maxTemp + ", " +
-                    " low " + dailyForecasts[0].minTemp + ". "
+                    " High today " + forecastToday.maxTemp + ", " +
+                    " low " + forecastToday.minTemp + ". "
                     // "Current humidity " + mCurrentHumidity + " percent. "
                     ;
 
@@ -333,30 +333,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
         if ( !text.equals("") ) {
             speakText(text);
-        }
-    }
-
-    // compile and say weather forecast for the next 3 days
-    private void speakWeatherForecast(){
-
-        if (dailyForecasts == null) return;
-
-        String today = "Today " + dailyForecasts[0].summary + " high of " + dailyForecasts[0].maxTemp +
-                " degrees, low tonight " + dailyForecasts[0].minTemp;
-
-        String tomorrow = "Tomorrow " + dailyForecasts[1].summary + " high of " + dailyForecasts[1].maxTemp +
-                " degrees, low temperature " + dailyForecasts[1].minTemp + " degrees";
-
-        Date date = new Date(dailyForecasts[2].forecastTime * 1000);
-        SimpleDateFormat sdf = new SimpleDateFormat("cccc", Locale.US);
-        String dayThreeName = sdf.format(date);
-
-        String nextDay = dayThreeName + ", " + dailyForecasts[2].summary + " high of " + dailyForecasts[2].maxTemp +
-                ", low of " + dailyForecasts[2].minTemp + " degrees ";
-
-        String forecast = today + ". " + tomorrow + ". " + nextDay;
-        if ( !forecast.equals("") ) {
-            speakText(forecast);
         }
     }
 
@@ -402,6 +378,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             JSONArray hourlyArray = hourly.getJSONArray("data");
             JSONObject currentHour = hourlyArray.getJSONObject(0);
 
+            String weatherDeg = getActivity().getString(R.string.weather_deg);
+
             // set current temp
             mCurrentTemp = (int)Math.round(currentHour.getDouble("temperature"));
             String tempFormat = mCurrentTemp + mPreferences.getTempString();
@@ -415,13 +393,15 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             // set Wind Speed & Direction
             mCurrentWind = (int)Math.round(currentHour.getDouble("windSpeed"));
             String windFormat = "";
-            /*
+
+            /* // show wind units. Removed for now.
             if (mPreferences.getWeatherUnits().equals(Preferences.METRIC) ) {
                 windFormat = "k";
             } else {
                 windFormat = "m";
             }
             */
+
             String windBearing = "";
             if (currentHour.has("windBearing")) {
                 windBearing = getDirectionFromBearing(currentHour.getInt("windBearing"));
@@ -432,6 +412,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
 
             // ---------------- 3-Day Forecast ---------------
+            /*
             JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
             for (int i = 0; i < 3; i++) {
                 JSONObject today = dailyData.getJSONObject(i);
@@ -445,15 +426,24 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 dailyForecasts[i].windSpeed = (int)Math.round(today.getDouble("windSpeed"));
                 dailyForecasts[i].forecastTime = today.getLong("time");
             }
+            */
+
+            JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
+            JSONObject today = dailyData.getJSONObject(0);
+            forecastToday = new DailyForecast(today);
 
             // set current weather icon
-            setWeatherIcon(txtWeatherIcon, currentHour.getString("icon"), dailyForecasts[0].sunrise * 1000,
-                    dailyForecasts[0].sunset * 1000 );
+            setWeatherIcon(getActivity(), weatherFont, txtWeatherIcon, currentHour.getString("icon"),
+                    forecastToday.sunrise * 1000,
+                    forecastToday.sunset * 1000 );
 
             // Set the dailyHigh and dailyLow
-            String maxIcon = getActivity().getString(R.string.weather_arrow_up) + dailyForecasts[0].maxTemp;
+            String maxIcon = getActivity().getString(R.string.weather_therm_high) + " " +
+                    forecastToday.maxTemp + weatherDeg;
             txtDailyHigh.setText(maxIcon);
-            String minIcon = getActivity().getString(R.string.weather_arrow_down) + dailyForecasts[0].minTemp;
+
+            String minIcon = getActivity().getString(R.string.weather_therm_low) + " " +
+                    forecastToday.minTemp+ weatherDeg;
             txtDailyLow.setText(minIcon);
 
             // ----------------- 2-Hour forecasts -------------
@@ -469,25 +459,27 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 Date date = new Date(forecast.getLong("time") * 1000);
                 String shortTimeFormat = mPreferences.getShortTimeFormat();
                 SimpleDateFormat sdf = new SimpleDateFormat(shortTimeFormat, Locale.US);
-                String time = sdf.format(date);
+                String time = sdf.format(date).toLowerCase(Locale.US);
                 timeForecast.setText(time);
 
                 // Forecast temp
                 TextView tempForecast = (TextView)forecastLayout.findViewById(R.id.forecast_temp);
-                String textTmp = (int)Math.round(forecast.getDouble("temperature")) + getResources().getString(R.string.weather_deg);
+                String textTmp = (int)Math.round(forecast.getDouble("temperature")) + weatherDeg;
                 tempForecast.setText(textTmp);
                 tempForecast.setTypeface(weatherFont);
 
                 // forecast icon
                 TextView iconForecast = (TextView)forecastLayout.findViewById(R.id.forecast_image);
                 String icon = forecast.getString("icon");
-                setWeatherIcon(iconForecast, icon, dailyForecasts[0].sunrise, dailyForecasts[0].sunset);
+                setWeatherIcon(getActivity(), weatherFont, iconForecast,  icon, forecastToday.sunrise, forecastToday.sunset);
 
                 TextView txtUmbrella = (TextView) forecastLayout.findViewById(R.id.forecast_umbrella);
                 TextView rainForecast = (TextView) forecastLayout.findViewById(R.id.forecast_rain);
 
                 int rainProb = (int)(forecast.getDouble("precipProbability") * 100);
-                if (rainProb > 10) {
+
+                // show chance of rain if >= 10%
+                if (rainProb >= 10) {
 
                     // umbrella icon
                     txtUmbrella.setTypeface(weatherFont);
@@ -519,6 +511,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             Log.e("DarkSky", "One or more fields not found in the JSON data");
         }
     }
+
+
 
     public String getWeatherAlerts(){
         StringBuilder alertText = new StringBuilder();
@@ -559,47 +553,47 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
 
     // choose weather icon based on iconType
-    private void setWeatherIcon(TextView tv, String iconType, long sunrise, long sunset){
+    public static void setWeatherIcon(Activity activity, Typeface font, TextView tv, String iconType, long sunrise, long sunset){
         String icon;
-        if (getActivity() == null) return;
+        if (activity == null) return;
         switch(iconType) {
-            case "clear-day": icon = getActivity().getString(R.string.weather_sunny);
+            case "clear-day": icon = activity.getString(R.string.weather_sunny);
                 break;
-            case "clear-night": icon = getActivity().getString(R.string.weather_clear_night);
+            case "clear-night": icon = activity.getString(R.string.weather_clear_night);
                 break;
-            case "cloudy" : icon = getActivity().getString(R.string.weather_cloudy);
+            case "cloudy" : icon = activity.getString(R.string.weather_cloudy);
                 break;
-            case "partly-cloudy-day" : icon = getActivity().getString(R.string.weather_cloudy_day);
+            case "partly-cloudy-day" : icon = activity.getString(R.string.weather_cloudy_day);
                 break;
-            case "partly-cloudy-night" :  icon = getActivity().getString(R.string.weather_partly_cloudy_night);
+            case "partly-cloudy-night" :  icon = activity.getString(R.string.weather_partly_cloudy_night);
                 break;
-            case "drizzle" : icon = getActivity().getString(R.string.weather_drizzle);
+            case "drizzle" : icon = activity.getString(R.string.weather_drizzle);
                 break;
-            case "fog" : icon = getActivity().getString(R.string.weather_foggy);
+            case "fog" : icon = activity.getString(R.string.weather_foggy);
                 break;
-            case "rain" : icon = getActivity().getString(R.string.weather_rainy);
+            case "rain" : icon = activity.getString(R.string.weather_rainy);
                 break;
-            case "sleet" : icon = getActivity().getString(R.string.weather_sleet);
+            case "sleet" : icon = activity.getString(R.string.weather_sleet);
                 break;
-            case "snow" : icon = getActivity().getString(R.string.weather_snowy);
+            case "snow" : icon = activity.getString(R.string.weather_snowy);
                 break;
-            case "thunderstorm" : icon = getActivity().getString(R.string.weather_thunder);
+            case "thunderstorm" : icon = activity.getString(R.string.weather_thunder);
                 break;
-            case "wind" : icon = getActivity().getString(R.string.weather_wind_strong);
+            case "wind" : icon = activity.getString(R.string.weather_wind_strong);
                 break;
             // if we can't find the right icon, set it to generic day or night depending on time
             default:
                 long currentTime = new Date().getTime();
                 if(currentTime>=sunrise && currentTime<sunset) {
-                    icon = getActivity().getString(R.string.weather_sunny);
+                    icon = activity.getString(R.string.weather_sunny);
                 } else {
-                    icon = getActivity().getString(R.string.weather_clear_night);
+                    icon = activity.getString(R.string.weather_clear_night);
                 }
                 break;
         }
 
         tv.setText(icon);
-        tv.setTypeface(weatherFont);
+        tv.setTypeface(font);
     }
 
     /** Callback from CacheManager */
@@ -612,19 +606,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     @Override
     public void onCacheChanged(String cacheName) {
         // In this case we do nothing, as calling startWeatherUpdate() will refresh the views.
-    }
-
-
-    // holds forecast data for one day
-    private class DailyForecast {
-        public int minTemp;
-        public int maxTemp;
-        public String summary;
-        public int windSpeed;
-        public long sunrise;
-        public long sunset;
-        public double precipProbability;
-        public long forecastTime;
     }
 
     /**
