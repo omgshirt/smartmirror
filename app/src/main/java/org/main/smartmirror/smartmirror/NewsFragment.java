@@ -32,16 +32,23 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
             "all&order-by=newest&q=world&api-key=";
     public static String mDefNewsSection = "world";
-    public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&q=";
+    //public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&q=";
+    public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&order-by=newest&q=";
     public static String mPostURL = "&api-key=";
     public static String mGuardURL = mPreURL + mDefNewsSection + mPostURL;
     public static String mNewsSection;
 
     // time in minutes before news data is considered old and is discarded
-    private final int DATA_UPDATE_FREQUENCY = 10;
+    private final int DATA_UPDATE_FREQUENCY = 1;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
     public static final String NEWS_CACHE = "news cache";
+    public static final String SPORTS_CACHE = "sports cache";
+    public static final String TECH_CACHE = "tech cache";
+    public static final String BUSINESS_CACHE = "business cache";
+    public static final String SCIENCE_CACHE = "science cache";
+    public static final String MEDIA_CACHE = "media cache";
+    public static final String TRAVEL_CACHE = "travel cache";
     private CacheManager mCacheManager = null;
 
     private TextView mTxtHeadline1;
@@ -189,7 +196,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     }
 
     public void startNewsUpdate(){
-
         mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
         updateNews(mGuardURL);
     }
@@ -280,22 +286,92 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // Check for any cached news data.
         // If a cache exists, render it to the view.
         // Update the cache if it has expired.
+
+        // TODO: 2/3/2016 add switch case so only current news section is checked/updated
+        // TODO: 2/3/2016 don't update when null/not prev visited
+
+        // -----CASE NEWS-----
         if (!mCacheManager.containsKey(NEWS_CACHE)) {
-            Log.i(Constants.TAG,"NewsCache does not exist, updating");
+            Log.i(Constants.TAG,"News Cache does not exist, updating");
             startNewsUpdate();
-        } else {
+            Log.i(Constants.TAG, "Rendering News");
             renderNews((JSONObject) mCacheManager.get(NEWS_CACHE));
-            if (mCacheManager.isExpired(NEWS_CACHE)) {
-                Log.i(Constants.TAG, "NewsCache expired. Refreshing...");
-                startNewsUpdate();
-            }
-            /*if (mNewsSection == mDefNewsSection) {
-                renderNews(mNewsCache.getData());
-                mDefNewsSection = mNewsSection;
-            } else {
-                Log.i(Constants.TAG, "New News Section");
-                startNewsUpdate();
-            }*/
+        }
+        else if (mCacheManager.isExpired(NEWS_CACHE)) {
+            Log.i(Constants.TAG, "NewsCache expired. Refreshing...");
+            startNewsUpdate();
+        }
+
+        // -----CASE SPORTS-----
+        if (!mCacheManager.containsKey(SPORTS_CACHE)) {
+            Log.i(Constants.TAG,"Sports Cache does not exist, updating");
+            startNewsUpdate();
+            Log.i(Constants.TAG, "Rendering Sports");
+            renderNews((JSONObject) mCacheManager.get(SPORTS_CACHE));
+        }
+        else if (mCacheManager.isExpired(SPORTS_CACHE)) {
+            Log.i(Constants.TAG, "SportsCache expired. Refreshing...");
+            startNewsUpdate();
+        }
+
+        // -----CASE TECHNOLOGY-----
+        if (!mCacheManager.containsKey(TECH_CACHE)) {
+            Log.i(Constants.TAG,"Tech Cache does not exist, updating");
+            startNewsUpdate();
+            Log.i(Constants.TAG, "Rendering Technology");
+            renderNews((JSONObject) mCacheManager.get(TECH_CACHE));
+        }
+        else if (mCacheManager.isExpired(TECH_CACHE)) {
+            Log.i(Constants.TAG, "TechCache expired. Refreshing...");
+            startNewsUpdate();
+        }
+
+        // -----CASE BUSINESS-----
+        if (!mCacheManager.containsKey(BUSINESS_CACHE)) {
+            Log.i(Constants.TAG,"Business Cache does not exist, updating");
+            startNewsUpdate();
+            Log.i(Constants.TAG, "Rendering Business");
+            renderNews((JSONObject) mCacheManager.get(BUSINESS_CACHE));
+        }
+        else if (mCacheManager.isExpired(BUSINESS_CACHE)) {
+            Log.i(Constants.TAG, "BusinessCache expired. Refreshing...");
+            startNewsUpdate();
+        }
+
+        // -----CASE MEDIA-----
+        if (!mCacheManager.containsKey(MEDIA_CACHE)) {
+            Log.i(Constants.TAG,"Media Cache does not exist, updating");
+            startNewsUpdate();
+            Log.i(Constants.TAG, "Rendering Media");
+            renderNews((JSONObject) mCacheManager.get(MEDIA_CACHE));
+        }
+        else if (mCacheManager.isExpired(MEDIA_CACHE)) {
+            Log.i(Constants.TAG, "MediaCache expired. Refreshing...");
+            startNewsUpdate();
+        }
+
+        // -----CASE TRAVEL-----
+        if (!mCacheManager.containsKey(TRAVEL_CACHE)) {
+            Log.i(Constants.TAG,"Travel Cache does not exist, updating");
+            startNewsUpdate();
+            Log.i(Constants.TAG, "Rendering Travel");
+            renderNews((JSONObject) mCacheManager.get(TRAVEL_CACHE));
+        }
+        else if (mCacheManager.isExpired(TRAVEL_CACHE)) {
+            Log.i(Constants.TAG, "TravelCache expired. Refreshing...");
+            startNewsUpdate();
+        }
+
+        // -----CASE SCIENCE-----
+        if (!mCacheManager.containsKey(SCIENCE_CACHE)) {
+            Log.i(Constants.TAG,"Science Cache does not exist, updating");
+            startNewsUpdate();
+            Log.i(Constants.TAG, "Rendering Science");
+            renderNews((JSONObject) mCacheManager.get(SCIENCE_CACHE));
+        }
+        else if (mCacheManager.isExpired(SCIENCE_CACHE)) {
+            Log.i(Constants.TAG, "ScienceCache expired. Refreshing...");
+            startNewsUpdate();
         }
     }
 
@@ -308,14 +384,44 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
-        mCacheManager.registerCacheListener(NEWS_CACHE, this);
+
+        if (mNewsSection == "world" || mNewsSection == "news") {
+            mCacheManager.registerCacheListener(NEWS_CACHE, this);
+        } else if (mNewsSection == "sports") {
+            mCacheManager.registerCacheListener(SPORTS_CACHE, this);
+        } else if (mNewsSection == "technology") {
+            mCacheManager.registerCacheListener(TECH_CACHE, this);
+        } else if (mNewsSection == "business") {
+            mCacheManager.registerCacheListener(BUSINESS_CACHE, this);
+        } else if (mNewsSection == "media") {
+            mCacheManager.registerCacheListener(MEDIA_CACHE, this);
+        } else if (mNewsSection == "travel") {
+            mCacheManager.registerCacheListener(TRAVEL_CACHE, this);
+        } else if (mNewsSection == "science") {
+            mCacheManager.registerCacheListener(SCIENCE_CACHE, this);
+        }
     }
 
     // when this goes out of view, halt listening
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-        mCacheManager.registerCacheListener(NEWS_CACHE, this);
+
+        if (mNewsSection == "world" || mNewsSection == "news") {
+            mCacheManager.registerCacheListener(NEWS_CACHE, this);
+        } else if (mNewsSection == "sports") {
+            mCacheManager.registerCacheListener(SPORTS_CACHE, this);
+        } else if (mNewsSection == "technology") {
+            mCacheManager.registerCacheListener(TECH_CACHE, this);
+        } else if (mNewsSection == "business") {
+            mCacheManager.registerCacheListener(BUSINESS_CACHE, this);
+        } else if (mNewsSection == "media") {
+            mCacheManager.registerCacheListener(MEDIA_CACHE, this);
+        } else if (mNewsSection == "travel") {
+            mCacheManager.registerCacheListener(TRAVEL_CACHE, this);
+        } else if (mNewsSection == "science") {
+            mCacheManager.registerCacheListener(SCIENCE_CACHE, this);
+        }
     }
 
     // Get news headlines from api and display
@@ -335,7 +441,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     mHandler.post(new Runnable(){
                         public void run(){
                             updateNewsCache(json);
-                            Log.i("NEWS ", json.toString());
+                            //Log.i("NEWS ", json.toString());
                             renderNews(json);
                         }
                     });
@@ -344,7 +450,21 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         }.start();
     }
     private void updateNewsCache(JSONObject data){
-        mCacheManager.addCache(NEWS_CACHE, data, DATA_UPDATE_FREQUENCY);
+        if (mNewsSection == "world" || mNewsSection == "news") {
+            mCacheManager.addCache(NEWS_CACHE, data, DATA_UPDATE_FREQUENCY);
+        } else if (mNewsSection == "sports") {
+            mCacheManager.addCache(SPORTS_CACHE, data, DATA_UPDATE_FREQUENCY);
+        } else if (mNewsSection == "technology") {
+            mCacheManager.addCache(TECH_CACHE, data, DATA_UPDATE_FREQUENCY);
+        } else if (mNewsSection == "business") {
+            mCacheManager.addCache(BUSINESS_CACHE, data, DATA_UPDATE_FREQUENCY);
+        } else if (mNewsSection == "media") {
+            mCacheManager.addCache(MEDIA_CACHE, data, DATA_UPDATE_FREQUENCY);
+        } else if (mNewsSection == "travel") {
+            mCacheManager.addCache(TRAVEL_CACHE, data, DATA_UPDATE_FREQUENCY);
+        } else if (mNewsSection == "science") {
+            mCacheManager.addCache(SCIENCE_CACHE, data, DATA_UPDATE_FREQUENCY);
+        }
     }
 
     private void renderNews(JSONObject json){
@@ -417,7 +537,22 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     /** Callback from CacheManager */
     @Override
     public void onCacheExpired(String cacheName) {
-        if (cacheName.equals(NEWS_CACHE)) startNewsUpdate();
+
+        if (mNewsSection == "world" || mNewsSection == "news") {
+            if (cacheName.equals(NEWS_CACHE)) startNewsUpdate();
+        } else if (mNewsSection == "sports") {
+            if (cacheName.equals(SPORTS_CACHE)) startNewsUpdate();
+        } else if (mNewsSection == "technology") {
+            if (cacheName.equals(TECH_CACHE)) startNewsUpdate();
+        } else if (mNewsSection == "business") {
+            if (cacheName.equals(BUSINESS_CACHE)) startNewsUpdate();
+        } else if (mNewsSection == "media") {
+            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();;
+        } else if (mNewsSection == "travel") {
+            if (cacheName.equals(TRAVEL_CACHE)) startNewsUpdate();
+        } else if (mNewsSection == "science") {
+            if (cacheName.equals(SCIENCE_CACHE)) startNewsUpdate();
+        }
     }
 
     /** Callback from CacheManager */
