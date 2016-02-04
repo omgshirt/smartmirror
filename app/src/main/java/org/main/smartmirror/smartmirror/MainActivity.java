@@ -270,19 +270,10 @@ public class MainActivity extends AppCompatActivity
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
 
         // on first load show initialFragment
-        if (mCurrentFragment == null)  {
+        if (mCurrentFragment == null || mCurrentFragment == Constants.CALENDAR)  { //Temporary Fix TODO: Fix
             wakeScreenAndDisplay(mInitialFragment);
         }
-        // if the system was put to sleep from LIGHT_SLEEP, pop SleepFragment off
-        else if ( mCurrentFragment.equals(Constants.LIGHT_SLEEP) ) {
-            getSupportFragmentManager().popBackStack();
-        }
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        Log.i(Constants.TAG, "onResume");
+        // if the system was put to sleep fr
     }
 
     @SuppressWarnings("deprecation")
