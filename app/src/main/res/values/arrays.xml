@@ -76,4 +76,9 @@
         <item>conditions</item>
         <item>forecast</item>
     </string-array>
+
+    <string-array name="facebook_help">
+        <item>scroll up</item>
+        <item>scroll down</item>
+    </string-array>
 </resources>

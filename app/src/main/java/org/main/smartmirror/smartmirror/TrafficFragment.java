@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +42,8 @@ public class TrafficFragment extends Fragment {
         mWorkLong = "-118.5272547";
 
         //somewhere in la
-        mWorkLat = "34.051144";
-        mWorkLong = "-118.2366286";
+//        mWorkLat = "34.051144";
+//        mWorkLong = "-118.2366286";
     }
 
     @Override
