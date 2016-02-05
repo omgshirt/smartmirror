@@ -534,9 +534,7 @@ public class MainActivity extends AppCompatActivity
         if (command.equals(Constants.HELP) && mHelpFragment == null) {
             mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
             mHelpFragment.show(getFragmentManager(), "HelpFragment");
-        }
-
-        if (mHelpFragment != null) {
+        } else if (mHelpFragment != null) {
             mHelpFragment.dismiss();
             mHelpFragment = null;
         }
