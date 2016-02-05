@@ -41,7 +41,7 @@ public class CacheManager {
         final Runnable expirationChecker = new Runnable() {
             @Override
             public void run() {
-                checkCacheExpirations();
+                checkCacheExpiration();
                 Log.i(Constants.TAG, "CacheManager: checking for expired caches");
             }
         };
@@ -157,7 +157,7 @@ public class CacheManager {
     /**
      *  Checks all caches for expiration & notifies attached listeners
      */
-    public void checkCacheExpirations() {
+    public void checkCacheExpiration() {
         if (mListenersMap.isEmpty()) return;
         for(String s : mListenersMap.keySet()) {
             if (cacheMap.get(s).isExpired()) {

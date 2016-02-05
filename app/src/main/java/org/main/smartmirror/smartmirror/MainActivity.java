@@ -33,7 +33,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -616,6 +615,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.FACEBOOK:
                 fragment = new FacebookFragment();
+                break;
+            case Constants.FORECAST:
+                fragment = new ForecastFragment();
                 break;
             case Constants.GALLERY:
                 fragment = new GalleryFragment();
