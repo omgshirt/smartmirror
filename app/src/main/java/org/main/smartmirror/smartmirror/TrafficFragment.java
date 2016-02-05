@@ -27,9 +27,8 @@ public class TrafficFragment extends Fragment {
     private TextView txtCurrent;
     private TextView txtDelays;
 
-
     Handler mHandler = new Handler();
-// https://maps.googleapis.com/maps/api/distancematrix/json?origins=34.0636439,-118.2593811&destinations=34.2370851,-118.5272547&departure_time=now&traffic_model=best_guess&key=AIzaSyBumZObXEyI5_7Ie0u8ZnrRKAXzojKpDw8
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,11 +89,7 @@ public class TrafficFragment extends Fragment {
             double tripTime = Double.parseDouble(splitString(data.getJSONObject("duration").getString("text")));
             double tripTimeTraffic = Double.parseDouble(splitString(data.getJSONObject("duration_in_traffic").getString("text")));
             double tripDistance = Double.parseDouble(splitString(data.getJSONObject("distance").getString("text")));
-            double delay=0.0;
-            String units = "kilometers";
-            if(mPreference.getWeatherUnits().equals(Preferences.ENGLISH)){
-                units = "miles";
-            }
+            double delay = 0.0;
 
             String travelFlow = "faster";
             if(tripTimeTraffic - tripTime > 0){
@@ -102,11 +97,18 @@ public class TrafficFragment extends Fragment {
                 travelFlow = "slower";
             } else if(tripTimeTraffic - tripTime < 0){
                 delay = Math.abs(tripTimeTraffic-tripTime);
+            } else {
+                travelFlow = "no delay";
+            }
+
+            String units = "kilometers";
+            if(mPreference.getWeatherUnits().equals(Preferences.ENGLISH)){
+                units = "miles";
             }
 
             txtDistance.setText("Distance to work: " + tripDistance + " " + units);
             txtCurrent.setText("Current travel time: " + tripTimeTraffic + " minutes");
-            txtDelays.setText("Traffic delay " + travelFlow + " by " + delay + " minutes");
+            txtDelays.setText("Traffic status: " + travelFlow + " by " + delay + " minutes");
         } catch (JSONException e) {
             e.printStackTrace();
         }

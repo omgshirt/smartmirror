@@ -1,51 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <!-- current fragment -->
-    <TextView
-        android:id="@+id/fragment_help_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="10sp"
-        android:textAlignment="center" />
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal">
 
+            <!-- current fragment -->
+            <TextView
+                android:id="@+id/fragment_help_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/fragment_help_content"
+                android:gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_below="@id/fragment_help_header"/>
+        </RelativeLayout>
 
-    <TextView
-        android:id="@+id/fragment_help_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/fragment_help_header"
-        android:paddingLeft="20sp" />
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal">
 
-    <!-- global commands -->
-    <TextView
-        android:id="@+id/general_help_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:layout_below="@id/fragment_help_content" />
+            <!-- General Help -->
+            <TextView
+                android:id="@+id/general_help_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/general_help_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:layout_below="@id/general_help_header" />
+            <TextView
+                android:id="@+id/general_help_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_below="@id/general_help_header"/>
+    </RelativeLayout>
 
-    <!-- weather commands -->
-    <TextView
-        android:id="@+id/weather_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:layout_below="@id/fragment_help_content" />
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/weather_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/weather_header" />
+            <!-- weather commands -->
+            <TextView
+                android:id="@+id/weather_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/weather_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_below="@id/weather_header"/>
+    </RelativeLayout>
+
+</LinearLayout>
