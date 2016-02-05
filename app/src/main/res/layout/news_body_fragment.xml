@@ -24,7 +24,7 @@
                 android:id="@+id/txtHeadline"
                 android:layout_gravity="center_horizontal"
                 android:textStyle="bold"
-                android:textSize="35dp" />
+                android:textSize="20dp" />
 
             <ScrollView
                 android:layout_width="wrap_content"
@@ -37,7 +37,8 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="News Body"
                     android:id="@+id/txtNewsBody"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="15dp" />
             </ScrollView>
         </LinearLayout>
     </FrameLayout>

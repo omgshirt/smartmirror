@@ -17,7 +17,7 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import io.fabric.sdk.android.Fabric;
 
 
-public class TwitterAct extends Activity{
+public class TwitterActivity extends Activity{
 
     private TwitterLoginButton mTwitterLoginButton;
     private TextView mStatus;
@@ -62,8 +62,8 @@ public class TwitterAct extends Activity{
                 mAuthSecret = result.data.getAuthToken().secret;
                 Log.i("auth token ", mAuthToken);
                 Log.i("auth token ", mAuthSecret);
-                Constants.TWITTER_ACCESS_TOKEN = mAuthToken;
-                Constants.TWITTER_ACCESS_SECRET = mAuthSecret;
+                TwitterASyncTask.TWITTER_ACCESS_TOKEN = mAuthToken;
+                TwitterASyncTask.TWITTER_ACCESS_SECRET = mAuthSecret;
                 finish();
             }
 

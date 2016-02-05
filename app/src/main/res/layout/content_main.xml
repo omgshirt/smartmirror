@@ -15,8 +15,10 @@
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_action_microphone" />
+        android:visibility="gone"
+        android:src="@drawable/ic_action_microphone"/>
 
     <fragment
         android:name="org.main.smartmirror.smartmirror.WeatherFragment"
@@ -26,8 +28,9 @@
         android:layout_height="wrap_content" />
 
     <FrameLayout
-        android:layout_below="@id/weather_fragment"
+        android:layout_below="@+id/weather_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/content_frame"></FrameLayout>
+        android:id="@+id/content_frame">
+    </FrameLayout>
 </RelativeLayout>

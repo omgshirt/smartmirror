@@ -13,9 +13,13 @@ import twitter4j.TwitterObjectFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 
+
 //android.os.AsyncTask<Params, Progress, Result>
 public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
+
+    public static String TWITTER_ACCESS_TOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
+    public static String TWITTER_ACCESS_SECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
 
     @Override
     protected String doInBackground(String[] params) {
@@ -27,14 +31,14 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     cb.setDebugEnabled(true);
                     cb.setOAuthConsumerKey(Constants.TWITTER_CONSUMER_KEY);
                     cb.setOAuthConsumerSecret(Constants.TWITTER_CONSUMER_SECRET);
-                    cb.setOAuthAccessToken(Constants.TWITTER_ACCESS_TOKEN);
-                    cb.setOAuthAccessTokenSecret(Constants.TWITTER_ACCESS_SECRET);
+                    cb.setOAuthAccessToken(TWITTER_ACCESS_TOKEN);
+                    cb.setOAuthAccessTokenSecret(TWITTER_ACCESS_SECRET);
                     cb.setJSONStoreEnabled(true);
-                    //.setOAuthAccessToken(TwitterAct.mAuthToken)
-                    //.setOAuthAccessTokenSecret(TwitterAct.mAuthToken);
+                    //.setOAuthAccessToken(TwitterActivity.mAuthToken)
+                    //.setOAuthAccessTokenSecret(TwitterActivity.mAuthToken);
 
 
-            AccessToken accessToken = new AccessToken(Constants.TWITTER_ACCESS_TOKEN, Constants.TWITTER_ACCESS_SECRET);
+            AccessToken accessToken = new AccessToken(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET);
             Twitter twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
 
             Paging paging = new Paging(5); // MAX 200 IN ONE CALL
@@ -47,12 +51,12 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     String rawJSON = TwitterObjectFactory.getRawJSON(status);
                     //String fileName = "statuses/" + status.getId() + ".json";
                     //System.out.println(status.getUser().getName() + "\n" + status.getText());
-                    Constants.mUser[i] = status.getUser().getName();
-                    Constants.mStatus[i] = status.getText();
-                    Constants.mUserAt[i] = status.getUser().getScreenName();
+                    TwitterFragment.mUser[i] = status.getUser().getName();
+                    TwitterFragment.mStatus[i] = status.getText();
+                    TwitterFragment.mUserAt[i] = status.getUser().getScreenName();
                     //System.out.println(Constants.mUser[i] + " @" + Constants.mUserAt[i] + "\n" + Constants.mStatus[i]);
                     //Constants.mUrl[i] = Uri.parse(status.getUser().getProfileImageURL());
-                    Constants.mUrl[i] = Uri.parse(status.getUser().getProfileImageURLHttps());
+                    TwitterFragment.mUrl[i] = Uri.parse(status.getUser().getProfileImageURLHttps());
 
                     i++;
                 }

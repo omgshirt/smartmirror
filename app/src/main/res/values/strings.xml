@@ -57,6 +57,7 @@
     <string name="weather_snowy">\uf01b</string>
     <string name="weather_sleet">\uf0b5</string>
     <string name="weather_rainy">\uf019</string>
+    <string name="weather_umbrella">\uf084</string>
 
     <string name="weather_humidity">\uf07a</string>
     <string name="weather_deg_c">\uf03c</string>
