@@ -33,6 +33,11 @@ public class Preferences implements LocationListener {
     private SharedPreferences mSharedPreferences;
     private Activity mActivity;
 
+    //Google Account Email Preference
+    public static final String PREFS_GMAIL = "accountName";
+    //Google Account Email String
+    public static String mUserAccountPref = "";
+
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
     public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
@@ -325,6 +330,10 @@ public class Preferences implements LocationListener {
         mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
         mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
+
+        //Google Account Email Preferences
+        mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
+
 
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
@@ -708,4 +717,17 @@ public class Preferences implements LocationListener {
     public void onProviderDisabled(String provider) {
 
     }
+
+    //Get User Gmail Account to be used in other fragments
+    public static String getUserAccountName(){
+        return mUserAccountPref;
+    }
+
+    //Set User Account if null
+    public void setUserAccountName(String userAcc) {
+            mUserAccountPref = userAcc;
+            SharedPreferences.Editor edit = mSharedPreferences.edit();
+            edit.putString(PREFS_GMAIL, userAcc);
+            edit.apply();
+        }
 }
