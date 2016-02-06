@@ -179,6 +179,12 @@ public class MainActivity extends AppCompatActivity
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
 
+        //Google Account Picker
+        if(mPreferences.getUserAccountName() == "") {
+            Intent gAccPick = new Intent(MainActivity.this, AccountPickerActivity.class);
+            startActivity(gAccPick);
+        }
+        Log.i(Constants.TAG, mPreferences.getUserAccountName() + " TESTING ONCREATE");
         // Set up views and nav drawer
         setContentView(R.layout.activity_main);
         // speech icon turn it off for now
@@ -242,6 +248,8 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.i(Constants.TAG, "onStart");
+        Log.i(Constants.TAG, mPreferences.getUserAccountName() + " TESTING ONSTART");
+
         mirrorSleepState = AWAKE;
 
         mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
@@ -259,19 +267,10 @@ public class MainActivity extends AppCompatActivity
         registerReceiver(mWifiReceiver, mWifiIntentFilter);
 
         // on first load show initialFragment
-        if (mCurrentFragment == null)  {
+        if (mCurrentFragment == null || mCurrentFragment == Constants.CALENDAR)  { //Temporary Fix TODO: Fix
             wakeScreenAndDisplay(mInitialFragment);
         }
-        // if the system was put to sleep from LIGHT_SLEEP, pop SleepFragment off
-        else if ( mCurrentFragment.equals(Constants.LIGHT_SLEEP) ) {
-            getSupportFragmentManager().popBackStack();
-        }
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        Log.i(Constants.TAG, "onResume");
+        // if the system was put to sleep fr
     }
 
     @SuppressWarnings("deprecation")
