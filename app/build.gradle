@@ -6,7 +6,6 @@ buildscript {
     }
 
     dependencies {
-
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
@@ -31,6 +30,7 @@ android {
         versionName "1.0"
         multiDexEnabled = true
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -50,10 +50,9 @@ dependencies {
     compile('com.google.apis:google-api-services-calendar:v3-rev125-1.20.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    compile('com.twitter.sdk.android:twitter:1.12.0@aar') {
+    compile('com.twitter.sdk.android:twitter:1.10.0@aar') {
         transitive = true;
     }
-    compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile project(':pocketsphinx-android-5prealpha-nolib')
 
@@ -64,6 +63,7 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
     }
 
+    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.google.android.gms:play-services-identity:8.3.0'
