@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,8 @@ import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.tweetui.TweetView;
+
+import org.json.JSONObject;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -57,7 +60,14 @@ public class TwitterFragment extends Fragment {
     private ImageView mPP11;
 
     private Button mTwitterLogin;
-    private Button mTwitterButton;
+    private Button mTwitterGet;
+
+    public static String mTwitterPreAPI = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=";
+    public static String mTwitterPostAPI = "&count=2";
+    public static String mTwitterUser;
+    public static String mTwitterAPI;
+    public static String mTwitterTokenURL = "https://api.twitter.com/oauth/access_token";
+    public static String mTwitterAuthURL = "https://api.twitter.com/oauth/authenticate?oauth_token=";
 
     public static String mUser[] = new String[100];
     public static String mStatus[] = new String[100];
@@ -106,6 +116,9 @@ public class TwitterFragment extends Fragment {
             }
         });*/
 
+        mTwitterLogin = (Button)view.findViewById(R.id.toLogin);
+        mTwitterGet = (Button)view.findViewById(R.id.pullTweets);
+
         mStatus1 = (TextView)view.findViewById(R.id.status1);
         mStatus2 = (TextView)view.findViewById(R.id.status2);
         mStatus3 = (TextView)view.findViewById(R.id.status3);
@@ -141,7 +154,28 @@ public class TwitterFragment extends Fragment {
         mStatus9.setText("");
         mStatus10.setText("");
         mStatus11.setText("");
-        twitterAsync();
+
+        mTwitterLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                twitterLogin();
+            }
+        });
+        mTwitterGet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /*TwitterSession session = Twitter.getSessionManager().getActiveSession();
+                TwitterAuthToken authToken = session.getAuthToken();
+                TwitterActivity.mAuthToken = authToken.token;
+                TwitterActivity.mAuthSecret = authToken.secret;*/
+
+                mTwitterAPI = mTwitterPreAPI+TwitterActivity.mScreenName+mTwitterPostAPI;
+                pullTweets(mTwitterAPI);
+                //twitterAsync();
+
+            }
+        });
 
         return view;
     }
@@ -158,10 +192,10 @@ public class TwitterFragment extends Fragment {
             Log.d("Twitter ", "Got message:\"" + message +"\"");
             switch (message) {
                 case Constants.mGet:
-                    twitterAsync();
+                    //twitterAsync();
                     break;
                 case Constants.mRefresh:
-                    twitterAsync();
+                    //twitterAsync();
                     Toast.makeText(getActivity(),"Twitter Feed Refreshed",Toast.LENGTH_LONG).show();
                     break;
                 case Constants.mLogin:
@@ -215,27 +249,53 @@ public class TwitterFragment extends Fragment {
         });*//*
     }*/
 
+
+    private void pullTweets(final String query){
+        new Thread(){
+            public void run(){
+                final JSONObject json = FetchURL.getJSON(query);
+                if(json == null){
+                    mHandler.post(new Runnable(){
+                        public void run(){
+                            Toast.makeText(getActivity(),
+                                    getActivity().getString(R.string.twitter_error),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } else {
+                    mHandler.post(new Runnable() {
+                        public void run(){
+                            Log.i("TWEETS ", json.toString());
+                            //renderTweets(json);
+                        }
+                    });
+                }
+            }
+        }.start();
+    }
+
     //to twitter login activity
     public void twitterLogin() {
         Intent intent = new Intent(getContext(), TwitterActivity.class);
         startActivity(intent);
     }
 
-    public void twitterAsync() {
-        new TwitterASyncTask().execute();
 
-        try {
+    public void twitterAsync() {
+        //new TwitterASyncTask().execute();
+
+        /*try {
             Thread.sleep(2000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
 
-        /* do this once you build txtListTweets
+        *//* do this once you build txtListTweets
         for (int i=0; i <= 10; i++) {
             String txt = "<b>" + Constants.mUser[i] + "</b> " + "<br>" + Constants.mStatus[i] + "<br>";
             txtListTweets.get(i).setText(Html.fromHtml(txt));
         }
-        */
+        *//*
 
         String txt0 = "<b>" + mUser[0] + "</b> " + "<br>" + mStatus[0] + "<br>";
         mStatus1.setText(Html.fromHtml(txt0));
@@ -279,7 +339,7 @@ public class TwitterFragment extends Fragment {
 
         String txt10 = "<b>" + mUser[10] + "</b> " + "<br>" + mStatus[10] + "<br>";
         mStatus11.setText(Html.fromHtml(txt10));
-        Picasso.with(getContext()).load(mUrl[10]).fit().centerInside().into(mPP11);
+        Picasso.with(getContext()).load(mUrl[10]).fit().centerInside().into(mPP11);*/
     }
 
 }

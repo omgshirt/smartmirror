@@ -7,9 +7,11 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
@@ -23,9 +25,9 @@ public class TwitterActivity extends Activity{
     private TextView mStatus;
     private TwitterSession mSession;
     private long mUserID;
-    private String mScreenName;
-    private static String mAuthToken;
-    private static String mAuthSecret;
+    public static String mScreenName;
+    public static String mAuthToken;
+    public static String mAuthSecret;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +58,18 @@ public class TwitterActivity extends Activity{
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
                 Long id = mSession.getId();
                 Log.i("ID: ", id.toString());
-                long tweetID = 631879971628183552L;
+                //long tweetID = 631879971628183552L;
                 //showTweet(tweetID);
                 mAuthToken = result.data.getAuthToken().token;
                 mAuthSecret = result.data.getAuthToken().secret;
-                Log.i("auth token ", mAuthToken);
-                Log.i("auth token ", mAuthSecret);
+
                 TwitterASyncTask.TWITTER_ACCESS_TOKEN = mAuthToken;
                 TwitterASyncTask.TWITTER_ACCESS_SECRET = mAuthSecret;
+                //twitterAsync();
+                //TwitterSession session = Twitter.getSessionManager().getActiveSession();
+                //TwitterAuthToken authToken = session.getAuthToken();
+                //mAuthToken = authToken.token;
+                //mAuthSecret = authToken.secret;
                 finish();
             }
 
@@ -81,5 +87,7 @@ public class TwitterActivity extends Activity{
         super.onActivityResult(requestCode, resultCode, data);
         mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
     }
+
+
 
 }
