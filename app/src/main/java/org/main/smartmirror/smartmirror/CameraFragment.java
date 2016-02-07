@@ -37,11 +37,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -218,7 +220,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 activity.finish();
             }
         }
-
     };
 
     /**
@@ -414,8 +415,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
         credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
-        //String accountName = ("smartmirrortesting@gmail.com");
-        //String accountName = Preferences.mUserAccountPref;
         String accountName = Preferences.getUserAccountName();
         credential.setSelectedAccountName(accountName);
         service = getDriveService(credential);
