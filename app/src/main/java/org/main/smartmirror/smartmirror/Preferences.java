@@ -143,19 +143,20 @@ public class Preferences implements LocationListener {
     private float mMusicVolume;                     // music stream volume
     private int mMusicVolumeHolder;
     private int mSystemVolumeHolder;
-
-    private String mDateFormat = "EEE, LLL d";      // SimpleDateFormat string for date display
-    private static final String TIME_FORMAT_24_HR = "k:mm";
-    private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
-    private static final String TIME_FORMAT_12_HR = "h:mm a";
-    private static final String TIME_FORMAT_12_HR_SHORT = "ha";
-
-
     private String mTimeFormat;
     private String mWeatherUnits;                      // Weather display format (English / metric)
 
     private double mLatitude;
     private double mLongitude;
+
+    private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
+    private static final String TIME_FORMAT_24_HR = "k:mm";
+    private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
+    private static final String TIME_FORMAT_12_HR = "h:mm";
+    private static final String TIME_FORMAT_12_HR_SHORT = "h:mm";
+
+
+
 
 
     // Handle any messages sent from MainActivity
@@ -458,9 +459,8 @@ public class Preferences implements LocationListener {
     public void setWeatherUnits(String unit) {
         if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
             mWeatherUnits = unit;
-            // (1/12/16) invalid the cache stored in WeatherFragment. Don't like this as it's too tightly coupled.
-            if (WeatherFragment.mWeatherCache != null)
-                WeatherFragment.mWeatherCache.invalidate();
+            // Invalidate the WEATHER_CACHE
+            CacheManager.getInstance().deleteCache(WeatherFragment.WEATHER_CACHE);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putString(PREFS_WEATHER_UNIT, mWeatherUnits);
             edit.apply();
@@ -656,6 +656,7 @@ public class Preferences implements LocationListener {
      */
     public void setVoiceEnabled(boolean voiceEnabled) {
         this.mVoiceEnabled = voiceEnabled;
+        ((MainActivity)mActivity).showSpeechIcon(voiceEnabled);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
         edit.apply();

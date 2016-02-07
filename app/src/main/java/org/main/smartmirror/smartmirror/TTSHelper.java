@@ -1,6 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
@@ -11,7 +10,7 @@ import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class TTSHelper{
-    private Context mContext;
+    private MainActivity mActivity;
 
     private static TextToSpeech mTextToSpeech = null;
     private static boolean mIsSpeaking = false;
@@ -21,8 +20,8 @@ public class TTSHelper{
     private int messageId = 0;
 
 
-    public TTSHelper(Context c) {
-        mContext = c;
+    public TTSHelper(MainActivity c) {
+        mActivity = c;
         mTextToSpeechListener = new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -33,19 +32,35 @@ public class TTSHelper{
                         @Override
                         public void onStart(String utteranceId) {
                             mIsSpeaking = true;
-                            ((MainActivity)mContext).stopSpeechRecognition();
+                            Log.i(Constants.TAG,"TTS utterance start");
+
+                            mActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mActivity.stopSpeechRecognition();
+                                }
+                            });
+                            // this is calling mActivity off the main thread
+                            //mActivity.stopSpeechRecognition();
                         }
 
                         @Override
                         public void onDone(String utteranceId){
                             mIsSpeaking = false;
-                            ((MainActivity)mContext).startSpeechRecognition();
+                            mActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mActivity.startSpeechRecognition();
+                                }
+                            });
+                            // this is calling mActivity off the main thread
+                            //mActivity.startSpeechRecognition();
                         }
 
                         @Override
                         public void onError(String utteranceId) {
                             mIsSpeaking = false;
-                            ((MainActivity)mContext).stopSpeechRecognition();
+                            mActivity.startSpeechRecognition(); // seems we would want to start speech if TTS encounters an error...
                         }
                     });
                     mTtsInitialized = true;
@@ -53,7 +68,7 @@ public class TTSHelper{
                 }
             }
         };
-        mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
+        mTextToSpeech = new TextToSpeech(mActivity, mTextToSpeechListener);
     }
 
     /** Check preferences for speech frequency. If successful, say the text
@@ -62,7 +77,7 @@ public class TTSHelper{
      */
     public void speakText(String text) {
         Random rand = new Random();
-        Preferences prefs = Preferences.getInstance((MainActivity)mContext);
+        Preferences prefs = Preferences.getInstance(mActivity);
         if (rand.nextFloat() < prefs.getSpeechFrequency()) {
             start(text);
         }
@@ -83,7 +98,7 @@ public class TTSHelper{
         if (mTextToSpeech == null) {
             Log.i("TextToSpeech", "not initialized");
             try {
-                mTextToSpeech = new TextToSpeech(mContext, mTextToSpeechListener);
+                mTextToSpeech = new TextToSpeech(mActivity, mTextToSpeechListener);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -124,6 +139,7 @@ public class TTSHelper{
             mIsSpeaking = false;
             mTextToSpeech = null;
             mTtsInitialized = false;
+            mActivity = null;
         }
     }
 

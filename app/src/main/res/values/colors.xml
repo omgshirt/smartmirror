@@ -13,17 +13,4 @@
     <color name="red">#FF0000</color>
     <color name="yellow">#FFFF00</color>
     <color name="white">#FFFFFF</color>
-
-    <array name="color_names">
-        <item>black</item>
-        <item>blue</item>
-        <item>gray</item>
-        <item>green</item>
-        <item>magenta</item>
-        <item>orange</item>
-        <item>purple</item>
-        <item>red</item>
-        <item>yellow</item>
-        <item>white</item>
-    </array>
 </resources>

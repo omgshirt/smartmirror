@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -57,6 +58,11 @@ public class TwitterFragment extends Fragment {
 
     private Button mTwitterLogin;
     private Button mTwitterButton;
+
+    public static String mUser[] = new String[100];
+    public static String mStatus[] = new String[100];
+    public static String mUserAt[] = new String[100];
+    public static Uri mUrl[] = new Uri[100]; // profile image url
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
@@ -211,7 +217,7 @@ public class TwitterFragment extends Fragment {
 
     //to twitter login activity
     public void twitterLogin() {
-        Intent intent = new Intent(getContext(), TwitterAct.class);
+        Intent intent = new Intent(getContext(), TwitterActivity.class);
         startActivity(intent);
     }
 
@@ -231,49 +237,49 @@ public class TwitterFragment extends Fragment {
         }
         */
 
-        String txt0 = "<b>" + Constants.mUser[0] + "</b> " + "<br>" + Constants.mStatus[0] + "<br>";
+        String txt0 = "<b>" + mUser[0] + "</b> " + "<br>" + mStatus[0] + "<br>";
         mStatus1.setText(Html.fromHtml(txt0));
-        Picasso.with(getContext()).load(Constants.mUrl[0]).fit().centerInside().into(mPP1);
+        Picasso.with(getContext()).load(mUrl[0]).fit().centerInside().into(mPP1);
 
-        String txt1 = "<b>" + Constants.mUser[1] + "</b> " + "<br>" + Constants.mStatus[1] + "<br>";
+        String txt1 = "<b>" + mUser[1] + "</b> " + "<br>" + mStatus[1] + "<br>";
         mStatus2.setText(Html.fromHtml(txt1));
-        Picasso.with(getContext()).load(Constants.mUrl[1]).fit().centerInside().into(mPP2);
+        Picasso.with(getContext()).load(mUrl[1]).fit().centerInside().into(mPP2);
 
-        String txt2 = "<b>" + Constants.mUser[2] + "</b> " + "<br>" + Constants.mStatus[2] + "<br>";
+        String txt2 = "<b>" + mUser[2] + "</b> " + "<br>" + mStatus[2] + "<br>";
         mStatus3.setText(Html.fromHtml(txt2));
-        Picasso.with(getContext()).load(Constants.mUrl[2]).fit().centerInside().into(mPP3);
+        Picasso.with(getContext()).load(mUrl[2]).fit().centerInside().into(mPP3);
 
-        String txt3 = "<b>" + Constants.mUser[3] + "</b> " + "<br>" + Constants.mStatus[3] + "<br>";
+        String txt3 = "<b>" + mUser[3] + "</b> " + "<br>" + mStatus[3] + "<br>";
         mStatus4.setText(Html.fromHtml(txt3));
-        Picasso.with(getContext()).load(Constants.mUrl[3]).fit().centerInside().into(mPP4);
+        Picasso.with(getContext()).load(mUrl[3]).fit().centerInside().into(mPP4);
 
-        String txt4 = "<b>" + Constants.mUser[4] + "</b> " + "<br>" + Constants.mStatus[4] + "<br>";
+        String txt4 = "<b>" + mUser[4] + "</b> " + "<br>" + mStatus[4] + "<br>";
         mStatus5.setText(Html.fromHtml(txt4));
-        Picasso.with(getContext()).load(Constants.mUrl[4]).fit().centerInside().into(mPP5);
+        Picasso.with(getContext()).load(mUrl[4]).fit().centerInside().into(mPP5);
 
-        String txt5 = "<b>" + Constants.mUser[5] + "</b> " + "<br>" + Constants.mStatus[5] + "<br>";
+        String txt5 = "<b>" + mUser[5] + "</b> " + "<br>" + mStatus[5] + "<br>";
         mStatus6.setText(Html.fromHtml(txt5));
-        Picasso.with(getContext()).load(Constants.mUrl[5]).fit().centerInside().into(mPP6);
+        Picasso.with(getContext()).load(mUrl[5]).fit().centerInside().into(mPP6);
 
-        String txt6 = "<b>" + Constants.mUser[6] + "</b> " + "<br>" + Constants.mStatus[6] + "<br>";
+        String txt6 = "<b>" + mUser[6] + "</b> " + "<br>" + mStatus[6] + "<br>";
         mStatus7.setText(Html.fromHtml(txt6));
-        Picasso.with(getContext()).load(Constants.mUrl[6]).fit().centerInside().into(mPP7);
+        Picasso.with(getContext()).load(mUrl[6]).fit().centerInside().into(mPP7);
 
-        String txt7 = "<b>" + Constants.mUser[7] + "</b> " + "<br>" + Constants.mStatus[7] + "<br>";
+        String txt7 = "<b>" + mUser[7] + "</b> " + "<br>" + mStatus[7] + "<br>";
         mStatus8.setText(Html.fromHtml(txt7));
-        Picasso.with(getContext()).load(Constants.mUrl[7]).fit().centerInside().into(mPP8);
+        Picasso.with(getContext()).load(mUrl[7]).fit().centerInside().into(mPP8);
 
-        String txt8 = "<b>" + Constants.mUser[8] + "</b> " + "<br>" + Constants.mStatus[8] + "<br>";
+        String txt8 = "<b>" + mUser[8] + "</b> " + "<br>" + mStatus[8] + "<br>";
         mStatus9.setText(Html.fromHtml(txt8));
-        Picasso.with(getContext()).load(Constants.mUrl[8]).fit().centerInside().into(mPP9);
+        Picasso.with(getContext()).load(mUrl[8]).fit().centerInside().into(mPP9);
 
-        String txt9 = "<b>" + Constants.mUser[9] + "</b> " + "<br>" + Constants.mStatus[9] + "<br>";
+        String txt9 = "<b>" + mUser[9] + "</b> " + "<br>" + mStatus[9] + "<br>";
         mStatus10.setText(Html.fromHtml(txt9));
-        Picasso.with(getContext()).load(Constants.mUrl[9]).fit().centerInside().into(mPP10);
+        Picasso.with(getContext()).load(mUrl[9]).fit().centerInside().into(mPP10);
 
-        String txt10 = "<b>" + Constants.mUser[10] + "</b> " + "<br>" + Constants.mStatus[10] + "<br>";
+        String txt10 = "<b>" + mUser[10] + "</b> " + "<br>" + mStatus[10] + "<br>";
         mStatus11.setText(Html.fromHtml(txt10));
-        Picasso.with(getContext()).load(Constants.mUrl[10]).fit().centerInside().into(mPP11);
+        Picasso.with(getContext()).load(mUrl[10]).fit().centerInside().into(mPP11);
     }
 
 }

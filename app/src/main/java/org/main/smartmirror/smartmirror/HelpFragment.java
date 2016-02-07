@@ -5,94 +5,93 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
+/**
+ * Class that handles the help dialog which shows the commands the user can issue
+ */
 public class HelpFragment extends DialogFragment {
-    private AlertDialog.Builder builder;
+    private AlertDialog.Builder mAlertDialogBuilder;
+    private static final String DIALOG_TITLE="Help";
 
     //used as the constructor to get the new instance of Helper dialogue
     public static HelpFragment newInstance(String name) {
-        HelpFragment frag = new HelpFragment();
+        HelpFragment frgHelpFrag = new HelpFragment();
         Bundle args = new Bundle();
-        args.putString("name",name);
-        frag.setArguments(args);
-        return frag;
+        args.putString("name", name);
+        frgHelpFrag.setArguments(args);
+        return frgHelpFrag;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
+        View vewHelp = inflater.inflate(R.layout.help_fragment, null);
         String name = getArguments().getString("name");
         Resources res = getResources();
 
-        //needed for the help string dialogue
-        String[] news_settings=res.getStringArray(R.array.news_settings);
-        String[] news_settings2=res.getStringArray(R.array.news_settings2);
-        String news_string =stringSpace(news_settings);
-        String news_string2=stringSpace(news_settings2);
+        mAlertDialogBuilder = new AlertDialog.Builder(getActivity(),R.style.MyDialog);
+        mAlertDialogBuilder.setTitle((name.substring(0,1).toUpperCase() + name.substring(1)) + " - " + DIALOG_TITLE);
+        mAlertDialogBuilder.setView(vewHelp);
+        TextView txtCurrentHelpHeader = (TextView)vewHelp.findViewById(R.id.fragment_help_header);
+        TextView txtCurrentHelpContent = (TextView)vewHelp.findViewById(R.id.fragment_help_content);
+        TextView txtHelpHeader = (TextView)vewHelp.findViewById(R.id.general_help_header);
+        TextView txtHelpContent = (TextView)vewHelp.findViewById(R.id.general_help_content);
+        TextView txtWeahterHelpHeader = (TextView)vewHelp.findViewById(R.id.weather_header);
+        TextView txtWeahterHelpContent = (TextView)vewHelp.findViewById(R.id.weather_content);
 
-        //needed for the settings string dialogue
-        String[] help_settings=res.getStringArray(R.array.help_settings);
-        String settings_string =stringSpace(help_settings);
-        String[] help_settings2=res.getStringArray(R.array.help_settings2);
-        String settings_string2=stringSpace(help_settings2);
+        // set the default help!
+        String strContent;
+        String[] arrayContent;
+        // general
+        arrayContent = res.getStringArray(R.array.general_help);
+        strContent = stringSpace(arrayContent);
+        txtHelpHeader.setText("Choose a View");
+        txtHelpContent.setText(strContent);
+        // weather
+        arrayContent = res.getStringArray(R.array.weather_help);
+        strContent = stringSpace(arrayContent);
+        txtWeahterHelpHeader.setText("Time & Weather");
+        txtWeahterHelpContent.setText(strContent);
 
-
-
-        //needed for the main string dialogue
-        String[] help_array = res.getStringArray(R.array.General_help_array);
-        String[] help_array2=res.getStringArray(R.array.General_help_array2);
-        String main_string=stringSpace(help_array);
-        String main_string2=stringSpace(help_array2);
-
-
-
-        builder=new AlertDialog.Builder(getActivity(),R.style.MyDialog);
-        String title = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase() + " - Help";
-        builder.setTitle(title);
         switch (name) {
-
-            case "news":
-                View layout_news=inflater.inflate(R.layout.help_fragment,null);
-                builder.setView((layout_news));
-                TextView view=(TextView)layout_news.findViewById(R.id.General_Help_Content);
-                TextView view2=(TextView)layout_news.findViewById(R.id.General_Help_content2);
-                view.setText(news_string);
-                view2.setText(news_string2);
+            // night light
+            case Constants.LIGHT:
+                arrayContent = res.getStringArray(R.array.color_names);
+                strContent = stringSpace(arrayContent);
+                txtCurrentHelpHeader.setText("Color Options:");
+                txtCurrentHelpContent.setText(strContent);
                 break;
-
-            case "settings":
-                View layout_settings=inflater.inflate(R.layout.help_fragment,null);
-                builder.setView((layout_settings));
-                TextView view_settings=(TextView)layout_settings.findViewById(R.id.General_Help_Content);
-                TextView view_settings2=(TextView)layout_settings.findViewById(R.id.General_Help_content2);
-                view_settings.setText(settings_string);
-                view_settings2.setText(settings_string2);
+            // news
+            case Constants.NEWS:
+                arrayContent = res.getStringArray(R.array.guardian_sections);
+                strContent = stringSpace(arrayContent);
+                txtCurrentHelpHeader.setText("Choose a news section:");
+                txtCurrentHelpContent.setText(strContent);
                 break;
-
-            default:
-                View layGeneralHelp=inflater.inflate(R.layout.help_fragment,null);
-                builder.setView((layGeneralHelp));
-                TextView view_makeup=(TextView)layGeneralHelp.findViewById(R.id.General_Help_Content);
-                TextView view_makeup2=(TextView)layGeneralHelp.findViewById(R.id.General_Help_content2);
-                view_makeup.setText(main_string);
-                view_makeup2.setText(main_string2);
+            // settings
+            case Constants.SETTINGS:
+                arrayContent = res.getStringArray(R.array.help_settings2);
+                strContent = stringSpace(arrayContent);
+                txtCurrentHelpHeader.setText("General Settings:");
+                txtCurrentHelpContent.setText(strContent);
+                break;
         }
-        return builder.create();
-
-    }
-
-    public void change_message(String s) {
-        builder=new AlertDialog.Builder(getActivity());
-        builder.setMessage(s);
+        return mAlertDialogBuilder.create();
     }
 
     public String stringSpace(String[] string){
-        String str="";
-        for(int i=0;i<string.length;i++){
-            str+=string[i]+"\n";
+        String str = "";
+        for(int i = 0; i < string.length; i++){
+            // capitalize the first letter in the arrays
+            string[i] = string[i].substring(0,1).toUpperCase() + string[i].substring(1);
+            str += string[i] + "\n";
         }
         return str;
     }
