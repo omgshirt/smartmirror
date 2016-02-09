@@ -42,8 +42,8 @@ public class TrafficFragment extends Fragment {
         mWorkLong = "-118.5272547";
 
         //somewhere in la
-//        mWorkLat = "34.051144";
-//        mWorkLong = "-118.2366286";
+        //mWorkLat = "34.051144";
+        //mWorkLong = "-118.2366286";
     }
 
     @Override
@@ -65,7 +65,6 @@ public class TrafficFragment extends Fragment {
     /**
      * Prepares the JSON request to get the current traffic information
      */
-
     private void startTrafficUpdate(){
         String distanceMatrixKey = getActivity().getResources().getString(R.string.distance_matrix_api_key);
         String distanceMatrixUnit = "metric";
@@ -130,7 +129,6 @@ public class TrafficFragment extends Fragment {
      * Updates the traffic data upon a successful JSON fetch reques
      * @param request the JSON request that we want to fetch
      */
-
     private void updateTrafficData(final String request){
         new Thread(){
             public void run(){

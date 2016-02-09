@@ -11,19 +11,20 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:gravity="center_horizontal">
-            <TextView
-                android:id="@+id/fragment_help_header"
-                android:gravity="center_horizontal"
-                android:layout_marginStart="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-            <TextView
-                android:id="@+id/fragment_help_content"
-                android:gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/fragment_help_header" />
+        <TextView
+            android:id="@+id/fragment_help_header"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/fragment_help_content"
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/fragment_help_header" />
     </RelativeLayout>
 
     <!-- available sections -->
@@ -38,6 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
         <TextView
             android:id="@+id/mode_content"
             android:gravity="center_horizontal"
@@ -51,20 +53,20 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:gravity="center_horizontal">
-            <TextView
-                android:id="@+id/news_header"
-                android:gravity="center_horizontal"
-                android:layout_marginStart="7dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:id="@+id/news_header"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <TextView
-                android:id="@+id/news_content"
-                android:gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/news_header" />
+        <TextView
+            android:id="@+id/news_content"
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/news_header" />
     </RelativeLayout>
 
     <!-- general help -->
@@ -72,7 +74,6 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:gravity="center_horizontal">
-
         <TextView
             android:id="@+id/general_help_header"
             android:gravity="center_horizontal"

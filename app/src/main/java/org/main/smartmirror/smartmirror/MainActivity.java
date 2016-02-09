@@ -530,15 +530,15 @@ public class MainActivity extends AppCompatActivity
      */
     public void hideHelpFragment(String command) {
 
-        if (command.equals(Constants.HELP) && mHelpFragment == null) {
-            mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
-            mHelpFragment.show(getFragmentManager(), "HelpFragment");
-        } else if (mHelpFragment != null) {
-            mHelpFragment.dismiss();
-            mHelpFragment = null;
-        }
-
-        closeMenuDrawer(command);
+//        if (command.equals(Constants.HELP) && mHelpFragment == null) {
+//            mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
+//            mHelpFragment.show(getFragmentManager(), "HelpFragment");
+//        } else if (mHelpFragment != null) {
+//            mHelpFragment.dismiss();
+//            mHelpFragment = null;
+//        }
+//
+//        closeMenuDrawer(command);
     }
 
     /**

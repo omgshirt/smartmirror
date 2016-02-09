@@ -1,44 +1,37 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 /**
  * Class that handles the help dialog which shows the commands the user can issue
  */
-public class HelpFragment extends DialogFragment {
-    private AlertDialog.Builder mAlertDialogBuilder;
+public class HelpFragment extends Fragment {
     private static final String DIALOG_TITLE="Help";
 
-    //used as the constructor to get the new instance of Helper dialogue
-    public static HelpFragment newInstance(String name) {
-        HelpFragment frgHelpFrag = new HelpFragment();
+    public static HelpFragment newInstance(String fragName) {
         Bundle args = new Bundle();
-        args.putString("name", name);
-        frgHelpFrag.setArguments(args);
-        return frgHelpFrag;
+        args.putString("name", fragName);
+        HelpFragment fragment = new HelpFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View vewHelp = inflater.inflate(R.layout.help_fragment, null);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        inflater = getActivity().getLayoutInflater();
+        View vewHelp = inflater.inflate(R.layout.help_fragment, container, false);
         String name = getArguments().getString("name");
         Resources res = getResources();
 
-        mAlertDialogBuilder = new AlertDialog.Builder(getActivity(),R.style.MyDialog);
-        mAlertDialogBuilder.setTitle((name.substring(0,1).toUpperCase() + name.substring(1)) + " - " + DIALOG_TITLE);
-        mAlertDialogBuilder.setView(vewHelp);
+//        mAlertDialogBuilder = new AlertDialog.Builder(getActivity(),R.style.MyDialog);
+//        mAlertDialogBuilder.setTitle((name.substring(0,1).toUpperCase() + name.substring(1)) + " - " + DIALOG_TITLE);
+//        mAlertDialogBuilder.setView(vewHelp);
         TextView txtCurrentHelpHeader = (TextView)vewHelp.findViewById(R.id.fragment_help_header);
         TextView txtCurrentHelpContent = (TextView)vewHelp.findViewById(R.id.fragment_help_content);
         TextView txtModeHeader = (TextView)vewHelp.findViewById(R.id.mode_header);
@@ -94,7 +87,7 @@ public class HelpFragment extends DialogFragment {
                 txtCurrentHelpContent.setVisibility(View.GONE);
             break;
         }
-        return mAlertDialogBuilder.create();
+        return vewHelp;
     }
 
     public String stringSpace(String[] string){
