@@ -59,7 +59,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, SensorEventListener {
+        WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, SensorEventListener,
+        NewsFragment.ArticleSelectedListener {
 
     // Globals, prefs, debug flags
     public static final boolean DEBUG = true;
@@ -141,6 +142,16 @@ public class MainActivity extends AppCompatActivity
             mService = null;
         }
     };
+
+    /**
+     * called when a news article is selected to be viewed
+     * @param articleTitle article title
+     * @param articleBody article text
+     */
+    @Override
+    public void onArticleSelected(String articleTitle, String articleBody) {
+        // TODO swap to given article body
+    }
 
     // handles the messages from VoiceService to this Activity
     public class IHandler extends Handler{

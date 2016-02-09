@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -92,8 +93,12 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
     ScrollView mScrollView;
 
-
     Handler mHandler = new Handler();
+    private ArticleSelectedListener articleSelectedListener;
+
+    public interface ArticleSelectedListener {
+        void onArticleSelected(String title, String body);
+    }
 
     public NewsFragment() {}
 
@@ -125,7 +130,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         mTxtHeadline7 = (TextView)view.findViewById(R.id.headline7);
         mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
 
-        txtNewsDesk = (TextView)view.findViewById(R.id.txtNewsDesk);
+        txtNewsDesk = (TextView)view.findViewById(R.id.news_desk_title);
 
         img1 = (ImageView)view.findViewById(R.id.img1);
         img2 = (ImageView)view.findViewById(R.id.img2);
@@ -294,6 +299,22 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
         }
     };
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        try {
+            articleSelectedListener = (ArticleSelectedListener)context;
+        } catch (ClassCastException cce){
+            cce.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        articleSelectedListener = null;
+    }
 
     @Override
     public void onStart() {
@@ -581,7 +602,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         } else if (mNewsSection == "business") {
             if (cacheName.equals(BUSINESS_CACHE)) startNewsUpdate();
         } else if (mNewsSection == "media") {
-            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();;
+            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();
         } else if (mNewsSection == "travel") {
             if (cacheName.equals(TRAVEL_CACHE)) startNewsUpdate();
         } else if (mNewsSection == "science") {
