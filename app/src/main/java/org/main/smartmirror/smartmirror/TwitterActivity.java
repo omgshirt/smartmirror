@@ -130,6 +130,7 @@ public class TwitterActivity extends Activity{
 
          if (networkInfo != null && networkInfo.isConnected()) {
              new DownloadTwitterTask().execute(mScreenName);
+             //new DownloadTwitterTask().execute();
          } else {
              Log.v("TWITTER", "No network connection available.");
          }
@@ -140,8 +141,8 @@ public class TwitterActivity extends Activity{
          final static String CONSUMER_KEY = Constants.TWITTER_CONSUMER_KEY;
          final static String CONSUMER_SECRET = Constants.TWITTER_CONSUMER_SECRET;
          final static String TwitterTokenURL = "https://api.twitter.com/oauth2/token";
-         final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=";
-         //final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/home_timeline.json?count=5";
+         //final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=";
+         final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/home_timeline.json?count=1";
 
          @Override
          protected String doInBackground(String... screenNames) {
@@ -149,6 +150,7 @@ public class TwitterActivity extends Activity{
 
              if (screenNames.length > 0) {
                  result = getTwitterStream(screenNames[0]);
+                 //result = getTwitterStream();
              }
              return result;
          }
@@ -156,12 +158,18 @@ public class TwitterActivity extends Activity{
          // onPostExecute convert the JSON results into a Twitter object (which is an Array list of tweets
          @Override
          protected void onPostExecute(String result) {
-             Twitter twits = jsonToTwitter(result);
+             try {
+                 Twitter twits = jsonToTwitter(result);
+                 Log.i("TWITTER OPE result", result.toString());
+             } catch (Exception e) {
+                 Log.i("TWITTER OPE result", "FAIL");
+             }
+
 
              // lets write the results to the console as well
-             for (Tweet tweet : twits) {
+             /*for (Tweet tweet : twits) {
                  Log.i("TWITTER", tweet.getText());
-             }
+             }*/
 
              // send the tweets to the adapter for rendering
              /*ArrayAdapter<Tweet> adapter = new ArrayAdapter<Tweet>(activity, android.R.layout.simple_list_item_1, twits);
@@ -173,8 +181,9 @@ public class TwitterActivity extends Activity{
              Twitter twits = null;
              if (result != null && result.length() > 0) {
                  try {
-                     Gson gson = new Gson();
-                     twits = gson.fromJson(result, Twitter.class);
+                     //Gson gson = new Gson();
+                     //twits = gson.fromJson(result, Twitter.class);
+                     Log.i("TWITTER json to twitter", result.toString());
                  } catch (IllegalStateException ex) {
                      // just eat the exception
                  }
@@ -226,6 +235,7 @@ public class TwitterActivity extends Activity{
          }
 
          private String getTwitterStream(String screenName) {
+         //private String getTwitterStream() {
              String results = null;
 
              // Step 1: Encode consumer key and secret
@@ -254,21 +264,46 @@ public class TwitterActivity extends Activity{
                  if (auth != null && auth.token_type.equals("bearer")) {
 
                      // Step 3: Authenticate API requests with bearer token
-                     HttpGet httpGet = new HttpGet(TwitterStreamURL + screenName);
-                     //HttpGet httpGet = new HttpGet(TwitterStreamURL);
+                     //HttpGet httpGet = new HttpGet(TwitterStreamURL + screenName);
+                     HttpGet httpGet = new HttpGet(TwitterStreamURL);
+                     //Log.i("TWITTER URL USed", TwitterStreamURL);
 
                      // construct a normal HTTPS request and include an Authorization
                      // header with the value of Bearer <>
                      httpGet.setHeader("Authorization", "Bearer " + auth.access_token);
+                     //Log.i("TWITTER auth token", auth.access_token.toString());
                      httpGet.setHeader("Content-Type", "application/json");
                      // update the results with the body of the response
                      results = getResponseBody(httpGet);
+                     Log.i("TWITTER get result", results.toString());
                  }
              } catch (UnsupportedEncodingException ex) {
              } catch (IllegalStateException ex1) {
              }
              return results;
          }
+     }
+
+     // Get twitter feed from api
+     private void updateFeed(final String query){
+         new Thread(){
+             public void run(){
+                 final JSONObject json = FetchURL.getJSON(query);
+                 if(json == null){
+                     mHandler.post(new Runnable(){
+                         public void run(){
+                             Log.i("TWITTER", "TWITTER json error");
+                         }
+                     });
+                 } else {
+                     mHandler.post(new Runnable(){
+                         public void run(){
+                             Log.i("TWITTER ", json.toString());
+                         }
+                     });
+                 }
+             }
+         }.start();
      }
 
 
