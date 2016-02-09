@@ -45,6 +45,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,7 +59,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, SensorEventListener {
+        WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, SensorEventListener,
+        NewsFragment.ArticleSelectedListener {
 
     // Globals, prefs, debug flags
     public static final boolean DEBUG = true;
@@ -66,6 +71,9 @@ public class MainActivity extends AppCompatActivity
     public static final int ASLEEP = 0;
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
+
+    // Mira
+    private Mira mira;
 
     // Help
     private HelpFragment mHelpFragment;
@@ -135,6 +143,16 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
+    /**
+     * called when a news article is selected to be viewed
+     * @param articleTitle article title
+     * @param articleBody article text
+     */
+    @Override
+    public void onArticleSelected(String articleTitle, String articleBody) {
+        // TODO swap to given article body
+    }
+
     // handles the messages from VoiceService to this Activity
     public class IHandler extends Handler{
         @Override
@@ -154,12 +172,13 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        checkMarshmallowPermissions();
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mira = Mira.getInstance(this);
 
-        checkMarshmallowPermissions();
         initializeWifiP2P();
         discoverWifiP2pPeers();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
@@ -363,6 +382,7 @@ public class MainActivity extends AppCompatActivity
         setScreenOffTimeout();
         stopUITimer();
         startLightSensor();
+        mira.saySleepMessage();
         mirrorSleepState = LIGHT_SLEEP;
     }
 
@@ -454,11 +474,18 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void displayFragment(Fragment fragment){
+    /**
+     * Display the fragment within content_frame_3
+     * @param fragment fragment to show
+     * @param addToBackStack if fragment should be added to back stack
+     */
+    private void displayFragment(Fragment fragment, boolean addToBackStack){
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_frame, fragment);
+        ft.replace(R.id.content_frame_3, fragment);
         if (!isFinishing()) {
-            ft.addToBackStack(null);
+            if (addToBackStack) {
+                ft.addToBackStack(null);
+            }
             ft.commit();
         } else {
             Log.e(Constants.TAG, "commit skipped. isFinishing() returned true");
@@ -471,7 +498,7 @@ public class MainActivity extends AppCompatActivity
      * @param duration int duration: ex. Toast.LENGTH_LONG
      */
     public void showToast(String text, int duration) {
-        showToast(text, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, duration);
+        showToast(text, Gravity.TOP|Gravity.CENTER_HORIZONTAL, duration);
     }
 
     /**
@@ -576,6 +603,7 @@ public class MainActivity extends AppCompatActivity
         }
         playSound(R.raw.celeste_a);
 
+        /*
         String mGuardSection;
         String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
         int i = 0;
@@ -594,6 +622,12 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }catch (Exception e) {}
+        */
+
+        for(String newsDesk : NewsFragment.NEWS_DESKS) {
+            if (newsDesk.equals(command))
+                fragment = NewsFragment.newInstance(command);
+        }
 
         // Create fragment based on the command. If the input string is not a fragment,
         // broadcast the command to all registered receivers for evaluation.
@@ -621,6 +655,10 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.GO_BACK:
                 getSupportFragmentManager().popBackStack();
+                break;
+            case Constants.HIDE_WINDOW:
+            case Constants.CLOSE_WINDOW:
+                fragment = new LightSleepFragment();
                 break;
             case Constants.LIGHT:
                 fragment = new LightFragment();
@@ -663,7 +701,8 @@ public class MainActivity extends AppCompatActivity
         if(fragment != null){
             //startTTS(command);
             mCurrentFragment = command;
-            displayFragment(fragment);
+            boolean addToBackStack = !(fragment instanceof LightSleepFragment);
+            displayFragment(fragment, addToBackStack);
         }
     }
 
@@ -728,8 +767,6 @@ public class MainActivity extends AppCompatActivity
             voiceInput = Preferences.CMD_WEATHER_ENGLISH;
         } else if (voiceInput.contains(Preferences.CMD_WEATHER_METRIC)) {
             voiceInput = Preferences.CMD_WEATHER_METRIC;
-        } else if (voiceInput.contains(Constants.WEATHER)) {
-            voiceInput = Constants.WEATHER;
         }
 
         if(voiceInput.contains(Constants.WAKE)) {

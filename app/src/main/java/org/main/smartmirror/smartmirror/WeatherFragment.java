@@ -184,12 +184,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 case Constants.TIME:
                     speakTime();
                     break;
-                case Constants.WEATHER:
-                    startWeatherUpdate();
-                    updateTimeDisplay();    // doing this to
-                    // refresh clock on 12/24 format changes. Otherwise not needed.
-                    speakText("Updating weather.");
-                    break;
                 default:
                     break;
             }
@@ -275,6 +269,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     // ----------------------- TTS Feedback -------------------------
 
+    // TODO: move this into Mira?
     private void speakTime() {
         GregorianCalendar calendar = new GregorianCalendar();
         String strMinute, strHour;
@@ -413,19 +408,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
             // ---------------- 3-Day Forecast ---------------
             /*
-            JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
-            for (int i = 0; i < 3; i++) {
-                JSONObject today = dailyData.getJSONObject(i);
-                dailyForecasts[i] = new DailyForecast();
-                dailyForecasts[i].maxTemp = (int)Math.round(today.getDouble("apparentTemperatureMax"));
-                dailyForecasts[i].minTemp = (int)Math.round(today.getDouble("apparentTemperatureMin"));
-                dailyForecasts[i].summary = today.getString("summary");
-                dailyForecasts[i].sunrise = today.getLong("sunriseTime");
-                dailyForecasts[i].sunset = today.getLong("sunsetTime");
-                dailyForecasts[i].precipProbability = today.getDouble("precipProbability");
-                dailyForecasts[i].windSpeed = (int)Math.round(today.getDouble("windSpeed"));
-                dailyForecasts[i].forecastTime = today.getLong("time");
-            }
+                Moved to ForecastFragment
             */
 
             JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");

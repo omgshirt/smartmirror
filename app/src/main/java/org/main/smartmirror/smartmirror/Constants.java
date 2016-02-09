@@ -10,6 +10,8 @@ public class Constants {
     public static final String BACK = "back";
     public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
+    public static final String HIDE_WINDOW = "hide window";
+    public static final String CLOSE_WINDOW = "close window";
     public static final String MENU = "menu";
     public static final String OFF = "off";
     public static final String ON = "on";
@@ -25,7 +27,6 @@ public class Constants {
     public static final String GALLERY = "gallery";
     public static final String LIGHT = "light";
     public static final String LIGHT_SLEEP = "light sleep"; // Not a voice command - only used to track current fragment
-    public static final String MUSIC = "music";
     public static final String NEWS = "news";
     public static final String NEWS_BODY = "news body";
     public static final String NIGHT_LIGHT = "night light";
@@ -35,11 +36,9 @@ public class Constants {
     public static final String TIME = "time";
     public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
-    public static final String WEATHER = "weather";
 
     //--------------HELP-----------------
     public static final String HELP = "help";
-    public static final String HIDE = "hide";
 
     //--------------WEATHER--------------
     public static final String OPEN_WEATHER_MAP_API =

@@ -1,6 +1,8 @@
 blue /1e4/
 calendar /1e-1/
 camera /1e-1/
+close window /1e-1/
+hide window /1e-1/
 conditions /1e-8/
 enable camera /1e-3/
 enable remote /1e-3/
@@ -15,15 +17,12 @@ go to sleep /1e-21/
 go back /1e10/
 help /1e6/
 log me in /1e-3/
-makeup /1e7/
 magenta /1e-4/
 menu /1e4/
 news /1e12/
 night light /1e-9/
 orange /1.0/
 options /1e-2/
-power off /1e-2/
-power on /1e-2/
 purple /1e0/
 quotes /1e4/
 refresh /1e-4/
@@ -72,7 +71,7 @@ first /1e6/
 second /1e4/
 third /1e6/
 fourth /1e14/
-fifth /1e2/
-sixth /1e2/
-seventh /1e2/
-eighth /1e2/
+fifth /1e6/
+sixth /1e6/
+seventh /1e6/
+eighth /1e6/
