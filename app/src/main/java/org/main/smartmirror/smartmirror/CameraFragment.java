@@ -28,6 +28,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -348,17 +349,22 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      *
      * @param text The message to show
      */
-    private void showToast(final String text) {
+    private void showToast(final String text){
         final Activity activity = getActivity();
-        if (activity != null) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ((MainActivity)getActivity()).startTTS(text);
-                    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+        Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Speaks the countdown timer
+     *
+     * @param text The message to speak.
+     */
+    private void speakCountdown(final String text) {
+        cheeseHandler.postDelayed(new Runnable() {
+            public void run() {
+                ((MainActivity) getActivity()).startTTS(text);
+            }
+        }, 10000);
     }
 
     /**
@@ -768,31 +774,20 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * Initiate a still image capture.
      */
     private void takePicture() {
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                showToast("three");
+        final Activity activity = getActivity();
+        new CountDownTimer(4000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                showToast(String.valueOf(millisUntilFinished/1000));
+                speakCountdown(String.valueOf(millisUntilFinished / 1000));
             }
-        }, 0);
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                showToast("two");
-            }
-        }, 2000);
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                showToast("one");
-            }
-        }, 4000);
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                showToast("say cheese");
-            }
-        }, 6000);
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
+
+            public void onFinish() {
+                showToast("cheese");
+                speakCountdown("cheese");
                 lockFocus();
             }
-        }, 7000);
+        }.start();
     }
 
     /**
