@@ -592,6 +592,7 @@ public class MainActivity extends AppCompatActivity
         }
         playSound(R.raw.celeste_a);
 
+        /*
         String mGuardSection;
         String[] urlArr = getResources().getStringArray(R.array.guardian_sections);
         int i = 0;
@@ -610,14 +611,12 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }catch (Exception e) {}
-
+        */
 
         for(String newsDesk : NewsFragment.NEWS_DESKS) {
             if (newsDesk.equals(command))
-                fragment = NewsFragment.newInstance("world");
+                fragment = NewsFragment.newInstance(command);
         }
-
-
 
         // Create fragment based on the command. If the input string is not a fragment,
         // broadcast the command to all registered receivers for evaluation.
