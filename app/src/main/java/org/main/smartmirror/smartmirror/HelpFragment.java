@@ -41,26 +41,47 @@ public class HelpFragment extends DialogFragment {
         mAlertDialogBuilder.setView(vewHelp);
         TextView txtCurrentHelpHeader = (TextView)vewHelp.findViewById(R.id.fragment_help_header);
         TextView txtCurrentHelpContent = (TextView)vewHelp.findViewById(R.id.fragment_help_content);
+        TextView txtModeHeader = (TextView)vewHelp.findViewById(R.id.mode_header);
+        TextView txtModeContent = (TextView)vewHelp.findViewById(R.id.mode_content);
+        TextView txtNewsHelpHeader = (TextView)vewHelp.findViewById(R.id.news_header);
+        TextView txtNewsHelpContent = (TextView)vewHelp.findViewById(R.id.news_content);
         TextView txtHelpHeader = (TextView)vewHelp.findViewById(R.id.general_help_header);
         TextView txtHelpContent = (TextView)vewHelp.findViewById(R.id.general_help_content);
-        TextView txtWeahterHelpHeader = (TextView)vewHelp.findViewById(R.id.weather_header);
-        TextView txtWeahterHelpContent = (TextView)vewHelp.findViewById(R.id.weather_content);
 
         // set the default help!
         String strContent;
         String[] arrayContent;
-        // general
+        // Modes
+        arrayContent = res.getStringArray(R.array.modes_list);
+        strContent = stringSpace(arrayContent);
+        txtModeHeader.setText("Mode");
+        txtModeContent.setText(strContent);
+        // News
+        arrayContent = res.getStringArray(R.array.guardian_sections);
+        strContent = stringSpace(arrayContent);
+        txtNewsHelpHeader.setText("News");
+        txtNewsHelpContent.setText(strContent);
+        // General
         arrayContent = res.getStringArray(R.array.general_help);
         strContent = stringSpace(arrayContent);
-        txtHelpHeader.setText("Choose a View");
+        txtHelpHeader.setText("General Help");
         txtHelpContent.setText(strContent);
-        // weather
-        arrayContent = res.getStringArray(R.array.weather_help);
-        strContent = stringSpace(arrayContent);
-        txtWeahterHelpHeader.setText("Time & Weather");
-        txtWeahterHelpContent.setText(strContent);
 
         switch (name) {
+            // facebook
+            case Constants.FACEBOOK:
+                arrayContent = res.getStringArray(R.array.facebook_help);
+                strContent = stringSpace(arrayContent);
+                txtCurrentHelpHeader.setText("Controls");
+                txtCurrentHelpContent.setText(strContent);
+                break;
+            // camera
+            case Constants.CAMERA:
+                arrayContent = res.getStringArray(R.array.camera_help);
+                strContent = stringSpace(arrayContent);
+                txtCurrentHelpHeader.setText("Controls");
+                txtCurrentHelpContent.setText(strContent);
+                break;
             // night light
             case Constants.LIGHT:
                 arrayContent = res.getStringArray(R.array.color_names);
@@ -68,20 +89,10 @@ public class HelpFragment extends DialogFragment {
                 txtCurrentHelpHeader.setText("Color Options:");
                 txtCurrentHelpContent.setText(strContent);
                 break;
-            // news
-            case Constants.NEWS:
-                arrayContent = res.getStringArray(R.array.guardian_sections);
-                strContent = stringSpace(arrayContent);
-                txtCurrentHelpHeader.setText("Choose a news section:");
-                txtCurrentHelpContent.setText(strContent);
-                break;
-            // settings
-            case Constants.SETTINGS:
-                arrayContent = res.getStringArray(R.array.help_settings2);
-                strContent = stringSpace(arrayContent);
-                txtCurrentHelpHeader.setText("General Settings:");
-                txtCurrentHelpContent.setText(strContent);
-                break;
+            default:
+                txtCurrentHelpHeader.setVisibility(View.GONE);
+                txtCurrentHelpContent.setVisibility(View.GONE);
+            break;
         }
         return mAlertDialogBuilder.create();
     }

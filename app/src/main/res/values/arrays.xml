@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <array name="camera_help">
+        <item>take a picture</item>
+    </array>
+
     <array name="color_names">
         <item>black</item>
         <item>blue</item>
@@ -14,6 +18,26 @@
         <item>white</item>
     </array>
 
+    <string-array name="facebook_help">
+        <item>scroll up</item>
+        <item>scroll down</item>
+    </string-array>
+
+    <string-array name="general_help">
+        <item>back / Go Back</item>
+        <item>help</item>
+        <item>conditions</item>
+        <item>settings</item>
+        <item>sleep</item>
+        <item>wake</item>
+        <item>show / Hide Time</item>
+        <item>show / Hide Weather</item>
+        <item>start / Stop Listening</item>
+        <item>enable / Disable Camera</item>
+        <item>enable / Disable Remote</item>
+        <item>weather English / Metric</item>
+    </string-array>
+
     <string-array name="guardian_sections">
         <item>world</item>
         <item>sports</item>
@@ -24,61 +48,19 @@
         <item>travel</item>
     </string-array>
 
-    <string-array name="help_settings">
-        <item>Mirror Brightness</item>
-        <item>Night Light Brightness</item>
-        <item>System Volume</item>
-        <item>Music Volume</item>
-        <item>Speech Frequency</item>
-        <item>\"Enable Camera\"</item>
-        <item>\"Disable Camera\"</item>
-        <item>\"Start Listening\"</item>
-        <item>\"Stop Listening\"</item>
-        <item>\"Enable Remote\"</item>
-        <item>\"Disable Remote\"</item>
-        <item>\"Weather English\"</item>
-        <item>\"Weather Metric\"</item>
-    </string-array>
-
-    <string-array name="help_settings2">
-        <item>VeryLow --> Very High</item>
-        <item>VeryLow --> Very High</item>
-        <item>OFF --> Very High</item>
-        <item>OFF --> Very High</item>
-        <item>Never / Rarely / Often / Always</item>
-        <item>Camera On</item>
-        <item>Camera Off</item>
-        <item>Voice Recognition On</item>
-        <item>Voice Recognition Off</item>
-        <item>Remote Control On</item>
-        <item>Remote Control Off</item>
-        <item>Set Weather units English</item>
-        <item>Set Weather units Metric</item>
-    </string-array>
-
-    <string-array name="general_help">
-        <item>Back</item>
-        <item>Calendar</item>
-        <item>Camera</item>
-        <item>Facebook</item>
-        <item>Gallery</item>
-        <item>Show Help</item>
-        <item>Night Light</item>
-        <item>News</item>
-        <item>Quotes</item>
-        <item>Settings</item>
-        <item>Twitter</item>
-        <item>Traffic</item>
-        <item>Weather</item>
+    <string-array name="modes_list">
+        <item>calendar</item>
+        <item>camera</item>
+        <item>facebook</item>
+        <item>gallery</item>
+        <item>light</item>
+        <item>quotes</item>
+        <item>twitter</item>
+        <item>traffic</item>
     </string-array>
 
     <string-array name="weather_help">
         <item>conditions</item>
         <item>forecast</item>
-    </string-array>
-
-    <string-array name="facebook_help">
-        <item>scroll up</item>
-        <item>scroll down</item>
     </string-array>
 </resources>
