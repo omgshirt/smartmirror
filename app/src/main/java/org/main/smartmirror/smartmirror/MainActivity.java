@@ -67,6 +67,9 @@ public class MainActivity extends AppCompatActivity
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
+    // Mira
+    private Mira mira;
+
     // Help
     private HelpFragment mHelpFragment;
 
@@ -159,6 +162,7 @@ public class MainActivity extends AppCompatActivity
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mira = Mira.getInstance(this);
 
         initializeWifiP2P();
         discoverWifiP2pPeers();
@@ -363,6 +367,7 @@ public class MainActivity extends AppCompatActivity
         setScreenOffTimeout();
         stopUITimer();
         startLightSensor();
+        mira.saySleepMessage();
         mirrorSleepState = LIGHT_SLEEP;
     }
 
@@ -471,7 +476,7 @@ public class MainActivity extends AppCompatActivity
      * @param duration int duration: ex. Toast.LENGTH_LONG
      */
     public void showToast(String text, int duration) {
-        showToast(text, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, duration);
+        showToast(text, Gravity.TOP|Gravity.CENTER_HORIZONTAL, duration);
     }
 
     /**
