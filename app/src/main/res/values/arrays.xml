@@ -15,13 +15,13 @@
     </array>
 
     <string-array name="guardian_sections">
-        <item>world</item>
-        <item>sports</item>
         <item>business</item>
-        <item>technology</item>
-        <item>science</item>
         <item>media</item>
+        <item>science</item>
+        <item>sports</item>
+        <item>technology</item>
         <item>travel</item>
+        <item>world</item>
     </string-array>
 
     <string-array name="help_settings">

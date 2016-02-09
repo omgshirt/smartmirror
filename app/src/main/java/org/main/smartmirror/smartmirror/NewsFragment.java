@@ -19,12 +19,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Cache;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
-
-import java.util.EnumSet;
 
 public class NewsFragment extends Fragment implements CacheManager.CacheListener{
 
@@ -49,6 +46,15 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static final String SCIENCE_CACHE = "science cache";
     public static final String MEDIA_CACHE = "media cache";
     public static final String TRAVEL_CACHE = "travel cache";
+
+    public static final String[] NEWS_DESKS = {"business",
+            "media",
+            "science",
+            "sports",
+            "tech",
+            "travel",
+            "world" };
+
     private CacheManager mCacheManager = null;
 
     private TextView mTxtHeadline1;
@@ -190,7 +196,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         mHeadline = hl[x];
         Fragment fragment = new NewsBodyFragment();
         FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.content_frame, fragment)
+        fm.beginTransaction().replace(R.id.content_frame_3, fragment)
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                 .commit();
     }
@@ -290,6 +296,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // TODO: 2/3/2016 add switch case so only current news section is checked/updated
         // TODO: 2/3/2016 don't update when null/not prev visited
 
+        for (String name : NEWS_DESKS) {
+
+        }
         // -----CASE NEWS-----
         if (!mCacheManager.containsKey(NEWS_CACHE)) {
             Log.i(Constants.TAG,"News Cache does not exist, updating");
