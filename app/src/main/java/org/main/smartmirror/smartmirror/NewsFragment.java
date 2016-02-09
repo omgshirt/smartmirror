@@ -39,6 +39,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private final int DATA_UPDATE_FREQUENCY = 1;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
+
     public static final String NEWS_CACHE = "news cache";
     public static final String SPORTS_CACHE = "sports cache";
     public static final String TECH_CACHE = "tech cache";
@@ -54,6 +55,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             "tech",
             "travel",
             "world" };
+
 
     private CacheManager mCacheManager = null;
 
@@ -94,6 +96,14 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     Handler mHandler = new Handler();
 
     public NewsFragment() {}
+
+    public static NewsFragment newInstance(String section) {
+        Bundle args = new Bundle();
+        args.putString("arrI", section);
+        NewsFragment fragment = new NewsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     static String mNewURL;
     static String mGuardAPIKey;
@@ -296,9 +306,21 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // TODO: 2/3/2016 add switch case so only current news section is checked/updated
         // TODO: 2/3/2016 don't update when null/not prev visited
 
-        for (String name : NEWS_DESKS) {
 
+        for (String name : NEWS_DESKS) {
+            String cacheName = name + " cache";
+            if (!mCacheManager.containsKey(cacheName)) {
+                Log.i(Constants.TAG, cacheName + " does not exist, creating");
+                startNewsUpdate();
+            } else if (mCacheManager.isExpired(name)){
+                Log.i(Constants.TAG, cacheName + " expired. Refreshing...");
+                startNewsUpdate();
+                renderNews((JSONObject) mCacheManager.get(cacheName));
+            }
         }
+
+        /*
+
         // -----CASE NEWS-----
         if (!mCacheManager.containsKey(NEWS_CACHE)) {
             Log.i(Constants.TAG,"News Cache does not exist, updating");
@@ -382,6 +404,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             Log.i(Constants.TAG, "ScienceCache expired. Refreshing...");
             startNewsUpdate();
         }
+
+        */
     }
 
     /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
@@ -416,6 +440,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
 
+        // TODO UNREGISTER ON PAUSE
         if (mNewsSection == "world" || mNewsSection == "news") {
             mCacheManager.registerCacheListener(NEWS_CACHE, this);
         } else if (mNewsSection == "sports") {

@@ -1,6 +1,8 @@
 blue /1e4/
 calendar /1e-1/
 camera /1e-1/
+close window /1e-1/
+hide window /1e-1/
 conditions /1e-8/
 enable camera /1e-3/
 enable remote /1e-3/

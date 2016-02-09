@@ -45,6 +45,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -459,11 +463,18 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void displayFragment(Fragment fragment){
+    /**
+     * Display the fragment within content_frame_3
+     * @param fragment fragment to show
+     * @param addToBackStack if fragment should be added to back stack
+     */
+    private void displayFragment(Fragment fragment, boolean addToBackStack){
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame_3, fragment);
         if (!isFinishing()) {
-            ft.addToBackStack(null);
+            if (addToBackStack) {
+                ft.addToBackStack(null);
+            }
             ft.commit();
         } else {
             Log.e(Constants.TAG, "commit skipped. isFinishing() returned true");
@@ -600,6 +611,14 @@ public class MainActivity extends AppCompatActivity
             }
         }catch (Exception e) {}
 
+
+        for(String newsDesk : NewsFragment.NEWS_DESKS) {
+            if (newsDesk.equals(command))
+                fragment = NewsFragment.newInstance("world");
+        }
+
+
+
         // Create fragment based on the command. If the input string is not a fragment,
         // broadcast the command to all registered receivers for evaluation.
         switch (command) {
@@ -626,6 +645,10 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.GO_BACK:
                 getSupportFragmentManager().popBackStack();
+                break;
+            case Constants.HIDE_WINDOW:
+            case Constants.CLOSE_WINDOW:
+                fragment = new LightSleepFragment();
                 break;
             case Constants.LIGHT:
                 fragment = new LightFragment();
@@ -668,7 +691,8 @@ public class MainActivity extends AppCompatActivity
         if(fragment != null){
             //startTTS(command);
             mCurrentFragment = command;
-            displayFragment(fragment);
+            boolean addToBackStack = !(fragment instanceof LightSleepFragment);
+            displayFragment(fragment, addToBackStack);
         }
     }
 
@@ -733,8 +757,6 @@ public class MainActivity extends AppCompatActivity
             voiceInput = Preferences.CMD_WEATHER_ENGLISH;
         } else if (voiceInput.contains(Preferences.CMD_WEATHER_METRIC)) {
             voiceInput = Preferences.CMD_WEATHER_METRIC;
-        } else if (voiceInput.contains(Constants.WEATHER)) {
-            voiceInput = Constants.WEATHER;
         }
 
         if(voiceInput.contains(Constants.WAKE)) {
