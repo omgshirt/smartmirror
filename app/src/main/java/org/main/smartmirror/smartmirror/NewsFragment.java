@@ -1,6 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -293,9 +292,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     Log.d("News", "Got message:\"" + message + "\"");
                     break;*/
             }
-            if(message.contains(Constants.SCROLLDOWN))
+            if(message.contains(Constants.SCROLL_DOWN))
                 mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
-            else if(!message.contains(Constants.SCROLLDOWN) && message.contains(Constants.SCROLLUP))
+            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
                 mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
         }
     };

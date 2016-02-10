@@ -22,6 +22,7 @@ public class TTSHelper{
 
     public TTSHelper(MainActivity c) {
         mActivity = c;
+
         mTextToSpeechListener = new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -40,8 +41,6 @@ public class TTSHelper{
                                     mActivity.stopSpeechRecognition();
                                 }
                             });
-                            // this is calling mActivity off the main thread
-                            //mActivity.stopSpeechRecognition();
                         }
 
                         @Override
@@ -53,8 +52,6 @@ public class TTSHelper{
                                     mActivity.startSpeechRecognition();
                                 }
                             });
-                            // this is calling mActivity off the main thread
-                            //mActivity.startSpeechRecognition();
                         }
 
                         @Override
@@ -68,6 +65,7 @@ public class TTSHelper{
                 }
             }
         };
+
         mTextToSpeech = new TextToSpeech(mActivity, mTextToSpeechListener);
     }
 

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.ImageFormat;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
