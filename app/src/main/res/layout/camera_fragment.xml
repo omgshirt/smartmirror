@@ -10,20 +10,20 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
 
-    <FrameLayout
-        android:id="@+id/control"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true">
+    <!--<FrameLayout-->
+        <!--android:id="@+id/control"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentStart="true">-->
+    <!--</FrameLayout>-->
 
-        <!--<Button-->
-            <!--android:id="@+id/picture"-->
-            <!--android:text="Take Picture"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_gravity="center"/>-->
-    </FrameLayout>
+    <TextView
+        android:id="@+id/count_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/texture"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
 
 </RelativeLayout>

@@ -43,6 +43,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -74,6 +75,7 @@ import java.util.concurrent.TimeUnit;
 @TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
 
+    private TextView mCountDownText;
     private static Drive service;
     private GoogleAccountCredential credential;
 
@@ -350,8 +352,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * @param text The message to show
      */
     private void showToast(final String text){
-        final Activity activity = getActivity();
-        Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
+        mCountDownText.setText(text);
+        ((MainActivity) getActivity()).showToast(text, Toast.LENGTH_SHORT);
     }
 
     /**
@@ -360,11 +362,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * @param text The message to speak.
      */
     private void speakCountdown(final String text) {
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                ((MainActivity) getActivity()).startTTS(text);
-            }
-        }, 10000);
+        ((MainActivity) getActivity()).startTTS(text);
     }
 
     /**
@@ -419,6 +417,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
+        mCountDownText = (TextView) view.findViewById(R.id.count_down);
         credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
         //String accountName = ("smartmirrortesting@gmail.com");
         //String accountName = Preferences.mUserAccountPref;
@@ -774,11 +773,10 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * Initiate a still image capture.
      */
     private void takePicture() {
-        final Activity activity = getActivity();
         new CountDownTimer(4000, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                showToast(String.valueOf(millisUntilFinished/1000));
+                showToast(String.valueOf(millisUntilFinished / 1000));
                 speakCountdown(String.valueOf(millisUntilFinished / 1000));
             }
 

@@ -75,8 +75,6 @@ public class MainActivity extends AppCompatActivity
     // Mira
     private Mira mira;
 
-    // Help
-    private HelpFragment mHelpFragment;
 
     // Light Sensor
     private SensorManager mSensorManager;
@@ -498,7 +496,7 @@ public class MainActivity extends AppCompatActivity
      * @param duration int duration: ex. Toast.LENGTH_LONG
      */
     public void showToast(String text, int duration) {
-        showToast(text, Gravity.TOP|Gravity.CENTER_HORIZONTAL, duration);
+        showToast(text, Gravity.TOP | Gravity.CENTER_HORIZONTAL, duration);
     }
 
     /**
@@ -557,15 +555,11 @@ public class MainActivity extends AppCompatActivity
      */
     public void hideHelpFragment(String command) {
 
-//        if (command.equals(Constants.HELP) && mHelpFragment == null) {
-//            mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
-//            mHelpFragment.show(getFragmentManager(), "HelpFragment");
-//        } else if (mHelpFragment != null) {
-//            mHelpFragment.dismiss();
-//            mHelpFragment = null;
-//        }
-//
-//        closeMenuDrawer(command);
+        if (command.equals(Constants.HELP)) {
+            displayFragment(new HelpFragment().newInstance(getCurrentFragment()), true);
+        }
+
+        closeMenuDrawer(command);
     }
 
     /**

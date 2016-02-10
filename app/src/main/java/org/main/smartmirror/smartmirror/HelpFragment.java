@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,23 +24,28 @@ public class HelpFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(Constants.TAG, "Starting Help");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         inflater = getActivity().getLayoutInflater();
-        View vewHelp = inflater.inflate(R.layout.help_fragment, container, false);
+        View view = inflater.inflate(R.layout.help_fragment, container, false);
         String name = getArguments().getString("name");
         Resources res = getResources();
 
-//        mAlertDialogBuilder = new AlertDialog.Builder(getActivity(),R.style.MyDialog);
-//        mAlertDialogBuilder.setTitle((name.substring(0,1).toUpperCase() + name.substring(1)) + " - " + DIALOG_TITLE);
-//        mAlertDialogBuilder.setView(vewHelp);
-        TextView txtCurrentHelpHeader = (TextView)vewHelp.findViewById(R.id.fragment_help_header);
-        TextView txtCurrentHelpContent = (TextView)vewHelp.findViewById(R.id.fragment_help_content);
-        TextView txtModeHeader = (TextView)vewHelp.findViewById(R.id.mode_header);
-        TextView txtModeContent = (TextView)vewHelp.findViewById(R.id.mode_content);
-        TextView txtNewsHelpHeader = (TextView)vewHelp.findViewById(R.id.news_header);
-        TextView txtNewsHelpContent = (TextView)vewHelp.findViewById(R.id.news_content);
-        TextView txtHelpHeader = (TextView)vewHelp.findViewById(R.id.general_help_header);
-        TextView txtHelpContent = (TextView)vewHelp.findViewById(R.id.general_help_content);
+        // title me
+
+        TextView txtCurrentHelpHeader = (TextView)view.findViewById(R.id.fragment_help_header);
+        TextView txtCurrentHelpContent = (TextView)view.findViewById(R.id.fragment_help_content);
+        TextView txtModeHeader = (TextView)view.findViewById(R.id.mode_header);
+        TextView txtModeContent = (TextView)view.findViewById(R.id.mode_content);
+        TextView txtNewsHelpHeader = (TextView)view.findViewById(R.id.news_header);
+        TextView txtNewsHelpContent = (TextView)view.findViewById(R.id.news_content);
+        TextView txtHelpHeader = (TextView)view.findViewById(R.id.general_help_header);
+        TextView txtHelpContent = (TextView)view.findViewById(R.id.general_help_content);
 
         // set the default help!
         String strContent;
@@ -87,7 +93,7 @@ public class HelpFragment extends Fragment {
                 txtCurrentHelpContent.setVisibility(View.GONE);
             break;
         }
-        return vewHelp;
+        return view;
     }
 
     public String stringSpace(String[] string){
