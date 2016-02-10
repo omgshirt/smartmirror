@@ -77,7 +77,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
         builder.setApplicationOnlyAuthEnabled(true);
 
         // setup
-        Twitter twitter = new TwitterFactory(builder.build()).getInstance();
+        TwitterArrayList twitter = new TwitterFactory(builder.build()).getInstance();
 
         // exercise & verify
         twitter.setOAuthConsumer(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
@@ -106,7 +106,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
             AccessToken accessToken = new AccessToken(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET);
             accToken = accessToken.toString();
-            Twitter twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
+            TwitterArrayList twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
 
             // pulling tweets commented out for now
             *//*Paging paging = new Paging(5); // MAX 200 IN ONE CALL

@@ -5,7 +5,7 @@ package org.main.smartmirror.smartmirror;
  */
 import com.google.gson.annotations.SerializedName;
 
-public class Tweet {
+public class TwitterTweet {
 
     @SerializedName("created_at")
     private String DateCreated;

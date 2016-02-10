@@ -86,9 +86,9 @@ public class TwitterFragment extends Fragment {
         final ViewGroup parentView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
         long tweetIds[] = {631879971628183552L, 503435417459249153L, 510908133917487104L, 473514864153870337L, 477788140900347904L};
         long currentTweet = tweetIds[mTweetNumber];
-        *//*TweetUtils.loadTweet(currentTweet, new Callback<Tweet>() {
+        *//*TweetUtils.loadTweet(currentTweet, new Callback<TwitterTweet>() {
             @Override
-            public void success(Result<Tweet> result) {
+            public void success(Result<TwitterTweet> result) {
                 //TweetView tweetView = new TweetView(getActivity(), result.data);
                 mTweetView = new TweetView(getActivity(), result.data);
                 parentView.addView(mTweetView);
@@ -96,7 +96,7 @@ public class TwitterFragment extends Fragment {
 
             @Override
             public void failure(TwitterException exception) {
-                Log.d("TwitterKit", "Load Tweet failure", exception);
+                Log.d("TwitterKit", "Load TwitterTweet failure", exception);
             }
         });*/
 
@@ -165,7 +165,7 @@ public class TwitterFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                /*TwitterSession session = Twitter.getSessionManager().getActiveSession();
+                /*TwitterSession session = TwitterArrayList.getSessionManager().getActiveSession();
                 TwitterAuthToken authToken = session.getAuthToken();
                 TwitterActivity.mAuthToken = authToken.token;
                 TwitterActivity.mAuthSecret = authToken.secret;*/
@@ -189,14 +189,14 @@ public class TwitterFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("Twitter ", "Got message:\"" + message +"\"");
+            Log.d("TwitterArrayList ", "Got message:\"" + message +"\"");
             switch (message) {
                 case Constants.mGet:
                     //twitterAsync();
                     break;
                 case Constants.mRefresh:
                     //twitterAsync();
-                    Toast.makeText(getActivity(),"Twitter Feed Refreshed",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"TwitterArrayList Feed Refreshed",Toast.LENGTH_LONG).show();
                     break;
                 case Constants.mLogin:
                     twitterLogin();
@@ -235,16 +235,16 @@ public class TwitterFragment extends Fragment {
         final ViewGroup parentView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
         long tweetIds[] = {631879971628183552L, 503435417459249153L, 510908133917487104L, 473514864153870337L, 477788140900347904L};
         long currentTweet = tweetIds[tw];
-        *//*TweetUtils.loadTweet(currentTweet, new Callback<Tweet>() {
+        *//*TweetUtils.loadTweet(currentTweet, new Callback<TwitterTweet>() {
             @Override
-            public void success(Result<Tweet> result) {
+            public void success(Result<TwitterTweet> result) {
                 //tweetView = new TweetView(getActivity(), result.data);
                 //parentView.addView(tweetView);
             }
 
             @Override
             public void failure(TwitterException exception) {
-                Log.d("TwitterKit", "Load Tweet failure", exception);
+                Log.d("TwitterKit", "Load TwitterTweet failure", exception);
             }
         });*//*
     }*/

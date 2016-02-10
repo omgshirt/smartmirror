@@ -54,10 +54,10 @@ public class Constants {
     public static final String TAKE_PICTURE="take a picture";
 
     //--------------TWITTER--------------
-    public static final String TWITTER_CONSUMER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx"; // from twitter
-    public static final String TWITTER_CONSUMER_SECRET= "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt"; // from twitter
-    // public static final String TWITTER_CONSUMER_KEY = "GAZWTz0pd3bduld0PzZMexSrH"; // from fabric, enabled for guest auth
-    // public static final String TWITTER_CONSUMER_SECRET= "oUtQGP4NX9L9ZGVZ8mvYSqaJ3dJCzMDtjLcojybwrT9PL9keud"; // from fabric, enabled for guest auth
+    // public static final String TWITTER_CONSUMER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx"; // from twitter
+    // public static final String TWITTER_CONSUMER_SECRET= "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt"; // from twitter
+    public static final String TWITTER_CONSUMER_KEY = "GAZWTz0pd3bduld0PzZMexSrH"; // from fabric, enabled for guest auth
+    public static final String TWITTER_CONSUMER_SECRET= "oUtQGP4NX9L9ZGVZ8mvYSqaJ3dJCzMDtjLcojybwrT9PL9keud"; // from fabric, enabled for guest auth
     public static final String mLogin= "log me in";
     public static final String mGet= "get";
     public static final String mRefresh= "refresh";
