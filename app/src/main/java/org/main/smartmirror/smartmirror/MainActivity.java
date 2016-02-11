@@ -149,6 +149,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onArticleSelected(String articleTitle, String articleBody) {
         // TODO swap to given article body
+        Fragment fragment = new NewsBodyFragment();
+        boolean addToBackStack = !(fragment instanceof LightSleepFragment);
+        displayFragment(fragment, addToBackStack);
+
     }
 
     // handles the messages from VoiceService to this Activity
@@ -184,6 +188,8 @@ public class MainActivity extends AppCompatActivity
 
         // initialize TextToSpeech (TTS)
         mTTSHelper = new TTSHelper(this);
+
+        Log.i(Constants.TAG, Constants.COMMAND_SET.toString());
 
         try {
             defaultScreenTimeout = Settings.System.getInt(getContentResolver(),
@@ -642,6 +648,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else {
                     showToast(getResources().getString(R.string.camera_disabled_toast), Toast.LENGTH_LONG);
+                    startTTS( getResources().getString(R.string.err_camera_off) );
                 }
                 break;
             case Constants.FACEBOOK:
@@ -665,13 +672,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.NEWS:
                 NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
-                Bundle bundle = new Bundle();
-                bundle.putString("arrI", "world");
-                fragment = new NewsFragment();
-                fragment.setArguments(bundle);
-                break;
-            case Constants.NEWS_BODY:
-                fragment = new NewsBodyFragment();
+                fragment = NewsFragment.newInstance("world");
                 break;
             case Constants.QUOTES:
                 fragment = new QuoteFragment();
@@ -782,7 +783,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Junk fix for remote
-        if(voiceInput.contains(Constants.REMOTE)) {
+        if(voiceInput.contains("remote")) {
             if (voiceInput.contains("enable")) {
                 voiceInput = Preferences.CMD_REMOTE_ON;
             } else if (voiceInput.contains("disable")) {

@@ -136,6 +136,11 @@ public class VoiceService extends Service implements RecognitionListener{
         if (hypothesis != null) {
             String text = hypothesis.getHypstr().trim();
             Log.i("VR", "onPartialResult: \"" + text + "\"");
+
+            // if the partial result holds the full hypothesis, stop now and return result.
+            if (Constants.COMMAND_SET.contains(hypothesis.toString())) {
+                stopVoice();
+            }
         }
     }
 
