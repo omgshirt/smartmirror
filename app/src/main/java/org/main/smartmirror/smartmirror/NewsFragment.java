@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -486,9 +487,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 if(json == null){
                     mHandler.post(new Runnable(){
                         public void run(){
-                            Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.news_error),
-                                    Toast.LENGTH_LONG).show();
+                            ((MainActivity)getActivity()).showToast(getString(R.string.err_news),
+                                    Gravity.CENTER, Toast.LENGTH_LONG);
                         }
                     });
                 } else {

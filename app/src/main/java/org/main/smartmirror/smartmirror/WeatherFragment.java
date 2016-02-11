@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,7 +92,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             mCacheManager = CacheManager.getInstance();
             weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         }
-        //dailyForecasts = new DailyForecast[3];
 
         mLatitude = Double.toString(mPreferences.getLatitude());
         mLongitude = Double.toString(mPreferences.getLongitude());
@@ -342,9 +342,9 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 if(json == null){
                     mHandler.post(new Runnable(){
                         public void run(){
-                            Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.place_not_found),
-                                    Toast.LENGTH_LONG).show();
+                            ((MainActivity)getActivity()).showToast(getString(R.string.err_weather_data),
+                                    Gravity.CENTER, Toast.LENGTH_LONG);
+                            updateWeatherCache(null);
                         }
                     });
                 } else {

@@ -46,7 +46,7 @@ public class AccountPickerDialogFragment extends DialogFragment {
         }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getActivity(), "You have selected : " + selection, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "You have selected : " + selection, Toast.LENGTH_SHORT).show();
                 //Store selected account in preferences
                 Preferences preferences = Preferences.getInstance(getActivity());
                 preferences.setUserAccountName(selection);

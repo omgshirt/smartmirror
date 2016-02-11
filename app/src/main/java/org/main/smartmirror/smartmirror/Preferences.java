@@ -41,7 +41,7 @@ public class Preferences implements LocationListener {
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
     public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
-    public static final String PREFS_MUSIC_VOL = "MIRROR_PREFS_MUSIC_VOL";
+    public static final String PREFS_SPEECH_VOL = "MIRROR_PREFS_SPEECH_VOL";
 
     public static final String PREFS_CAMERA_ENABLED = "MIRROR_PREFS_CAMERA_ENABLED";
     public static final String PREFS_VOICE_ENABLED = "MIRROR_PREFS_VOICE_ENABLED";
@@ -86,12 +86,13 @@ public class Preferences implements LocationListener {
     public static final String CMD_LIGHT_HIGH = "light high";
     public static final String CMD_LIGHT_VHIGH= "light very high";
 
-    public static final String CMD_MUSIC_OFF = "music off";
-    public static final String CMD_MUSIC_VLOW = "music very low";
-    public static final String CMD_MUSIC_LOW = "music low";
-    public static final String CMD_MUSIC_MEDIUM = "music medium";
-    public static final String CMD_MUSIC_HIGH = "music high";
-    public static final String CMD_MUSIC_VHIGH= "music very high";
+
+    public static final String CMD_SPEECH_OFF = "speech off";
+    public static final String CMD_SPEECH_VLOW = "speech very low";
+    public static final String CMD_SPEECH_LOW = "speech low";
+    public static final String CMD_SPEECH_MEDIUM = "speech medium";
+    public static final String CMD_SPEECH_HIGH = "speech high";
+    public static final String CMD_SPEECH_VHIGH= "speech very high";
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
@@ -200,22 +201,22 @@ public class Preferences implements LocationListener {
                 break;
 
             // Music
-            case CMD_MUSIC_OFF:
+            case CMD_SPEECH_OFF:
                 setMusicVolume(VOL_OFF);
                 break;
-            case CMD_MUSIC_VLOW:
+            case CMD_SPEECH_VLOW:
                 setMusicVolume(VOL_VLOW);
                 break;
-            case CMD_MUSIC_LOW:
+            case CMD_SPEECH_LOW:
                 setMusicVolume(VOL_LOW);
                 break;
-            case CMD_MUSIC_MEDIUM:
+            case CMD_SPEECH_MEDIUM:
                 setMusicVolume(VOL_MEDIUM);
                 break;
-            case CMD_MUSIC_HIGH:
+            case CMD_SPEECH_HIGH:
                 setMusicVolume(VOL_HIGH);
                 break;
-            case CMD_MUSIC_VHIGH:
+            case CMD_SPEECH_VHIGH:
                 setMusicVolume(VOL_VHIGH);
                 break;
 
@@ -320,7 +321,7 @@ public class Preferences implements LocationListener {
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
         mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
-        mMusicVolume = mSharedPreferences.getFloat(PREFS_MUSIC_VOL, VOL_LOW);
+        mMusicVolume = mSharedPreferences.getFloat(PREFS_SPEECH_VOL, VOL_LOW);
         mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_LOW);
         mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
         mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
@@ -423,7 +424,7 @@ public class Preferences implements LocationListener {
         mMusicVolume = vol;
         setStreamVolume(vol, AudioManager.STREAM_MUSIC);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putFloat(PREFS_MUSIC_VOL, mMusicVolume);
+        edit.putFloat(PREFS_SPEECH_VOL, mMusicVolume);
         edit.apply();
     }
 

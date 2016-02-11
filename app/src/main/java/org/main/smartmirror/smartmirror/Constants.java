@@ -90,11 +90,10 @@ public class Constants {
     public static final String EIGHT = "eight";
     public static final String EIGHTH = "eighth";
 
-    public static final Set<String> COMMAND_SET = createCommandSet();
 
     public static final String[] COMMANDS = { BACK, BUSINESS,
             CAMERA, CALENDAR, CLOSE_WINDOW,
-            CONDITIONS, FACEBOOK, GALLERY,
+            CONDITIONS, FACEBOOK, FORECAST, GALLERY,
             GO_BACK, GO_TO_SLEEP, HIDE_TIME,
             HIDE_WEATHER, HIDE_WINDOW, LIGHT,
             MEDIA, MENU, NIGHT_LIGHT, NEWS,
@@ -108,7 +107,17 @@ public class Constants {
             WAKE, WAKE_UP, WORLD,
             "black", "blue", "gray", "green",
             "magenta", "orange", "purple",
-            "red", "yellow", "white"
+            "red", "yellow", "white",
+            "first", "second", "third", "fourth",
+            "fifth", "sixth", "seventh", "eighth",
+            Preferences.CMD_CAMERA_OFF, Preferences.CMD_CAMERA_ON,
+            Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
+            Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
+            Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
+            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC,
+            Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_VLOW,
+            Preferences.CMD_SPEECH_LOW, Preferences.CMD_SPEECH_MEDIUM,
+            Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH
     };
     public static HashSet<String> createCommandSet(){
 
@@ -118,7 +127,7 @@ public class Constants {
         List<String> commandList = Arrays.asList(
                 BACK, BUSINESS,
                 CAMERA, CALENDAR, CLOSE_WINDOW,
-                CONDITIONS, FACEBOOK, GALLERY,
+                CONDITIONS, FACEBOOK, FORECAST, GALLERY,
                 GO_BACK, GO_TO_SLEEP, HIDE_TIME,
                 HIDE_WEATHER, HIDE_WINDOW, LIGHT,
                 MEDIA, MENU, NIGHT_LIGHT, NEWS,
@@ -132,12 +141,24 @@ public class Constants {
                 WAKE, WAKE_UP, WORLD,
                 "black", "blue", "gray", "green",
                 "magenta", "orange", "purple",
-                "red", "yellow", "white"
+                "red", "yellow", "white",
+                "first", "second", "third", "fourth",
+                "fifth", "sixth", "seventh", "eighth",
+                Preferences.CMD_CAMERA_OFF, Preferences.CMD_CAMERA_ON,
+                Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
+                Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
+                Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
+                Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC,
+                Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_VLOW,
+                Preferences.CMD_SPEECH_LOW, Preferences.CMD_SPEECH_MEDIUM,
+                Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH
         );
 
         result.addAll(commandList);
         return result;
     }
+
+    public static final Set<String> COMMAND_SET = createCommandSet();
 
     //--------------TRAFFIC--------------
     public static final String DISTANCE_MATRIX_API =

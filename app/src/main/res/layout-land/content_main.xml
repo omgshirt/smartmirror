@@ -20,28 +20,36 @@
         android:visibility="gone" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-        <fragment
+        <!-- Weather Frame -->
+        <FrameLayout
             android:id="@+id/content_frame_1"
-            android:name="org.main.smartmirror.smartmirror.WeatherFragment"
             android:layout_weight="2"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            tools:layout="@layout/weather_fragment" />
+            android:layout_height="match_parent">
 
+            <fragment
+                android:name="org.main.smartmirror.smartmirror.WeatherFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout="@layout/weather_fragment" />
+        </FrameLayout>
+
+        <!-- Help frame -->
         <FrameLayout
             android:id="@+id/content_frame_2"
-            android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
 
+        <!-- Data Frame -->
         <FrameLayout
             android:id="@+id/content_frame_3"
-            android:layout_weight="2"
             android:layout_width="0dp"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_weight="2" />
     </LinearLayout>
 </RelativeLayout>
