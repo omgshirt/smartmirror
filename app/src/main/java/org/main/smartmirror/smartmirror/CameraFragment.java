@@ -352,8 +352,16 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * @param text The message to show
      */
     private void showToast(final String text){
-        mCountDownText.setText(text);
         ((MainActivity) getActivity()).showToast(text, Toast.LENGTH_SHORT);
+    }
+
+    /**
+     * Displays feedback to the user as to what the camera is doing.
+     *
+     * @param text the countdown to display.
+     */
+    private void showCameraFeedback(final String text){
+        mCountDownText.setText(text);
     }
 
     /**
@@ -776,12 +784,12 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         new CountDownTimer(4000, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                showToast(String.valueOf(millisUntilFinished / 1000));
+                showCameraFeedback(String.valueOf(millisUntilFinished / 1000));
                 speakCountdown(String.valueOf(millisUntilFinished / 1000));
             }
 
             public void onFinish() {
-                showToast("cheese");
+                showCameraFeedback("cheese");
                 speakCountdown("cheese");
                 lockFocus();
             }
@@ -860,7 +868,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     unlockFocus();
                 }
             };
-
             mCaptureSession.stopRepeating();
             mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
         } catch (CameraAccessException e) {
@@ -960,7 +967,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     body.setMimeType("image/jpeg");
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-                    showToast("Upload to Drive Successful!");
+                    showCameraFeedback("Upload to Drive Successful!");
                 } catch (UserRecoverableAuthIOException e) {
                     e.printStackTrace();
                 }
