@@ -472,6 +472,12 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void displayHelpFragment(Fragment fragment){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content_frame_2, fragment);
+        ft.commit();
+    }
+
     /**
      * Display the fragment within content_frame_3
      * @param fragment fragment to show
@@ -556,7 +562,7 @@ public class MainActivity extends AppCompatActivity
     public void hideHelpFragment(String command) {
 
         if (command.equals(Constants.HELP)) {
-            displayFragment(new HelpFragment().newInstance(getCurrentFragment()), true);
+            displayHelpFragment(new HelpFragment().newInstance(getCurrentFragment()));
         }
 
         closeMenuDrawer(command);

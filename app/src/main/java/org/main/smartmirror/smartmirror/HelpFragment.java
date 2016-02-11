@@ -24,19 +24,12 @@ public class HelpFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Log.d(Constants.TAG, "Starting Help");
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.help_fragment, container, false);
         String name = getArguments().getString("name");
+        Log.i(Constants.TAG, name);
         Resources res = getResources();
-
-        // title me
 
         TextView txtCurrentHelpHeader = (TextView)view.findViewById(R.id.fragment_help_header);
         TextView txtCurrentHelpContent = (TextView)view.findViewById(R.id.fragment_help_content);
@@ -71,7 +64,7 @@ public class HelpFragment extends Fragment {
             case Constants.FACEBOOK:
                 arrayContent = res.getStringArray(R.array.facebook_help);
                 strContent = stringSpace(arrayContent);
-                txtCurrentHelpHeader.setText("Controls");
+                txtCurrentHelpHeader.setText(name.substring(0,1).toUpperCase() + name.substring(1) + " - Help");
                 txtCurrentHelpContent.setText(strContent);
                 break;
             // camera
