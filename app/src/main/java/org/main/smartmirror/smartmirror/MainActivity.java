@@ -175,15 +175,16 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Set up views and nav drawer
-        setContentView(R.layout.activity_main);
-
         checkMarshmallowPermissions();
         mContext = getApplicationContext();
 
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+
+        // Set up views and nav drawer.
+        // This needs to occur after Preferences is set in order to successfully retrieve GPS position.
+        setContentView(R.layout.activity_main);
 
         // Create Mira
         mira = Mira.getInstance(this);
