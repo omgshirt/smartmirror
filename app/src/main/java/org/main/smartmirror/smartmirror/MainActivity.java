@@ -151,6 +151,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onArticleSelected(String articleTitle, String articleBody) {
         // TODO swap to given article body
+        Fragment fragment = new NewsBodyFragment();
+        boolean addToBackStack = !(fragment instanceof LightSleepFragment);
+        displayFragment(fragment, addToBackStack);
+
     }
 
     // handles the messages from VoiceService to this Activity
