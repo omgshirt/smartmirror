@@ -53,6 +53,8 @@ import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.ParentReference;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -951,6 +953,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 .build();
     }
 
+        private static final String MIME_FOLDER = "application/vnd.google-apps.folder";
+        private static final String FOLDER_NAME = "SmartMirrorPics";
+
     private void saveFileToDrive() {
         Thread t = new Thread(new Runnable() {
             @Override
@@ -967,6 +972,57 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
                     showToast("Upload to Drive Successful!");
+                    //DONT DELETE BELOW CODE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//                    boolean folderExists =false;
+//                    //String query = "mimeType='application/vnd/google-apps.folder' and trashed=false and title='" + FOLDER_NAME + "'";
+//
+//                    Drive.Files.List request = service.files().list().setQ(
+//                            "mimeType='application/vnd.google-apps.folder' and trashed=false");
+//                    FileList files = request.execute();
+//                    for(int i = 0; i < files.size(); i++){
+//                        if(files.getItems().get(i).getOriginalFilename() == "SmartMirrorPics"){
+//                            folderExists = true;
+//                        }
+//                        else if(files.getItems().get(i).getOriginalFilename()==null){
+//                            folderExists = false;
+//                        }
+//                    }
+//                    if(folderExists = true){
+//                        // File's binary content
+//                        java.io.File fileContent = new java.io.File(mFile.getPath());
+//                        FileContent mediaContent = new FileContent("image/jpeg", fileContent);
+//
+//                        // File's metadata.
+//                        com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
+//                        body.setTitle(fileContent.getName());
+//                        body.setMimeType("image/jpeg");
+//                        body.setParents(Arrays.asList(new ParentReference()
+//                            .setId(body.getId())));
+//
+//                        com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
+//                        showToast("Upload to Drive Successful!");
+//                    }
+//                    else if(folderExists = false) {
+//                        com.google.api.services.drive.model.File mBody = new com.google.api.services.drive.model.File();
+//                        mBody.setTitle(FOLDER_NAME);
+//                        mBody.setMimeType(MIME_FOLDER);
+//
+//                        com.google.api.services.drive.model.File mmFile = service.files().insert(mBody).execute();
+//
+//                    // File's binary content
+//                    java.io.File fileContent = new java.io.File(mFile.getPath());
+//                    FileContent mediaContent = new FileContent("image/jpeg", fileContent);
+//
+//                    // File's metadata.
+//                    com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
+//                    body.setTitle(fileContent.getName());
+//                    body.setMimeType("image/jpeg");
+//                    body.setParents(Arrays.asList(new ParentReference()
+//                            .setId(mmFile.getId())));
+//
+//                    com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
+//                    showToast("Upload to Drive Successful!");
+//                    }
                 } catch (UserRecoverableAuthIOException e) {
                     e.printStackTrace();
                 }
