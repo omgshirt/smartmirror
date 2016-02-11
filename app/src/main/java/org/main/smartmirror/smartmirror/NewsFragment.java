@@ -19,12 +19,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Cache;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
-
-import java.util.EnumSet;
 
 public class NewsFragment extends Fragment implements CacheManager.CacheListener{
 
@@ -42,6 +39,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private final int DATA_UPDATE_FREQUENCY = 1;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
+
     public static final String NEWS_CACHE = "news cache";
     public static final String SPORTS_CACHE = "sports cache";
     public static final String TECH_CACHE = "tech cache";
@@ -49,6 +47,16 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static final String SCIENCE_CACHE = "science cache";
     public static final String MEDIA_CACHE = "media cache";
     public static final String TRAVEL_CACHE = "travel cache";
+
+    public static final String[] NEWS_DESKS = {"business",
+            "media",
+            "science",
+            "sports",
+            "tech",
+            "travel",
+            "world" };
+
+
     private CacheManager mCacheManager = null;
 
     private TextView mTxtHeadline1;
@@ -84,10 +92,22 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
     ScrollView mScrollView;
 
-
     Handler mHandler = new Handler();
+    private ArticleSelectedListener articleSelectedListener;
+
+    public interface ArticleSelectedListener {
+        void onArticleSelected(String title, String body);
+    }
 
     public NewsFragment() {}
+
+    public static NewsFragment newInstance(String section) {
+        Bundle args = new Bundle();
+        args.putString("arrI", section);
+        NewsFragment fragment = new NewsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     static String mNewURL;
     static String mGuardAPIKey;
@@ -109,7 +129,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         mTxtHeadline7 = (TextView)view.findViewById(R.id.headline7);
         mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
 
-        txtNewsDesk = (TextView)view.findViewById(R.id.txtNewsDesk);
+        txtNewsDesk = (TextView)view.findViewById(R.id.news_desk_title);
 
         img1 = (ImageView)view.findViewById(R.id.img1);
         img2 = (ImageView)view.findViewById(R.id.img2);
@@ -190,7 +210,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         mHeadline = hl[x];
         Fragment fragment = new NewsBodyFragment();
         FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.content_frame, fragment)
+        fm.beginTransaction().replace(R.id.content_frame_3, fragment)
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                 .commit();
     }
@@ -272,12 +292,28 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     Log.d("News", "Got message:\"" + message + "\"");
                     break;*/
             }
-            if(message.contains(Constants.SCROLLDOWN))
+            if(message.contains(Constants.SCROLL_DOWN))
                 mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
-            else if(!message.contains(Constants.SCROLLDOWN) && message.contains(Constants.SCROLLUP))
+            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
                 mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
         }
     };
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        try {
+            articleSelectedListener = (ArticleSelectedListener)context;
+        } catch (ClassCastException cce){
+            cce.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        articleSelectedListener = null;
+    }
 
     @Override
     public void onStart() {
@@ -289,6 +325,21 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
         // TODO: 2/3/2016 add switch case so only current news section is checked/updated
         // TODO: 2/3/2016 don't update when null/not prev visited
+
+
+        for (String name : NEWS_DESKS) {
+            String cacheName = name + " cache";
+            if (!mCacheManager.containsKey(cacheName)) {
+                Log.i(Constants.TAG, cacheName + " does not exist, creating");
+                startNewsUpdate();
+            } else if (mCacheManager.isExpired(name)){
+                Log.i(Constants.TAG, cacheName + " expired. Refreshing...");
+                startNewsUpdate();
+                renderNews((JSONObject) mCacheManager.get(cacheName));
+            }
+        }
+
+        /*
 
         // -----CASE NEWS-----
         if (!mCacheManager.containsKey(NEWS_CACHE)) {
@@ -373,6 +424,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             Log.i(Constants.TAG, "ScienceCache expired. Refreshing...");
             startNewsUpdate();
         }
+
+        */
     }
 
     /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
@@ -407,6 +460,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
 
+        // TODO UNREGISTER ON PAUSE
         if (mNewsSection == "world" || mNewsSection == "news") {
             mCacheManager.registerCacheListener(NEWS_CACHE, this);
         } else if (mNewsSection == "sports") {
@@ -547,7 +601,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         } else if (mNewsSection == "business") {
             if (cacheName.equals(BUSINESS_CACHE)) startNewsUpdate();
         } else if (mNewsSection == "media") {
-            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();;
+            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();
         } else if (mNewsSection == "travel") {
             if (cacheName.equals(TRAVEL_CACHE)) startNewsUpdate();
         } else if (mNewsSection == "science") {

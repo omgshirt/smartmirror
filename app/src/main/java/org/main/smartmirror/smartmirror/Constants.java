@@ -1,48 +1,56 @@
 package org.main.smartmirror.smartmirror;
 
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class Constants {
 
-    //--------------CONSTANTS--------------
+    //--------------CONSTANTS------------
     public static final String TAG = "SmartMirror";
     public static final String BACK = "back";
     public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
+    public static final String HIDE_WINDOW = "hide window";
+    public static final String CLOSE_WINDOW = "close window";
     public static final String MENU = "menu";
-    public static final String OFF = "off";
-    public static final String ON = "on";
     public static final String OPTIONS = "options";
-    public static final String REMOTE = "remote";
+    public static final String SLEEP = "sleep";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
 
-    //--------------FRAGMENTS--------------
+    //--------------FRAGMENTS------------
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
-    public static final String TWITTER = "twitter";
-    public static final String WEATHER = "weather";
-    public static final String QUOTES = "quotes";
-    public static final String MAKEUP= "makeup";
-    public static final String SETTINGS = "settings";
-    public static final String SLEEP = "sleep";
-    public static final String MUSIC = "music";
-    public static final String NEWS = "news";
-    public static final String NEWS_BODY = "news body";
-    //public static final String SHOW_HELP = "show help";
-    public static final String TRAFFIC = "traffic";
-    public static final String TIME = "time";
-    public static final String NIGHT_LIGHT = "night light";
     public static final String LIGHT = "light";
     public static final String LIGHT_SLEEP = "light sleep"; // Not a voice command - only used to track current fragment
+    public static final String NEWS = "news";
+    public static final String NIGHT_LIGHT = "night light";
+    public static final String QUOTES = "quotes";
+    public static final String SETTINGS = "settings";
+    public static final String TIME = "current time";
+    public static final String TRAFFIC = "traffic";
+    public static final String TWITTER = "twitter";
 
-    //--------------HELP--------------
+    // ------------- NEWS ------------
+    public static final String BUSINESS = "business";
+    public static final String MEDIA = "media";
+    public static final String SCIENCE = "science";
+    public static final String SPORTS = "sports";
+    public static final String TECHNOLOGY = "technology";
+    public static final String TRAVEL = "travel";
+    public static final String WORLD = "world";
+
+
+    //--------------HELP-----------------
     public static final String HELP = "help";
-    public static final String HIDE = "hide";
 
     //--------------WEATHER--------------
-    public static final String OPEN_WEATHER_MAP_API =
-            "http://api.openweathermap.org/data/2.5/weather?id=%s&units=%s";
     public static final String CONDITIONS = "conditions";
     public static final String FORECAST = "forecast";
     public static final String SHOW_WEATHER = "show weather";
@@ -50,7 +58,7 @@ public class Constants {
     public static final String SHOW_TIME = "show time";
     public static final String HIDE_TIME = "hide time";
 
-    //--------------CAMERA--------------
+    //--------------CAMERA---------------
     public static final String TAKE_PICTURE="take a picture";
 
     //--------------TWITTER--------------
@@ -62,9 +70,9 @@ public class Constants {
     public static final String mGet= "get";
     public static final String mRefresh= "refresh";
 
-    //--------------FACEBOOK--------------
-    public static final String SCROLLUP="scroll up";
-    public static final String SCROLLDOWN="scroll down";
+    //--------------FACEBOOK-------------
+    public static final String SCROLL_UP ="scroll up";
+    public static final String SCROLL_DOWN ="scroll down";
 
     //--------------NEWS--------------
     public static final String ONE = "one";
@@ -83,4 +91,57 @@ public class Constants {
     public static final String SEVENTH = "seventh";
     public static final String EIGHT = "eight";
     public static final String EIGHTH = "eighth";
+
+    public static final Set<String> COMMAND_SET = createCommandSet();
+
+    public static final String[] COMMANDS = { BACK, BUSINESS,
+            CAMERA, CALENDAR, CLOSE_WINDOW,
+            CONDITIONS, FACEBOOK, GALLERY,
+            GO_BACK, GO_TO_SLEEP, HIDE_TIME,
+            HIDE_WEATHER, HIDE_WINDOW, LIGHT,
+            MEDIA, MENU, NIGHT_LIGHT, NEWS,
+            ONE, OPTIONS, QUOTES, SCIENCE,
+            SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
+            SETTINGS, SEVEN, SEVENTH,
+            SHOW_TIME, SHOW_WEATHER, SIX,
+            SIXTH, SLEEP, TAKE_PICTURE,
+            THIRD, THREE, TECHNOLOGY, TIME,
+            TRAFFIC, TRAVEL, TWITTER, TWO,
+            WAKE, WAKE_UP, WORLD,
+            "black", "blue", "gray", "green",
+            "magenta", "orange", "purple",
+            "red", "yellow", "white"
+    };
+    public static HashSet<String> createCommandSet(){
+
+        HashSet<String> result = new HashSet<>();
+        //List<String> commandList = new ArrayList<>(Arrays.asList(COMMANDS));
+
+        List<String> commandList = Arrays.asList(
+                BACK, BUSINESS,
+                CAMERA, CALENDAR, CLOSE_WINDOW,
+                CONDITIONS, FACEBOOK, GALLERY,
+                GO_BACK, GO_TO_SLEEP, HIDE_TIME,
+                HIDE_WEATHER, HIDE_WINDOW, LIGHT,
+                MEDIA, MENU, NIGHT_LIGHT, NEWS,
+                ONE, OPTIONS, QUOTES, SCIENCE,
+                SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
+                SETTINGS, SEVEN, SEVENTH,
+                SHOW_TIME, SHOW_WEATHER, SIX,
+                SIXTH, SLEEP, TAKE_PICTURE,
+                THIRD, THREE, TECHNOLOGY, TIME,
+                TRAFFIC, TRAVEL, TWITTER, TWO,
+                WAKE, WAKE_UP, WORLD,
+                "black", "blue", "gray", "green",
+                "magenta", "orange", "purple",
+                "red", "yellow", "white"
+        );
+
+        result.addAll(commandList);
+        return result;
+    }
+
+    //--------------TRAFFIC--------------
+    public static final String DISTANCE_MATRIX_API =
+            "https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s,%s&destinations=%s,%s&departure_time=now&traffic_model=best_guess&units=%s&key=%s";
 }

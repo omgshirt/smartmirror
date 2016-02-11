@@ -1,6 +1,8 @@
 blue /1e4/
 calendar /1e-1/
 camera /1e-1/
+close window /1e-1/
+hide window /1e-1/
 conditions /1e-8/
 enable camera /1e-3/
 enable remote /1e-3/
@@ -13,18 +15,14 @@ gray /1e10/
 green /1e4/
 go to sleep /1e-21/
 go back /1e10/
-hangman /1e1/
 help /1e6/
 log me in /1e-3/
-makeup /1e7/
 magenta /1e-4/
 menu /1e4/
 news /1e12/
 night light /1e-9/
 orange /1.0/
 options /1e-2/
-power off /1e-2/
-power on /1e-2/
 purple /1e0/
 quotes /1e4/
 refresh /1e-4/
@@ -36,7 +34,7 @@ sleep /1e12/
 start listening /1e-6/
 stop listening /1e-8/
 take a picture /1e-15/
-time/1e8/
+current time/1e8/
 show time/1e-3/
 hide time/1e-2/
 traffic/1e1/
@@ -54,7 +52,6 @@ traffic /1e1/
 twitter /1e1/
 wake /1e3/
 wake up /1e-3/
-weather /1e5/
 weather english /1e2/
 weather metric /1e2/
 screen brightness very low /1e-5/
@@ -73,7 +70,7 @@ first /1e6/
 second /1e4/
 third /1e6/
 fourth /1e14/
-fifth /1e2/
-sixth /1e2/
-seventh /1e2/
-eighth /1e2/
+fifth /1e6/
+sixth /1e6/
+seventh /1e6/
+eighth /1e6/

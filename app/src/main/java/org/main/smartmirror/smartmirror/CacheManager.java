@@ -20,8 +20,7 @@ public class CacheManager {
     private static CacheManager mCacheManager;
     private static HashMap<String, DataCache> cacheMap;
     private static HashMap<String, List<CacheListener>> mListenersMap;
-
-    private ScheduledFuture<?> cacheScheduler;
+    private static ScheduledFuture<?> cacheScheduler;
 
     public interface CacheListener {
         /** Called when a cached has expired. Expected that the listener will update the cache. */
@@ -41,18 +40,19 @@ public class CacheManager {
         final Runnable expirationChecker = new Runnable() {
             @Override
             public void run() {
-                checkCacheExpirations();
+                checkCacheExpiration();
                 Log.i(Constants.TAG, "CacheManager: checking for expired caches");
             }
         };
 
         // set a thread to check for expired caches.
-        cacheScheduler = scheduler.scheduleAtFixedRate(expirationChecker, 31, 31,
-                TimeUnit.SECONDS);
+        if (cacheScheduler == null)
+            cacheScheduler = scheduler.scheduleAtFixedRate(expirationChecker, 31, 31, TimeUnit.SECONDS);
     }
 
     public static CacheManager getInstance(){
         if (mCacheManager == null) {
+            Log.i(Constants.TAG, "Creating cache manager");
             mCacheManager = new CacheManager();
         }
         return mCacheManager;
@@ -141,7 +141,7 @@ public class CacheManager {
     }
 
     /**
-     * Unregister listener from all cache notifications
+     * Unregister the given listener from all cache notifications it is associated with
      * @param listener listener object to unregister
      */
     public void unRegisterCacheListener(CacheListener listener){
@@ -157,7 +157,7 @@ public class CacheManager {
     /**
      *  Checks all caches for expiration & notifies attached listeners
      */
-    public void checkCacheExpirations() {
+    public void checkCacheExpiration() {
         if (mListenersMap.isEmpty()) return;
         for(String s : mListenersMap.keySet()) {
             if (cacheMap.get(s).isExpired()) {
