@@ -101,7 +101,7 @@ public class TwitterActivity extends ListActivity{
                 downloadTweets();
 
                 // this displays user timeline in twitter app like feed, need home_timeline
-                UserTimeline userTimeline = new UserTimeline.Builder().screenName(mScreenName).build();
+                /*UserTimeline userTimeline = new UserTimeline.Builder().screenName(mScreenName).build();
                 Log.i("TWITTER USER TL ",userTimeline.toString() );
 
                 final UserTimeline userTL = new UserTimeline.Builder()
@@ -110,7 +110,7 @@ public class TwitterActivity extends ListActivity{
                 final TweetTimelineListAdapter adapter = new TweetTimelineListAdapter.Builder(TwitterActivity.this)
                         .setTimeline(userTL)
                         .build();
-                setListAdapter(adapter);
+                setListAdapter(adapter);*/
             }
 
             @Override
@@ -151,14 +151,14 @@ public class TwitterActivity extends ListActivity{
          //final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name="; // this works
          final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/home_timeline.json?count=1"; // this gives error code 403 Forbidden,
                                                                                                                     //    possibly pull limit reached?
-                                                                                                                    // emailing twitter support
+                                                                                                                    //    emailing twitter support
 
          @Override
          protected String doInBackground(String... screenNames) {
              String result = null;
 
              if (screenNames.length > 0) {
-                 result = getTwitterStream(screenNames[0]);
+                 result = getTwitterStream(mScreenName);
                  //result = getTwitterStream();
              }
              return result;
@@ -253,6 +253,7 @@ public class TwitterActivity extends ListActivity{
              } catch (UnsupportedEncodingException ex) {
              } catch (IllegalStateException ex1) {
              }
+
              return results;
          }
      }

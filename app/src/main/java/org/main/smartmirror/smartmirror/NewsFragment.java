@@ -442,14 +442,15 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
 
-        /*for (String name : NEWS_DESKS) {
+        for (String name : NEWS_DESKS) {
             String cacheName = name;
-            if (mNewsSection.contains(cacheName)) {
-                mCacheManager.registerCacheListener(???, this);
+            if (mNewsSection.equals(cacheName)) {
+                mCacheManager.registerCacheListener(cacheName, this);
+                Log.i("NEWS CACHE", "register " + cacheName);
             }
-        }*/
+        }
 
-        if (mNewsSection.equals("world")  || mNewsSection.equals("news")) {
+        /*if (mNewsSection.equals("world")  || mNewsSection.equals("news")) {
             mCacheManager.registerCacheListener(WORLD_CACHE, this);
         } else if (mNewsSection.equals("sports")) {
             mCacheManager.registerCacheListener(SPORTS_CACHE, this);
@@ -463,7 +464,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             mCacheManager.registerCacheListener(TRAVEL_CACHE, this);
         } else if (mNewsSection.equals("science")) {
             mCacheManager.registerCacheListener(SCIENCE_CACHE, this);
-        }
+        }*/
     }
 
     // when this goes out of view, halt listening
@@ -472,7 +473,16 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
 
         // TODO UNREGISTER ON PAUSE
-        if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
+
+        for (String name : NEWS_DESKS) {
+            String cacheName = name;
+            if (mNewsSection.equals(cacheName)) {
+                mCacheManager.unRegisterCacheListener(cacheName, this);
+                Log.i("NEWS CACHE", "unregister " + cacheName);
+            }
+        }
+
+        /*if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
             mCacheManager.unRegisterCacheListener(WORLD_CACHE, this);
         } else if (mNewsSection.equals("sports")) {
             mCacheManager.unRegisterCacheListener(SPORTS_CACHE, this);
@@ -486,7 +496,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             mCacheManager.unRegisterCacheListener(TRAVEL_CACHE, this);
         } else if (mNewsSection.equals("science")) {
             mCacheManager.unRegisterCacheListener(SCIENCE_CACHE, this);
-        }
+        }*/
     }
 
     // Get news headlines from api and display
@@ -516,7 +526,15 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     }
     private void updateNewsCache(JSONObject data){
 
-        if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
+        for (String name : NEWS_DESKS) {
+            String cacheName = name;
+            if (mNewsSection.equals(cacheName)) {
+                mCacheManager.addCache(cacheName, data, DATA_UPDATE_FREQUENCY);
+                Log.i("NEWS CACHE", "updating " + cacheName);
+            }
+        }
+
+        /*if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
             mCacheManager.addCache(WORLD_CACHE, data, DATA_UPDATE_FREQUENCY);
         } else if (mNewsSection.equals("sports")) {
             mCacheManager.addCache(SPORTS_CACHE, data, DATA_UPDATE_FREQUENCY);
@@ -530,7 +548,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             mCacheManager.addCache(TRAVEL_CACHE, data, DATA_UPDATE_FREQUENCY);
         } else if (mNewsSection.equals("science")) {
             mCacheManager.addCache(SCIENCE_CACHE, data, DATA_UPDATE_FREQUENCY);
-        }
+        }*/
     }
 
     private void renderNews(JSONObject json){
@@ -604,21 +622,29 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     @Override
     public void onCacheExpired(String cacheName) {
 
-        if (mNewsSection == "world" || mNewsSection == "news") {
-            if (cacheName.equals(WORLD_CACHE)) startNewsUpdate();
-        } else if (mNewsSection == "sports") {
-            if (cacheName.equals(SPORTS_CACHE)) startNewsUpdate();
-        } else if (mNewsSection == "technology") {
-            if (cacheName.equals(TECH_CACHE)) startNewsUpdate();
-        } else if (mNewsSection == "business") {
-            if (cacheName.equals(BUSINESS_CACHE)) startNewsUpdate();
-        } else if (mNewsSection == "media") {
-            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();
-        } else if (mNewsSection == "travel") {
-            if (cacheName.equals(TRAVEL_CACHE)) startNewsUpdate();
-        } else if (mNewsSection == "science") {
-            if (cacheName.equals(SCIENCE_CACHE)) startNewsUpdate();
+        for (String name : NEWS_DESKS) {
+            cacheName = name;
+            if (mNewsSection.equals(cacheName)) {
+                startNewsUpdate();
+                Log.i("NEWS CACHE", "updating expired cache" + cacheName);
+            }
         }
+
+        /*if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
+            if (cacheName.equals(WORLD_CACHE)) startNewsUpdate();
+        } else if (mNewsSection.equals("sports")) {
+            if (cacheName.equals(SPORTS_CACHE)) startNewsUpdate();
+        } else if (mNewsSection.equals("technology")) {
+            if (cacheName.equals(TECH_CACHE)) startNewsUpdate();
+        } else if (mNewsSection.equals("business")) {
+            if (cacheName.equals(BUSINESS_CACHE)) startNewsUpdate();
+        } else if (mNewsSection.equals("media")) {
+            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();
+        } else if (mNewsSection.equals("travel")) {
+            if (cacheName.equals(TRAVEL_CACHE)) startNewsUpdate();
+        } else if (mNewsSection.equals("science")) {
+            if (cacheName.equals(SCIENCE_CACHE)) startNewsUpdate();
+        }*/
     }
 
     /** Callback from CacheManager */
