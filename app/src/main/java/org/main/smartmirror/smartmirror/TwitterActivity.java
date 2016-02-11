@@ -45,9 +45,19 @@ import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 
 
- /*Steps for OAuth
+/*Steps for OAuth
   * https://dev.twitter.com/oauth/application-only
-  * */
+* */
+
+/*API Console
+   * https://dev.twitter.com/zh-hant/rest/tools/console
+* */
+
+/* TWITTER Login details
+   * username: smartmirrortesting@gmail.com
+   * password: smartmirrort
+* */
+
 public class TwitterActivity extends ListActivity{
 
 
@@ -151,15 +161,14 @@ public class TwitterActivity extends ListActivity{
          //final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name="; // this works
          final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/home_timeline.json?count=1"; // this gives error code 403 Forbidden,
                                                                                                                     //    possibly pull limit reached?
-                                                                                                                    //    emailing twitter support
 
          @Override
          protected String doInBackground(String... screenNames) {
              String result = null;
 
              if (screenNames.length > 0) {
+                 // result = getTwitterStream(screenNames[0]);
                  result = getTwitterStream(mScreenName);
-                 //result = getTwitterStream();
              }
              return result;
          }
