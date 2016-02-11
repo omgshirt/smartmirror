@@ -154,12 +154,12 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        checkMarshmallowPermissions();
         mContext = getApplicationContext();
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
-        checkMarshmallowPermissions();
         initializeWifiP2P();
         discoverWifiP2pPeers();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
@@ -456,7 +456,7 @@ public class MainActivity extends AppCompatActivity
 
     private void displayFragment(Fragment fragment){
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_frame, fragment);
+        ft.replace(R.id.content_frame_3, fragment);
         if (!isFinishing()) {
             ft.addToBackStack(null);
             ft.commit();
