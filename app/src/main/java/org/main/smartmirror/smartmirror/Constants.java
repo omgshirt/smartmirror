@@ -96,7 +96,8 @@ public class Constants {
 
 
     // used to initialize COMMAND_SET
-    public static final String[] COMMANDS = { BACK, BUSINESS,
+    public static final String[] COMMANDS = {
+            BACK, BUSINESS,
             CAMERA, CALENDAR, CLOSE_WINDOW,
             CONDITIONS, FACEBOOK, FORECAST, GALLERY,
             GO_BACK, GO_TO_SLEEP, HIDE_TIME,
@@ -110,19 +111,33 @@ public class Constants {
             THIRD, THREE, TECHNOLOGY, TIME,
             TRAFFIC, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WORLD,
-            "black", "blue", "gray", "green",
+            "black", "blue", "gray", //"green"
             "magenta", "orange", "purple",
             "red", "yellow", "white",
             "first", "second", "third", "fourth",
             "fifth", "sixth", "seventh", "eighth",
             Preferences.CMD_CAMERA_OFF, Preferences.CMD_CAMERA_ON,
-            Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
+
+            Preferences.CMD_LIGHT_HIGH, Preferences.CMD_LIGHT_LOW,
+            Preferences.CMD_LIGHT_MEDIUM, Preferences.CMD_LIGHT_VHIGH,
+            Preferences.CMD_LIGHT_VLOW,
+
             Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
-            Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
-            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC,
+
+            Preferences.CMD_SCREEN_HIGH, Preferences.CMD_SCREEN_LOW,
+            Preferences.CMD_SCREEN_MEDIUM, Preferences.CMD_SCREEN_VHIGH,
+            Preferences.CMD_SCREEN_VLOW,
+
             Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_VLOW,
             Preferences.CMD_SPEECH_LOW, Preferences.CMD_SPEECH_MEDIUM,
-            Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH
+            Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH,
+
+            Preferences.CMD_SPEECH_RARE,
+            Preferences.CMD_SPEECH_OFTEN, Preferences.CMD_SPEECH_ALWAYS,
+
+            Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
+            Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
+            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC
     };
 
     public static HashSet<String> createCommandSet(){

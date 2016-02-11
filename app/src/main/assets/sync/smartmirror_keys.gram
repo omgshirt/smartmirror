@@ -14,11 +14,16 @@ gallery /1e-2/
 gray /1e15/
 go to sleep /1e-21/
 go back /1e8/
-green /1e15/
+green /1e20/
 help /1e6/
 hide time/1e-2/
 hide weather/1e1/
 hide window /1e-1/
+light very low/1e1/
+light low/1e1/
+light medium/1e1/
+light high/1e1/
+light very high/1e1/
 log me in /1e-3/
 magenta /1e-4/
 menu /1e4/
@@ -38,12 +43,23 @@ screen brightness high /1e-5/
 screen brightness very high /1e-5/
 scroll up /1e6/
 scroll down /1e6/
+speech off/1e1/
+speech very low/1e1/
+speech low/1e1/
+speech medium/1e1/
+speech high/1e1/
+speech very high/1e1/
+speech rare/1e1/
+speech often/1e1/
+speech always/1e1/
 show time/1e-3/
 show weather/1e1/
 sleep /1e12/
 start listening /1e-6/
 stop listening /1e-8/
 take a picture /1e-15/
+time twelve hour /1e-10/
+time twenty four hour /1e-10/
 traffic/1e1/
 twitter/1e1/
 wake/1e6/

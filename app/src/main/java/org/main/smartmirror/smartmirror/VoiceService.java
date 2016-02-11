@@ -137,7 +137,7 @@ public class VoiceService extends Service implements RecognitionListener {
     public void onPartialResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr().trim();
-            Log.i("VR", "onPartialResult: \"" + text + "\"" );
+            Log.i("VR", "onPartialResult: \"" + text + "\"");
             findCommandInText(text);
         }
     }
@@ -146,23 +146,20 @@ public class VoiceService extends Service implements RecognitionListener {
      * Look for recognized commands, starting with the last word.
      * Also checks two word pairs (n-1) + (n) from end back towards front of string
      * If a command is found, cancel voice listener and return that command.
+     *
      * @param text string to evaluate
+     * @return true if the string contains a recognized command
      */
     public boolean findCommandInText(String text) {
 
         String[] candidates = text.split("\\s+");
-        for (int i = candidates.length-1; i >= 0; i--) {
-            String candidate = candidates[i];
-            Log.i("VR", "looking for \"" + candidate + "\"");
-            if (Constants.COMMAND_SET.contains(candidate)) {
-                Log.i("VR", "found command: " + candidate);
-                cancelAndSendResult(candidate);
-                return true;
-            }
-            // check two-word strings
-            if (i >= 1) {
-                candidate = candidates[i-1] + " " + candidates[i];
+        for (int i = candidates.length - 1; i >= 0; i--) {
+            String candidate = "";
+
+            for (int j = i; j < candidates.length; j++) {
+                candidate = (candidate + " " + candidates[j]).trim();
                 Log.i("VR", "looking for \"" + candidate + "\"");
+
                 if (Constants.COMMAND_SET.contains(candidate)) {
                     Log.i("VR", "found command: " + candidate);
                     cancelAndSendResult(candidate);
@@ -170,11 +167,10 @@ public class VoiceService extends Service implements RecognitionListener {
                 }
             }
         }
-
         return false;
     }
 
-    public void cancelAndSendResult(String text){
+    public void cancelAndSendResult(String text) {
         //Log.i("VR", "cancelling voice. Result: \"" + text + "\"");
         //Log.i(Constants.TAG, "cancelling voice. Result: \"" + text + "\"");
         mSpeechRecognizer.cancel();
