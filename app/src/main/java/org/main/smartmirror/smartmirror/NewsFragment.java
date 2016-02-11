@@ -24,6 +24,10 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
 public class NewsFragment extends Fragment implements CacheManager.CacheListener{
 
     // the guardian api
@@ -49,13 +53,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static final String MEDIA_CACHE = "media cache";
     public static final String TRAVEL_CACHE = "travel cache";
 
-    public static final String[] NEWS_DESKS = {"business",
-            "media",
-            "science",
-            "sports",
-            "tech",
-            "travel",
-            "world" };
 
 
     private CacheManager mCacheManager = null;
@@ -328,7 +325,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // TODO: 2/3/2016 don't update when null/not prev visited
 
 
-        for (String name : NEWS_DESKS) {
+        for (String name : Constants.NEWS_DESKS) {
             String cacheName = name + " cache";
             if (!mCacheManager.containsKey(cacheName)) {
                 Log.i(Constants.TAG, cacheName + " does not exist, creating");

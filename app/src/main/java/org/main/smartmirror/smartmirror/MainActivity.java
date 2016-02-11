@@ -584,12 +584,6 @@ public class MainActivity extends AppCompatActivity
                     // if the command is light (a special case) wake and directly show LightFragment
                     hideHelpFragment(command);
                 }
-                /*
-                else {
-                    // in LIGHT_SLEEP we're showing a black, empty fragment. Instead, display the last
-                    // fragment shown before SleepFragment.
-                    getSupportFragmentManager().popBackStack();
-                } */
             }
         }
     }
@@ -654,9 +648,9 @@ public class MainActivity extends AppCompatActivity
         // Play sound effect - disabled
         //playSound(R.raw.celeste_a);
 
-        for (String newsDesk : NewsFragment.NEWS_DESKS) {
-            if (newsDesk.equals(command))
-                fragment = NewsFragment.newInstance(command);
+        // look for news desk
+        if (Constants.DESK_HASH.contains(command)) {
+            fragment = NewsFragment.newInstance(command);
         }
 
         // Create fragment based on the command. If the input string is not a fragment,
@@ -666,7 +660,6 @@ public class MainActivity extends AppCompatActivity
                 fragment = new CalendarFragment();
                 break;
             case Constants.CAMERA:
-                // TODO: can we handle this disabling within the CameraFragment instead?
                 if (mPreferences.isCameraEnabled()) {
                     fragment = new CameraFragment();
                 } else {
@@ -688,7 +681,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.HIDE_WINDOW:
             case Constants.CLOSE_WINDOW:
-                fragment = new LightSleepFragment();
+                fragment = new BlankFragment();
                 break;
             case Constants.LIGHT:
                 fragment = new LightFragment();
@@ -705,10 +698,8 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 break;
             case Constants.SLEEP:
-                //fragment = new LightSleepFragment();
                 enterLightSleep();
                 command = mCurrentFragment;
-                //command = Constants.LIGHT_SLEEP;
                 break;
             case Constants.TRAFFIC:
                 fragment = new TrafficFragment();
@@ -726,7 +717,7 @@ public class MainActivity extends AppCompatActivity
         if (fragment != null) {
             //startTTS(command);
             mCurrentFragment = command;
-            boolean addToBackStack = !(fragment instanceof LightSleepFragment);
+            boolean addToBackStack = !(fragment instanceof BlankFragment);
             displayFragment(fragment, command, addToBackStack);
         }
     }
@@ -776,91 +767,6 @@ public class MainActivity extends AppCompatActivity
             }
             return;
         }
-
-        /*
-        // Starting at the front on the input string, check if either the first word or
-        // first two words match a known command.
-        String[] candidates = voiceInput.split("\\s+");
-        for (int i = 0; i < candidates.length; i++) {
-            String candidate = candidates[i];
-            if (Constants.COMMAND_SET.contains(candidate)) {
-                voiceInput = candidate;
-            }
-            // check two-word strings
-            if (i + 1 < candidates.length) {
-                candidate = candidates[i] + " " + candidates[i + 1];
-                if (Constants.COMMAND_SET.contains(candidate)) {
-                    voiceInput = candidate;
-                }
-            }
-            Log.i(Constants.TAG, "candidate changed to: " + candidate);
-        }
-        */
-
-        /*
-        // time
-        if(voiceInput.contains(Constants.SHOW_TIME)) {
-            voiceInput = Constants.SHOW_TIME;
-        } else if (voiceInput.contains(Constants.HIDE_TIME)) {
-            voiceInput = Constants.HIDE_TIME;
-        } else if (voiceInput.contains(Constants.TIME)) {
-            voiceInput = Constants.TIME;
-        }
-
-        // weather
-        if(voiceInput.contains(Constants.HIDE_WEATHER)) {
-            voiceInput = Constants.HIDE_WEATHER;
-        } else if (voiceInput.contains(Constants.SHOW_WEATHER)) {
-            voiceInput = Constants.SHOW_WEATHER;
-        } else if (voiceInput.contains(Preferences.CMD_WEATHER_ENGLISH)) {
-            voiceInput = Preferences.CMD_WEATHER_ENGLISH;
-        } else if (voiceInput.contains(Preferences.CMD_WEATHER_METRIC)) {
-            voiceInput = Preferences.CMD_WEATHER_METRIC;
-        }
-
-        if(voiceInput.contains(Constants.WAKE)) {
-            voiceInput = Constants.WAKE;
-        }
-
-        if(voiceInput.contains(Constants.NIGHT_LIGHT)) {
-            voiceInput = Constants.LIGHT;
-        }
-
-        if(voiceInput.contains(Constants.SLEEP)) {
-            voiceInput = Constants.SLEEP;
-        }
-
-        // Junk fix for remote
-        if(voiceInput.contains("remote")) {
-            if (voiceInput.contains("enable")) {
-                voiceInput = Preferences.CMD_REMOTE_ON;
-            } else if (voiceInput.contains("disable")) {
-                voiceInput = Preferences.CMD_REMOTE_OFF;
-            }
-        }
-        // more garbage...
-        if(voiceInput.contains(Constants.CAMERA)) {
-            if (voiceInput.contains("enable")) {
-                voiceInput = Preferences.CMD_CAMERA_ON;
-            } else if (voiceInput.contains("disable")) {
-                voiceInput = Preferences.CMD_CAMERA_OFF;
-            }
-        }
-
-        // Normalize speech commands to match remote control versions.
-        switch (voiceInput) {
-            case Constants.GO_TO_SLEEP:
-                voiceInput = Constants.SLEEP;
-                break;
-            case Constants.OPTIONS:
-                voiceInput = Constants.SETTINGS;
-                break;
-            case Constants.WAKE_UP:
-                voiceInput = Constants.WAKE;
-                break;
-        }
-
-        */
 
         wakeScreenAndDisplay(voiceInput);
     }
