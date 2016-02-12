@@ -12,7 +12,7 @@ import java.util.Random;
  * This fragment will be all black simulating the "Off" feature
  */
 
-public class LightSleepFragment extends Fragment {
+public class BlankFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -1,76 +1,85 @@
-blue /1e4/
+blue /1e14/
 calendar /1e-1/
 camera /1e-1/
-close window /1e-1/
-hide window /1e-1/
+close window /1e-4/
 conditions /1e-8/
-enable camera /1e-3/
-enable remote /1e-3/
+current time/1e8/
 disable camera /1e-3/
 disable remote /1e-3/
+enable camera /1e-3/
+enable remote /1e-3/
 facebook /1e-5/
 forecast /1e-4/
 gallery /1e-2/
-gray /1e10/
-green /1e4/
+gray /1e15/
 go to sleep /1e-21/
-go back /1e10/
+go back /1e8/
+green /1e20/
 help /1e6/
+hide time/1e-2/
+hide weather/1e1/
+hide window /1e-1/
+light very low/1e1/
+light low/1e1/
+light medium/1e1/
+light high/1e1/
+light very high/1e1/
 log me in /1e-3/
 magenta /1e-4/
 menu /1e4/
 news /1e12/
 night light /1e-9/
-orange /1.0/
+orange /1e8/
 options /1e-2/
 purple /1e0/
-quotes /1e4/
+quotes /1e6/
 refresh /1e-4/
 red /1e12/
 settings /1e-4/
-scroll up /1e6/
-scroll down /1e6/
-sleep /1e12/
-start listening /1e-6/
-stop listening /1e-8/
-take a picture /1e-15/
-current time/1e8/
-show time/1e-3/
-hide time/1e-2/
-traffic/1e1/
-twitter/1e1/
-wake/1e6/
-wake up/1e-4/
-weather/1e4/
-show weather/1e8/
-hide weather/1e8/
-weather english/1e2/
-weather metric/1e2/
-white/1e-1/
-yellow/1e2/
-traffic /1e1/
-twitter /1e1/
-wake /1e3/
-wake up /1e-3/
-weather english /1e2/
-weather metric /1e2/
 screen brightness very low /1e-5/
 screen brightness low /1e-5/
 screen brightness medium /1e-5/
 screen brightness high /1e-5/
 screen brightness very high /1e-5/
-sports /1e10/
+scroll up /1e6/
+scroll down /1e6/
+speech off/1e1/
+speech very low/1e1/
+speech low/1e1/
+speech medium/1e1/
+speech high/1e1/
+speech very high/1e1/
+speech rare/1e1/
+speech often/1e1/
+speech always/1e1/
+show time/1e-3/
+show weather/1e1/
+sleep /1e12/
+start listening /1e-6/
+stop listening /1e-8/
+take a picture /1e-15/
+time twelve hour /1e-10/
+time twenty four hour /1e-10/
+traffic/1e1/
+twitter/1e1/
+wake/1e6/
+wake up/1e-4/
+weather english/1e-2/
+weather metric/1e-2/
+white/1e-1/
+yellow/1e2/
+sports /1e8/
 technology /1e3/
 business /1e5/
 world /1e2/
 science /1e3/
 travel /1e4/
-media /1e4/
+media /1e2/
 first /1e6/
 second /1e4/
 third /1e6/
 fourth /1e14/
-fifth /1e6/
+fifth /1e10/
 sixth /1e6/
 seventh /1e6/
 eighth /1e6/

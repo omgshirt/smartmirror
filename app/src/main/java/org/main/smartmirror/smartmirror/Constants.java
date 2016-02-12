@@ -1,7 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +26,6 @@ public class Constants {
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
     public static final String LIGHT = "light";
-    public static final String LIGHT_SLEEP = "light sleep"; // Not a voice command - only used to track current fragment
     public static final String NEWS = "news";
     public static final String NIGHT_LIGHT = "night light";
     public static final String QUOTES = "quotes";
@@ -46,6 +43,11 @@ public class Constants {
     public static final String TRAVEL = "travel";
     public static final String WORLD = "world";
 
+    public static final String[] NEWS_DESKS = { BUSINESS, MEDIA, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL,
+                                WORLD };
+
+    public static final List<String> DESK_LIST = Arrays.asList(NEWS_DESKS);
+    public static final HashSet<String> DESK_HASH = new HashSet<>(DESK_LIST);
 
     //--------------HELP-----------------
     public static final String HELP = "help";
@@ -92,11 +94,12 @@ public class Constants {
     public static final String EIGHT = "eight";
     public static final String EIGHTH = "eighth";
 
-    public static final Set<String> COMMAND_SET = createCommandSet();
 
-    public static final String[] COMMANDS = { BACK, BUSINESS,
+    // used to initialize COMMAND_SET
+    public static final String[] COMMANDS = {
+            BACK, BUSINESS,
             CAMERA, CALENDAR, CLOSE_WINDOW,
-            CONDITIONS, FACEBOOK, GALLERY,
+            CONDITIONS, FACEBOOK, FORECAST, GALLERY,
             GO_BACK, GO_TO_SLEEP, HIDE_TIME,
             HIDE_WEATHER, HIDE_WINDOW, LIGHT,
             MEDIA, MENU, NIGHT_LIGHT, NEWS,
@@ -108,38 +111,42 @@ public class Constants {
             THIRD, THREE, TECHNOLOGY, TIME,
             TRAFFIC, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WORLD,
-            "black", "blue", "gray", "green",
+            "black", "blue", "gray", //"green"
             "magenta", "orange", "purple",
-            "red", "yellow", "white"
+            "red", "yellow", "white",
+            "first", "second", "third", "fourth",
+            "fifth", "sixth", "seventh", "eighth",
+            Preferences.CMD_CAMERA_OFF, Preferences.CMD_CAMERA_ON,
+
+            Preferences.CMD_LIGHT_HIGH, Preferences.CMD_LIGHT_LOW,
+            Preferences.CMD_LIGHT_MEDIUM, Preferences.CMD_LIGHT_VHIGH,
+            Preferences.CMD_LIGHT_VLOW,
+
+            Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
+
+            Preferences.CMD_SCREEN_HIGH, Preferences.CMD_SCREEN_LOW,
+            Preferences.CMD_SCREEN_MEDIUM, Preferences.CMD_SCREEN_VHIGH,
+            Preferences.CMD_SCREEN_VLOW,
+
+            Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_VLOW,
+            Preferences.CMD_SPEECH_LOW, Preferences.CMD_SPEECH_MEDIUM,
+            Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH,
+
+            Preferences.CMD_SPEECH_RARE,
+            Preferences.CMD_SPEECH_OFTEN, Preferences.CMD_SPEECH_ALWAYS,
+
+            Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
+            Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
+            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC
     };
+
     public static HashSet<String> createCommandSet(){
 
-        HashSet<String> result = new HashSet<>();
-        //List<String> commandList = new ArrayList<>(Arrays.asList(COMMANDS));
-
-        List<String> commandList = Arrays.asList(
-                BACK, BUSINESS,
-                CAMERA, CALENDAR, CLOSE_WINDOW,
-                CONDITIONS, FACEBOOK, GALLERY,
-                GO_BACK, GO_TO_SLEEP, HIDE_TIME,
-                HIDE_WEATHER, HIDE_WINDOW, LIGHT,
-                MEDIA, MENU, NIGHT_LIGHT, NEWS,
-                ONE, OPTIONS, QUOTES, SCIENCE,
-                SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
-                SETTINGS, SEVEN, SEVENTH,
-                SHOW_TIME, SHOW_WEATHER, SIX,
-                SIXTH, SLEEP, TAKE_PICTURE,
-                THIRD, THREE, TECHNOLOGY, TIME,
-                TRAFFIC, TRAVEL, TWITTER, TWO,
-                WAKE, WAKE_UP, WORLD,
-                "black", "blue", "gray", "green",
-                "magenta", "orange", "purple",
-                "red", "yellow", "white"
-        );
-
-        result.addAll(commandList);
-        return result;
+        List<String> commandList = Arrays.asList(COMMANDS);
+        return  new HashSet<>(commandList);
     }
+
+    public static final Set<String> COMMAND_SET = createCommandSet();
 
     //--------------TRAFFIC--------------
     public static final String DISTANCE_MATRIX_API =

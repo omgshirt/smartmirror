@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,10 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 public class NewsFragment extends Fragment implements CacheManager.CacheListener{
 
@@ -48,14 +53,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static final String MEDIA_CACHE = "media";
     public static final String TRAVEL_CACHE = "travel";
 
-    public static final String[] NEWS_DESKS = {
-            "business",
-            "media",
-            "science",
-            "sports",
-            "tech",
-            "travel",
-            "world" };
 
 
     private CacheManager mCacheManager = null;
@@ -94,7 +91,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     ScrollView mScrollView;
 
     Handler mHandler = new Handler();
-    ArticleSelectedListener articleSelectedListener;
+    private ArticleSelectedListener articleSelectedListener;
 
     public interface ArticleSelectedListener {
         void onArticleSelected(String title, String body);
@@ -331,8 +328,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // TODO: 2/3/2016 don't update when null/not prev visited
 
 
-        for (String name : NEWS_DESKS) {
-            String cacheName = name;
+        for (String name : Constants.NEWS_DESKS) {
+            String cacheName = name + " cache";
             if (!mCacheManager.containsKey(cacheName)) {
                 Log.i(Constants.TAG, cacheName + " does not exist, creating");
                 startNewsUpdate();
@@ -481,22 +478,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 Log.i("NEWS CACHE", "unregister " + cacheName);
             }
         }
-
-        /*if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
-            mCacheManager.unRegisterCacheListener(WORLD_CACHE, this);
-        } else if (mNewsSection.equals("sports")) {
-            mCacheManager.unRegisterCacheListener(SPORTS_CACHE, this);
-        } else if (mNewsSection.equals("technology")) {
-            mCacheManager.unRegisterCacheListener(TECH_CACHE, this);
-        } else if (mNewsSection.equals("business")) {
-            mCacheManager.unRegisterCacheListener(BUSINESS_CACHE, this);
-        } else if (mNewsSection.equals("media")) {
-            mCacheManager.unRegisterCacheListener(MEDIA_CACHE, this);
-        } else if (mNewsSection.equals("travel")) {
-            mCacheManager.unRegisterCacheListener(TRAVEL_CACHE, this);
-        } else if (mNewsSection.equals("science")) {
-            mCacheManager.unRegisterCacheListener(SCIENCE_CACHE, this);
-        }*/
     }
 
     // Get news headlines from api and display
@@ -507,9 +488,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 if(json == null){
                     mHandler.post(new Runnable(){
                         public void run(){
-                            Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.news_error),
-                                    Toast.LENGTH_LONG).show();
+                            ((MainActivity)getActivity()).showToast(getString(R.string.err_news),
+                                    Gravity.CENTER, Toast.LENGTH_LONG);
                         }
                     });
                 } else {
