@@ -6,13 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.ImageFormat;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,7 +92,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             mCacheManager = CacheManager.getInstance();
             weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
         }
-        //dailyForecasts = new DailyForecast[3];
 
         mLatitude = Double.toString(mPreferences.getLatitude());
         mLongitude = Double.toString(mPreferences.getLongitude());
@@ -184,12 +183,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 case Constants.TIME:
                     speakTime();
                     break;
-                case Constants.WEATHER:
-                    startWeatherUpdate();
-                    updateTimeDisplay();    // doing this to
-                    // refresh clock on 12/24 format changes. Otherwise not needed.
-                    speakText("Updating weather.");
-                    break;
                 default:
                     break;
             }
@@ -275,6 +268,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     // ----------------------- TTS Feedback -------------------------
 
+    // TODO: move this into Mira?
     private void speakTime() {
         GregorianCalendar calendar = new GregorianCalendar();
         String strMinute, strHour;
@@ -348,9 +342,9 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 if(json == null){
                     mHandler.post(new Runnable(){
                         public void run(){
-                            Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.place_not_found),
-                                    Toast.LENGTH_LONG).show();
+                            ((MainActivity)getActivity()).showToast(getString(R.string.err_weather_data),
+                                    Gravity.CENTER, Toast.LENGTH_LONG);
+                            updateWeatherCache(null);
                         }
                     });
                 } else {
@@ -413,19 +407,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
             // ---------------- 3-Day Forecast ---------------
             /*
-            JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
-            for (int i = 0; i < 3; i++) {
-                JSONObject today = dailyData.getJSONObject(i);
-                dailyForecasts[i] = new DailyForecast();
-                dailyForecasts[i].maxTemp = (int)Math.round(today.getDouble("apparentTemperatureMax"));
-                dailyForecasts[i].minTemp = (int)Math.round(today.getDouble("apparentTemperatureMin"));
-                dailyForecasts[i].summary = today.getString("summary");
-                dailyForecasts[i].sunrise = today.getLong("sunriseTime");
-                dailyForecasts[i].sunset = today.getLong("sunsetTime");
-                dailyForecasts[i].precipProbability = today.getDouble("precipProbability");
-                dailyForecasts[i].windSpeed = (int)Math.round(today.getDouble("windSpeed"));
-                dailyForecasts[i].forecastTime = today.getLong("time");
-            }
+                Moved to ForecastFragment
             */
 
             JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");

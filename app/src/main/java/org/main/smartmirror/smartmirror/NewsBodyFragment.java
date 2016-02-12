@@ -41,9 +41,9 @@ public class NewsBodyFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            if(message.contains(Constants.SCROLLDOWN))
+            if(message.contains(Constants.SCROLL_DOWN))
                 mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
-            else if(!message.contains(Constants.SCROLLDOWN) && message.contains(Constants.SCROLLUP))
+            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
                 mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
         }
     };
