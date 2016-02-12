@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
@@ -23,10 +22,6 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 
 public class NewsFragment extends Fragment implements CacheManager.CacheListener{
 

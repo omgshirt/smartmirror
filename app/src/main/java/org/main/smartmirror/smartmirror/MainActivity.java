@@ -585,7 +585,7 @@ public class MainActivity extends AppCompatActivity
                 exitSleep();
             } else {
                 exitLightSleep();
-                if (command.equals(Constants.LIGHT)) {
+                if (command.equals(Constants.NIGHT_LIGHT)) {
                     // if the command is light (a special case) wake and directly show LightFragment
                     hideHelpFragment(command);
                 }
@@ -594,7 +594,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public boolean commandWakesFromSleep(String command) {
-        return (command.equals(Constants.WAKE) || command.equals(Constants.LIGHT));
+        return (command.equals(Constants.WAKE) || command.equals(Constants.NIGHT_LIGHT));
     }
 
     /**
@@ -685,7 +685,7 @@ public class MainActivity extends AppCompatActivity
             case Constants.CLOSE_WINDOW:
                 fragment = new BlankFragment();
                 break;
-            case Constants.LIGHT:
+            case Constants.NIGHT_LIGHT:
                 fragment = new LightFragment();
                 break;
             case Constants.NEWS:

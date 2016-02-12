@@ -102,7 +102,7 @@
     <string name="err_camera_off">The camera is disabled.</string>
 
     <!-- Camera String -->
-    <string name="camera_disabled_toast">Camera Disabled. Say \'Enable Camera\' to change this setting.</string>
+    <string name="camera_disabled_toast">Camera Disabled. Say \'Camera On\' to change this setting.</string>
 
 
 </resources>

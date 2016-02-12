@@ -1,21 +1,17 @@
 package org.main.smartmirror.smartmirror;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.logging.Handler;
 
 import twitter4j.Paging;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.TwitterObjectFactory;
 import twitter4j.auth.AccessToken;
-import twitter4j.auth.OAuth2Token;
 import twitter4j.conf.ConfigurationBuilder;
 
 

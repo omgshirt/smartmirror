@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Random;
-
 /**
  * This fragment will be all black simulating the "Off" feature
  */

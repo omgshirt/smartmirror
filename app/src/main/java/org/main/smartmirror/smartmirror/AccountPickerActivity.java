@@ -4,9 +4,10 @@ package org.main.smartmirror.smartmirror;
  * Created by Master N on 1/29/2016.
  */
 
-import java.util.ArrayList;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+
+import java.util.ArrayList;
 
 //AccountPickerActivity creates DialogFragment through AccountPickerDialogFragment using AccountItem objects
 

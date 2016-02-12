@@ -80,43 +80,43 @@ public class Preferences implements LocationListener {
     public static final String CMD_CAMERA_ON = "camera on";
     public static final String CMD_CAMERA_OFF = "camera off";
 
-    public static final String CMD_LIGHT_VLOW = "light very low";
+    public static final String CMD_LIGHT_VLOW = "light min";
     public static final String CMD_LIGHT_LOW = "light low";
     public static final String CMD_LIGHT_MEDIUM = "light medium";
     public static final String CMD_LIGHT_HIGH = "light high";
-    public static final String CMD_LIGHT_VHIGH= "light very high";
+    public static final String CMD_LIGHT_VHIGH= "light max";
 
 
     public static final String CMD_SPEECH_OFF = "speech off";
-    public static final String CMD_SPEECH_VLOW = "speech very low";
+    public static final String CMD_SPEECH_VLOW = "speech min";
     public static final String CMD_SPEECH_LOW = "speech low";
     public static final String CMD_SPEECH_MEDIUM = "speech medium";
     public static final String CMD_SPEECH_HIGH = "speech high";
-    public static final String CMD_SPEECH_VHIGH= "speech very high";
+    public static final String CMD_SPEECH_VHIGH= "speech max";
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
 
-    public static final String CMD_SCREEN_VLOW = "screen very low";
-    public static final String CMD_SCREEN_LOW = "screen low";
-    public static final String CMD_SCREEN_MEDIUM = "screen medium";
-    public static final String CMD_SCREEN_HIGH = "screen high";
-    public static final String CMD_SCREEN_VHIGH= "screen very high";
+    public static final String CMD_SCREEN_VLOW = "brightness min";
+    public static final String CMD_SCREEN_LOW = "brightness low";
+    public static final String CMD_SCREEN_MEDIUM = "brightness medium";
+    public static final String CMD_SCREEN_HIGH = "brightness high";
+    public static final String CMD_SCREEN_VHIGH= "brightness max";
 
     public static final String CMD_SPEECH_NEVER = "speech never";
     public static final String CMD_SPEECH_RARE = "speech rare";
-    public static final String CMD_SPEECH_OFTEN = "speech often";
+    public static final String CMD_SPEECH_FREQUENT = "speech frequent";
     public static final String CMD_SPEECH_ALWAYS = "speech always";
 
     public static final String CMD_VOICE_OFF = "stop listening";
     public static final String CMD_VOICE_ON = "start listening";
 
     public static final String CMD_VOLUME_OFF = "volume off";
-    public static final String CMD_VOLUME_VLOW = "volume very low";
+    public static final String CMD_VOLUME_VLOW = "volume min";
     public static final String CMD_VOLUME_LOW = "volume low";
     public static final String CMD_VOLUME_MEDIUM = "volume medium";
     public static final String CMD_VOLUME_HIGH = "volume high";
-    public static final String CMD_VOLUME_VHIGH= "volume very high";
+    public static final String CMD_VOLUME_VHIGH= "volume max";
 
     public static final String CMD_WEATHER_ENGLISH = "weather english";
     public static final String CMD_WEATHER_METRIC = "weather metric";
@@ -155,9 +155,6 @@ public class Preferences implements LocationListener {
     private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
     private static final String TIME_FORMAT_12_HR = "h:mm";
     private static final String TIME_FORMAT_12_HR_SHORT = "h:mm";
-
-
-
 
 
     // Handle any messages sent from MainActivity
@@ -254,7 +251,7 @@ public class Preferences implements LocationListener {
             case CMD_SPEECH_RARE:
                 setSpeechFrequency(SPEECH_RARE);
                 break;
-            case CMD_SPEECH_OFTEN:
+            case CMD_SPEECH_FREQUENT:
                 setSpeechFrequency(SPEECH_OFTEN);
                 break;
             case CMD_SPEECH_ALWAYS:

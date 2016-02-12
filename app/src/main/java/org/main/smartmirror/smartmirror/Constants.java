@@ -25,7 +25,6 @@ public class Constants {
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
-    public static final String LIGHT = "light";
     public static final String NEWS = "news";
     public static final String NIGHT_LIGHT = "night light";
     public static final String QUOTES = "quotes";
@@ -95,16 +94,20 @@ public class Constants {
     public static final String SEVENTH = "seventh";
     public static final String EIGHT = "eight";
     public static final String EIGHTH = "eighth";
+    public static final String NINE = "nine";
+    public static final String NINTH = "ninth";
 
 
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {
             BACK, BUSINESS,
             CAMERA, CALENDAR, CLOSE_WINDOW,
-            CONDITIONS, FACEBOOK, FORECAST, GALLERY,
+            CONDITIONS, EIGHT, EIGHTH, FACEBOOK, FIVE,
+            FORECAST, FOUR, GALLERY,
             GO_BACK, GO_TO_SLEEP, HIDE_TIME,
-            HIDE_WEATHER, HIDE_WINDOW, LIGHT,
-            MEDIA, MENU, NIGHT_LIGHT, NEWS,
+            HIDE_WEATHER, HIDE_WINDOW,
+            MEDIA, MENU, NIGHT_LIGHT,
+            NEWS, NINE, NINTH,
             ONE, OPTIONS, QUOTES, SCIENCE,
             SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
             SETTINGS, SEVEN, SEVENTH,
@@ -113,7 +116,7 @@ public class Constants {
             THIRD, THREE, TECHNOLOGY, TIME,
             TRAFFIC, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WORLD,
-            "black", "blue", "gray", //"green"
+            "black", "blue", "gray", "green",
             "magenta", "orange", "purple",
             "red", "yellow", "white",
             "first", "second", "third", "fourth",
@@ -135,7 +138,7 @@ public class Constants {
             Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH,
 
             Preferences.CMD_SPEECH_RARE,
-            Preferences.CMD_SPEECH_OFTEN, Preferences.CMD_SPEECH_ALWAYS,
+            Preferences.CMD_SPEECH_FREQUENT, Preferences.CMD_SPEECH_ALWAYS,
 
             Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
             Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
