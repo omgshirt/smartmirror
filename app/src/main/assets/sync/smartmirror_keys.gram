@@ -1,4 +1,3 @@
-blue/1e14/
 brightness min/1e-5/
 brightness low/1e5/
 brightness medium/1e-5/
@@ -8,6 +7,7 @@ calendar/1e-1/
 camera/1e-1/
 camera off/1e-3/
 camera on/1e-3/
+close screen/1e-4/
 close window/1e-4/
 conditions/1e-8/
 current time/1e8/
@@ -15,37 +15,35 @@ disable remote/1e-3/
 enable remote/1e-3/
 facebook/1e-5/
 forecast/1e-4/
+full screen/1e-5/
 gallery/1e-2/
-gray/1e12/
 go to sleep/1e-21/
 go back/1e8/
-green/1e20/
 help/1e6/
 hide time/1e-2/
 hide weather/1e1/
-hide window/1e-1/
+hide screen/1e-4/
 light min/1e-5/
 light low/1e8/
 light medium/1e-10/
 light high/1e4/
 light max/1e-15/
 log me in/1e-3/
-magenta/1e-4/
 menu/1e4/
+minimize/1e-5/
+maximize/1e-5/
 news/1e12/
 night light/1e-9/
-orange/1e8/
 options/1e-2/
-purple/1e0/
+photos/1e3/
 quotes/1e6/
 refresh/1e-4/
-red/1e12/
 settings/1e-4/
 scroll up/1e6/
 scroll down/1e6/
 speech off/1e10/
 speech min/1e-5/
-speech low/1e10/
+speech low/1e5/
 speech medium/1e-20/
 speech high/1e1/
 speech max/1e-15/
@@ -54,9 +52,10 @@ speech frequent/1e-10/
 speech always/1e-10/
 show time/1e-3/
 show weather/1e1/
+small screen/1e1/
 sleep/1e12/
-start listening/1e-8/
-stop listening/1e-10/
+start listening/1e-10/
+stop listening/1e-12/
 take a picture/1e-15/
 time twelve hour/1e-10/
 time twenty four hour/1e-10/
@@ -72,8 +71,7 @@ wake/1e6/
 wake up/1e-4/
 weather english/1e-2/
 weather metric/1e-2/
-white/1e10/
-yellow/1e2/
+wide screen/1e-8/
 business/1e5/
 media/1e10/
 science/1e3/
@@ -93,7 +91,7 @@ ninth/1e10/
 one/1e8/
 two/1e10/
 three/1e10/
-four/1e10/
+four/1e20/
 five/1e8/
 six/1e4/
 seven/1e5/

@@ -34,7 +34,7 @@
             <fragment
                 android:name="org.main.smartmirror.smartmirror.WeatherFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 tools:layout="@layout/weather_fragment" />
         </FrameLayout>
 

@@ -25,6 +25,7 @@ import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -150,10 +151,8 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onArticleSelected(String articleTitle, String articleBody) {
-        // TODO swap to given article body
         Fragment fragment = new NewsBodyFragment();
-        boolean addToBackStack = !(fragment instanceof BlankFragment);
-        displayFragment(fragment, Constants.NEWS_BODY, addToBackStack);
+        displayFragment(fragment, Constants.NEWS_BODY, true);
 
     }
 
@@ -386,7 +385,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "exitSleep() called");
 
         // ensure content frames are visible if we were in LIGHT_SLEEP before calling sleep
-        showContentFrames();
+        setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
@@ -398,7 +397,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void exitLightSleep() {
-        showContentFrames();
+        setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
         setDefaultScreenOffTimeout();
         addScreenOnFlag();
         startUITimer();
@@ -407,7 +406,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void enterLightSleep() {
-        hideContentFrames();
+        setContentFrameVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
         clearScreenOnFlag();
         setScreenOffTimeout();
         stopUITimer();
@@ -416,16 +415,20 @@ public class MainActivity extends AppCompatActivity
         mirrorSleepState = LIGHT_SLEEP;
     }
 
-    protected void hideContentFrames() {
-        contentFrame1.setVisibility(View.INVISIBLE);
-        contentFrame2.setVisibility(View.INVISIBLE);
-        contentFrame3.setVisibility(View.INVISIBLE);
+    // ------------------------ UI Visibility / Content Frames ---------------------------
+
+    protected void hideAllContentFrames() {
+        setContentFrameVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
     }
 
-    protected void showContentFrames() {
-        contentFrame1.setVisibility(View.VISIBLE);
-        contentFrame2.setVisibility(View.VISIBLE);
-        contentFrame3.setVisibility(View.VISIBLE);
+    protected void showAllContentFrames() {
+        setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+    }
+
+    private void setContentFrameVisibility(int frameOne,int frameTwo,int frameThree) {
+        contentFrame1.setVisibility(frameOne);
+        contentFrame2.setVisibility(frameTwo);
+        contentFrame3.setVisibility(frameThree);
     }
 
     // Restores the screen off to the duration set when the application first ran.
@@ -518,7 +521,7 @@ public class MainActivity extends AppCompatActivity
 
     private void displayHelpFragment(Fragment fragment){
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_frame_2, fragment);
+        ft.replace(R.id.content_frame_2, fragment, Constants.HELP);
         ft.commit();
     }
 
@@ -538,6 +541,20 @@ public class MainActivity extends AppCompatActivity
             ft.commit();
         } else {
             Log.e(Constants.TAG, "commit skipped. isFinishing() returned true");
+        }
+    }
+
+    /**
+     * Remove the fragment given by tag if it exists
+     * @param tag tag to remove
+     */
+    private void removeFragment(String tag) {
+        Log.i(Constants.TAG, "removing fragment: " + tag);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment != null) {
+            ft.remove(fragment);
+            ft.commit();
         }
     }
 
@@ -571,15 +588,20 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Entry point for processing user commands.
+     *
      * If sleeping, this will ignore commands except those which cause a state transition to "awake".
      * If command would wake the application, trigger proper state change and handle the command.
+     *
+     * Actions related to commands are processed in this order: Wake the screen, hide the help fragment,
+     * close menu drawer, set content frame visibility, then change fragments and / or broadcast command to
+     * command listeners.
      *
      * @param command input command
      */
     public void wakeScreenAndDisplay(String command) {
         if (mirrorSleepState == AWAKE) {
             startUITimer();
-            hideHelpFragment(command);
+            handleHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP) {
                 exitSleep();
@@ -587,7 +609,7 @@ public class MainActivity extends AppCompatActivity
                 exitLightSleep();
                 if (command.equals(Constants.NIGHT_LIGHT)) {
                     // if the command is light (a special case) wake and directly show LightFragment
-                    hideHelpFragment(command);
+                    handleHelpFragment(command);
                 }
             }
         }
@@ -598,14 +620,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * "help" displays the helpFragment. All other commands dismiss it.
+     * Help command displays the helpFragment & sets content visibility to default.
+     * All other commands dismiss Help.
      *
      * @param command
      */
-    public void hideHelpFragment(String command) {
-
-        if (command.equals(Constants.HELP)) {
-            displayHelpFragment(new HelpFragment().newInstance(getCurrentFragment()));
+    public void handleHelpFragment(String command) {
+        boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
+        if ( command.equals(Constants.HELP) && !helpIsVisible ) {
+            setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+            displayHelpFragment(HelpFragment.newInstance(getCurrentFragment()));
+        } else {
+            // remove HelpFragment if visible
+            removeFragment(Constants.HELP);
         }
         closeMenuDrawer(command);
     }
@@ -627,10 +654,18 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         }
 
+        setContentVisibility(command);
+    }
+
+
+    /**
+     * Adjust the visible content frames if required by the command. Bypassed for now.
+     * @param command command to be executed
+     */
+    private void setContentVisibility(String command) {
         // Create fragment
         handleCommand(command);
     }
-
 
     /**
      * Show a fragment or broadcast a command to listeners.
@@ -668,6 +703,12 @@ public class MainActivity extends AppCompatActivity
                     startTTS(getResources().getString(R.string.err_camera_off));
                 }
                 break;
+            case Constants.CLOSE_SCREEN:
+            case Constants.CLOSE_WINDOW:
+            case Constants.HIDE_SCREEN:
+                //fragment = new BlankFragment();
+                setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+                break;
             case Constants.FACEBOOK:
                 fragment = new FacebookFragment();
                 break;
@@ -681,9 +722,13 @@ public class MainActivity extends AppCompatActivity
             case Constants.GO_BACK:
                 getSupportFragmentManager().popBackStack();
                 break;
-            case Constants.HIDE_WINDOW:
-            case Constants.CLOSE_WINDOW:
-                fragment = new BlankFragment();
+            case Constants.MAXIMIZE:
+            case Constants.FULL_SCREEN:
+                setContentFrameVisibility(View.GONE, View.GONE, View.VISIBLE);
+                break;
+            case Constants.MINIMIZE:
+            case Constants.SMALL_SCREEN:
+                setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 break;
             case Constants.NIGHT_LIGHT:
                 fragment = new LightFragment();
@@ -691,6 +736,9 @@ public class MainActivity extends AppCompatActivity
             case Constants.NEWS:
                 NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
                 fragment = NewsFragment.newInstance("world");
+                break;
+            case Constants.PHOTOS:
+                // create photos fragment
                 break;
             case Constants.QUOTES:
                 fragment = new QuoteFragment();
@@ -712,6 +760,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.WAKE:
                 break;
+            case Constants.WIDE_SCREEN:
+                setContentFrameVisibility(View.VISIBLE, View.GONE, View.VISIBLE);
+                break;
             default:
                 broadcastMessage("inputAction", command);
                 break;
@@ -720,6 +771,9 @@ public class MainActivity extends AppCompatActivity
         if (fragment != null) {
             //startTTS(command);
             mCurrentFragment = command;
+            if (contentFrame3.getVisibility() == View.INVISIBLE || contentFrame3.getVisibility() == View.GONE) {
+                contentFrame3.setVisibility(View.VISIBLE);
+            }
             boolean addToBackStack = !(fragment instanceof BlankFragment);
             displayFragment(fragment, command, addToBackStack);
         }
@@ -756,22 +810,22 @@ public class MainActivity extends AppCompatActivity
      * @param input the command the user gave
      */
     public void handleVoiceCommand(String input) {
-        String voiceInput = input.trim();
+        //String voiceInput = input.trim();
         Log.i(Constants.TAG, "handleVoiceCommand:\"" + input + "\"");
 
         if (mPowerManager.isScreenOn()) {
             showToast(input, Toast.LENGTH_LONG);
         }
 
-        // if voice is disabled, ignore everything except "start listening" command
-        if (!mPreferences.isVoiceEnabled()) {
-            if (voiceInput.equals(Preferences.CMD_VOICE_ON)) {
-                broadcastMessage("inputAction", voiceInput);
+        // if voice is disabled, ignore everything except "start listening" and "wake / night light" commands
+        if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(input)) {
+            if (input.equals(Preferences.CMD_VOICE_ON) || input.equals(Preferences.CMD_VOICE_OFF)) {
+                broadcastMessage("inputAction", input);
             }
             return;
         }
 
-        wakeScreenAndDisplay(voiceInput);
+        wakeScreenAndDisplay(input);
     }
 
     public void initSpeechRecognition() {

@@ -7,18 +7,25 @@ import java.util.Set;
 
 public class Constants {
 
-    //--------------CONSTANTS------------
+
     public static final String TAG = "SmartMirror";
+    //-------------- DISPLAY -----------
     public static final String BACK = "back";
+    public static final String CLOSE_WINDOW = "close window";
+    public static final String CLOSE_SCREEN = "close screen";
+    public static final String FULL_SCREEN = "full screen";
     public static final String GO_BACK = "go back";
     public static final String GO_TO_SLEEP = "go to sleep";
-    public static final String HIDE_WINDOW = "hide window";
-    public static final String CLOSE_WINDOW = "close window";
+    public static final String HIDE_SCREEN = "hide screen";
+    public static final String MAXIMIZE = "maximize";
     public static final String MENU = "menu";
+    public static final String MINIMIZE = "minimize";
     public static final String OPTIONS = "options";
     public static final String SLEEP = "sleep";
+    public static final String SMALL_SCREEN = "small screen";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
+    public static final String WIDE_SCREEN = "wide screen";
 
     //--------------FRAGMENTS------------
     public static final String CALENDAR = "calendar";
@@ -27,6 +34,7 @@ public class Constants {
     public static final String GALLERY = "gallery";
     public static final String NEWS = "news";
     public static final String NIGHT_LIGHT = "night light";
+    public static final String PHOTOS = "photos";
     public static final String QUOTES = "quotes";
     public static final String SETTINGS = "settings";
     public static final String TIME = "current time";
@@ -101,21 +109,21 @@ public class Constants {
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {
             BACK, BUSINESS,
-            CAMERA, CALENDAR, CLOSE_WINDOW,
+            CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
             CONDITIONS, EIGHT, EIGHTH, FACEBOOK, FIVE,
-            FORECAST, FOUR, GALLERY,
-            GO_BACK, GO_TO_SLEEP, HIDE_TIME,
-            HIDE_WEATHER, HIDE_WINDOW,
-            MEDIA, MENU, NIGHT_LIGHT,
+            FORECAST, FOUR, FULL_SCREEN, GALLERY,
+            GO_BACK, GO_TO_SLEEP, HELP, HIDE_TIME,
+            HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
+            MEDIA, MENU, MINIMIZE, NIGHT_LIGHT,
             NEWS, NINE, NINTH,
-            ONE, OPTIONS, QUOTES, SCIENCE,
+            ONE, OPTIONS, PHOTOS, QUOTES, SCIENCE,
             SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
             SETTINGS, SEVEN, SEVENTH,
             SHOW_TIME, SHOW_WEATHER, SIX,
-            SIXTH, SLEEP, TAKE_PICTURE,
+            SIXTH, SLEEP, SMALL_SCREEN, TAKE_PICTURE,
             THIRD, THREE, TECHNOLOGY, TIME,
             TRAFFIC, TRAVEL, TWITTER, TWO,
-            WAKE, WAKE_UP, WORLD,
+            WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
             "black", "blue", "gray", "green",
             "magenta", "orange", "purple",
             "red", "yellow", "white",

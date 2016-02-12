@@ -70,10 +70,10 @@ public class Preferences implements LocationListener {
 
     // constants for volumes
     public static final float VOL_OFF = 0f;
-    public static final float VOL_VLOW = .1f;
-    public static final float VOL_LOW = .3f;
-    public static final float VOL_MEDIUM = .5f;
-    public static final float VOL_HIGH = .7f;
+    public static final float VOL_VLOW = .2f;
+    public static final float VOL_LOW = .4f;
+    public static final float VOL_MEDIUM = .6f;
+    public static final float VOL_HIGH = .8f;
     public static final float VOL_VHIGH = 1.0f;
 
     // strings
@@ -260,12 +260,18 @@ public class Preferences implements LocationListener {
 
             // Voice recognition on / off
             case CMD_VOICE_OFF:
-                speakText(R.string.cmd_voice_recognition_off);
+                if (isVoiceEnabled())
+                    speakText(R.string.cmd_voice_recognition_off);
+                else
+                    speakText(R.string.cmd_voice_recognition_off_err);
                 setVoiceEnabled(false);
                 break;
 
             case CMD_VOICE_ON:
-                speakText(R.string.cmd_voice_recognition_on);
+                if (isVoiceEnabled())
+                    speakText(R.string.cmd_voice_recognition_on_err);
+                else
+                    speakText(R.string.cmd_voice_recognition_on);
                 setVoiceEnabled(true);
                 break;
 

@@ -22,7 +22,7 @@
 
     <FrameLayout
         android:id="@+id/content_frame_1"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <fragment
@@ -37,11 +37,11 @@
         android:id="@+id/content_frame_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/content_frame_1"></FrameLayout>
+        android:layout_below="@+id/content_frame_1"/>
 
     <FrameLayout
         android:id="@+id/content_frame_3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/content_frame_2"></FrameLayout>
+        android:layout_below="@+id/content_frame_2"/>
 </RelativeLayout>

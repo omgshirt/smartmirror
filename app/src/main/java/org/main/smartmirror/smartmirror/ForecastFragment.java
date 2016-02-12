@@ -59,7 +59,8 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
 
     private void updateForecasts() {
         JSONObject json = (JSONObject) CacheManager.getInstance().get(WeatherFragment.WEATHER_CACHE);
-        if (json == null) return;
+
+        //if (json == null) return;
 
         // Get today plus next 3 days
         try {

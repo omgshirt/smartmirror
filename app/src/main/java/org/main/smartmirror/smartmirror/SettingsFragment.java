@@ -24,7 +24,7 @@ public class SettingsFragment extends Fragment {
     private RadioGroup grpAppBrightness;
     private RadioGroup grpLightBrightness;
     private RadioGroup grpSysVolume;
-    private RadioGroup grpMusVolume;
+    private RadioGroup grpSpeechVolume;
     private Switch swtVoiceEnabled;
     private Switch swtRemoteEnabled;
     private Switch swtCameraEnabled;
@@ -95,11 +95,11 @@ public class SettingsFragment extends Fragment {
             grpSysVolume.check(R.id.sys_vol_vhigh);
         }
 
-        grpMusVolume = (RadioGroup) view.findViewById(R.id.mus_vol_group);
-        grpMusVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        grpSpeechVolume = (RadioGroup) view.findViewById(R.id.mus_vol_group);
+        grpSpeechVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
+                switch (checkedId) {
                     case R.id.mus_vol_off:
                         mPreferences.setMusicVolume(Preferences.VOL_OFF);
                         break;
@@ -124,17 +124,17 @@ public class SettingsFragment extends Fragment {
 
         vol = mPreferences.getMusicVolume();
         if (vol == Preferences.VOL_OFF) {
-            grpMusVolume.check(R.id.mus_vol_off);
+            grpSpeechVolume.check(R.id.mus_vol_off);
         } else if (vol == Preferences.VOL_VLOW) {
-            grpMusVolume.check(R.id.mus_vol_vlow);
+            grpSpeechVolume.check(R.id.mus_vol_vlow);
         } else if (vol == Preferences.VOL_LOW) {
-            grpMusVolume.check(R.id.mus_vol_low);
+            grpSpeechVolume.check(R.id.mus_vol_low);
         } else if (vol == Preferences.VOL_MEDIUM) {
-            grpMusVolume.check(R.id.mus_vol_medium);
+            grpSpeechVolume.check(R.id.mus_vol_medium);
         } else if (vol == Preferences.VOL_HIGH) {
-            grpMusVolume.check(R.id.mus_vol_high);
+            grpSpeechVolume.check(R.id.mus_vol_high);
         } else if (vol == Preferences.VOL_VHIGH) {
-            grpMusVolume.check(R.id.mus_vol_vhigh);
+            grpSpeechVolume.check(R.id.mus_vol_vhigh);
         }
 
             // Speech Frequency radio group
