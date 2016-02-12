@@ -210,9 +210,6 @@ public class MainActivity extends AppCompatActivity
         // TextToSpeech (TTS) init
         mTTSHelper = new TTSHelper(this);
 
-        Log.i(Constants.TAG, Constants.COMMAND_SET.toString());
-
-
         try {
             defaultScreenTimeout = Settings.System.getInt(getContentResolver(),
                     Settings.System.SCREEN_OFF_TIMEOUT);
@@ -680,6 +677,7 @@ public class MainActivity extends AppCompatActivity
             case Constants.GALLERY:
                 fragment = new GalleryFragment();
                 break;
+            case Constants.BACK:
             case Constants.GO_BACK:
                 getSupportFragmentManager().popBackStack();
                 break;
@@ -702,6 +700,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 break;
             case Constants.SLEEP:
+            case Constants.GO_TO_SLEEP:
                 enterLightSleep();
                 command = mCurrentFragment;
                 break;

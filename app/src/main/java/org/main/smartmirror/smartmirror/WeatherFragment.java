@@ -75,8 +75,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     private boolean mShowFullAlerts = true;
 
     private CacheManager mCacheManager = null;
-    // time in minutes before weather data expires
-    private final int DATA_UPDATE_FREQUENCY = 1;
+    // time in seconds before weather data expires
+    private final int DATA_UPDATE_FREQUENCY = 60;
     public static final String WEATHER_CACHE = "weather cache";
 
     Handler mHandler = new Handler();
