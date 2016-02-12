@@ -152,8 +152,8 @@ public class MainActivity extends AppCompatActivity
     public void onArticleSelected(String articleTitle, String articleBody) {
         // TODO swap to given article body
         Fragment fragment = new NewsBodyFragment();
-        boolean addToBackStack = !(fragment instanceof LightSleepFragment);
-        displayFragment(fragment, addToBackStack);
+        boolean addToBackStack = !(fragment instanceof BlankFragment);
+        displayFragment(fragment, Constants.NEWS_BODY, addToBackStack);
 
     }
 

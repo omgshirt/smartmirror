@@ -439,7 +439,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
 
-        for (String name : NEWS_DESKS) {
+        for (String name : Constants.NEWS_DESKS) {
             String cacheName = name;
             if (mNewsSection.equals(cacheName)) {
                 mCacheManager.registerCacheListener(cacheName, this);
@@ -471,7 +471,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
         // TODO UNREGISTER ON PAUSE
 
-        for (String name : NEWS_DESKS) {
+        for (String name : Constants.NEWS_DESKS) {
             String cacheName = name;
             if (mNewsSection.equals(cacheName)) {
                 mCacheManager.unRegisterCacheListener(cacheName, this);
@@ -506,7 +506,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     }
     private void updateNewsCache(JSONObject data){
 
-        for (String name : NEWS_DESKS) {
+        for (String name : Constants.NEWS_DESKS) {
             String cacheName = name;
             if (mNewsSection.equals(cacheName)) {
                 mCacheManager.addCache(cacheName, data, DATA_UPDATE_FREQUENCY);
@@ -602,7 +602,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     @Override
     public void onCacheExpired(String cacheName) {
 
-        for (String name : NEWS_DESKS) {
+        for (String name : Constants.NEWS_DESKS) {
             cacheName = name;
             if (mNewsSection.equals(cacheName)) {
                 startNewsUpdate();

@@ -43,6 +43,8 @@ public class Constants {
     public static final String TRAVEL = "travel";
     public static final String WORLD = "world";
 
+    public static final String NEWS_BODY= "news body";
+
     public static final String[] NEWS_DESKS = { BUSINESS, MEDIA, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL,
                                 WORLD };
 
