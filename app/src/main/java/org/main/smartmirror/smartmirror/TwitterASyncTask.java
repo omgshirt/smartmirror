@@ -31,66 +31,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String[] params) {
 
-        ConfigurationBuilder cb = new ConfigurationBuilder();
         try {
-            cb.setOAuthAuthenticationURL("https://api.twitter.com/oauth/request_token");
-            cb.setOAuthAccessTokenURL("https://api.twitter.com/oauth/access_token");
-            cb.setOAuthAuthorizationURL("https://api.twitter.com/oauth/authorize");
-            cb.setOAuthRequestTokenURL("https://api.twitter.com/oauth/request_token");
-            cb.setRestBaseURL("https://api.twitter.com/1.1/");
-            cb.setOAuthConsumerKey(Constants.TWITTER_CONSUMER_KEY);
-            cb.setOAuthConsumerSecret(Constants.TWITTER_CONSUMER_SECRET);
-        } catch (Exception e) {
-            Log.i("TWITTER", "Config not built");
-        }
-
-
-        AccessToken accessToken = new AccessToken(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET);
-        accToken = accessToken.toString();
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
-
-        Paging paging;
-        List<twitter4j.Status> statuses = null;
-
-        try {
-            paging = new Paging(5); // MAX 200 IN ONE CALL
-            statuses = twitter.getHomeTimeline(paging);
-        }catch (Exception e) {
-            Log.i("TWITTER", "Paging failed");
-        }
-
-        try {
-            for (twitter4j.Status status : statuses) {
-                String rawJSON = TwitterObjectFactory.getRawJSON(status);
-                //String fileName = "statuses/" + status.getId() + ".json";
-                //Log.i("TWITTER", rawJSON.toString());
-
-            }
-
-        } catch (Exception e) {
-            Log.i("TWITTER", "Statuses not found");
-        }
-
-
-        /*ConfigurationBuilder builder=new ConfigurationBuilder();
-        builder.setUseSSL(true);
-        builder.setApplicationOnlyAuthEnabled(true);
-
-        // setup
-        TwitterArrayList twitter = new TwitterFactory(builder.build()).getInstance();
-
-        // exercise & verify
-        twitter.setOAuthConsumer(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
-
-        try{
-            OAuth2Token token = twitter.getOAuth2Token();
-            twitter.getOAuth2Token();
-        } catch (Exception e) {
-            Log.i("TOKEN", "Could not get token");
-        }*/
-
-
-        /*try {
             ConfigurationBuilder cb = new ConfigurationBuilder();
 
                     cb.setDebugEnabled(true);
@@ -106,10 +47,10 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
             AccessToken accessToken = new AccessToken(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET);
             accToken = accessToken.toString();
-            TwitterArrayList twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
+            Twitter twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
 
             // pulling tweets commented out for now
-            *//*Paging paging = new Paging(5); // MAX 200 IN ONE CALL
+            Paging paging = new Paging(5); // MAX 200 IN ONE CALL
             List<twitter4j.Status> statuses = twitter.getHomeTimeline(paging);
 
             try {
@@ -122,7 +63,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     TwitterFragment.mUser[i] = status.getUser().getName();
                     TwitterFragment.mStatus[i] = status.getText();
                     TwitterFragment.mUserAt[i] = status.getUser().getScreenName();
-                    //System.out.println(Constants.mUser[i] + " @" + Constants.mUserAt[i] + "\n" + Constants.mStatus[i]);
+                    System.out.println(TwitterFragment.mUser[i] + " @" + TwitterFragment.mUserAt[i] + "\n" + TwitterFragment.mStatus[i]);
                     TwitterFragment.mUrl[i] = Uri.parse(status.getUser().getProfileImageURLHttps());
                     i++;
                 }
@@ -130,11 +71,11 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
             } catch (Exception e) {
                 Log.i("TWITTER JSON Parse ", "Didnt work");
-            }*//*
+            }
         }catch (Exception e) {
             Log.i("ERR ", "Something's not right");
 
-        }*/
+        }
 
         return "SUCCESS";
 
@@ -143,23 +84,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String message) {
-        TwitterFragment.mTwitterUser = TwitterActivity.mScreenName;
-        String APICall = TwitterFragment.mTwitterPreAPI + TwitterFragment.mTwitterUser + TwitterFragment.mTwitterPostAPI;
-        pullTweets(APICall);
-    }
 
-    protected void pullTweets(final String query){
-        new Thread(){
-            public void run(){
-                final JSONObject json = FetchURL.getJSON(query);
-                if(json == null){
-                    Log.i("TWITTER", "ERROR WITH TWITTER DATA");
-
-                } else {
-                    Log.i("TWEETS ", json.toString());
-                }
-            }
-        }.start();
     }
 
 }

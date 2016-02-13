@@ -62,17 +62,11 @@ public class TwitterFragment extends Fragment {
     private Button mTwitterLogin;
     private Button mTwitterGet;
 
-    public static String mTwitterPreAPI = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=";
-    public static String mTwitterPostAPI = "&count=2";
-    public static String mTwitterUser;
-    public static String mTwitterAPI;
-    public static String mTwitterTokenURL = "https://api.twitter.com/oauth/access_token";
-    public static String mTwitterAuthURL = "https://api.twitter.com/oauth/authenticate?oauth_token=";
-
     public static String mUser[] = new String[100];
     public static String mStatus[] = new String[100];
     public static String mUserAt[] = new String[100];
     public static Uri mUrl[] = new Uri[100]; // profile image url
+
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
@@ -81,40 +75,6 @@ public class TwitterFragment extends Fragment {
         Fabric.with(getActivity(), new Twitter(authConfig));
 
         View view = inflater.inflate(R.layout.twitter_fragment, container, false);
-
-        /*// show initial tweet
-        final ViewGroup parentView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
-        long tweetIds[] = {631879971628183552L, 503435417459249153L, 510908133917487104L, 473514864153870337L, 477788140900347904L};
-        long currentTweet = tweetIds[mTweetNumber];
-        *//*TweetUtils.loadTweet(currentTweet, new Callback<TwitterTweet>() {
-            @Override
-            public void success(Result<TwitterTweet> result) {
-                //TweetView tweetView = new TweetView(getActivity(), result.data);
-                mTweetView = new TweetView(getActivity(), result.data);
-                parentView.addView(mTweetView);
-            }
-
-            @Override
-            public void failure(TwitterException exception) {
-                Log.d("TwitterKit", "Load TwitterTweet failure", exception);
-            }
-        });*/
-
-        //mTwitterButton = (Button)view.findViewById(R.id.btn_twitter);
-        //mTwitterLogin = (Button)view.findViewById(R.id.btn_login);
-        /*mTwitterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                twitterAsync();
-            }
-        });*/
-
-        /*mTwitterLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                twitterLogin();
-            }
-        });*/
 
         mTwitterLogin = (Button)view.findViewById(R.id.toLogin);
         mTwitterGet = (Button)view.findViewById(R.id.pullTweets);
@@ -155,6 +115,7 @@ public class TwitterFragment extends Fragment {
         mStatus10.setText("");
         mStatus11.setText("");
 
+
         mTwitterLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,15 +125,7 @@ public class TwitterFragment extends Fragment {
         mTwitterGet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                /*TwitterSession session = TwitterArrayList.getSessionManager().getActiveSession();
-                TwitterAuthToken authToken = session.getAuthToken();
-                TwitterActivity.mAuthToken = authToken.token;
-                TwitterActivity.mAuthSecret = authToken.secret;*/
-
-                mTwitterAPI = mTwitterPreAPI+TwitterActivity.mScreenName+mTwitterPostAPI;
-                pullTweets(mTwitterAPI);
-                //twitterAsync();
+                twitterAsync();
 
             }
         });
@@ -192,23 +145,16 @@ public class TwitterFragment extends Fragment {
             Log.d("TwitterArrayList ", "Got message:\"" + message +"\"");
             switch (message) {
                 case Constants.mGet:
-                    //twitterAsync();
+                    twitterAsync();
                     break;
                 case Constants.mRefresh:
-                    //twitterAsync();
+                    twitterAsync();
                     Toast.makeText(getActivity(),"TwitterArrayList Feed Refreshed",Toast.LENGTH_LONG).show();
                     break;
                 case Constants.mLogin:
                     twitterLogin();
                     break;
 
-                /*case MainActivity.mNEXTTWEET:
-                    mTweetNumber++;
-                    mTweetView.removeAllViews();
-                    if(mTweetNumber > 4)
-                        mTweetNumber = 0;
-                    showTweets(mTweetNumber);
-                    break;*/
             }
         }
     };
@@ -282,20 +228,20 @@ public class TwitterFragment extends Fragment {
 
 
     public void twitterAsync() {
-        //new TwitterASyncTask().execute();
+        new TwitterASyncTask().execute();
 
-        /*try {
-            Thread.sleep(2000);                 //1000 milliseconds is one second.
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
 
-        *//* do this once you build txtListTweets
+        /* do this once you build txtListTweets
         for (int i=0; i <= 10; i++) {
             String txt = "<b>" + Constants.mUser[i] + "</b> " + "<br>" + Constants.mStatus[i] + "<br>";
             txtListTweets.get(i).setText(Html.fromHtml(txt));
         }
-        *//*
+        */
 
         String txt0 = "<b>" + mUser[0] + "</b> " + "<br>" + mStatus[0] + "<br>";
         mStatus1.setText(Html.fromHtml(txt0));
@@ -339,7 +285,7 @@ public class TwitterFragment extends Fragment {
 
         String txt10 = "<b>" + mUser[10] + "</b> " + "<br>" + mStatus[10] + "<br>";
         mStatus11.setText(Html.fromHtml(txt10));
-        Picasso.with(getContext()).load(mUrl[10]).fit().centerInside().into(mPP11);*/
+        Picasso.with(getContext()).load(mUrl[10]).fit().centerInside().into(mPP11);
     }
 
 }
