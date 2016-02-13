@@ -331,7 +331,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     }
 
     private void speakText(String text) {
-        ((MainActivity) getActivity()).startTTS(text);
+        ((MainActivity) getActivity()).speakText(text);
     }
 
     // Get weather data from API and display
@@ -342,7 +342,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 if (json == null) {
                     mHandler.post(new Runnable() {
                         public void run() {
-                            ((MainActivity) getActivity()).showToast(getString(R.string.err_weather_data),
+                            ((MainActivity) getActivity()).showToast(getString(R.string.weather_data_err),
                                     Gravity.CENTER, Toast.LENGTH_LONG);
                             updateWeatherCache(null);
                         }

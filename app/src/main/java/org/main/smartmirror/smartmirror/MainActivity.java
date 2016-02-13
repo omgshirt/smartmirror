@@ -25,7 +25,6 @@ import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -94,8 +93,9 @@ public class MainActivity extends AppCompatActivity
     private final int WAKELOCK_TIMEOUT = 100;            // Wakelock should be held only briefly to trigger screen wake
     private PowerManager.WakeLock mWakeLock;
     private Timer mUITimer;
-    private final long UI_TIMEOUT_DELAY = 1000 * 60 * 5; // User interactions reset screen on timer to 5 minutes
-    private final int SCREEN_OFF_TIMEOUT = 5000;         // Timeout for lightSleep -> sleep transition
+    private final long DEFAULT_INTERACTION_TIMEOUT = 1000 * 60 * 5;
+    private long mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT; // User interactions reset screen on timer to 5 minutes
+    private final int SLEEP_DELAY = 5000;                           // Timeout for lightSleep -> sleep transition
     private PowerManager mPowerManager;
 
     // WiFiP2p
@@ -295,7 +295,7 @@ public class MainActivity extends AppCompatActivity
 
         mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
         addScreenOnFlag();
-        startUITimer();
+        resetInteractionTimer();
 
         if (mPowerManager.isScreenOn()) {
             mPreferences.resetScreenBrightness();
@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "exitSleep() called");
 
         // ensure content frames are visible if we were in LIGHT_SLEEP before calling sleep
-        setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+        resetAllContentFrames();
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
@@ -400,13 +400,14 @@ public class MainActivity extends AppCompatActivity
         setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
         setDefaultScreenOffTimeout();
         addScreenOnFlag();
-        startUITimer();
+        resetInteractionTimer();
         stopLightSensor();
         mirrorSleepState = AWAKE;
     }
 
     protected void enterLightSleep() {
-        setContentFrameVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+        mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
+        hideAllContentFrames();
         clearScreenOnFlag();
         setScreenOffTimeout();
         stopUITimer();
@@ -421,8 +422,22 @@ public class MainActivity extends AppCompatActivity
         setContentFrameVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
     }
 
-    protected void showAllContentFrames() {
+    protected void resetAllContentFrames() {
         setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+    }
+
+    /**
+     * Makes a view visible if it is currently INVISIBLE or GONE
+     * @param view to show
+     */
+    public void showViewIfHidden(View view){
+        if (contentFrameHidden(view)) {
+            view.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public boolean contentFrameHidden(View view){
+        return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
     }
 
     private void setContentFrameVisibility(int frameOne,int frameTwo,int frameThree) {
@@ -440,7 +455,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void setScreenOffTimeout() {
-        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SCREEN_OFF_TIMEOUT);
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SLEEP_DELAY);
     }
 
     // Flags the system to keep the screen on indefinitely.
@@ -455,19 +470,20 @@ public class MainActivity extends AppCompatActivity
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    // Start a timer to track interval between user interactions.
-    // When expired, clear the screen on flag so the screen can time out per system settings.
-    protected void startUITimer() {
+    /** Start a timer to track interval between user interactions.
+    * When expired, clear the screen on flag so the screen can time out per system settings.
+    */
+     protected void resetInteractionTimer() {
         stopUITimer();
         mUITimer = new Timer();
-        Log.i(Constants.TAG, "UI timer start. " + UI_TIMEOUT_DELAY + " ms");
+        Log.i(Constants.TAG, "UI timer start. " + mInteractionTimeout + " ms");
         mUITimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Log.i(Constants.TAG, "UI timeout reached at " + UI_TIMEOUT_DELAY + " ms");
+                Log.i(Constants.TAG, "UI timeout reached at " + mInteractionTimeout + " ms");
                 MainActivity.this.runOnUiThread(uiTimerRunnable);
             }
-        }, UI_TIMEOUT_DELAY);
+        }, mInteractionTimeout);
     }
 
     protected void stopUITimer() {
@@ -600,7 +616,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void wakeScreenAndDisplay(String command) {
         if (mirrorSleepState == AWAKE) {
-            startUITimer();
+            resetInteractionTimer();
             handleHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP) {
@@ -628,7 +644,7 @@ public class MainActivity extends AppCompatActivity
     public void handleHelpFragment(String command) {
         boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
         if ( command.equals(Constants.HELP) && !helpIsVisible ) {
-            setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+            resetAllContentFrames();
             displayHelpFragment(HelpFragment.newInstance(getCurrentFragment()));
         } else {
             // remove HelpFragment if visible
@@ -659,11 +675,10 @@ public class MainActivity extends AppCompatActivity
 
 
     /**
-     * Adjust the visible content frames if required by the command. Bypassed for now.
+     * Adjust the visible content frames if required by the command. Currently exmpty.
      * @param command command to be executed
      */
     private void setContentVisibility(String command) {
-        // Create fragment
         handleCommand(command);
     }
 
@@ -681,9 +696,6 @@ public class MainActivity extends AppCompatActivity
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         }
 
-        // Play sound effect - disabled
-        //playSound(R.raw.celeste_a);
-
         // look for news desk
         if (Constants.DESK_HASH.contains(command)) {
             fragment = NewsFragment.newInstance(command);
@@ -700,7 +712,7 @@ public class MainActivity extends AppCompatActivity
                     fragment = new CameraFragment();
                 } else {
                     showToast(getResources().getString(R.string.camera_disabled_toast), Toast.LENGTH_LONG);
-                    startTTS(getResources().getString(R.string.err_camera_off));
+                    speakText(getResources().getString(R.string.camera_off_err));
                 }
                 break;
             case Constants.CLOSE_SCREEN:
@@ -728,7 +740,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.MINIMIZE:
             case Constants.SMALL_SCREEN:
-                setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                resetAllContentFrames();
                 break;
             case Constants.NIGHT_LIGHT:
                 fragment = new LightFragment();
@@ -736,6 +748,9 @@ public class MainActivity extends AppCompatActivity
             case Constants.NEWS:
                 NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
                 fragment = NewsFragment.newInstance("world");
+                break;
+            case Constants.OPEN_WINDOW:
+                showViewIfHidden(contentFrame3);
                 break;
             case Constants.PHOTOS:
                 // create photos fragment
@@ -751,6 +766,15 @@ public class MainActivity extends AppCompatActivity
             case Constants.GO_TO_SLEEP:
                 enterLightSleep();
                 command = mCurrentFragment;
+                break;
+            case Constants.STAY_AWAKE:
+                if (mInteractionTimeout == 604800000) {
+                    speakText(getResources().getString(R.string.cmd_stay_awake_err));
+                }else {
+                    speakText(getResources().getString(R.string.cmd_stay_awake));
+                    mInteractionTimeout = 604800000;
+                    resetInteractionTimer();
+                }
                 break;
             case Constants.TRAFFIC:
                 fragment = new TrafficFragment();
@@ -769,7 +793,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (fragment != null) {
-            //startTTS(command);
+            //speakText(command);
             mCurrentFragment = command;
             if (contentFrame3.getVisibility() == View.INVISIBLE || contentFrame3.getVisibility() == View.GONE) {
                 contentFrame3.setVisibility(View.VISIBLE);
@@ -906,7 +930,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @param phrase to speak
      */
-    public void startTTS(final String phrase) {
+    public void speakText(final String phrase) {
         Thread mSpeechThread = new Thread(new Runnable() {
             @Override
             public void run() {

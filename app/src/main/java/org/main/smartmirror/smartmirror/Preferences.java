@@ -680,7 +680,7 @@ public class Preferences implements LocationListener {
     // helper sends a string to MainActivity to be spoken
     private void speakText(int stringId) {
         String text = mActivity.getResources().getString(stringId);
-        ((MainActivity)mActivity).startTTS(text);
+        ((MainActivity)mActivity).speakText(text);
     }
 
     public double getLatitude() {

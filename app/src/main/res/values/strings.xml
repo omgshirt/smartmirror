@@ -6,7 +6,7 @@
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
     <string name="distance_matrix_api_key">AIzaSyBumZObXEyI5_7Ie0u8ZnrRKAXzojKpDw8</string>
     <string name="guardian_api_key">c6ed3edf-b0c6-4669-8e5c-ba32ba96a65f</string>
-    <string name="err_news">Unable to retrieve news &#8212; check your internet connection</string>
+    <string name="news_err">Unable to retrieve news &#8212; check your internet connection</string>
 
     <string name="twitter_api_key">mQ51h9ZbAz9Xk2AZtsUBJAGlx</string>
     <string name="twitter_secret">uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt</string>
@@ -41,7 +41,7 @@
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
-    <string name="err_weather_data">Failed to retrieve weather data &#8212; check your internet connection</string>
+    <string name="weather_data_err">Failed to retrieve weather data &#8212; check your internet connection</string>
 
     <string name="weather_sunny">\uf00d</string>
     <string name="weather_cloudy_day">\uf002</string>
@@ -93,6 +93,8 @@
     <string name="cmd_voice_recognition_on_err">I\'m already listening</string>
     <string name="cmd_voice_recognition_off">I\'ll ignore you</string>
     <string name="cmd_voice_recognition_off_err">I\'m still ignoring you</string>
+    <string name="cmd_stay_awake">I\'ll stay awake. Say \'sleep\' to cancel.</string>
+    <string name="cmd_stay_awake_err">I\'m already awake until you say \'sleep\'.</string>
     <string name="cmd_remote_on">Remote control on</string>
     <string name="cmd_remote_off">Remote control off</string>
     <string name="cmd_camera_on">Camera on</string>
@@ -100,8 +102,8 @@
     <string name="cmd_weather_english">Weather display English</string>
     <string name="cmd_weather_metric">Weather display metric</string>
 
-    <string name="err_remote_off">The remote is disabled.</string>
-    <string name="err_camera_off">The camera is disabled.</string>
+    <string name="remote_off_err">The remote is disabled.</string>
+    <string name="camera_off_err">The camera is disabled.</string>
 
     <!-- Camera String -->
     <string name="camera_disabled_toast">Camera Disabled. Say \'Camera On\' to change this setting.</string>

@@ -40,6 +40,6 @@ public class Mira {
             voice = "I'll charge up for a bit";
         else
             voice = "it will be good to be rid of you for a while";
-        mActivity.startTTS(voice);
+        mActivity.speakText(voice);
     }
 }

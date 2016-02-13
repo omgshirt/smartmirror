@@ -143,7 +143,7 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     }
 
     private void speakText(String text) {
-        ((MainActivity) getActivity()).startTTS(text);
+        ((MainActivity) getActivity()).speakText(text);
     }
 
     @Override

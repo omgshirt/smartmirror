@@ -35,7 +35,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String mGuardURL = mPreURL + mDefNewsSection + mPostURL;
     public static String mNewsSection;
 
-    // time in minutes before news data is considered old and is discarded
+    // time in seconds before news data is considered old and is discarded
     private final int DATA_UPDATE_FREQUENCY = 60;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
@@ -483,7 +483,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 if(json == null){
                     mHandler.post(new Runnable(){
                         public void run(){
-                            ((MainActivity)getActivity()).showToast(getString(R.string.err_news),
+                            ((MainActivity)getActivity()).showToast(getString(R.string.news_err),
                                     Gravity.CENTER, Toast.LENGTH_LONG);
                         }
                     });

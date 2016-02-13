@@ -20,8 +20,10 @@ public class Constants {
     public static final String MAXIMIZE = "maximize";
     public static final String MENU = "menu";
     public static final String MINIMIZE = "minimize";
+    public static final String OPEN_WINDOW = "open window";
     public static final String OPTIONS = "options";
     public static final String SLEEP = "sleep";
+    public static final String STAY_AWAKE = "stay awake";
     public static final String SMALL_SCREEN = "small screen";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
@@ -115,12 +117,12 @@ public class Constants {
             GO_BACK, GO_TO_SLEEP, HELP, HIDE_TIME,
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
             MEDIA, MENU, MINIMIZE, NIGHT_LIGHT,
-            NEWS, NINE, NINTH,
-            ONE, OPTIONS, PHOTOS, QUOTES, SCIENCE,
+            NEWS, NINE, NINTH, ONE,
+            OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
             SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
             SETTINGS, SEVEN, SEVENTH,
             SHOW_TIME, SHOW_WEATHER, SIX,
-            SIXTH, SLEEP, SMALL_SCREEN, TAKE_PICTURE,
+            SIXTH, SLEEP, SMALL_SCREEN, STAY_AWAKE, TAKE_PICTURE,
             THIRD, THREE, TECHNOLOGY, TIME,
             TRAFFIC, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WIDE_SCREEN, WORLD,

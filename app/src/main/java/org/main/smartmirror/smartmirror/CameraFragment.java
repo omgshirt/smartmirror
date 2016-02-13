@@ -370,7 +370,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * @param text The message to speak.
      */
     private void speakCountdown(final String text) {
-        ((MainActivity) getActivity()).startTTS(text);
+        ((MainActivity) getActivity()).speakText(text);
     }
 
     /**
