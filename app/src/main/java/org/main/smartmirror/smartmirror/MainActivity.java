@@ -144,16 +144,15 @@ public class MainActivity extends AppCompatActivity
     };
 
     /**
-     * called when a news article is selected to be viewed
+     * Callback from NewsFragment when a news article has been selected
      *
      * @param articleTitle article title
      * @param articleBody  article text
      */
     @Override
     public void onArticleSelected(String articleTitle, String articleBody) {
-        Fragment fragment = new NewsBodyFragment();
+        Fragment fragment = NewsBodyFragment.NewInstance(articleTitle, articleBody);
         displayFragment(fragment, Constants.NEWS_BODY, true);
-
     }
 
     // handles the messages from VoiceService to this Activity
@@ -772,6 +771,7 @@ public class MainActivity extends AppCompatActivity
                 command = mCurrentFragment;
                 break;
             case Constants.STAY_AWAKE:
+                // Screen awake for 7 days
                 if (mInteractionTimeout == 604800000) {
                     speakText(getResources().getString(R.string.cmd_stay_awake_err));
                 }else {
