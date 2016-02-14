@@ -27,9 +27,9 @@
         <!-- Weather Frame -->
         <FrameLayout
             android:id="@+id/content_frame_1"
-            android:layout_weight="3"
             android:layout_width="0dp"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="3">
 
             <fragment
                 android:name="org.main.smartmirror.smartmirror.WeatherFragment"
@@ -38,18 +38,24 @@
                 tools:layout="@layout/weather_fragment" />
         </FrameLayout>
 
-        <!-- Help frame -->
-        <FrameLayout
-            android:id="@+id/content_frame_2"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight="5"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2" />
+            android:layout_height="match_parent">
+            <!-- Help frame -->
+            <FrameLayout
+                android:id="@+id/content_frame_2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2" />
 
-        <!-- Data Frame -->
-        <FrameLayout
-            android:id="@+id/content_frame_3"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3" />
+            <!-- Data Frame -->
+            <FrameLayout
+                android:id="@+id/content_frame_3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

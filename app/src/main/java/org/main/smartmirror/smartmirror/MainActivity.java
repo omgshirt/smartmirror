@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "exitSleep() called");
 
         // ensure content frames are visible if we were in LIGHT_SLEEP before calling sleep
-        resetAllContentFrames();
+        showAllContentFrames();
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
@@ -407,6 +407,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void enterLightSleep() {
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
+        resetInteractionTimer();
         hideAllContentFrames();
         clearScreenOnFlag();
         setScreenOffTimeout();
@@ -422,21 +423,21 @@ public class MainActivity extends AppCompatActivity
         setContentFrameVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
     }
 
-    protected void resetAllContentFrames() {
+    protected void showAllContentFrames() {
         setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
     }
 
     /**
      * Makes a view visible if it is currently INVISIBLE or GONE
-     * @param view to show
+     * @param view view to show
      */
     public void showViewIfHidden(View view){
-        if (contentFrameHidden(view)) {
+        if (viewHidden(view)) {
             view.setVisibility(View.VISIBLE);
         }
     }
 
-    public boolean contentFrameHidden(View view){
+    public boolean viewHidden(View view){
         return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
     }
 
@@ -644,7 +645,9 @@ public class MainActivity extends AppCompatActivity
     public void handleHelpFragment(String command) {
         boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
         if ( command.equals(Constants.HELP) && !helpIsVisible ) {
-            resetAllContentFrames();
+            if (!viewHidden(contentFrame3)) {
+                showAllContentFrames();
+            }
             displayHelpFragment(HelpFragment.newInstance(getCurrentFragment()));
         } else {
             // remove HelpFragment if visible
@@ -740,13 +743,14 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.MINIMIZE:
             case Constants.SMALL_SCREEN:
-                resetAllContentFrames();
+                showAllContentFrames();
                 break;
             case Constants.NIGHT_LIGHT:
+            case Constants.SHOW_LIGHT:
                 fragment = new LightFragment();
                 break;
             case Constants.NEWS:
-                NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
+                //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
                 fragment = NewsFragment.newInstance("world");
                 break;
             case Constants.OPEN_WINDOW:
@@ -795,11 +799,9 @@ public class MainActivity extends AppCompatActivity
         if (fragment != null) {
             //speakText(command);
             mCurrentFragment = command;
-            if (contentFrame3.getVisibility() == View.INVISIBLE || contentFrame3.getVisibility() == View.GONE) {
-                contentFrame3.setVisibility(View.VISIBLE);
-            }
             boolean addToBackStack = !(fragment instanceof BlankFragment);
             displayFragment(fragment, command, addToBackStack);
+            showViewIfHidden(contentFrame3);
         }
     }
 
