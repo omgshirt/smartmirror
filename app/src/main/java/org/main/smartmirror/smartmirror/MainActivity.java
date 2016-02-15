@@ -77,6 +77,12 @@ public class MainActivity extends AppCompatActivity
     private FrameLayout contentFrame2;
     private FrameLayout contentFrame3;
 
+    // FrameSize maintains the size of the content window between state changes
+    private int frame1Size = View.VISIBLE;
+    private int frame2Size = View.VISIBLE;
+    private int frame3Size = View.VISIBLE;
+
+
     // Light Sensor
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
@@ -383,8 +389,8 @@ public class MainActivity extends AppCompatActivity
     protected void exitSleep() {
         Log.i(Constants.TAG, "exitSleep() called");
 
-        // ensure content frames are visible if we were in LIGHT_SLEEP before calling sleep
-        showAllContentFrames();
+        // Set content frames sizes to their stored values
+        restoreContentFrameVisibility();
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
@@ -396,7 +402,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void exitLightSleep() {
-        setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+        restoreContentFrameVisibility();
         setDefaultScreenOffTimeout();
         addScreenOnFlag();
         resetInteractionTimer();
@@ -405,26 +411,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void enterLightSleep() {
+
+        mirrorSleepState = LIGHT_SLEEP;
+
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
         resetInteractionTimer();
-        hideAllContentFrames();
+
+        // temporarily hide all content frames for duration of LIGHT_SLEEP
+        setContentFrameVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
+
         clearScreenOnFlag();
         setScreenOffTimeout();
         stopUITimer();
         startLightSensor();
         mira.saySleepMessage();
-        mirrorSleepState = LIGHT_SLEEP;
+
     }
 
     // ------------------------ UI Visibility / Content Frames ---------------------------
-
-    protected void hideAllContentFrames() {
-        setContentFrameVisibility(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
-    }
-
-    protected void showAllContentFrames() {
-        setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
-    }
 
     /**
      * Makes a view visible if it is currently INVISIBLE or GONE
@@ -440,11 +444,33 @@ public class MainActivity extends AppCompatActivity
         return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
     }
 
-    private void setContentFrameVisibility(int frameOne,int frameTwo,int frameThree) {
+    /**
+     * Sets all content frames and adjusts view to new values
+     *
+     */
+    protected void setContentFrameValues(int frameOne, int frameTwo, int frameThree) {
+        frame1Size = frameOne;
+        frame2Size = frameTwo;
+        frame3Size = frameThree;
+        restoreContentFrameVisibility();
+    }
+
+    protected void restoreContentFrameVisibility() {
+        contentFrame1.setVisibility(frame1Size);
+        contentFrame2.setVisibility(frame2Size);
+        contentFrame3.setVisibility(frame3Size);
+    }
+
+    /**
+     * Temporarily set content frame visibility to given values
+     */
+    private void setContentFrameVisibility(int frameOne, int frameTwo, int frameThree) {
         contentFrame1.setVisibility(frameOne);
         contentFrame2.setVisibility(frameTwo);
         contentFrame3.setVisibility(frameThree);
     }
+
+
 
     // Restores the screen off to the duration set when the application first ran.
     protected void setDefaultScreenOffTimeout() {
@@ -637,21 +663,30 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Help command displays the helpFragment & sets content visibility to default.
-     * All other commands dismiss Help.
+     * Saying "help" again closes help
      *
      * @param command
      */
     public void handleHelpFragment(String command) {
-        boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
-        if ( command.equals(Constants.HELP) && !helpIsVisible ) {
-            if (!viewHidden(contentFrame3)) {
-                showAllContentFrames();
+
+        if (command.equals(Constants.HELP)) {
+            boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
+            if (helpIsVisible) {
+
+                // remove HelpFragment if visible
+                removeFragment(Constants.HELP);
+
+            } else  {
+
+                // If frame3 is in any visible state, ensure that it's set back to small screen so
+                // that help has room in the layout.
+                if (frame3Size == View.VISIBLE) {
+                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                }
+                displayHelpFragment(HelpFragment.newInstance(getCurrentFragment()));
             }
-            displayHelpFragment(HelpFragment.newInstance(getCurrentFragment()));
-        } else {
-            // remove HelpFragment if visible
-            removeFragment(Constants.HELP);
         }
+
         closeMenuDrawer(command);
     }
 
@@ -721,7 +756,7 @@ public class MainActivity extends AppCompatActivity
             case Constants.CLOSE_WINDOW:
             case Constants.HIDE_SCREEN:
                 //fragment = new BlankFragment();
-                setContentFrameVisibility(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case Constants.FACEBOOK:
                 fragment = new FacebookFragment();
@@ -734,15 +769,18 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.BACK:
             case Constants.GO_BACK:
-                getSupportFragmentManager().popBackStack();
+                if (frame3Size != View.INVISIBLE) {
+                    // Can't go back if the window is closed.
+                    getSupportFragmentManager().popBackStack();
+                }
                 break;
             case Constants.MAXIMIZE:
             case Constants.FULL_SCREEN:
-                setContentFrameVisibility(View.GONE, View.GONE, View.VISIBLE);
+                setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
                 break;
             case Constants.MINIMIZE:
             case Constants.SMALL_SCREEN:
-                showAllContentFrames();
+                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 break;
             case Constants.NIGHT_LIGHT:
             case Constants.SHOW_LIGHT:
@@ -789,7 +827,7 @@ public class MainActivity extends AppCompatActivity
             case Constants.WAKE:
                 break;
             case Constants.WIDE_SCREEN:
-                setContentFrameVisibility(View.VISIBLE, View.GONE, View.VISIBLE);
+                setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
                 break;
             default:
                 broadcastMessage("inputAction", command);
