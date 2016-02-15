@@ -196,9 +196,9 @@ public class MainActivity extends AppCompatActivity
          frame2 = help
          frame3 = data / variable
         */
-        contentFrame1 = (FrameLayout)findViewById(R.id.content_frame_1);
-        contentFrame2 = (FrameLayout)findViewById(R.id.content_frame_2);
-        contentFrame3 = (FrameLayout)findViewById(R.id.content_frame_3);
+        contentFrame1 = (FrameLayout) findViewById(R.id.content_frame_1);
+        contentFrame2 = (FrameLayout) findViewById(R.id.content_frame_2);
+        contentFrame3 = (FrameLayout) findViewById(R.id.content_frame_3);
 
 
         // Remote control and Light Sensor Init
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
 
         //Google Account Picker
-        if ( mPreferences.getUserAccountName().equals("") ) {
+        if (mPreferences.getUserAccountName().equals("")) {
             Intent gAccPick = new Intent(MainActivity.this, AccountPickerActivity.class);
             startActivity(gAccPick);
         }
@@ -519,7 +519,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void displayHelpFragment(Fragment fragment){
+    private void displayHelpFragment(Fragment fragment) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame_2, fragment);
         ft.commit();

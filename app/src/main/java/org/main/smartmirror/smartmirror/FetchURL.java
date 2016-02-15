@@ -15,18 +15,18 @@ import java.net.URL;
 
 public class FetchURL {
 
-    public static JSONObject getJSON(String query){
+    public static JSONObject getJSON(String query) {
         try {
             URL url = new URL(query);
             HttpURLConnection connection =
-                    (HttpURLConnection)url.openConnection();
+                    (HttpURLConnection) url.openConnection();
 
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream()));
 
             StringBuilder json = new StringBuilder();
             String tmp;
-            while((tmp=reader.readLine())!=null)
+            while ((tmp = reader.readLine()) != null)
                 json.append(tmp).append("\n");
             reader.close();
             connection.disconnect();
@@ -35,7 +35,7 @@ public class FetchURL {
 
             return data;
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

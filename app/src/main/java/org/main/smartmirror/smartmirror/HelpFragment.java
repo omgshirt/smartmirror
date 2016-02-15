@@ -13,7 +13,7 @@ import android.widget.TextView;
  * Class that handles the help dialog which shows the commands the user can issue
  */
 public class HelpFragment extends Fragment {
-    private static final String DIALOG_TITLE="Help";
+    private static final String DIALOG_TITLE = "Help";
 
     public static HelpFragment newInstance(String fragName) {
         Bundle args = new Bundle();
@@ -31,14 +31,14 @@ public class HelpFragment extends Fragment {
         Log.i(Constants.TAG, name);
         Resources res = getResources();
 
-        TextView txtCurrentHelpHeader = (TextView)view.findViewById(R.id.fragment_help_header);
-        TextView txtCurrentHelpContent = (TextView)view.findViewById(R.id.fragment_help_content);
-        TextView txtModeHeader = (TextView)view.findViewById(R.id.mode_header);
-        TextView txtModeContent = (TextView)view.findViewById(R.id.mode_content);
-        TextView txtNewsHelpHeader = (TextView)view.findViewById(R.id.news_header);
-        TextView txtNewsHelpContent = (TextView)view.findViewById(R.id.news_content);
-        TextView txtHelpHeader = (TextView)view.findViewById(R.id.general_help_header);
-        TextView txtHelpContent = (TextView)view.findViewById(R.id.general_help_content);
+        TextView txtCurrentHelpHeader = (TextView) view.findViewById(R.id.fragment_help_header);
+        TextView txtCurrentHelpContent = (TextView) view.findViewById(R.id.fragment_help_content);
+        TextView txtModeHeader = (TextView) view.findViewById(R.id.mode_header);
+        TextView txtModeContent = (TextView) view.findViewById(R.id.mode_content);
+        TextView txtNewsHelpHeader = (TextView) view.findViewById(R.id.news_header);
+        TextView txtNewsHelpContent = (TextView) view.findViewById(R.id.news_content);
+        TextView txtHelpHeader = (TextView) view.findViewById(R.id.general_help_header);
+        TextView txtHelpContent = (TextView) view.findViewById(R.id.general_help_content);
 
         // set the default help!
         String strContent;
@@ -64,7 +64,7 @@ public class HelpFragment extends Fragment {
             case Constants.FACEBOOK:
                 arrayContent = res.getStringArray(R.array.facebook_help);
                 strContent = stringSpace(arrayContent);
-                txtCurrentHelpHeader.setText(name.substring(0,1).toUpperCase() + name.substring(1) + " - Help");
+                txtCurrentHelpHeader.setText(name.substring(0, 1).toUpperCase() + name.substring(1) + " - Help");
                 txtCurrentHelpContent.setText(strContent);
                 break;
             // camera
@@ -84,16 +84,16 @@ public class HelpFragment extends Fragment {
             default:
                 txtCurrentHelpHeader.setVisibility(View.GONE);
                 txtCurrentHelpContent.setVisibility(View.GONE);
-            break;
+                break;
         }
         return view;
     }
 
-    public String stringSpace(String[] string){
+    public String stringSpace(String[] string) {
         String str = "";
-        for(int i = 0; i < string.length; i++){
+        for (int i = 0; i < string.length; i++) {
             // capitalize the first letter in the arrays
-            string[i] = string[i].substring(0,1).toUpperCase() + string[i].substring(1);
+            string[i] = string[i].substring(0, 1).toUpperCase() + string[i].substring(1);
             str += string[i] + "\n";
         }
         return str;

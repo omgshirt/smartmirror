@@ -1,21 +1,17 @@
 package org.main.smartmirror.smartmirror;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.logging.Handler;
 
 import twitter4j.Paging;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.TwitterObjectFactory;
 import twitter4j.auth.AccessToken;
-import twitter4j.auth.OAuth2Token;
 import twitter4j.conf.ConfigurationBuilder;
 
 
@@ -55,7 +51,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
         try {
             paging = new Paging(5); // MAX 200 IN ONE CALL
             statuses = twitter.getHomeTimeline(paging);
-        }catch (Exception e) {
+        } catch (Exception e) {
             Log.i("TWITTER", "Paging failed");
         }
 
@@ -148,11 +144,11 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
         pullTweets(APICall);
     }
 
-    protected void pullTweets(final String query){
-        new Thread(){
-            public void run(){
+    protected void pullTweets(final String query) {
+        new Thread() {
+            public void run() {
                 final JSONObject json = FetchURL.getJSON(query);
-                if(json == null){
+                if (json == null) {
                     Log.i("TWITTER", "ERROR WITH TWITTER DATA");
 
                 } else {

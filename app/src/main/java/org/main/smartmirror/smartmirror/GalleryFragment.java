@@ -42,16 +42,16 @@ public class GalleryFragment extends Fragment {
     /**
      * Taken from Apache Commons IO https://commons.apache.org/proper/commons-io/xref/org/apache/commons/io/FilenameUtils.html
      * Gets the base name, minus the full path and extension, from a full filename.
-     * <p>
+     * <p/>
      * This method will handle a file in either Unix or Windows format.
      * The text after the last forward or backslash and before the last dot is returned.
-     <pre>
+     * <pre>
      * a/b/c.txt --&gt; c
      * a.txt     --&gt; a
      * a/b/c     --&gt; c
      * a/b/c/    --&gt; ""
      * </pre>
-     * <p>
+     * <p/>
      * The output will be the same irrespective of the machine that the code is running on.
      *
      * @param filename  the filename to query, null returns null
@@ -65,6 +65,7 @@ public class GalleryFragment extends Fragment {
     public static String getBaseName(final String filename) {
         return removeExtension(getName(filename));
     }
+
     public static String getName(final String filename) {
         if (filename == null) {
             return null;
@@ -84,6 +85,7 @@ public class GalleryFragment extends Fragment {
             return filename.substring(0, index);
         }
     }
+
     public static int indexOfLastSeparator(final String filename) {
         if (filename == null) {
             return -1;
@@ -102,8 +104,8 @@ public class GalleryFragment extends Fragment {
         return lastSeparator > extensionPos ? -1 : extensionPos;
     }
 
-    public void startExtensionRemoval(){
-        for(int i=0; i<mImageList.size(); i++) {
+    public void startExtensionRemoval() {
+        for (int i = 0; i < mImageList.size(); i++) {
             mImageFileNames.add(getBaseName(mImageList.get(i)));
             mImageFileNames.set(i, mImageFileNames.get(i).replace('_', ' '));
             mImageFileNames.set(i, mImageFileNames.get(i).replace('-', '\n'));
@@ -166,13 +168,13 @@ public class GalleryFragment extends Fragment {
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
         mTimerTask.cancel();
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         mTimerTask.cancel();
     }
@@ -180,9 +182,10 @@ public class GalleryFragment extends Fragment {
     /**
      * Method that handles the randomization of the image and assigns a drawable
      * to be painted on the UI
+     *
      * @param num the random number seed
      */
-    public void makeRandomImage(int num){
+    public void makeRandomImage(int num) {
         //TODO make sure that the images are truly random (they don't repeat)
         Random imageRandomizer = new Random();
         int randomNumber = imageRandomizer.nextInt(num);

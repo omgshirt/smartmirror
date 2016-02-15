@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 /**
  * Created by Harout on 2/6/2016.
  */
+
 import com.google.gson.annotations.SerializedName;
 
 public class TwitterTweet {
@@ -85,7 +86,7 @@ public class TwitterTweet {
     }
 
     @Override
-    public String  toString(){
+    public String toString() {
         return getText();
     }
 }

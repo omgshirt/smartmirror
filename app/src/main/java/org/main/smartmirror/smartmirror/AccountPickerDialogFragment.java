@@ -8,7 +8,6 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -20,15 +19,16 @@ public class AccountPickerDialogFragment extends DialogFragment {
     public ArrayList<AccountItem> list2; //Used to store AccountItem objects
     public String[] nameList; //Used to store account name strings from above object arraylist
 
-    public void getAccs(){
-       list2 = getData();
+    public void getAccs() {
+        list2 = getData();
         nameList = new String[list2.size()];
-        for (int i = 0; i < list2.size(); i++){
+        for (int i = 0; i < list2.size(); i++) {
             nameList[i] = list2.get(i).getValue();
         }
     }
 
     String selection;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         getAccs();
@@ -37,8 +37,8 @@ public class AccountPickerDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //Find which account was picked
-                for(int i = 0; i < nameList.length; i++){
-                    if(which == i){
+                for (int i = 0; i < nameList.length; i++) {
+                    if (which == i) {
                         selection = nameList[which];
                     }
                 }

@@ -5,11 +5,11 @@
     android:layout_height="wrap_content"
     android:padding="15dp">
 
-<!--    <com.twitter.sdk.android.core.identity.TwitterLoginButton
-        android:id="@+id/twitter_login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>-->
+    <!--    <com.twitter.sdk.android.core.identity.TwitterLoginButton
+            android:id="@+id/twitter_login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>-->
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -37,7 +37,7 @@
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/scrollView3" >
+        android:id="@+id/scrollView3">
 
         <LinearLayout
             android:orientation="vertical"

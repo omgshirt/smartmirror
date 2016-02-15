@@ -20,8 +20,6 @@ import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
-import com.twitter.sdk.android.tweetui.TweetTimelineListAdapter;
-import com.twitter.sdk.android.tweetui.UserTimeline;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -58,7 +56,7 @@ import io.fabric.sdk.android.services.concurrency.AsyncTask;
    * password: smartmirrort
 * */
 
-public class TwitterActivity extends ListActivity{
+public class TwitterActivity extends ListActivity {
 
 
     private TwitterLoginButton mTwitterLoginButton;
@@ -69,7 +67,7 @@ public class TwitterActivity extends ListActivity{
     public static String mAuthToken;
     public static String mAuthSecret;
     private ListView userTL;
-     Handler mHandler;
+    Handler mHandler;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +78,7 @@ public class TwitterActivity extends ListActivity{
 
         setContentView(R.layout.twitter_login_fragment);
         mTwitterLoginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
-        mStatus = (TextView)findViewById(R.id.status);
+        mStatus = (TextView) findViewById(R.id.status);
         mStatus.setText("Status: Ready");
 
         mTwitterLoginButton.setCallback(new Callback<TwitterSession>() {
@@ -139,133 +137,132 @@ public class TwitterActivity extends ListActivity{
     }
 
 
+    // download twitter timeline after first checking to see if there is a network connection
+    public void downloadTweets() {
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-     // download twitter timeline after first checking to see if there is a network connection
-     public void downloadTweets() {
-         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new DownloadTwitterTask().execute(mScreenName);
+            //new DownloadTwitterTask().execute();
+        } else {
+            Log.v("TWITTER", "No network connection available.");
+        }
+    }
 
-         if (networkInfo != null && networkInfo.isConnected()) {
-             new DownloadTwitterTask().execute(mScreenName);
-             //new DownloadTwitterTask().execute();
-         } else {
-             Log.v("TWITTER", "No network connection available.");
-         }
-     }
+    // Uses an AsyncTask to download a TwitterArrayList user's timeline
+    private class DownloadTwitterTask extends AsyncTask<String, Void, String> {
+        final static String CONSUMER_KEY = Constants.TWITTER_CONSUMER_KEY;
+        final static String CONSUMER_SECRET = Constants.TWITTER_CONSUMER_SECRET;
+        final static String TwitterTokenURL = "https://api.twitter.com/oauth2/token";
+        //final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name="; // this works
+        final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/home_timeline.json?count=1"; // this gives error code 403 Forbidden,
+        //    possibly pull limit reached?
 
-     // Uses an AsyncTask to download a TwitterArrayList user's timeline
-     private class DownloadTwitterTask extends AsyncTask<String, Void, String> {
-         final static String CONSUMER_KEY = Constants.TWITTER_CONSUMER_KEY;
-         final static String CONSUMER_SECRET = Constants.TWITTER_CONSUMER_SECRET;
-         final static String TwitterTokenURL = "https://api.twitter.com/oauth2/token";
-         //final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name="; // this works
-         final static String TwitterStreamURL = "https://api.twitter.com/1.1/statuses/home_timeline.json?count=1"; // this gives error code 403 Forbidden,
-                                                                                                                    //    possibly pull limit reached?
+        @Override
+        protected String doInBackground(String... screenNames) {
+            String result = null;
 
-         @Override
-         protected String doInBackground(String... screenNames) {
-             String result = null;
-
-             if (screenNames.length > 0) {
-                 // result = getTwitterStream(screenNames[0]);
-                 result = getTwitterStream(mScreenName);
-             }
-             return result;
-         }
+            if (screenNames.length > 0) {
+                // result = getTwitterStream(screenNames[0]);
+                result = getTwitterStream(mScreenName);
+            }
+            return result;
+        }
 
 
-         // convert a JSON authentication object into an TwitterAuthenticated object
-         private TwitterAuthenticated jsonToAuthenticated(String rawAuthorization) {
-             TwitterAuthenticated auth = null;
-             if (rawAuthorization != null && rawAuthorization.length() > 0) {
-                 try {
-                     Gson gson = new Gson();
-                     auth = gson.fromJson(rawAuthorization, TwitterAuthenticated.class);
-                 } catch (IllegalStateException ex) {
-                     // just eat the exception
-                 }
-             }
-             return auth;
-         }
+        // convert a JSON authentication object into an TwitterAuthenticated object
+        private TwitterAuthenticated jsonToAuthenticated(String rawAuthorization) {
+            TwitterAuthenticated auth = null;
+            if (rawAuthorization != null && rawAuthorization.length() > 0) {
+                try {
+                    Gson gson = new Gson();
+                    auth = gson.fromJson(rawAuthorization, TwitterAuthenticated.class);
+                } catch (IllegalStateException ex) {
+                    // just eat the exception
+                }
+            }
+            return auth;
+        }
 
-         private String getResponseBody(HttpRequestBase request) {
-             StringBuilder sb = new StringBuilder();
-             try {
+        private String getResponseBody(HttpRequestBase request) {
+            StringBuilder sb = new StringBuilder();
+            try {
 
-                 DefaultHttpClient httpClient = new DefaultHttpClient(new BasicHttpParams());
-                 HttpResponse response = httpClient.execute(request);
-                 int statusCode = response.getStatusLine().getStatusCode();
-                 String reason = response.getStatusLine().getReasonPhrase();
+                DefaultHttpClient httpClient = new DefaultHttpClient(new BasicHttpParams());
+                HttpResponse response = httpClient.execute(request);
+                int statusCode = response.getStatusLine().getStatusCode();
+                String reason = response.getStatusLine().getReasonPhrase();
 
-                 if (statusCode == 200) {
+                if (statusCode == 200) {
 
-                     HttpEntity entity = response.getEntity();
-                     InputStream inputStream = entity.getContent();
+                    HttpEntity entity = response.getEntity();
+                    InputStream inputStream = entity.getContent();
 
-                     BufferedReader bReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
-                     String line = null;
-                     while ((line = bReader.readLine()) != null) {
-                         sb.append(line);
-                     }
-                 } else {
-                     sb.append(statusCode + " " + reason);
-                 }
-             } catch (UnsupportedEncodingException ex) {
-             } catch (ClientProtocolException ex1) {
-             } catch (IOException ex2) {
-             }
-             return sb.toString();
-         }
+                    BufferedReader bReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
+                    String line = null;
+                    while ((line = bReader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                } else {
+                    sb.append(statusCode + " " + reason);
+                }
+            } catch (UnsupportedEncodingException ex) {
+            } catch (ClientProtocolException ex1) {
+            } catch (IOException ex2) {
+            }
+            return sb.toString();
+        }
 
-         private String getTwitterStream(String screenName) {
-         //private String getTwitterStream() {
-             String results = null;
+        private String getTwitterStream(String screenName) {
+            //private String getTwitterStream() {
+            String results = null;
 
-             // Step 1: Encode consumer key and secret
-             try {
-                 // URL encode the consumer key and secret
-                 String urlApiKey = URLEncoder.encode(CONSUMER_KEY, "UTF-8");
-                 String urlApiSecret = URLEncoder.encode(CONSUMER_SECRET, "UTF-8");
+            // Step 1: Encode consumer key and secret
+            try {
+                // URL encode the consumer key and secret
+                String urlApiKey = URLEncoder.encode(CONSUMER_KEY, "UTF-8");
+                String urlApiSecret = URLEncoder.encode(CONSUMER_SECRET, "UTF-8");
 
-                 // Concatenate the encoded consumer key, a colon character, and the
-                 // encoded consumer secret
-                 String combined = urlApiKey + ":" + urlApiSecret;
+                // Concatenate the encoded consumer key, a colon character, and the
+                // encoded consumer secret
+                String combined = urlApiKey + ":" + urlApiSecret;
 
-                 // Base64 encode the string
-                 String base64Encoded = Base64.encodeToString(combined.getBytes(), Base64.NO_WRAP);
+                // Base64 encode the string
+                String base64Encoded = Base64.encodeToString(combined.getBytes(), Base64.NO_WRAP);
 
-                 // Step 2: Obtain a bearer token
-                 HttpPost httpPost = new HttpPost(TwitterTokenURL);
-                 httpPost.setHeader("Authorization", "Basic " + base64Encoded);
-                 httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-                 httpPost.setEntity(new StringEntity("grant_type=client_credentials"));
-                 String rawAuthorization = getResponseBody(httpPost);
-                 TwitterAuthenticated auth = jsonToAuthenticated(rawAuthorization);
+                // Step 2: Obtain a bearer token
+                HttpPost httpPost = new HttpPost(TwitterTokenURL);
+                httpPost.setHeader("Authorization", "Basic " + base64Encoded);
+                httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+                httpPost.setEntity(new StringEntity("grant_type=client_credentials"));
+                String rawAuthorization = getResponseBody(httpPost);
+                TwitterAuthenticated auth = jsonToAuthenticated(rawAuthorization);
 
-                 // Applications should verify that the value associated with the
-                 // token_type key of the returned object is bearer
-                 if (auth != null && auth.token_type.equals("bearer")) {
+                // Applications should verify that the value associated with the
+                // token_type key of the returned object is bearer
+                if (auth != null && auth.token_type.equals("bearer")) {
 
-                     // Step 3: Authenticate API requests with bearer token
-                     //HttpGet httpGet = new HttpGet(TwitterStreamURL + screenName);
-                     HttpGet httpGet = new HttpGet(TwitterStreamURL);
+                    // Step 3: Authenticate API requests with bearer token
+                    //HttpGet httpGet = new HttpGet(TwitterStreamURL + screenName);
+                    HttpGet httpGet = new HttpGet(TwitterStreamURL);
 
-                     // construct a normal HTTPS request and include an Authorization
-                     // header with the value of Bearer <>
-                     httpGet.setHeader("Authorization", "Bearer " + auth.access_token);
-                     httpGet.setHeader("Content-Type", "application/json");
+                    // construct a normal HTTPS request and include an Authorization
+                    // header with the value of Bearer <>
+                    httpGet.setHeader("Authorization", "Bearer " + auth.access_token);
+                    httpGet.setHeader("Content-Type", "application/json");
 
-                     // update the results with the body of the response
-                     results = getResponseBody(httpGet);
-                     Log.i("TWITTER result", results.toString());
-                 }
-             } catch (UnsupportedEncodingException ex) {
-             } catch (IllegalStateException ex1) {
-             }
+                    // update the results with the body of the response
+                    results = getResponseBody(httpGet);
+                    Log.i("TWITTER result", results.toString());
+                }
+            } catch (UnsupportedEncodingException ex) {
+            } catch (IllegalStateException ex1) {
+            }
 
-             return results;
-         }
-     }
+            return results;
+        }
+    }
 
 
 }

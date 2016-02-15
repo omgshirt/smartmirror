@@ -5,12 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.tweetui.TweetView;
@@ -75,7 +72,7 @@ public class TwitterFragment extends Fragment {
     public static Uri mUrl[] = new Uri[100]; // profile image url
 
     @Override
-    public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
         Fabric.with(getActivity(), new Twitter(authConfig));
@@ -116,32 +113,32 @@ public class TwitterFragment extends Fragment {
             }
         });*/
 
-        mTwitterLogin = (Button)view.findViewById(R.id.toLogin);
-        mTwitterGet = (Button)view.findViewById(R.id.pullTweets);
+        mTwitterLogin = (Button) view.findViewById(R.id.toLogin);
+        mTwitterGet = (Button) view.findViewById(R.id.pullTweets);
 
-        mStatus1 = (TextView)view.findViewById(R.id.status1);
-        mStatus2 = (TextView)view.findViewById(R.id.status2);
-        mStatus3 = (TextView)view.findViewById(R.id.status3);
-        mStatus4 = (TextView)view.findViewById(R.id.status4);
-        mStatus5 = (TextView)view.findViewById(R.id.status5);
-        mStatus6 = (TextView)view.findViewById(R.id.status6);
-        mStatus7 = (TextView)view.findViewById(R.id.status7);
-        mStatus8 = (TextView)view.findViewById(R.id.status8);
-        mStatus9 = (TextView)view.findViewById(R.id.status9);
-        mStatus10 = (TextView)view.findViewById(R.id.status10);
-        mStatus11 = (TextView)view.findViewById(R.id.status11);
+        mStatus1 = (TextView) view.findViewById(R.id.status1);
+        mStatus2 = (TextView) view.findViewById(R.id.status2);
+        mStatus3 = (TextView) view.findViewById(R.id.status3);
+        mStatus4 = (TextView) view.findViewById(R.id.status4);
+        mStatus5 = (TextView) view.findViewById(R.id.status5);
+        mStatus6 = (TextView) view.findViewById(R.id.status6);
+        mStatus7 = (TextView) view.findViewById(R.id.status7);
+        mStatus8 = (TextView) view.findViewById(R.id.status8);
+        mStatus9 = (TextView) view.findViewById(R.id.status9);
+        mStatus10 = (TextView) view.findViewById(R.id.status10);
+        mStatus11 = (TextView) view.findViewById(R.id.status11);
 
-        mPP1 = (ImageView)view.findViewById(R.id.pp1);
-        mPP2 = (ImageView)view.findViewById(R.id.pp2);
-        mPP3 = (ImageView)view.findViewById(R.id.pp3);
-        mPP4 = (ImageView)view.findViewById(R.id.pp4);
-        mPP5 = (ImageView)view.findViewById(R.id.pp5);
-        mPP6 = (ImageView)view.findViewById(R.id.pp6);
-        mPP7 = (ImageView)view.findViewById(R.id.pp7);
-        mPP8 = (ImageView)view.findViewById(R.id.pp8);
-        mPP9 = (ImageView)view.findViewById(R.id.pp9);
-        mPP10 = (ImageView)view.findViewById(R.id.pp10);
-        mPP11 = (ImageView)view.findViewById(R.id.pp11);
+        mPP1 = (ImageView) view.findViewById(R.id.pp1);
+        mPP2 = (ImageView) view.findViewById(R.id.pp2);
+        mPP3 = (ImageView) view.findViewById(R.id.pp3);
+        mPP4 = (ImageView) view.findViewById(R.id.pp4);
+        mPP5 = (ImageView) view.findViewById(R.id.pp5);
+        mPP6 = (ImageView) view.findViewById(R.id.pp6);
+        mPP7 = (ImageView) view.findViewById(R.id.pp7);
+        mPP8 = (ImageView) view.findViewById(R.id.pp8);
+        mPP9 = (ImageView) view.findViewById(R.id.pp9);
+        mPP10 = (ImageView) view.findViewById(R.id.pp10);
+        mPP11 = (ImageView) view.findViewById(R.id.pp11);
 
         mStatus1.setText("");
         mStatus2.setText("");
@@ -170,7 +167,7 @@ public class TwitterFragment extends Fragment {
                 TwitterActivity.mAuthToken = authToken.token;
                 TwitterActivity.mAuthSecret = authToken.secret;*/
 
-                mTwitterAPI = mTwitterPreAPI+TwitterActivity.mScreenName+mTwitterPostAPI;
+                mTwitterAPI = mTwitterPreAPI + TwitterActivity.mScreenName + mTwitterPostAPI;
                 pullTweets(mTwitterAPI);
                 //twitterAsync();
 
@@ -189,14 +186,14 @@ public class TwitterFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("TwitterArrayList ", "Got message:\"" + message +"\"");
+            Log.d("TwitterArrayList ", "Got message:\"" + message + "\"");
             switch (message) {
                 case Constants.mGet:
                     //twitterAsync();
                     break;
                 case Constants.mRefresh:
                     //twitterAsync();
-                    Toast.makeText(getActivity(),"TwitterArrayList Feed Refreshed",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "TwitterArrayList Feed Refreshed", Toast.LENGTH_LONG).show();
                     break;
                 case Constants.mLogin:
                     twitterLogin();
@@ -213,12 +210,13 @@ public class TwitterFragment extends Fragment {
         }
     };
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     * voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
@@ -250,13 +248,13 @@ public class TwitterFragment extends Fragment {
     }*/
 
 
-    private void pullTweets(final String query){
-        new Thread(){
-            public void run(){
+    private void pullTweets(final String query) {
+        new Thread() {
+            public void run() {
                 final JSONObject json = FetchURL.getJSON(query);
-                if(json == null){
-                    mHandler.post(new Runnable(){
-                        public void run(){
+                if (json == null) {
+                    mHandler.post(new Runnable() {
+                        public void run() {
                             Toast.makeText(getActivity(),
                                     getActivity().getString(R.string.twitter_error),
                                     Toast.LENGTH_LONG).show();
@@ -264,7 +262,7 @@ public class TwitterFragment extends Fragment {
                     });
                 } else {
                     mHandler.post(new Runnable() {
-                        public void run(){
+                        public void run() {
                             Log.i("TWEETS ", json.toString());
                             //renderTweets(json);
                         }

@@ -10,11 +10,11 @@ public class Mira {
     private MainActivity mActivity;
     private static Mira mira;
 
-    private Mira(MainActivity activity){
+    private Mira(MainActivity activity) {
         mActivity = activity;
     }
 
-    public static Mira getInstance(MainActivity activity){
+    public static Mira getInstance(MainActivity activity) {
         if (mira == null) {
             mira = new Mira(activity);
         }
@@ -24,7 +24,7 @@ public class Mira {
     /**
      * Speak a random message about sleeping
      */
-    public void saySleepMessage(){
+    public void saySleepMessage() {
         Random random = new Random();
         String voice;
         float rand = random.nextFloat();

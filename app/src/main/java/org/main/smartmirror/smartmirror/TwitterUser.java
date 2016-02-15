@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 /**
  * Created by Harout on 2/6/2016.
  */
+
 import com.google.gson.annotations.SerializedName;
 
 

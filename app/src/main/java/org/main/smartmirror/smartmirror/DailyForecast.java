@@ -15,10 +15,12 @@ public class DailyForecast {
     public double precipProbability;
     public long forecastTime;
 
-    public DailyForecast() {}
+    public DailyForecast() {
+    }
 
     /**
      * Construct with JSON
+     *
      * @param today JSONObject corresponding to one daily: { data: { 'today' } }
      */
     public DailyForecast(JSONObject today) {
@@ -32,7 +34,7 @@ public class DailyForecast {
             precipProbability = today.getDouble("precipProbability");
             windSpeed = (int) Math.round(today.getDouble("windSpeed"));
             forecastTime = today.getLong("time");
-        } catch(JSONException jse) {
+        } catch (JSONException jse) {
             jse.printStackTrace();
         }
     }

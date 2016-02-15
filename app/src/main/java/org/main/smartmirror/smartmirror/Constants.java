@@ -43,10 +43,10 @@ public class Constants {
     public static final String TRAVEL = "travel";
     public static final String WORLD = "world";
 
-    public static final String NEWS_BODY= "news body";
+    public static final String NEWS_BODY = "news body";
 
-    public static final String[] NEWS_DESKS = { BUSINESS, MEDIA, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL,
-                                WORLD };
+    public static final String[] NEWS_DESKS = {BUSINESS, MEDIA, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL,
+            WORLD};
 
     public static final List<String> DESK_LIST = Arrays.asList(NEWS_DESKS);
     public static final HashSet<String> DESK_HASH = new HashSet<>(DESK_LIST);
@@ -63,20 +63,20 @@ public class Constants {
     public static final String HIDE_TIME = "hide time";
 
     //--------------CAMERA---------------
-    public static final String TAKE_PICTURE="take a picture";
+    public static final String TAKE_PICTURE = "take a picture";
 
     //--------------TWITTER--------------
     public static final String TWITTER_CONSUMER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx"; // from twitter
-    public static final String TWITTER_CONSUMER_SECRET= "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt"; // from twitter
+    public static final String TWITTER_CONSUMER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt"; // from twitter
     public static final String TWITTER_FABRIC_CONSUMER_KEY = "GAZWTz0pd3bduld0PzZMexSrH"; // from fabric, enabled for guest auth
-    public static final String TWITTER_FABRIC_CONSUMER_SECRET= "oUtQGP4NX9L9ZGVZ8mvYSqaJ3dJCzMDtjLcojybwrT9PL9keud"; // from fabric, enabled for guest auth
-    public static final String mLogin= "log me in";
-    public static final String mGet= "get";
-    public static final String mRefresh= "refresh";
+    public static final String TWITTER_FABRIC_CONSUMER_SECRET = "oUtQGP4NX9L9ZGVZ8mvYSqaJ3dJCzMDtjLcojybwrT9PL9keud"; // from fabric, enabled for guest auth
+    public static final String mLogin = "log me in";
+    public static final String mGet = "get";
+    public static final String mRefresh = "refresh";
 
     //--------------FACEBOOK-------------
-    public static final String SCROLL_UP ="scroll up";
-    public static final String SCROLL_DOWN ="scroll down";
+    public static final String SCROLL_UP = "scroll up";
+    public static final String SCROLL_DOWN = "scroll down";
 
     //--------------NEWS--------------
     public static final String ONE = "one";
@@ -142,10 +142,10 @@ public class Constants {
             Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC
     };
 
-    public static HashSet<String> createCommandSet(){
+    public static HashSet<String> createCommandSet() {
 
         List<String> commandList = Arrays.asList(COMMANDS);
-        return  new HashSet<>(commandList);
+        return new HashSet<>(commandList);
     }
 
     public static final Set<String> COMMAND_SET = createCommandSet();

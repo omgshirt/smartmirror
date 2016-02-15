@@ -54,14 +54,14 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 mManager.requestPeers(mChannel, mPeerListListener);
             }
 
-            Log.i("Wifi","Wifi p2p peers have changed");
+            Log.i("Wifi", "Wifi p2p peers have changed");
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             // Respond to new connection or disconnections
             if (mManager == null) {
                 return;
             }
 
-            Log.i("Wifi","Wifi p2p connections changed");
+            Log.i("Wifi", "Wifi p2p connections changed");
 
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             if (networkInfo.isConnected()) {
@@ -70,13 +70,13 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 Toast.makeText(mActivity, "Remote Connected", Toast.LENGTH_SHORT).show();
                 mManager.requestConnectionInfo(mChannel, mActivity);
             } else {
-                Toast.makeText(mActivity, "Cannot Connect to Remote" ,Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "Cannot Connect to Remote", Toast.LENGTH_SHORT).show();
                 mActivity.discoverWifiP2pPeers();
             }
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
             // Respond to this device's wifi state changing
-            Log.i("Wifi","Device's wifi state has changed");
+            Log.i("Wifi", "Device's wifi state has changed");
         }
     }
 }
