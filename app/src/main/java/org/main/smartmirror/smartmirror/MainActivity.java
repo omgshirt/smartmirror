@@ -784,6 +784,8 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.NIGHT_LIGHT:
             case Constants.SHOW_LIGHT:
+                // Night light always starts in full screen
+                setContentFrameVisibility(View.GONE, View.GONE, View.VISIBLE);
                 fragment = new LightFragment();
                 break;
             case Constants.NEWS:
