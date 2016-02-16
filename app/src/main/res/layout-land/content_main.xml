@@ -25,25 +25,27 @@
         android:orientation="horizontal">
 
         <!-- Weather Frame -->
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/content_frame_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="2">
+            android:layout_weight="2"
+            android:orientation="vertical">
 
             <fragment
+                android:id="@+id/weather_fragment"
                 android:name="org.main.smartmirror.smartmirror.WeatherFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 tools:layout="@layout/weather_fragment" />
 
             <fragment
+                android:id="@+id/traffic_fragment"
                 android:name="org.main.smartmirror.smartmirror.TrafficFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="150dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 tools:layout="@layout/traffic_fragment" />
-        </FrameLayout>
+        </LinearLayout>
 
         <!-- Help frame -->
         <FrameLayout
