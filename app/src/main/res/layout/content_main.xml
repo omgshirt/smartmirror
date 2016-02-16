@@ -22,14 +22,28 @@
 
     <FrameLayout
         android:id="@+id/content_frame_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
         <fragment
+            android:id="@+id/weather_display"
             android:name="org.main.smartmirror.smartmirror.WeatherFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:layout="@layout/weather_fragment" />
+        <fragment
+            android:id="@+id/gmail_home"
+            android:name="org.main.smartmirror.smartmirror.GmailHomeFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        </LinearLayout>
+
     </FrameLayout>
 
     <FrameLayout

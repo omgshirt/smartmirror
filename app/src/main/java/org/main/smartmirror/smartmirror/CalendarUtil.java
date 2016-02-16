@@ -1,6 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -16,22 +15,22 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class CalendarUtil extends Activity {
+public class CalendarUtil {
 
-    public static String DateToStr;
+    public static String dateToStr;
 
     public static void setCalendarHeader(String dateToString){
-        DateToStr = dateToString;
+        dateToStr = dateToString;
     }
     public static String getCalendarHeader(){
         Date curDate = new Date();
         SimpleDateFormat format = new SimpleDateFormat();
-        DateToStr = format.format(curDate);
+        dateToStr = format.format(curDate);
 
         format = new SimpleDateFormat("E, dd MMM yyyy");
-        DateToStr = format.format(curDate);
-        setCalendarHeader(DateToStr);
-        return DateToStr;
+        dateToStr = format.format(curDate);
+        setCalendarHeader(dateToStr);
+        return dateToStr;
     }
 
     public static  ArrayList<String> readCalendarEvent(Context context, ListView listView) {
