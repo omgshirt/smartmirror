@@ -28,6 +28,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -43,6 +44,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -77,6 +79,7 @@ import java.util.concurrent.TimeUnit;
 @TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
 
+    private TextView mCountDownText;
     private static Drive service;
     private GoogleAccountCredential credential;
 
@@ -351,17 +354,26 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      *
      * @param text The message to show
      */
-    private void showToast(final String text) {
-        final Activity activity = getActivity();
-        if (activity != null) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ((MainActivity)getActivity()).startTTS(text);
-                    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+    private void showToast(final String text){
+        ((MainActivity) getActivity()).showToast(text, Toast.LENGTH_SHORT);
+    }
+
+    /**
+     * Displays feedback to the user as to what the camera is doing.
+     *
+     * @param text the countdown to display.
+     */
+    private void showCameraFeedback(final String text){
+        mCountDownText.setText(text);
+    }
+
+    /**
+     * Speaks the countdown timer
+     *
+     * @param text The message to speak.
+     */
+    private void speakCountdown(final String text) {
+        ((MainActivity) getActivity()).startTTS(text);
     }
 
     /**
@@ -416,6 +428,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
+        mCountDownText = (TextView) view.findViewById(R.id.count_down);
         credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
         String accountName = Preferences.getUserAccountName();
         credential.setSelectedAccountName(accountName);
@@ -769,31 +782,19 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * Initiate a still image capture.
      */
     private void takePicture() {
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                showToast("three");
+        new CountDownTimer(4000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                showCameraFeedback(String.valueOf(millisUntilFinished / 1000));
+                speakCountdown(String.valueOf(millisUntilFinished / 1000));
             }
-        }, 0);
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                showToast("two");
-            }
-        }, 2000);
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                showToast("one");
-            }
-        }, 4000);
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
-                showToast("say cheese");
-            }
-        }, 6000);
-        cheeseHandler.postDelayed(new Runnable() {
-            public void run() {
+
+            public void onFinish() {
+                showCameraFeedback("cheese");
+                speakCountdown("cheese");
                 lockFocus();
             }
-        }, 7000);
+        }.start();
     }
 
     /**
@@ -868,7 +869,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     unlockFocus();
                 }
             };
-
             mCaptureSession.stopRepeating();
             mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
         } catch (CameraAccessException e) {
@@ -971,7 +971,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     body.setMimeType("image/jpeg");
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-                    showToast("Upload to Drive Successful!");
+                    showCameraFeedback("Upload to Drive Successful!");
+                    //showToast("Upload to Drive Successful!");
                     //DONT DELETE BELOW CODE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //                    boolean folderExists =false;
 //                    //String query = "mimeType='application/vnd/google-apps.folder' and trashed=false and title='" + FOLDER_NAME + "'";

@@ -2,65 +2,92 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
     android:orientation="vertical">
 
+    <!-- current fragment -->
     <RelativeLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:gravity="center_horizontal">
+        <TextView
+            android:id="@+id/fragment_help_header"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <!-- current fragment -->
-            <TextView
-                android:id="@+id/fragment_help_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/fragment_help_content"
-                android:gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_below="@id/fragment_help_header"/>
-        </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:gravity="center_horizontal">
-
-            <!-- General Help -->
-            <TextView
-                android:id="@+id/general_help_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/general_help_content"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginLeft="10dp"
-                android:layout_below="@id/general_help_header"/>
+        <TextView
+            android:id="@+id/fragment_help_content"
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/fragment_help_header" />
     </RelativeLayout>
 
+    <!-- available sections -->
     <RelativeLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:gravity="center_horizontal">
+        <TextView
+            android:id="@+id/mode_header"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <!-- weather commands -->
-            <TextView
-                android:id="@+id/weather_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/mode_content"
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mode_header" />
+    </RelativeLayout>
 
-            <TextView
-                android:id="@+id/weather_content"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginLeft="10dp"
-                android:layout_below="@id/weather_header"/>
+    <!-- news sections -->
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal">
+        <TextView
+            android:id="@+id/news_header"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/news_content"
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/news_header" />
+    </RelativeLayout>
+
+    <!-- general help -->
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal">
+        <TextView
+            android:id="@+id/general_help_header"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="9dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/general_help_content"
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/general_help_header" />
     </RelativeLayout>
 
 </LinearLayout>

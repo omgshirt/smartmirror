@@ -4,15 +4,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class NewsBodyFragment extends Fragment {
 
@@ -25,10 +28,20 @@ public class NewsBodyFragment extends Fragment {
 
         // Initialize Items
         mTxtBody = (TextView)view.findViewById(R.id.txtNewsBody);
-        mTxtBody.setText(Html.fromHtml(NewsFragment.mArticleFullBody));
         mTxtHeadline = (TextView)view.findViewById(R.id.txtHeadline);
-        mTxtHeadline.setText(NewsFragment.mHeadline);
         mScrollView = (ScrollView)view.findViewById(R.id.scrollView);
+        mTxtBody.setText("");
+        mTxtHeadline.setText("");
+
+        try {
+            mTxtBody.setText(Html.fromHtml(NewsFragment.mArticleFullBody));
+            mTxtHeadline.setText(NewsFragment.mHeadline);
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "Check your internet connection",
+                    Toast.LENGTH_LONG).show();
+            Log.i("NEWS BODY", "cannot draw, check your internet connection");
+        }
+
         return view;
     }
 

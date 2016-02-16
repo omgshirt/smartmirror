@@ -68,7 +68,7 @@ public class CacheManager {
      * Add a cache object to the CacheManager. This will overwrite any object with the same name.
      * @param key key used to tag this item
      * @param data data to store.
-     * @param time time in minutes until the cache is considered expired
+     * @param time time in seconds until the cache is considered expired
      */
     public void addCache(String key, Object data, int time){
         cacheMap.put(key, new DataCache<>(data, time));
@@ -194,7 +194,7 @@ public class CacheManager {
 
         /**
          * @param data Data to store
-         * @param time expiration (in minutes) from current time
+         * @param time expiration (in seconds) from current time
          */
         public DataCache(T data, int time) {
             expirationTime = new Date();
@@ -204,12 +204,12 @@ public class CacheManager {
 
         /**
          * @param data         Data to store
-         * @param dataDuration time (in minutes) before the cache is considered expired
+         * @param dataDuration time (in seconds) before the cache is considered expired
          */
         public void setData(T data, int dataDuration) {
             this.data = data;
             long now = System.currentTimeMillis();
-            expirationTime.setTime(now + (long) dataDuration * 60 * 1000);
+            expirationTime.setTime(now + (long) dataDuration * 1000);
         }
 
         public T getData() {

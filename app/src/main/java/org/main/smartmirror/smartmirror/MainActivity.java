@@ -77,9 +77,6 @@ public class MainActivity extends AppCompatActivity
     private FrameLayout contentFrame2;
     private FrameLayout contentFrame3;
 
-    // Help
-    private HelpFragment mHelpFragment;
-
     // Light Sensor
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
@@ -154,6 +151,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onArticleSelected(String articleTitle, String articleBody) {
         // TODO swap to given article body
+        Fragment fragment = new NewsBodyFragment();
+        boolean addToBackStack = !(fragment instanceof BlankFragment);
+        displayFragment(fragment, Constants.NEWS_BODY, addToBackStack);
+
     }
 
     // handles the messages from VoiceService to this Activity
@@ -175,15 +176,16 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Set up views and nav drawer
-        setContentView(R.layout.activity_main);
-
         checkMarshmallowPermissions();
         mContext = getApplicationContext();
 
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+
+        // Set up views and nav drawer.
+        // This needs to occur after Preferences is set in order to successfully retrieve GPS position.
+        setContentView(R.layout.activity_main);
 
         // Create Mira
         mira = Mira.getInstance(this);
@@ -207,9 +209,6 @@ public class MainActivity extends AppCompatActivity
 
         // TextToSpeech (TTS) init
         mTTSHelper = new TTSHelper(this);
-
-        Log.i(Constants.TAG, Constants.COMMAND_SET.toString());
-
 
         try {
             defaultScreenTimeout = Settings.System.getInt(getContentResolver(),
@@ -517,6 +516,12 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void displayHelpFragment(Fragment fragment){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content_frame_2, fragment);
+        ft.commit();
+    }
+
     /**
      * Display the fragment within content_frame_3
      *
@@ -599,12 +604,8 @@ public class MainActivity extends AppCompatActivity
      */
     public void hideHelpFragment(String command) {
 
-        if (command.equals(Constants.HELP) && mHelpFragment == null) {
-            mHelpFragment = HelpFragment.newInstance(getCurrentFragment());
-            mHelpFragment.show(getFragmentManager(), "HelpFragment");
-        } else if (mHelpFragment != null) {
-            mHelpFragment.dismiss();
-            mHelpFragment = null;
+        if (command.equals(Constants.HELP)) {
+            displayHelpFragment(new HelpFragment().newInstance(getCurrentFragment()));
         }
         closeMenuDrawer(command);
     }
@@ -676,6 +677,7 @@ public class MainActivity extends AppCompatActivity
             case Constants.GALLERY:
                 fragment = new GalleryFragment();
                 break;
+            case Constants.BACK:
             case Constants.GO_BACK:
                 getSupportFragmentManager().popBackStack();
                 break;
@@ -698,6 +700,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 break;
             case Constants.SLEEP:
+            case Constants.GO_TO_SLEEP:
                 enterLightSleep();
                 command = mCurrentFragment;
                 break;

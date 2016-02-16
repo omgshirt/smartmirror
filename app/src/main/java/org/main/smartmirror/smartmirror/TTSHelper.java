@@ -33,7 +33,6 @@ public class TTSHelper{
                         @Override
                         public void onStart(String utteranceId) {
                             mIsSpeaking = true;
-                            Log.i(Constants.TAG,"TTS utterance start");
 
                             mActivity.runOnUiThread(new Runnable() {
                                 @Override
@@ -111,7 +110,6 @@ public class TTSHelper{
         // String.valueOf(AudioManager.STREAM_NOTIFICATION); // param to set TTS to use NOTIFICATION stream
         if (mTextToSpeak != null) {
             mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
-            Log.i("TTS", "speak:\"" + mTextToSpeak + "\"");
         }
     }
 

@@ -32,7 +32,7 @@
             android:orientation="vertical">
 
         <fragment
-            android:id="@+id/weather_display"
+            android:id="@+id/weather_fragment"
             android:name="org.main.smartmirror.smartmirror.WeatherFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
