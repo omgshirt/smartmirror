@@ -48,9 +48,6 @@ speech low/1e5/
 speech medium/1e-20/
 speech high/1e1/
 speech max/1e-15/
-speech rare/1e-3/
-speech frequent/1e-10/
-speech always/1e-10/
 show time/1e-3/
 show weather/1e1/
 show light/1e-5/

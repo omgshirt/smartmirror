@@ -20,8 +20,9 @@
         android:src="@drawable/ic_action_microphone"
         android:visibility="gone" />
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/content_frame_1"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -31,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:layout="@layout/weather_fragment" />
-    </FrameLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/content_frame_2"

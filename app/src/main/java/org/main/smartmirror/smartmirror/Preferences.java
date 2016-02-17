@@ -36,7 +36,7 @@ public class Preferences implements LocationListener {
     //Google Account Email Preference
     public static final String PREFS_GMAIL = "accountName";
     //Google Account Email String
-    public static String mUserAccountPref = "";
+    private static String mUserAccountPref = "";
 
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
@@ -103,11 +103,6 @@ public class Preferences implements LocationListener {
     public static final String CMD_SCREEN_HIGH = "brightness high";
     public static final String CMD_SCREEN_VHIGH= "brightness max";
 
-    public static final String CMD_SPEECH_NEVER = "speech never";
-    public static final String CMD_SPEECH_RARE = "speech rare";
-    public static final String CMD_SPEECH_FREQUENT = "speech frequent";
-    public static final String CMD_SPEECH_ALWAYS = "speech always";
-
     public static final String CMD_VOICE_OFF = "stop listening";
     public static final String CMD_VOICE_ON = "start listening";
 
@@ -124,8 +119,6 @@ public class Preferences implements LocationListener {
     public static final String CMD_TIME_12HR = "time twelve hour";
     public static final String CMD_TIME_24HR = "time twenty four hour";
 
-    public static final String OFF = "off";
-    public static final String ON = "on";
     public static final String ENGLISH = "english";
     public static final String METRIC = "metric";
 
@@ -138,7 +131,6 @@ public class Preferences implements LocationListener {
     private boolean mRemoteEnabled;                 // Enable / disable remote control connections
     private boolean mCameraEnabled;                 // Enable / disable all camera-related actions
     private boolean mVoiceEnabled;                  // Enable / disable voice recognition UNTIL keyword spoken
-    private float mSpeechFrequency;                 // control how often TTS voice responses occur (0-1)
 
     private float mSystemVolume;                    // control general system volume
     private float mMusicVolume;                     // music stream volume
@@ -244,20 +236,6 @@ public class Preferences implements LocationListener {
                 setScreenBrightness(BRIGHTNESS_VHIGH);
                 break;
 
-            // speech frequency
-            case CMD_SPEECH_NEVER:
-                setSpeechFrequency(SPEECH_NEVER);
-                break;
-            case CMD_SPEECH_RARE:
-                setSpeechFrequency(SPEECH_RARE);
-                break;
-            case CMD_SPEECH_FREQUENT:
-                setSpeechFrequency(SPEECH_OFTEN);
-                break;
-            case CMD_SPEECH_ALWAYS:
-                setSpeechFrequency(SPEECH_ALWAYS);
-                break;
-
             // Voice recognition on / off
             case CMD_VOICE_OFF:
                 if (isVoiceEnabled())
@@ -323,7 +301,6 @@ public class Preferences implements LocationListener {
         mSharedPreferences = mActivity.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
-        mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
         mMusicVolume = mSharedPreferences.getFloat(PREFS_SPEECH_VOL, VOL_LOW);
         mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_LOW);
         mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
@@ -563,22 +540,6 @@ public class Preferences implements LocationListener {
 
     public void setTimeFormat12hr() {
         setTimeFormat(TIME_FORMAT_12_HR);
-    }
-
-    /**
-     *
-     * @param frequency how often the TTS should speak (0-1)
-     */
-    public void setSpeechFrequency(float frequency) {
-        if (frequency < 0 || frequency > 1) return;
-        mSpeechFrequency = frequency;
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putFloat(PREFS_SPEECH_FREQ, mSpeechFrequency);
-        edit.apply();
-    }
-
-    public float getSpeechFrequency() {
-        return mSpeechFrequency;
     }
 
     /** Set brightness value used by night light

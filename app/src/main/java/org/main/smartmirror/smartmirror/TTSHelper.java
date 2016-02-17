@@ -68,17 +68,6 @@ public class TTSHelper{
         mTextToSpeech = new TextToSpeech(mActivity, mTextToSpeechListener);
     }
 
-    /** Check preferences for speech frequency. If successful, say the text
-     *
-     * @param text string to say
-     */
-    public void speakText(String text) {
-        Random rand = new Random();
-        Preferences prefs = Preferences.getInstance(mActivity);
-        if (rand.nextFloat() < prefs.getSpeechFrequency()) {
-            start(text);
-        }
-    }
 
     /**
      * Initialize a TTS engine if necessary, then speak the text.

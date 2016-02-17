@@ -43,6 +43,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,9 +74,9 @@ public class MainActivity extends AppCompatActivity
     private Mira mira;
 
     // Conent Frames
-    private FrameLayout contentFrame1;
-    private FrameLayout contentFrame2;
-    private FrameLayout contentFrame3;
+    private ViewGroup contentFrame1;
+    private ViewGroup contentFrame2;
+    private ViewGroup contentFrame3;
 
     // FrameSize maintains the size of the content window between state changes
     private int frame1Size = View.VISIBLE;
@@ -200,9 +201,9 @@ public class MainActivity extends AppCompatActivity
          frame2 = help
          frame3 = data / variable
         */
-        contentFrame1 = (FrameLayout)findViewById(R.id.content_frame_1);
-        contentFrame2 = (FrameLayout)findViewById(R.id.content_frame_2);
-        contentFrame3 = (FrameLayout)findViewById(R.id.content_frame_3);
+        contentFrame1 = (ViewGroup)findViewById(R.id.content_frame_1);
+        contentFrame2 = (ViewGroup)findViewById(R.id.content_frame_2);
+        contentFrame3 = (ViewGroup)findViewById(R.id.content_frame_3);
 
 
         // Remote control and Light Sensor Init
@@ -665,7 +666,7 @@ public class MainActivity extends AppCompatActivity
      * Help command displays the helpFragment & sets content visibility to default.
      * Saying "help" again closes help
      *
-     * @param command
+     * @param command command to process
      */
     public void handleHelpFragment(String command) {
 
@@ -803,7 +804,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.SETTINGS:
             case Constants.OPTIONS:
-                fragment = new SettingsFragment();
+                fragment = SettingsFragment.newInstance();
                 break;
             case Constants.SLEEP:
             case Constants.GO_TO_SLEEP:
@@ -837,10 +838,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (fragment != null) {
-            //speakText(command);
             mCurrentFragment = command;
-            boolean addToBackStack = !(fragment instanceof BlankFragment);
-            displayFragment(fragment, command, addToBackStack);
+            //boolean addToBackStack = !(fragment instanceof BlankFragment);
+            displayFragment(fragment, command, true);
             showViewIfHidden(contentFrame3);
         }
     }
@@ -875,6 +875,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @param input the command the user gave
      */
+    @SuppressWarnings("deprecation")
     public void handleVoiceCommand(String input) {
         //String voiceInput = input.trim();
         Log.i(Constants.TAG, "handleVoiceCommand:\"" + input + "\"");
@@ -977,7 +978,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 try {
-                    mTTSHelper.speakText(phrase);
+                    mTTSHelper.start(phrase);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
