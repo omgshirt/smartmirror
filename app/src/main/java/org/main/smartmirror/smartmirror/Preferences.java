@@ -150,6 +150,8 @@ public class Preferences implements LocationListener {
     private double mLatitude;
     private double mLongitude;
 
+    private String mWorkAddress;
+
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
     private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
@@ -697,6 +699,10 @@ public class Preferences implements LocationListener {
     public void setLongitude(double mLongitude) {
         this.mLongitude = mLongitude;
     }
+
+    public String getWorkAddress() { return mWorkAddress; }
+
+    public void setWorkAddress(String mWorkAddress) { this.mWorkAddress = mWorkAddress;}
 
     // Location Listener Implementation
     @Override

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/fb_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Facebook" />
+
+    <EditText
+        android:id="@+id/fb_username"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fb_title"
+        android:hint="Email"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/fb_password"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fb_username"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+    <TextView
+        android:id="@+id/twitter_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fb_password"
+        android:text="Twitter" />
+
+    <EditText
+        android:id="@+id/twitter_username"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/twitter_title"
+        android:hint="Username"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/twitter_password"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/twitter_username"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+    <TextView
+        android:id="@+id/google_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/twitter_password"
+        android:text="Google Account" />
+
+    <TextView
+        android:id="@+id/work_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/google_account"
+        android:text="Work Location" />
+
+    <EditText
+        android:id="@+id/work_location"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/work_title"
+        android:hint="Address"
+        android:inputType="text"/>
+
+    <Button
+        android:id="@+id/submit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/work_location"
+        android:text="Submit"
+        android:onClick="startMain"/>
+
+
+</RelativeLayout>

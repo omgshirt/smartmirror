@@ -20,8 +20,7 @@ public class TrafficFragment extends Fragment {
     private Preferences mPreference;
     private String mCurrentLat;
     private String mCurrentLong;
-    private String mWorkLat;
-    private String mWorkLong;
+    private String mWorkAddress;
     private TextView txtDistance;
     private TextView txtTravelTime;
 
@@ -33,14 +32,7 @@ public class TrafficFragment extends Fragment {
         mPreference = Preferences.getInstance(getActivity());
         mCurrentLat = Double.toString(mPreference.getLatitude());
         mCurrentLong = Double.toString(mPreference.getLongitude());
-
-        //csun
-        mWorkLat = "34.2370851";
-        mWorkLong = "-118.5272547";
-
-        //somewhere in la
-        //mWorkLat = "34.051144";
-        //mWorkLong = "-118.2366286";
+        mWorkAddress = (mPreference.getWorkAddress());
     }
 
     @Override
@@ -66,7 +58,7 @@ public class TrafficFragment extends Fragment {
         if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
             distanceMatrixUnit = "imperial";
         }
-        updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
+        updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkAddress, distanceMatrixUnit, distanceMatrixKey));
 
     }
 
@@ -85,7 +77,13 @@ public class TrafficFragment extends Fragment {
             double tripTime = Double.parseDouble(splitString(data.getJSONObject("duration").getString("text")));
             double tripTimeTraffic = Double.parseDouble(splitString(data.getJSONObject("duration_in_traffic").getString("text")));
             double tripDistance = Double.parseDouble(splitString(data.getJSONObject("distance").getString("text")));
-            double delay = tripTimeTraffic - tripTime;
+            double tripCost = tripTimeTraffic - tripTime;
+
+            String trafficFlow = "faster";
+            if ((tripTimeTraffic - tripTime) < 0) {
+                tripCost = Math.abs(tripTimeTraffic - tripTime);
+                trafficFlow = "slower";
+            }
 
             String units = "kilometers";
             if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
@@ -93,7 +91,7 @@ public class TrafficFragment extends Fragment {
             }
 
             txtDistance.setText("Distance: " + tripDistance + " " + units);
-            txtTravelTime.setText("Travel Time: " + tripTime + " minutes (" + delay + " minute delay)");
+            txtTravelTime.setText("Travel Time: " + tripTime + " minutes (" + tripCost + " minute(s) " + trafficFlow + ".)");
         } catch (JSONException e) {
             e.printStackTrace();
         }
