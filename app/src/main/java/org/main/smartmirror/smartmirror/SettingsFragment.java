@@ -20,7 +20,6 @@ import android.widget.Switch;
 public class SettingsFragment extends Fragment {
 
     private Preferences mPreferences;
-    private RadioGroup grpSpeechFreqGroup;
     private RadioGroup grpAppBrightness;
     private RadioGroup grpLightBrightness;
     private RadioGroup grpSysVolume;
@@ -135,40 +134,6 @@ public class SettingsFragment extends Fragment {
             grpSpeechVolume.check(R.id.mus_vol_high);
         } else if (vol == Preferences.VOL_VHIGH) {
             grpSpeechVolume.check(R.id.mus_vol_vhigh);
-        }
-
-            // Speech Frequency radio group
-        grpSpeechFreqGroup = (RadioGroup) view.findViewById(R.id.speech_frequency_group);
-        grpSpeechFreqGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.speech_never:
-                        mPreferences.setSpeechFrequency(Preferences.SPEECH_NEVER);
-                        break;
-                    case R.id.speech_rare:
-                        mPreferences.setSpeechFrequency(Preferences.SPEECH_RARE);
-                        break;
-                    case R.id.speech_often:
-                        mPreferences.setSpeechFrequency(Preferences.SPEECH_OFTEN);
-                        break;
-                    case R.id.speech_always:
-                        mPreferences.setSpeechFrequency(Preferences.SPEECH_ALWAYS);
-                        break;
-                }
-            }
-        });
-
-        // select the proper radio button based on current setting
-        float freq = mPreferences.getSpeechFrequency();
-        if (freq == Preferences.SPEECH_NEVER) {
-            grpSpeechFreqGroup.check(R.id.speech_never);
-        } else if (freq == Preferences.SPEECH_RARE) {
-            grpSpeechFreqGroup.check(R.id.speech_rare);
-        } else if (freq == Preferences.SPEECH_OFTEN) {
-            grpSpeechFreqGroup.check(R.id.speech_often);
-        } else if (freq == Preferences.SPEECH_ALWAYS) {
-            grpSpeechFreqGroup.check(R.id.speech_always);
         }
 
         // Handle App Brightness radio group

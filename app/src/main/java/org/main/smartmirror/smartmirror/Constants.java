@@ -150,9 +150,6 @@ public class Constants {
             Preferences.CMD_SPEECH_LOW, Preferences.CMD_SPEECH_MEDIUM,
             Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH,
 
-            Preferences.CMD_SPEECH_RARE,
-            Preferences.CMD_SPEECH_FREQUENT, Preferences.CMD_SPEECH_ALWAYS,
-
             Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
             Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
             Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC

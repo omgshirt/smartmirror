@@ -1,6 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class CalendarUtil extends Activity {
+public class CalendarUtil {
 
     public static String DateToStr;
 
