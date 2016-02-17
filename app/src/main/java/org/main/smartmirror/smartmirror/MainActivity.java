@@ -981,7 +981,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 try {
-                    mTTSHelper.speakText(phrase);
+                    mTTSHelper.start(phrase);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
