@@ -34,7 +34,12 @@
         android:id="@+id/txtTwitterFragTitle"
         android:layout_gravity="center_horizontal" />
 
-    <ScrollView
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_twitter" />
+
+    <!--<ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/scrollView3" >
@@ -255,7 +260,7 @@
             </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
+    </ScrollView>-->
 
 
     <!--    <TextView

@@ -26,7 +26,10 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
     public static String TWITTER_ACCESS_TOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
     public static String TWITTER_ACCESS_SECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
     public static String accToken;
-
+    private AccessToken accessToken;
+    Twitter twitter;
+    List<twitter4j.Status> statuses;
+    Paging paging;
 
     @Override
     protected String doInBackground(String[] params) {
@@ -45,13 +48,13 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     //.setOAuthAccessTokenSecret(TwitterActivity.mAuthToken);
 
 
-            AccessToken accessToken = new AccessToken(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET);
+            accessToken = new AccessToken(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET);
             accToken = accessToken.toString();
-            Twitter twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
+            twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
 
             // pulling tweets commented out for now
-            Paging paging = new Paging(5); // MAX 200 IN ONE CALL
-            List<twitter4j.Status> statuses = twitter.getHomeTimeline(paging);
+            paging = new Paging(5); // MAX 200 IN ONE CALL
+            statuses = twitter.getHomeTimeline(paging);
 
             try {
 
@@ -70,8 +73,9 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
 
             } catch (Exception e) {
-                Log.i("TWITTER JSON Parse ", "Didnt work");
+                Log.i("TWITTER Parse ", "Didnt work");
             }
+
         }catch (Exception e) {
             Log.i("ERR ", "Something's not right");
 
@@ -84,6 +88,8 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String message) {
+
+
 
     }
 

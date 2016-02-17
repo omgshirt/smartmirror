@@ -1,6 +1,7 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,8 +16,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +29,8 @@ import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.tweetui.TweetView;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -67,6 +72,13 @@ public class TwitterFragment extends Fragment {
     public static String mUserAt[] = new String[100];
     public static Uri mUrl[] = new Uri[100]; // profile image url
 
+    private ListView twitterFeed;
+
+    ArrayList<String> users = new ArrayList<String>();
+    ArrayList<String> tweets = new ArrayList<String>();
+    ArrayAdapter<String> userAdapter;
+    ArrayAdapter<String> tweetAdapter;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
@@ -79,7 +91,7 @@ public class TwitterFragment extends Fragment {
         mTwitterLogin = (Button)view.findViewById(R.id.toLogin);
         mTwitterGet = (Button)view.findViewById(R.id.pullTweets);
 
-        mStatus1 = (TextView)view.findViewById(R.id.status1);
+        /*mStatus1 = (TextView)view.findViewById(R.id.status1);
         mStatus2 = (TextView)view.findViewById(R.id.status2);
         mStatus3 = (TextView)view.findViewById(R.id.status3);
         mStatus4 = (TextView)view.findViewById(R.id.status4);
@@ -113,7 +125,20 @@ public class TwitterFragment extends Fragment {
         mStatus8.setText("");
         mStatus9.setText("");
         mStatus10.setText("");
-        mStatus11.setText("");
+        mStatus11.setText("");*/
+
+
+
+        //int i = 2;
+        //adapter = new ArrayAdapter<String>(getActivity(),i);
+        /*for (int i = 0; i < 8; i++) {
+            adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, mUser[i]);
+            twitterFeed.setAdapter(adapter);
+        }*/
+
+        twitterFeed = (ListView)view.findViewById(R.id.list_twitter);
+
+
 
 
         mTwitterLogin.setOnClickListener(new View.OnClickListener() {
@@ -176,26 +201,6 @@ public class TwitterFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
-    /*public void showTweets(int tw) {
-
-        final ViewGroup parentView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
-        long tweetIds[] = {631879971628183552L, 503435417459249153L, 510908133917487104L, 473514864153870337L, 477788140900347904L};
-        long currentTweet = tweetIds[tw];
-        *//*TweetUtils.loadTweet(currentTweet, new Callback<TwitterTweet>() {
-            @Override
-            public void success(Result<TwitterTweet> result) {
-                //tweetView = new TweetView(getActivity(), result.data);
-                //parentView.addView(tweetView);
-            }
-
-            @Override
-            public void failure(TwitterException exception) {
-                Log.d("TwitterKit", "Load TwitterTweet failure", exception);
-            }
-        });*//*
-    }*/
-
-
     private void pullTweets(final String query){
         new Thread(){
             public void run(){
@@ -227,6 +232,8 @@ public class TwitterFragment extends Fragment {
     }
 
 
+
+
     public void twitterAsync() {
         new TwitterASyncTask().execute();
 
@@ -236,14 +243,25 @@ public class TwitterFragment extends Fragment {
             Thread.currentThread().interrupt();
         }
 
-        /* do this once you build txtListTweets
-        for (int i=0; i <= 10; i++) {
-            String txt = "<b>" + Constants.mUser[i] + "</b> " + "<br>" + Constants.mStatus[i] + "<br>";
+        // do this once you build txtListTweets
+        /*for (int i=0; i <= 10; i++) {
+            String txt = "<b>" + mUser[i] + "</b> " + "<br>" + mStatus[i] + "<br>";
             txtListTweets.get(i).setText(Html.fromHtml(txt));
-        }
-        */
+        }*/
+        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+        try {
+            for(int i = 0; i < 6; i++){
+                CustomObject co = new CustomObject(mUser[i],mStatus[i]);
+                objects.add(co);
+            }
 
-        String txt0 = "<b>" + mUser[0] + "</b> " + "<br>" + mStatus[0] + "<br>";
+            CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
+            twitterFeed.setAdapter(customAdapter);
+        } catch (Exception e) {}
+
+
+
+        /*String txt0 = "<b>" + mUser[0] + "</b> " + "<br>" + mStatus[0] + "<br>";
         mStatus1.setText(Html.fromHtml(txt0));
         Picasso.with(getContext()).load(mUrl[0]).fit().centerInside().into(mPP1);
 
@@ -285,7 +303,7 @@ public class TwitterFragment extends Fragment {
 
         String txt10 = "<b>" + mUser[10] + "</b> " + "<br>" + mStatus[10] + "<br>";
         mStatus11.setText(Html.fromHtml(txt10));
-        Picasso.with(getContext()).load(mUrl[10]).fit().centerInside().into(mPP11);
+        Picasso.with(getContext()).load(mUrl[10]).fit().centerInside().into(mPP11);*/
     }
 
 }
