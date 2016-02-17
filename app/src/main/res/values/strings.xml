@@ -94,7 +94,7 @@
     <string name="cmd_voice_recognition_off">I\'ll ignore you</string>
     <string name="cmd_voice_recognition_off_err">I\'m still ignoring you</string>
     <string name="cmd_stay_awake">I\'ll stay awake. Say \'sleep\' to cancel.</string>
-    <string name="cmd_stay_awake_err">I\'m already awake until you say \'sleep\'.</string>
+    <string name="cmd_stay_awake_err">I\'m staying awake until you say \'sleep\'.</string>
     <string name="cmd_remote_on">Remote control on</string>
     <string name="cmd_remote_off">Remote control off</string>
     <string name="cmd_camera_on">Camera on</string>

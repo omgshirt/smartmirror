@@ -21,6 +21,8 @@ public class Constants {
     public static final String MAXIMIZE = "maximize";
     public static final String MENU = "menu";
     public static final String MINIMIZE = "minimize";
+    public static final String MIRA_WAKE = "mira wake";
+    public static final String MIRA_SLEEP = "mira sleep";
     public static final String OPEN_WINDOW = "open window";
     public static final String OPTIONS = "options";
     public static final String SCROLL_UP = "scroll up";
@@ -116,7 +118,8 @@ public class Constants {
             FORECAST, FOUR, FULL_SCREEN, GALLERY,
             GO_BACK, GO_TO_SLEEP, HELP, HIDE_TIME,
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
-            MEDIA, MENU, MINIMIZE, NIGHT_LIGHT,
+            MEDIA, MENU, MINIMIZE,
+            MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,
             NEWS, NINE, NINTH, ONE,
             OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
             SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,

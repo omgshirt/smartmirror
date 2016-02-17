@@ -43,6 +43,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,9 +74,9 @@ public class MainActivity extends AppCompatActivity
     private Mira mira;
 
     // Conent Frames
-    private FrameLayout contentFrame1;
-    private FrameLayout contentFrame2;
-    private FrameLayout contentFrame3;
+    private ViewGroup contentFrame1;
+    private ViewGroup contentFrame2;
+    private ViewGroup contentFrame3;
 
     // FrameSize maintains the size of the content window between state changes
     private int frame1Size = View.VISIBLE;
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity
          frame2 = help
          frame3 = data / variable
         */
-        contentFrame1 = (FrameLayout)findViewById(R.id.content_frame_1);
+        contentFrame1 = (LinearLayout)findViewById(R.id.content_frame_1);
         contentFrame2 = (FrameLayout)findViewById(R.id.content_frame_2);
         contentFrame3 = (FrameLayout)findViewById(R.id.content_frame_3);
 
@@ -658,7 +659,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public boolean commandWakesFromSleep(String command) {
-        return (command.equals(Constants.WAKE) || command.equals(Constants.NIGHT_LIGHT));
+        return (command.equals(Constants.WAKE)
+                || command.equals(Constants.NIGHT_LIGHT)
+                || command.equals(Constants.MIRA_WAKE));
     }
 
     /**
@@ -807,6 +810,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.SLEEP:
             case Constants.GO_TO_SLEEP:
+            case Constants.MIRA_SLEEP:
                 enterLightSleep();
                 command = mCurrentFragment;
                 break;
