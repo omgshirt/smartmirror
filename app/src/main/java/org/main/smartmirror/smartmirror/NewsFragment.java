@@ -304,12 +304,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 case Constants.EIGHTH:
                     toNewsBodyFragment(7);
                     break;
-                /*default:
-                    if(message.contains(Constants.HELP) || message.contains(Constants.HIDE)) {
-                        txtNewsDesk.setText(mNewsSection.toUpperCase());
-                    }
-                    Log.d("News", "Got message:\"" + message + "\"");
-                    break;*/
+                default:
+                    txtNewsDesk.setText(mNewsSection.toUpperCase());
+
             }
             if(message.contains(Constants.SCROLL_DOWN))
                 mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
