@@ -1,7 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
 import android.app.KeyguardManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +11,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
-import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDeviceList;
-import android.net.wifi.p2p.WifiP2pInfo;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,42 +36,35 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, SensorEventListener,
-        NewsFragment.ArticleSelectedListener {
+        SensorEventListener,NewsFragment.ArticleSelectedListener {
 
     // Globals, prefs, debug flags
     public static final boolean DEBUG = true;
     private static Context mContext;
     private Preferences mPreferences;
 
-    // Mirror state
-    public static final int ASLEEP = 0;
-    public static final int LIGHT_SLEEP = 1;
-    public static final int AWAKE = 2;
-
     // Mira
     private Mira mira;
 
-    // Conent Frames
+    // Content Frames
     private ViewGroup contentFrame1;
     private ViewGroup contentFrame2;
     private ViewGroup contentFrame3;
+
+    // Set initial fragments & track displayed views
+    private String mInitialFragment = Constants.NEWS;
+    private String mCurrentFragment;
 
     // FrameSize maintains the size of the content window between state changes
     private int frame1Size = View.VISIBLE;
@@ -91,12 +79,14 @@ public class MainActivity extends AppCompatActivity
     private final long LIGHT_WAKE_DELAY = 4000;   // time delay before screen will wake due to light changes
     private RecentLightValues mRecentLightValues;
 
+    // Mirror state
+    public static final int ASLEEP = 0;
+    public static final int LIGHT_SLEEP = 1;
+    public static final int AWAKE = 2;
+
     // Sleep state & wakelocks
-    // mirrorSleepState can be ASLEEP, LIGHT_SLEEP or AWAKE
     private int mirrorSleepState;
     private int defaultScreenTimeout;
-    private String mInitialFragment = Constants.CALENDAR;
-    private String mCurrentFragment;
     private final int WAKELOCK_TIMEOUT = 100;            // Wakelock should be held only briefly to trigger screen wake
     private PowerManager.WakeLock mWakeLock;
     private Timer mUITimer;
@@ -105,20 +95,13 @@ public class MainActivity extends AppCompatActivity
     private final int SLEEP_DELAY = 5000;                           // Timeout for lightSleep -> sleep transition
     private PowerManager mPowerManager;
 
-    // WiFiP2p
-    private WifiP2pManager mWifiManager;
-    private WifiP2pManager.Channel mWifiChannel;
-    private WifiP2pDeviceList mWifiDeviceList;
-    private WifiP2pInfo mWifiInfo;
-    private BroadcastReceiver mWifiReceiver;
-    private IntentFilter mWifiIntentFilter;
-    private RemoteServerAsyncTask mServerTask;
-    public final static int PORT = 8888;
-    public final static int SOCKET_TIMEOUT = 500;
-    private ScheduledFuture<?> wifiHeartbeat;
-
     // TTS
     private TTSHelper mTTSHelper;
+
+    // NSD
+    NsdHelper mNsdHelper;
+    private Handler mRemoteHandler;
+    private RemoteConnection mRemoteConnection;
 
     // Speech recognition
     private Messenger mMessenger = new Messenger(new IHandler());
@@ -137,7 +120,7 @@ public class MainActivity extends AppCompatActivity
     };
 
     // used to establish a service connection
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mVoiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = new Messenger(service);
@@ -177,6 +160,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public class RemoteHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            String command = msg.getData().getString("msg");
+            handleRemoteCommand(command);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,12 +196,6 @@ public class MainActivity extends AppCompatActivity
         contentFrame2 = (ViewGroup)findViewById(R.id.content_frame_2);
         contentFrame3 = (ViewGroup)findViewById(R.id.content_frame_3);
 
-
-        // Remote control
-        initializeWifiP2P();
-        discoverWifiP2pPeers();
-        mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
-
         initializeLightSensor();
 
         // TextToSpeech (TTS) init
@@ -233,6 +218,14 @@ public class MainActivity extends AppCompatActivity
             startActivity(gAccPick);
         }
         Log.i(Constants.TAG, mPreferences.getUserAccountName() + " TESTING ONCREATE");
+
+        // Start Network Discovery Service (NSD) & create handler
+        mRemoteHandler = new RemoteHandler();
+        mRemoteConnection = new RemoteConnection(mRemoteHandler);
+        mNsdHelper = new NsdHelper(this);
+        mNsdHelper.initializeNsd();
+        registerNsdService();
+
 
         // speech icon turn it off for now
         mSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
@@ -260,14 +253,6 @@ public class MainActivity extends AppCompatActivity
         //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
         //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         decorView.setSystemUiVisibility(uiOptions);
-        /*
-        try {
-            //noinspection ConstantConditions
-            getSupportActionBar().hide();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        */
     }
 
     private void checkMarshmallowPermissions() {
@@ -300,7 +285,7 @@ public class MainActivity extends AppCompatActivity
 
         mirrorSleepState = AWAKE;
 
-        mIsBound = bindService(new Intent(this, VoiceService.class), mConnection, BIND_AUTO_CREATE);
+        mIsBound = bindService(new Intent(this, VoiceService.class), mVoiceConnection, BIND_AUTO_CREATE);
         addScreenOnFlag();
         resetInteractionTimer();
 
@@ -308,11 +293,14 @@ public class MainActivity extends AppCompatActivity
             mPreferences.resetScreenBrightness();
         }
 
+        // start NSD
+        if (mNsdHelper != null) {
+            mNsdHelper.discoverServices();
+        }
+
         mPreferences.setVolumesToPrefValues();
-        stopWifiHeartbeat();
         stopLightSensor();
         startSpeechRecognition();
-        registerReceiver(mWifiReceiver, mWifiIntentFilter);
 
         // on first load show initialFragment
         if (mCurrentFragment == null || mCurrentFragment == Constants.CALENDAR) { //Temporary Fix TODO: Fix
@@ -333,12 +321,16 @@ public class MainActivity extends AppCompatActivity
             mPreferences.setVolumesToSystemValues();
             setDefaultScreenOffTimeout();
         } else {
-            // Otherwise the screen is turning off: start Light Sensor and maintain Wifi connection
-            startWifiHeartbeat();
+            // Otherwise the screen is turning off: start Light Sensor
             startLightSensor();
         }
         stopUITimer();
-        unregisterReceiver(mWifiReceiver);
+
+        // stop NSD. This will prevent discovery while sleeping....
+        if (mNsdHelper != null) {
+            mNsdHelper.stopDiscovery();
+        }
+
     }
 
     @Override
@@ -355,11 +347,11 @@ public class MainActivity extends AppCompatActivity
         mMessenger = null;
         mPreferences.destroy();
         CacheManager.destroy();
-        if (wifiHeartbeat != null) {
-            wifiHeartbeat.cancel(true);
-            wifiHeartbeat = null;
-        }
-        unbindService(mConnection);
+
+        mNsdHelper.tearDown();
+        mRemoteConnection.tearDown();
+
+        unbindService(mVoiceConnection);
         mIsBound = false;
         Log.i(Constants.TAG, "onDestroy");
     }
@@ -1004,19 +996,14 @@ public class MainActivity extends AppCompatActivity
         return (mTTSHelper != null && mTTSHelper.isSpeaking());
     }
 
-    // ------------------------------  WIFI P2P  ----------------------------------
-
-    /**
-     * Create
-     */
-    private void initializeWifiP2P() {
-        mWifiIntentFilter = new IntentFilter();
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mWifiIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mWifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mWifiChannel = mWifiManager.initialize(this, getMainLooper(), null);
+    // --------------------------- REMOTE CONTROL -----------------------------
+    
+    public void registerNsdService() {
+        if (mRemoteConnection.getLocalPort() > -1) {
+            mNsdHelper.registerService(mRemoteConnection.getLocalPort());
+        } else {
+            Log.d(Constants.TAG, "ServerSocket isn't bound.");
+        }
     }
 
     /**
@@ -1025,6 +1012,7 @@ public class MainActivity extends AppCompatActivity
      * @param command String: received command
      */
     public void handleRemoteCommand(String command) {
+        Log.i(Constants.TAG, "remote msg :: " + command);
         if (mPreferences.isRemoteEnabled())
             wakeScreenAndDisplay(command);
         else {
@@ -1033,97 +1021,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    // calls the P2pManager to refresh peer list
-    public void discoverWifiP2pPeers() {
-        mWifiManager.discoverPeers(mWifiChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                if (DEBUG)
-                    Log.i(Constants.TAG, "Peer discovery successful");
-            }
-
-            @Override
-            public void onFailure(int reasonCode) {
-                if (DEBUG)
-                    Log.i(Constants.TAG, "discoverWifiP2pPeers failed: " + reasonCode);
-            }
-        });
-    }
-
-    // Interface passes back a device list when the peer list changes, or discovery is successful
-    @Override
-    public void onPeersAvailable(WifiP2pDeviceList peers) {
-        mWifiDeviceList = peers;
-    }
-
-
-    /**
-     * called when a connection is made to this device
-     *
-     * @param info response info
-     */
-    @Override
-    public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-        // make this the group owner and start the server to listen for commands
-        if (DEBUG)
-            Log.i(Constants.TAG, "Connection info: " + info.toString());
-        mWifiInfo = info;
-        WifiP2pConfig config = new WifiP2pConfig();
-        config.groupOwnerIntent = 15;
-        if (info.groupFormed && info.isGroupOwner) {
-            if (DEBUG)
-                Log.i(Constants.TAG, "onConnectionInfo is starting server...");
-            startRemoteServer();
-        } else if (info.groupFormed) {
-            Log.i(Constants.TAG, "group exists, mirror is not owner");
-        }
-    }
-
-    /**
-     * Enables or disables WifiP2P connections to the mirror. This should not be called directly,
-     * but through Preferences.setRemoteEnabled()
-     *
-     * @param isEnabled service state: enabled or disabled
-     */
-    public void setRemoteStatus(boolean isEnabled) {
-        if (isEnabled) {
-            // if there's a connection established, ignore
-            // otherwise, start peer discovery.
-            discoverWifiP2pPeers();
-        } else {
-            // if a connection exists, cancel and refuse further
-            mServerTask.cancel(true);
-        }
-    }
-
-    // Start a server socket: this will listen to commands from the remote control
-    public void startRemoteServer() {
-        mServerTask = new RemoteServerAsyncTask(this);
-        mServerTask.execute();
-    }
-
-    // Start a thread that keeps the wifip2p connection alive by performing network discovery.
-    public void startWifiHeartbeat() {
-        ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
-                Executors.newScheduledThreadPool(1);
-
-        final Runnable heartbeatTask = new Runnable() {
-            @Override
-            public void run() {
-                discoverWifiP2pPeers();
-                Log.i(Constants.TAG, "Heartbeat: discoverWifiP2pPeers()");
-            }
-        };
-        wifiHeartbeat = scheduler.scheduleAtFixedRate(heartbeatTask, 360, 360,
-                TimeUnit.SECONDS);
-    }
-
-    // Stop the heartbeat thread
-    public void stopWifiHeartbeat() {
-        if (wifiHeartbeat != null) {
-            wifiHeartbeat.cancel(true);
-        }
-    }
 
     // --------------------------- LIGHT SENSOR --------------------------------------
 

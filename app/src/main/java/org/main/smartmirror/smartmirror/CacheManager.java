@@ -41,7 +41,7 @@ public class CacheManager {
             @Override
             public void run() {
                 checkCacheExpiration();
-                Log.i(Constants.TAG, "CacheManager: checking for expired caches");
+                //Log.i(Constants.TAG, "CacheManager: checking for expired caches");
             }
         };
 

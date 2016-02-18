@@ -25,7 +25,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         this.mChannel = channel;
         this.mActivity = activity;
 
-        mPeerListListener = activity;
+        //mPeerListListener = activity;
     }
 
     @Override
@@ -67,10 +67,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 // we are connected with the other device, request connection
                 // info to find group owner IP
                 mActivity.showToast("Remote Connected", Toast.LENGTH_SHORT);
-                mManager.requestConnectionInfo(mChannel, mActivity);
+                //mManager.requestConnectionInfo(mChannel, mActivity);
             } else {
                 mActivity.showToast("Cannot Connect to Remote", Toast.LENGTH_SHORT);
-                mActivity.discoverWifiP2pPeers();
+                //mActivity.discoverWifiP2pPeers();
             }
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {

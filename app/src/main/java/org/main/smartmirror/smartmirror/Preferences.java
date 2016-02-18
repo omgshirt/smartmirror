@@ -23,7 +23,7 @@ import android.util.Log;
  *
  * This is a singleton class to hold preferences for the application
  * Get the instance of it by using the getInstance() method
- *
+
  * Class is created at MainActivity start and loads the SharedPrefences for the application
  * Access is by getters and setters, which also handle file storage:
  */
@@ -602,7 +602,6 @@ public class Preferences implements LocationListener {
     public void setRemoteEnabled(boolean isEnabled) {
         try {
             mRemoteEnabled = isEnabled;
-            ((MainActivity)mActivity).setRemoteStatus(mRemoteEnabled);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
             edit.apply();
