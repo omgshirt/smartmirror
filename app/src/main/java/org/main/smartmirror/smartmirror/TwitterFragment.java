@@ -251,7 +251,7 @@ public class TwitterFragment extends Fragment {
         ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
         try {
             for(int i = 0; i < 6; i++){
-                CustomObject co = new CustomObject(mUser[i],mStatus[i]);
+                CustomObject co = new CustomObject(mUser[i],mStatus[i],mUrl[i]);
                 objects.add(co);
             }
 
