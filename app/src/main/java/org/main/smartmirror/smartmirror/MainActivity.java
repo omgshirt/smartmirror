@@ -206,10 +206,11 @@ public class MainActivity extends AppCompatActivity
         contentFrame3 = (ViewGroup)findViewById(R.id.content_frame_3);
 
 
-        // Remote control and Light Sensor Init
+        // Remote control
         initializeWifiP2P();
         discoverWifiP2pPeers();
         mWifiReceiver = new WiFiDirectBroadcastReceiver(mWifiManager, mWifiChannel, this);
+
         initializeLightSensor();
 
         // TextToSpeech (TTS) init
@@ -403,6 +404,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void exitLightSleep() {
+
         restoreContentFrameVisibility();
         setDefaultScreenOffTimeout();
         addScreenOnFlag();
@@ -414,7 +416,6 @@ public class MainActivity extends AppCompatActivity
     protected void enterLightSleep() {
 
         mirrorSleepState = LIGHT_SLEEP;
-
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
         resetInteractionTimer();
 
