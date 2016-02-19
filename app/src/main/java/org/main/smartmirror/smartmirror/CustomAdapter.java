@@ -1,8 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Created by harout on 2/17/16.
@@ -62,10 +55,12 @@ public class CustomAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.header.setText(objects.get(position).getProp1());
-        holder.snippet.setText(objects.get(position).getProp2());
-        //holder.thumbnail.setImageURI(objects.get(position).getProp3());
-        Picasso.with(context).load(objects.get(position).getProp3()).fit().centerInside().into(holder.thumbnail);
+        try {
+            holder.header.setText(objects.get(position).getProp1());
+            holder.snippet.setText(objects.get(position).getProp2());
+            Picasso.with(context).load(objects.get(position).getProp3()).fit().centerInside().into(holder.thumbnail);
+        } catch (Exception e) {}
+
 
         return convertView;
     }

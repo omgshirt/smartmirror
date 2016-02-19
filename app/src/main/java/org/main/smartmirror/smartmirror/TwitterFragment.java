@@ -31,38 +31,16 @@ import com.twitter.sdk.android.tweetui.TweetView;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 import io.fabric.sdk.android.Fabric;
 
 public class TwitterFragment extends Fragment {
 
-    int mTweetNumber = 0;
-    TweetView mTweetView;
     Handler mHandler = new Handler();
 
-    private TextView mStatus1;
-    private TextView mStatus2;
-    private TextView mStatus3;
-    private TextView mStatus4;
-    private TextView mStatus5;
-    private TextView mStatus6;
-    private TextView mStatus7;
-    private TextView mStatus8;
-    private TextView mStatus9;
-    private TextView mStatus10;
-    private TextView mStatus11;
-
-    private ImageView mPP1;
-    private ImageView mPP2;
-    private ImageView mPP3;
-    private ImageView mPP4;
-    private ImageView mPP5;
-    private ImageView mPP6;
-    private ImageView mPP7;
-    private ImageView mPP8;
-    private ImageView mPP9;
-    private ImageView mPP10;
-    private ImageView mPP11;
+    Handler mTimerHandler = new Handler();
+    int mDelay = 61000; //milliseconds
 
     private Button mTwitterLogin;
     private Button mTwitterGet;
@@ -72,12 +50,12 @@ public class TwitterFragment extends Fragment {
     public static String mUserAt[] = new String[100];
     public static Uri mUrl[] = new Uri[100]; // profile image url
 
-    private ListView twitterFeed;
+    public static ListView twitterFeed;
 
-    ArrayList<String> users = new ArrayList<String>();
-    ArrayList<String> tweets = new ArrayList<String>();
-    ArrayAdapter<String> userAdapter;
-    ArrayAdapter<String> tweetAdapter;
+    public static ArrayList<String> mUsers = new ArrayList<String>();
+    public static ArrayList<String> mTweets = new ArrayList<String>();
+    public static ArrayList<String> mUsersAt = new ArrayList<String>();
+    public static ArrayList<Uri> mUri = new ArrayList<Uri>();
 
 
     @Override
@@ -91,55 +69,10 @@ public class TwitterFragment extends Fragment {
         mTwitterLogin = (Button)view.findViewById(R.id.toLogin);
         mTwitterGet = (Button)view.findViewById(R.id.pullTweets);
 
-        /*mStatus1 = (TextView)view.findViewById(R.id.status1);
-        mStatus2 = (TextView)view.findViewById(R.id.status2);
-        mStatus3 = (TextView)view.findViewById(R.id.status3);
-        mStatus4 = (TextView)view.findViewById(R.id.status4);
-        mStatus5 = (TextView)view.findViewById(R.id.status5);
-        mStatus6 = (TextView)view.findViewById(R.id.status6);
-        mStatus7 = (TextView)view.findViewById(R.id.status7);
-        mStatus8 = (TextView)view.findViewById(R.id.status8);
-        mStatus9 = (TextView)view.findViewById(R.id.status9);
-        mStatus10 = (TextView)view.findViewById(R.id.status10);
-        mStatus11 = (TextView)view.findViewById(R.id.status11);
-
-        mPP1 = (ImageView)view.findViewById(R.id.pp1);
-        mPP2 = (ImageView)view.findViewById(R.id.pp2);
-        mPP3 = (ImageView)view.findViewById(R.id.pp3);
-        mPP4 = (ImageView)view.findViewById(R.id.pp4);
-        mPP5 = (ImageView)view.findViewById(R.id.pp5);
-        mPP6 = (ImageView)view.findViewById(R.id.pp6);
-        mPP7 = (ImageView)view.findViewById(R.id.pp7);
-        mPP8 = (ImageView)view.findViewById(R.id.pp8);
-        mPP9 = (ImageView)view.findViewById(R.id.pp9);
-        mPP10 = (ImageView)view.findViewById(R.id.pp10);
-        mPP11 = (ImageView)view.findViewById(R.id.pp11);
-
-        mStatus1.setText("");
-        mStatus2.setText("");
-        mStatus3.setText("");
-        mStatus4.setText("");
-        mStatus5.setText("");
-        mStatus6.setText("");
-        mStatus7.setText("");
-        mStatus8.setText("");
-        mStatus9.setText("");
-        mStatus10.setText("");
-        mStatus11.setText("");*/
-
-
-
-        //int i = 2;
-        //adapter = new ArrayAdapter<String>(getActivity(),i);
-        /*for (int i = 0; i < 8; i++) {
-            adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, mUser[i]);
-            twitterFeed.setAdapter(adapter);
-        }*/
 
         twitterFeed = (ListView)view.findViewById(R.id.list_twitter);
 
-
-
+        twitterAsync();
 
         mTwitterLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,8 +88,20 @@ public class TwitterFragment extends Fragment {
             }
         });
 
+
+
+        mTimerHandler.postDelayed(new Runnable(){
+            public void run(){
+                System.out.println("TIMER EXPIRED UPDATING TWITTER");
+                twitterAsync();
+                mTimerHandler.postDelayed(this, mDelay);
+            }
+        }, mDelay);
+
         return view;
     }
+
+
 
     // ----------------------- Local Broadcast Receiver -----------------------
 
@@ -224,7 +169,6 @@ public class TwitterFragment extends Fragment {
             }
         }.start();
     }
-
     //to twitter login activity
     public void twitterLogin() {
         Intent intent = new Intent(getContext(), TwitterActivity.class);
@@ -232,78 +176,8 @@ public class TwitterFragment extends Fragment {
     }
 
 
-
-
     public void twitterAsync() {
         new TwitterASyncTask().execute();
-
-        try {
-            Thread.sleep(1000);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-
-        // do this once you build txtListTweets
-        /*for (int i=0; i <= 10; i++) {
-            String txt = "<b>" + mUser[i] + "</b> " + "<br>" + mStatus[i] + "<br>";
-            txtListTweets.get(i).setText(Html.fromHtml(txt));
-        }*/
-        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
-        try {
-            for(int i = 0; i < 6; i++){
-                CustomObject co = new CustomObject(mUser[i],mStatus[i],mUrl[i]);
-                objects.add(co);
-            }
-
-            CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
-            twitterFeed.setAdapter(customAdapter);
-        } catch (Exception e) {}
-
-
-
-        /*String txt0 = "<b>" + mUser[0] + "</b> " + "<br>" + mStatus[0] + "<br>";
-        mStatus1.setText(Html.fromHtml(txt0));
-        Picasso.with(getContext()).load(mUrl[0]).fit().centerInside().into(mPP1);
-
-        String txt1 = "<b>" + mUser[1] + "</b> " + "<br>" + mStatus[1] + "<br>";
-        mStatus2.setText(Html.fromHtml(txt1));
-        Picasso.with(getContext()).load(mUrl[1]).fit().centerInside().into(mPP2);
-
-        String txt2 = "<b>" + mUser[2] + "</b> " + "<br>" + mStatus[2] + "<br>";
-        mStatus3.setText(Html.fromHtml(txt2));
-        Picasso.with(getContext()).load(mUrl[2]).fit().centerInside().into(mPP3);
-
-        String txt3 = "<b>" + mUser[3] + "</b> " + "<br>" + mStatus[3] + "<br>";
-        mStatus4.setText(Html.fromHtml(txt3));
-        Picasso.with(getContext()).load(mUrl[3]).fit().centerInside().into(mPP4);
-
-        String txt4 = "<b>" + mUser[4] + "</b> " + "<br>" + mStatus[4] + "<br>";
-        mStatus5.setText(Html.fromHtml(txt4));
-        Picasso.with(getContext()).load(mUrl[4]).fit().centerInside().into(mPP5);
-
-        String txt5 = "<b>" + mUser[5] + "</b> " + "<br>" + mStatus[5] + "<br>";
-        mStatus6.setText(Html.fromHtml(txt5));
-        Picasso.with(getContext()).load(mUrl[5]).fit().centerInside().into(mPP6);
-
-        String txt6 = "<b>" + mUser[6] + "</b> " + "<br>" + mStatus[6] + "<br>";
-        mStatus7.setText(Html.fromHtml(txt6));
-        Picasso.with(getContext()).load(mUrl[6]).fit().centerInside().into(mPP7);
-
-        String txt7 = "<b>" + mUser[7] + "</b> " + "<br>" + mStatus[7] + "<br>";
-        mStatus8.setText(Html.fromHtml(txt7));
-        Picasso.with(getContext()).load(mUrl[7]).fit().centerInside().into(mPP8);
-
-        String txt8 = "<b>" + mUser[8] + "</b> " + "<br>" + mStatus[8] + "<br>";
-        mStatus9.setText(Html.fromHtml(txt8));
-        Picasso.with(getContext()).load(mUrl[8]).fit().centerInside().into(mPP9);
-
-        String txt9 = "<b>" + mUser[9] + "</b> " + "<br>" + mStatus[9] + "<br>";
-        mStatus10.setText(Html.fromHtml(txt9));
-        Picasso.with(getContext()).load(mUrl[9]).fit().centerInside().into(mPP10);
-
-        String txt10 = "<b>" + mUser[10] + "</b> " + "<br>" + mStatus[10] + "<br>";
-        mStatus11.setText(Html.fromHtml(txt10));
-        Picasso.with(getContext()).load(mUrl[10]).fit().centerInside().into(mPP11);*/
     }
 
 }

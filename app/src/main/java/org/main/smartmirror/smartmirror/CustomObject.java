@@ -2,9 +2,6 @@ package org.main.smartmirror.smartmirror;
 
 import android.net.Uri;
 
-/**
- * Created by harout on 2/17/16.
- */
 public class CustomObject {
 
     private String prop1;

@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
 
@@ -25,6 +26,8 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
     // fallback tokens, replaced once user signs in
     public static String TWITTER_ACCESS_TOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
     public static String TWITTER_ACCESS_SECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
+    /*final String TWITTER_ACCESS_TOKEN = TwitterActivity.mAuthToken;
+    final String TWITTER_ACCESS_SECRET = TwitterActivity.mAuthSecret;*/
     public static String accToken;
     private AccessToken accessToken;
     Twitter twitter;
@@ -60,14 +63,20 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
                 int i = 0;
                 for (twitter4j.Status status : statuses) {
-                    String rawJSON = TwitterObjectFactory.getRawJSON(status);
+                    //String rawJSON = TwitterObjectFactory.getRawJSON(status);
                     //String fileName = "statuses/" + status.getId() + ".json";
-                    //System.out.println(status.getUser().getName() + "\n" + status.getText());
+                    /*System.out.println(status.getUser().getName() + "\n" + status.getText());
                     TwitterFragment.mUser[i] = status.getUser().getName();
                     TwitterFragment.mStatus[i] = status.getText();
                     TwitterFragment.mUserAt[i] = status.getUser().getScreenName();
-                    System.out.println(TwitterFragment.mUser[i] + " @" + TwitterFragment.mUserAt[i] + "\n" + TwitterFragment.mStatus[i]);
-                    TwitterFragment.mUrl[i] = Uri.parse(status.getUser().getProfileImageURLHttps());
+                    TwitterFragment.mUrl[i] = Uri.parse(status.getUser().getProfileImageURLHttps());*/
+                    //System.out.println(TwitterFragment.mUser[i] + " @" + TwitterFragment.mUserAt[i] + "\n" + TwitterFragment.mStatus[i]);
+
+                    TwitterFragment.mUsers.add(i,status.getUser().getName());
+                    TwitterFragment.mTweets.add(i,status.getText());
+                    TwitterFragment.mUsersAt.add(i,status.getUser().getScreenName());
+                    TwitterFragment.mUri.add(i,Uri.parse(status.getUser().getProfileImageURLHttps()));
+
                     i++;
                 }
 
@@ -77,7 +86,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
             }
 
         }catch (Exception e) {
-            Log.i("ERR ", "Something's not right");
+            Log.i("ERR ", "Something's not right, max call limit reached");
 
         }
 
@@ -89,6 +98,16 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String message) {
 
+        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+        try {
+            for(int i = 0; i < statuses.size(); i++){
+                //CustomObject co = new CustomObject(mUser[i],mStatus[i],mUrl[i]);
+                CustomObject co = new CustomObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i));
+                objects.add(co);
+            }
+            CustomAdapter customAdapter = new CustomAdapter(MainActivity.getContextForApplication(), objects);
+            TwitterFragment.twitterFeed.setAdapter(customAdapter);
+        } catch (Exception e) {}
 
 
     }

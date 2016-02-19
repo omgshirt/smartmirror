@@ -309,9 +309,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
             }
             if(message.contains(Constants.SCROLL_DOWN))
-                mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
+                mScrollView.scrollBy(0, -(0-mScrollView.getHeight()));
             else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
+                mScrollView.scrollBy(0, 0-mScrollView.getHeight());
         }
     };
 

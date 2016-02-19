@@ -33,15 +33,13 @@ public class TwitterActivity extends Activity{
     private TwitterSession mSession;
     private long mUserID;
     public static String mScreenName;
-    private String mAuthToken;
-    private String mAuthSecret;
+    public static String mAuthToken;
+    public static String mAuthSecret;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
-        /*Fabric.with(this, new com.twitter.sdk.android.Twitter(authConfig));
-        TwitterAuthConfig authConfig =  new TwitterAuthConfig("consumerKey", "consumerSecret");*/
         Fabric.with(this, new TwitterCore(authConfig));
 
         setContentView(R.layout.twitter_login_fragment);
