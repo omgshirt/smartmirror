@@ -76,7 +76,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     private CacheManager mCacheManager = null;
     // time in seconds before weather data expires
-    private final int DATA_UPDATE_FREQUENCY = 60;
+    private final int DATA_UPDATE_FREQUENCY = 600;
     public static final String WEATHER_CACHE = "weather cache";
 
     Handler mHandler = new Handler();
@@ -164,7 +164,11 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     startWeatherUpdate();
                     break;
                 case Preferences.CMD_TIME_12HR:
+                    mPreferences.setTimeFormat12hr();
+                    updateTimeDisplay();
+                    break;
                 case Preferences.CMD_TIME_24HR:
+                    mPreferences.setTimeFormat24hr();
                     updateTimeDisplay();
                     break;
                 case Constants.HIDE_TIME:
@@ -229,6 +233,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     // Refresh time and date displays to current preference setting
     public void updateTimeDisplay() {
+        Log.i(Constants.TAG, "getTimeFormat() :: " + mPreferences.getTimeFormat());
+        Log.i(Constants.TAG, clkTextClock.getFormat12Hour().toString());
         clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
         clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
         clkDateClock.setFormat12Hour(mPreferences.getDateFormat());

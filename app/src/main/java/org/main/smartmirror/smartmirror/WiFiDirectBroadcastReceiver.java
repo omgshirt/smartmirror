@@ -39,8 +39,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 // Wifi P2P is enabled
             } else {
                 // Wi-Fi P2P is not enabled
-                String text = mActivity.getString(R.string.wifi_not_enabled);
-                mActivity.showToast(text, Toast.LENGTH_SHORT);
+                //String text = mActivity.getString(R.string.wifi_not_enabled);
+                //mActivity.showToast(text, Toast.LENGTH_SHORT);
                 Log.e("WiFi", "wifi not enabled");
             }
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {

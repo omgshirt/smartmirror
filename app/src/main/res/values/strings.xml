@@ -15,14 +15,18 @@
 
     <string name="facebook_app_id">913606198722814</string>
     <string name="facebook_app_secret">7ab77882cb36c0e7f942ebee16117444</string>
+
+    <!--
     <string name="scroll_up">Scroll Up</string>
     <string name="scroll_down">Scroll Down</string>
+    <string name="title_activity_voice__recognition">Voice_Recognition</string>
+    -->
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="results_speech">Speech Results</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_voice__recognition">Voice_Recognition</string>
+
 
     <!-- Module name (used to create Navigation Bar menu) -->
     <string name="title_calendar">Calendar</string>
@@ -72,41 +76,37 @@
     <string name="settings_weather_units">Weather Units</string>
     <string name="settings_system_vol">System Volume</string>
     <string name="settings_music_vol">Speech Volume</string>
-    <string name="settings_speech_freq">Speech Frequency</string>
-    <string name="settings_never">Never</string>
-    <string name="settings_rare">Rarely</string>
-    <string name="settings_often">Often</string>
-    <string name="settings_always">Always</string>
 
     <string name="settings_off">Off</string>
-    <string name="settings_vlow">Minimum</string>
+    <string name="settings_vlow">Min</string>
     <string name="settings_low">Low</string>
     <string name="settings_medium">Medium</string>
     <string name="settings_high">High</string>
-    <string name="settings_vhigh">Maximum</string>
+    <string name="settings_vhigh">Max</string>
 
-    <!-- WiFi P2P strings -->
-    <string name="wifi_not_enabled">Wifi Not Enabled</string>
+    <string name="voice_on">Voice Recognition: On</string>
+    <string name="voice_off">Voice Recognition: Off</string>
+
+    <string name="remote_on">Remote: On</string>
+    <string name="remote_off">Remote: Off</string>
+
+    <string name="weather_english">Weather: English</string>
+    <string name="weather_metric">Weather: Metric</string>
+
+    <string name="time_format_12hr">Time: 12-hour</string>
+    <string name="time_format_24hr">Time: 24-hour</string>
 
     <!-- Text to Speech phrases -->
-    <string name="cmd_voice_recognition_on">I\'m listening</string>
-    <string name="cmd_voice_recognition_on_err">I\'m already listening</string>
-    <string name="cmd_voice_recognition_off">I\'ll ignore you</string>
-    <string name="cmd_voice_recognition_off_err">I\'m still ignoring you</string>
-    <string name="cmd_stay_awake">I\'ll stay awake. Say \'sleep\' to cancel.</string>
-    <string name="cmd_stay_awake_err">I\'m staying awake until you say \'sleep\'.</string>
-    <string name="cmd_remote_on">Remote control on</string>
-    <string name="cmd_remote_off">Remote control off</string>
-    <string name="cmd_camera_on">Camera on</string>
-    <string name="cmd_camera_off">Camera off</string>
-    <string name="cmd_weather_english">Weather display English</string>
-    <string name="cmd_weather_metric">Weather display metric</string>
-
-    <string name="remote_off_err">The remote is disabled.</string>
-    <string name="camera_off_err">The camera is disabled.</string>
-
-    <!-- Camera String -->
-    <string name="camera_disabled_toast">Camera Disabled. Say \'Camera On\' to change this setting.</string>
-
+    <string name="speech_voice_on">I\'m listening</string>
+    <string name="speech_voice_on_err">I\'m already listening</string>
+    <string name="speech_voice_off">I\'ll ignore you</string>
+    <string name="speech_voice_off_err">I\'m still ignoring you</string>
+    <string name="speech_stay_awake">I\'ll stay awake. Say \'sleep\' to cancel.</string>
+    <string name="speech_stay_awake_err">I\'m staying awake until you say \'sleep\'.</string>
+    <string name="speech_remote_on">Remote control on</string>
+    <string name="speech_remote_off">Remote control off</string>
+    <string name="speech_weather_english">Weather display English</string>
+    <string name="speech_weather_metric">Weather display metric</string>
+    <string name="speech_remote_off_err">The remote is disabled.</string>
 
 </resources>

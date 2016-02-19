@@ -135,7 +135,6 @@ public class Constants {
             "red", "yellow", "white",
             "first", "second", "third", "fourth",
             "fifth", "sixth", "seventh", "eighth",
-            Preferences.CMD_CAMERA_OFF, Preferences.CMD_CAMERA_ON,
 
             Preferences.CMD_LIGHT_HIGH, Preferences.CMD_LIGHT_LOW,
             Preferences.CMD_LIGHT_MEDIUM, Preferences.CMD_LIGHT_VHIGH,
@@ -150,6 +149,10 @@ public class Constants {
             Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_VLOW,
             Preferences.CMD_SPEECH_LOW, Preferences.CMD_SPEECH_MEDIUM,
             Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH,
+
+            Preferences.CMD_VOLUME_OFF, Preferences.CMD_VOLUME_VLOW,
+            Preferences.CMD_VOLUME_LOW, Preferences.CMD_VOLUME_MEDIUM,
+            Preferences.CMD_VOLUME_HIGH, Preferences.CMD_VOLUME_VHIGH,
 
             Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
             Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,

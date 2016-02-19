@@ -145,7 +145,10 @@ public class MainActivity extends AppCompatActivity
         displayFragment(fragment, Constants.NEWS_BODY, true);
     }
 
-    // handles the messages from VoiceService to this Activity
+    /**
+     * handles the messages from VoiceService to this Activity
+     *
+     */
     public class IHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -160,6 +163,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Handler for receiving messages from the remote control application
+     */
     public class RemoteHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -592,19 +598,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Show a toast centered on the bottom of the screen
+     * Show a toast centered in the top center of the screen
      *
      * @param text     text to display
      * @param duration int duration: ex. Toast.LENGTH_LONG
      */
     public void showToast(String text, int duration) {
-        showToast(text, Gravity.TOP | Gravity.CENTER_HORIZONTAL, duration);
+            showToast(text, Gravity.TOP | Gravity.CENTER_HORIZONTAL, duration);
     }
 
     /**
-     * Show a toast, specifying the gravity for the display
+     * Show a toast with given gravity for duration
+     * @param text text to show
+     * @param gravity View.Gravity
+     * @param duration Toast.Duration
      */
+    @SuppressWarnings("deprecation")
     public void showToast(String text, int gravity, int duration) {
+
+        if (!mPowerManager.isScreenOn()) return;
+
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.toast_layout,
                 (ViewGroup) findViewById(R.id.toast_layout_root));
@@ -664,7 +677,7 @@ public class MainActivity extends AppCompatActivity
 
         if (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP)) {
             boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
-            Log.i(Constants.TAG,"helpIsVisible :: " + helpIsVisible);
+            Log.i(Constants.TAG, "helpIsVisible :: " + helpIsVisible);
             if (helpIsVisible) {
                 // remove HelpFragment if visible
                 removeFragment(Constants.HELP);
@@ -734,12 +747,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new CalendarFragment();
                 break;
             case Constants.CAMERA:
-                if (mPreferences.isCameraEnabled()) {
-                    fragment = new CameraFragment();
-                } else {
-                    showToast(getResources().getString(R.string.camera_disabled_toast), Toast.LENGTH_LONG);
-                    speakText(getResources().getString(R.string.camera_off_err));
-                }
+                fragment = new CameraFragment();
                 break;
             case Constants.CLOSE_SCREEN:
             case Constants.CLOSE_WINDOW:
@@ -803,9 +811,9 @@ public class MainActivity extends AppCompatActivity
             case Constants.STAY_AWAKE:
                 // Screen awake for 7 days
                 if (mInteractionTimeout == 604800000) {
-                    speakText(getResources().getString(R.string.cmd_stay_awake_err));
+                    speakText(getResources().getString(R.string.speech_stay_awake_err));
                 }else {
-                    speakText(getResources().getString(R.string.cmd_stay_awake));
+                    speakText(getResources().getString(R.string.speech_stay_awake));
                     mInteractionTimeout = 604800000;
                     resetInteractionTimer();
                 }
@@ -869,17 +877,18 @@ public class MainActivity extends AppCompatActivity
         //String voiceInput = input.trim();
         Log.i(Constants.TAG, "handleVoiceCommand:\"" + input + "\"");
 
-        if (mPowerManager.isScreenOn()) {
-            showToast(input, Toast.LENGTH_LONG);
-        }
-
         // if voice is disabled, ignore everything except "start listening" and "wake / night light" commands
         if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(input)) {
             if (input.equals(Preferences.CMD_VOICE_ON) || input.equals(Preferences.CMD_VOICE_OFF)) {
                 broadcastMessage("inputAction", input);
+            } else {
+                showToast(getResources().getString(R.string.speech_voice_off_err), Toast.LENGTH_SHORT);
             }
             return;
         }
+
+        // show the command to the user
+        showToast(input, Toast.LENGTH_SHORT);
 
         wakeScreenAndDisplay(input);
     }
