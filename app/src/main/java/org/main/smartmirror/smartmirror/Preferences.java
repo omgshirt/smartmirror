@@ -55,6 +55,8 @@ public class Preferences implements LocationListener {
     public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
     public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
 
+    public static final String PREFS_WORK_ADDRESS = "address";
+
     // chance for TTS to happen (0-1)
     public static final float SPEECH_NEVER = 0;
     public static final float SPEECH_RARE = .25f;
@@ -334,7 +336,7 @@ public class Preferences implements LocationListener {
         //Google Account Email Preferences
         mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
 
-
+        mWorkAddress = mSharedPreferences.getString(PREFS_WORK_ADDRESS, "");
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
         mMusicVolumeHolder = getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -700,9 +702,16 @@ public class Preferences implements LocationListener {
         this.mLongitude = mLongitude;
     }
 
-    public String getWorkAddress() { return mWorkAddress; }
+    public String getWorkAddress() {
+        return mWorkAddress;
+    }
 
-    public void setWorkAddress(String mWorkAddress) { this.mWorkAddress = mWorkAddress;}
+    public void setWorkAddress(String mWorkAddress) {
+        this.mWorkAddress = mWorkAddress;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_WORK_ADDRESS, mWorkAddress);
+        edit.apply();
+    }
 
     // Location Listener Implementation
     @Override

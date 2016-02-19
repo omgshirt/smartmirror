@@ -83,6 +83,8 @@ public class TrafficFragment extends Fragment {
             if ((tripTimeTraffic - tripTime) < 0) {
                 tripCost = Math.abs(tripTimeTraffic - tripTime);
                 trafficFlow = "slower";
+            } else if((tripTimeTraffic - tripTime) == 0){
+                trafficFlow = "no delay";
             }
 
             String units = "kilometers";
