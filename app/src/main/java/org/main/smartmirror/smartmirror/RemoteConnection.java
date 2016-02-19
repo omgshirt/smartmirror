@@ -22,8 +22,8 @@ import java.util.concurrent.BlockingQueue;
 public class RemoteConnection {
 
     private Handler mUpdateHandler;
-    private ChatServer mChatServer;
-    private ChatClient mChatClient;
+    private RemoteServer mServer;
+    private RemoteClient mClient;
 
     private static final String TAG = Constants.TAG;
 
@@ -32,23 +32,24 @@ public class RemoteConnection {
 
     public RemoteConnection(Handler handler) {
         mUpdateHandler = handler;
-        mChatServer = new ChatServer(handler);
+        mServer = new RemoteServer(handler);
     }
 
     public void tearDown() {
-        if (mChatClient != null) {
-            mChatServer.tearDown();
-            mChatClient.tearDown();
+        if (mClient != null) {
+            mServer.tearDown();
+            mClient.tearDown();
         }
     }
 
     public void connectToServer(InetAddress address, int port) {
-        mChatClient = new ChatClient(address, port);
+        mClient = new RemoteClient(address, port);
     }
 
+    // Send a message to the receiver
     public void sendMessage(String msg) {
-        if (mChatClient != null) {
-            mChatClient.sendMessage(msg);
+        if (mClient != null) {
+            mClient.sendMessage(msg);
         }
     }
 
@@ -98,11 +99,11 @@ public class RemoteConnection {
         return mSocket;
     }
 
-    private class ChatServer {
+    private class RemoteServer {
         ServerSocket mServerSocket = null;
         Thread mThread = null;
 
-        public ChatServer(Handler handler) {
+        public RemoteServer(Handler handler) {
             mThread = new Thread(new ServerThread());
             mThread.start();
         }
@@ -131,7 +132,7 @@ public class RemoteConnection {
                         Log.d(TAG, "ServerSocket Created, awaiting connection");
                         setSocket(mServerSocket.accept());
                         Log.d(TAG, "Connected.");
-                        if (mChatClient == null) {
+                        if (mClient == null) {
                             int port = mSocket.getPort();
                             InetAddress address = mSocket.getInetAddress();
                             connectToServer(address, port);
@@ -145,17 +146,17 @@ public class RemoteConnection {
         }
     }
 
-    private class ChatClient {
+    private class RemoteClient {
 
         private InetAddress mAddress;
         private int PORT;
 
-        private final String CLIENT_TAG = "ChatClient";
+        private final String CLIENT_TAG = "SmartRemoteClient";
 
         private Thread mSendThread;
         private Thread mRecThread;
 
-        public ChatClient(InetAddress address, int port) {
+        public RemoteClient(InetAddress address, int port) {
 
             Log.d(CLIENT_TAG, "Creating chatClient");
             this.mAddress = address;
@@ -227,7 +228,7 @@ public class RemoteConnection {
                         }
                     }
                     input.close();
-
+                    Log.i(CLIENT_TAG, "receive thread stopped");
                 } catch (IOException e) {
                     Log.e(CLIENT_TAG, "Server loop error: ", e);
                 }

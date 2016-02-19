@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity
     private String mCurrentFragment;
 
     // FrameSize maintains the size of the content window between state changes
-    private int frame1Size = View.VISIBLE;
-    private int frame2Size = View.VISIBLE;
-    private int frame3Size = View.VISIBLE;
+    private int frame1Visibility = View.VISIBLE;
+    private int frame2Visibility = View.VISIBLE;
+    private int frame3Visibility = View.VISIBLE;
 
 
     // Light Sensor
@@ -217,7 +217,6 @@ public class MainActivity extends AppCompatActivity
             Intent gAccPick = new Intent(MainActivity.this, AccountPickerActivity.class);
             startActivity(gAccPick);
         }
-        Log.i(Constants.TAG, mPreferences.getUserAccountName() + " TESTING ONCREATE");
 
         // Start Network Discovery Service (NSD) & create handler
         mRemoteHandler = new RemoteHandler();
@@ -281,7 +280,6 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.i(Constants.TAG, "onStart");
-        Log.i(Constants.TAG, mPreferences.getUserAccountName() + " TESTING ONSTART");
 
         mirrorSleepState = AWAKE;
 
@@ -294,9 +292,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         // start NSD
-        if (mNsdHelper != null) {
-            mNsdHelper.discoverServices();
-        }
+        mNsdHelper.discoverServices();
+
 
         mPreferences.setVolumesToPrefValues();
         stopLightSensor();
@@ -327,10 +324,10 @@ public class MainActivity extends AppCompatActivity
         stopUITimer();
 
         // stop NSD. This will prevent discovery while sleeping....
+
         if (mNsdHelper != null) {
             mNsdHelper.stopDiscovery();
         }
-
     }
 
     @Override
@@ -443,16 +440,16 @@ public class MainActivity extends AppCompatActivity
      *
      */
     protected void setContentFrameValues(int frameOne, int frameTwo, int frameThree) {
-        frame1Size = frameOne;
-        frame2Size = frameTwo;
-        frame3Size = frameThree;
+        frame1Visibility = frameOne;
+        frame2Visibility = frameTwo;
+        frame3Visibility = frameThree;
         restoreContentFrameVisibility();
     }
 
     protected void restoreContentFrameVisibility() {
-        contentFrame1.setVisibility(frame1Size);
-        contentFrame2.setVisibility(frame2Size);
-        contentFrame3.setVisibility(frame3Size);
+        contentFrame1.setVisibility(frame1Visibility);
+        contentFrame2.setVisibility(frame2Visibility);
+        contentFrame3.setVisibility(frame3Visibility);
     }
 
     /**
@@ -665,24 +662,20 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleHelpFragment(String command) {
 
-        if (command.equals(Constants.HELP)) {
+        if (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP)) {
             boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
+            Log.i(Constants.TAG,"helpIsVisible :: " + helpIsVisible);
             if (helpIsVisible) {
-
                 // remove HelpFragment if visible
                 removeFragment(Constants.HELP);
-
             } else  {
-
-                // If frame3 is in any visible state, ensure that it's set back to small screen so
-                // that help has room in the layout.
-                if (frame3Size == View.VISIBLE) {
+                // If frame3 is in any visible state, return it to 'small screen' proportion
+                if (frame3Visibility == View.VISIBLE) {
                     setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 }
                 displayHelpFragment(HelpFragment.newInstance(getCurrentFragment()));
             }
         }
-
         closeMenuDrawer(command);
     }
 
@@ -765,7 +758,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.BACK:
             case Constants.GO_BACK:
-                if (frame3Size != View.INVISIBLE) {
+                if (frame3Visibility != View.INVISIBLE) {
                     // Can't go back if the window is closed.
                     getSupportFragmentManager().popBackStack();
                 }
@@ -866,8 +859,8 @@ public class MainActivity extends AppCompatActivity
     // ----------------------- SPEECH RECOGNITION --------------------------
 
     /**
-     * Handle the result of speech input. Conform voice inputs into standard commands
-     * used by the remote.
+     * Handle the result of speech input.
+     * Normalize inputs when several phrases are paired with the same action ('settings' & 'options')
      *
      * @param input the command the user gave
      */

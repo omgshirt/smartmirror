@@ -18,7 +18,7 @@ public class NsdHelper {
     public static final String SERVICE_TYPE = "_http._tcp.";
 
     public static final String TAG = Constants.TAG;
-    public String mServiceName = "NsdSmartMirror";
+    public String mServiceName = "NsdSmartMirrorApp";
 
     NsdServiceInfo mService;
 
@@ -28,11 +28,10 @@ public class NsdHelper {
     }
 
     public void initializeNsd() {
-        initializeResolveListener();
-        initializeDiscoveryListener();
-        initializeRegistrationListener();
 
-        //mNsdManager.init(mContext.getMainLooper(), this);
+        initializeRegistrationListener();
+        initializeDiscoveryListener();
+        initializeResolveListener();
 
     }
 
@@ -58,7 +57,7 @@ public class NsdHelper {
 
             @Override
             public void onServiceLost(NsdServiceInfo service) {
-                Log.e(TAG, "service lost" + service);
+                Log.e(TAG, "service lost " + service);
                 if (mService == service) {
                     mService = null;
                 }
@@ -96,7 +95,7 @@ public class NsdHelper {
                 Log.e(TAG, "Resolve Succeeded. " + serviceInfo);
 
                 if (serviceInfo.getServiceName().equals(mServiceName)) {
-                    Log.d(TAG, "Same IP.");
+                    Log.d(TAG, "Same IP :: " + serviceInfo.getHost().toString());
                     return;
                 }
                 mService = serviceInfo;
@@ -141,7 +140,7 @@ public class NsdHelper {
     }
 
     public void discoverServices() {
-        Log.i(Constants.TAG,"discoverServices()");
+        Log.i(Constants.TAG,"NsdHelper.discoverServices()");
         mNsdManager.discoverServices(
                 SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
     }
