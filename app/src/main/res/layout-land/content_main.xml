@@ -13,10 +13,20 @@
         android:id="@+id/speech_icon"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_alignParentRight="true"
+        android:layout_toLeftOf="@+id/remote_icon"
+        android:layout_marginRight="2dp"
         android:layout_alignParentTop="true"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_action_microphone"
+        android:visibility="gone" />
+    <ImageView
+        android:id="@+id/remote_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"
+        android:src="@drawable/white_remote_control_64"
         android:visibility="gone" />
 
     <LinearLayout

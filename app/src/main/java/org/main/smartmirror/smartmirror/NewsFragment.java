@@ -36,7 +36,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String mNewsSection;
 
     // time in seconds before news data is considered old and is discarded
-    private final int DATA_UPDATE_FREQUENCY = 60;
+    private final int DATA_UPDATE_FREQUENCY = 600;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
 

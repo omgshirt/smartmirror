@@ -26,6 +26,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="results_speech">Speech Results</string>
     <string name="action_settings">Settings</string>
+    <string name="remote_connected">Remote Connected</string>
+    <string name="remote_disconnected">Remote Disconnected</string>
 
 
     <!-- Module name (used to create Navigation Bar menu) -->

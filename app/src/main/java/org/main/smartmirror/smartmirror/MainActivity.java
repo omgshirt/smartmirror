@@ -11,6 +11,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.net.nsd.NsdServiceInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -62,6 +63,9 @@ public class MainActivity extends AppCompatActivity
     private ViewGroup contentFrame2;
     private ViewGroup contentFrame3;
 
+    private ImageView imgSpeechIcon;
+    private ImageView imgRemoteIcon;
+
     // Set initial fragments & track displayed views
     private String mInitialFragment = Constants.NEWS;
     private String mCurrentFragment;
@@ -107,7 +111,6 @@ public class MainActivity extends AppCompatActivity
     private Messenger mMessenger = new Messenger(new IHandler());
     private boolean mIsBound;
     private Messenger mService;
-    private ImageView mSpeechIcon;
 
     // Sound effects
     private MediaPlayer mFXPlayer;
@@ -167,10 +170,16 @@ public class MainActivity extends AppCompatActivity
      * Handler for receiving messages from the remote control application
      */
     public class RemoteHandler extends Handler {
+
         @Override
         public void handleMessage(Message msg) {
             String command = msg.getData().getString("msg");
-            handleRemoteCommand(command);
+            if (command.equals(RemoteConnection.SERVER_STARTED)) {
+                // Server Socket has been created
+                registerNsdService();
+            } else {
+                handleRemoteCommand(command);
+            }
         }
     }
 
@@ -226,18 +235,19 @@ public class MainActivity extends AppCompatActivity
 
         // Start Network Discovery Service (NSD) & create handler
         mRemoteHandler = new RemoteHandler();
-        mRemoteConnection = new RemoteConnection(mRemoteHandler);
+        mRemoteConnection = new RemoteConnection(this, mRemoteHandler);
         mNsdHelper = new NsdHelper(this);
         mNsdHelper.initializeNsd();
-        registerNsdService();
-
 
         // speech icon turn it off for now
-        mSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
-        mSpeechIcon.setVisibility(View.INVISIBLE);
+        imgSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
+        imgSpeechIcon.setVisibility(View.INVISIBLE);
         if (mPreferences.isVoiceEnabled()) {
-            mSpeechIcon.setVisibility(View.VISIBLE);
+            imgSpeechIcon.setVisibility(View.VISIBLE);
         }
+
+        imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
+        imgRemoteIcon.setVisibility(View.INVISIBLE);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -300,7 +310,6 @@ public class MainActivity extends AppCompatActivity
         // start NSD
         mNsdHelper.discoverServices();
 
-
         mPreferences.setVolumesToPrefValues();
         stopLightSensor();
         startSpeechRecognition();
@@ -329,11 +338,8 @@ public class MainActivity extends AppCompatActivity
         }
         stopUITimer();
 
-        // stop NSD. This will prevent discovery while sleeping....
-
-        if (mNsdHelper != null) {
-            mNsdHelper.stopDiscovery();
-        }
+        //stop NSD. This will prevent discovery while sleeping....
+        mNsdHelper.stopDiscovery();
     }
 
     @Override
@@ -499,11 +505,11 @@ public class MainActivity extends AppCompatActivity
      protected void resetInteractionTimer() {
         stopUITimer();
         mUITimer = new Timer();
-        Log.i(Constants.TAG, "UI timer start. " + mInteractionTimeout + " ms");
+        Log.i(Constants.TAG, "Interaction timer set :: " + mInteractionTimeout + " ms");
         mUITimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Log.i(Constants.TAG, "UI timeout reached at " + mInteractionTimeout + " ms");
+                Log.i(Constants.TAG, "Interaction timeout reached :: " + mInteractionTimeout + " ms");
                 MainActivity.this.runOnUiThread(uiTimerRunnable);
             }
         }, mInteractionTimeout);
@@ -511,7 +517,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void stopUITimer() {
         if (mUITimer != null) {
-            Log.i(Constants.TAG, "UI timer cancelled");
+            Log.i(Constants.TAG, "Interaction timer cancelled");
             mUITimer.cancel();
         }
     }
@@ -852,17 +858,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Show or hide the speech icon
+     * Show or hide the given icon
      *
+     * @param icon ImageView to be adjusted
      * @param showIcon true to display icon, false to hide
      */
-    public void showSpeechIcon(boolean showIcon) {
+    public void showIcon(ImageView icon, boolean showIcon) {
         if (showIcon) {
-            mSpeechIcon.setVisibility(View.VISIBLE);
-        } else if (mSpeechIcon.getVisibility() == View.VISIBLE) {
-            mSpeechIcon.setVisibility(View.INVISIBLE);
+            icon.setVisibility(View.VISIBLE);
+        } else {
+            icon.setVisibility(View.GONE);
         }
     }
+
+    public void showRemoteIcon(boolean showIcon){
+        showIcon(imgRemoteIcon, showIcon);
+    }
+
+    public void showSpeechIcon(boolean showIcon) {
+        showIcon(imgSpeechIcon, showIcon);
+    }
+
 
     // ----------------------- SPEECH RECOGNITION --------------------------
 
@@ -1008,6 +1024,15 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void connectToRemote(NsdServiceInfo service) {
+        if (service != null) {
+            Log.d(NsdHelper.TAG, "Connecting to server :: " + service.toString());
+            mRemoteConnection.connectToServer(service.getHost(), service.getPort());
+        } else {
+            Log.d(NsdHelper.TAG, "No service to connect to!");
+        }
+    }
+
     /**
      * Callback from RemoteServerAsyncTask when a command is received from the remote control.
      *
@@ -1015,6 +1040,9 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleRemoteCommand(String command) {
         Log.i(Constants.TAG, "remote msg :: " + command);
+        if (command.equals("light")) {
+            command = Constants.NIGHT_LIGHT;
+        }
         if (mPreferences.isRemoteEnabled())
             wakeScreenAndDisplay(command);
         else {

@@ -5,6 +5,11 @@ import android.content.Context;
 import android.net.nsd.NsdServiceInfo;
 import android.net.nsd.NsdManager;
 import android.util.Log;
+import android.widget.Toast;
+
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NsdHelper {
 
@@ -17,8 +22,12 @@ public class NsdHelper {
 
     public static final String SERVICE_TYPE = "_http._tcp.";
 
-    public static final String TAG = Constants.TAG;
-    public String mServiceName = "NsdSmartMirrorApp";
+    public static final String TAG = "NsdHelper";
+    public String mServiceName = "NsdSmartMirror";
+    private boolean serviceRegistered = false;
+
+    //private boolean serviceRegistered = false;
+
 
     NsdServiceInfo mService;
 
@@ -28,88 +37,95 @@ public class NsdHelper {
     }
 
     public void initializeNsd() {
-
         initializeRegistrationListener();
-        initializeDiscoveryListener();
-        initializeResolveListener();
-
     }
 
     public void initializeDiscoveryListener() {
-        mDiscoveryListener = new NsdManager.DiscoveryListener() {
-
-            @Override
-            public void onDiscoveryStarted(String regType) {
-                Log.d(TAG, "Service discovery started");
-            }
-
-            @Override
-            public void onServiceFound(NsdServiceInfo service) {
-                Log.d(TAG, "Service discovery success" + service);
-                if (!service.getServiceType().equals(SERVICE_TYPE)) {
-                    Log.d(TAG, "Unknown Service Type: " + service.getServiceType());
-                } else if (service.getServiceName().equals(mServiceName)) {
-                    Log.d(TAG, "Same machine: " + mServiceName);
-                } else if (service.getServiceName().contains(mServiceName)) {
-                    mNsdManager.resolveService(service, mResolveListener);
-                }
-            }
-
-            @Override
-            public void onServiceLost(NsdServiceInfo service) {
-                Log.e(TAG, "service lost " + service);
-                if (mService == service) {
-                    mService = null;
-                }
-            }
-
-            @Override
-            public void onDiscoveryStopped(String serviceType) {
-                Log.i(TAG, "Discovery stopped: " + serviceType);
-            }
-
-            @Override
-            public void onStartDiscoveryFailed(String serviceType, int errorCode) {
-                Log.e(TAG, "Discovery failed: Error code:" + errorCode);
-                mNsdManager.stopServiceDiscovery(this);
-            }
-
-            @Override
-            public void onStopDiscoveryFailed(String serviceType, int errorCode) {
-                Log.e(TAG, "Discovery failed: Error code:" + errorCode);
-                mNsdManager.stopServiceDiscovery(this);
-            }
-        };
+        mDiscoveryListener = new MyDiscoveryListener();
+        discoverServices();
     }
 
-    public void initializeResolveListener() {
-        mResolveListener = new NsdManager.ResolveListener() {
+    public class MyDiscoveryListener implements NsdManager.DiscoveryListener {
 
-            @Override
-            public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-                Log.e(TAG, "Resolve failed" + errorCode);
+        @Override
+        public void onDiscoveryStarted(String regType) {
+            Log.d(TAG, "onDiscoveryStarted()");
+        }
+
+        @Override
+        public void onServiceFound(NsdServiceInfo service) {
+
+            if (!service.getServiceType().equals(SERVICE_TYPE)) {
+                Log.d(TAG, "Unknown Service Type: " + service.getServiceType());
+            } else if (service.getServiceName().equals(mServiceName)) {
+                Log.d(TAG, "Same machine: " + mServiceName);
+
+            } else if (service.getServiceName().contains(mServiceName)) {
+                // TODO: show remote connected message / icon?
+                ((MainActivity) mContext).showToast("Remote Connected", Toast.LENGTH_SHORT);
+                mNsdManager.resolveService(service, new MyResolveListener());
             }
+        }
 
-            @Override
-            public void onServiceResolved(NsdServiceInfo serviceInfo) {
-                Log.e(TAG, "Resolve Succeeded. " + serviceInfo);
-
-                if (serviceInfo.getServiceName().equals(mServiceName)) {
-                    Log.d(TAG, "Same IP :: " + serviceInfo.getHost().toString());
-                    return;
-                }
-                mService = serviceInfo;
+        @Override
+        public void onServiceLost(NsdServiceInfo service) {
+            Log.e(TAG, "service lost :: " + service);
+            if (mService == service) {
+                // TODO remove remote connected icon?
+                ((MainActivity) mContext).showToast("Remote Disconnected", Toast.LENGTH_SHORT);
+                mService = null;
             }
-        };
+        }
+
+        @Override
+        public void onDiscoveryStopped(String serviceType) {
+            Log.i(TAG, "Discovery stopped:" + serviceType);
+        }
+
+        @Override
+        public void onStartDiscoveryFailed(String serviceType, int errorCode) {
+            Log.e(TAG, "Discovery failed: Error code:" + errorCode);
+            mNsdManager.stopServiceDiscovery(this);
+        }
+
+        @Override
+        public void onStopDiscoveryFailed(String serviceType, int errorCode) {
+            Log.e(TAG, "Discovery failed: Error code:" + errorCode);
+            mNsdManager.stopServiceDiscovery(this);
+        }
+    }
+
+
+    private class MyResolveListener implements NsdManager.ResolveListener {
+        @Override
+        public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.e(TAG, "Resolve failed" + errorCode);
+        }
+
+        @Override
+        public void onServiceResolved(NsdServiceInfo serviceInfo) {
+            Log.d(TAG, "Resolve Succeeded :: " + serviceInfo.getHost().toString());
+
+            if (serviceInfo.getServiceName().equals(mServiceName)) {
+                Log.d(TAG, "Same IP :: " + serviceInfo.getHost().toString());
+                return;
+            }
+            mService = serviceInfo;
+            //((MainActivity)mContext).connectToRemote(mService);
+        }
+
     }
 
     public void initializeRegistrationListener() {
-        Log.i(Constants.TAG, "initializeRegistrationListener()");
+        Log.i(TAG, "initializeRegistrationListener()");
         mRegistrationListener = new NsdManager.RegistrationListener() {
 
             @Override
-            public void onServiceRegistered(NsdServiceInfo NsdServiceInfo) {
-                mServiceName = NsdServiceInfo.getServiceName();
+            public void onServiceRegistered(NsdServiceInfo nsdServiceInfo) {
+                mServiceName = nsdServiceInfo.getServiceName();
+                Log.d(TAG, "service registered as :: " + nsdServiceInfo);
+                serviceRegistered = true;
+                initializeDiscoveryListener();
             }
 
             @Override
@@ -118,6 +134,8 @@ public class NsdHelper {
 
             @Override
             public void onServiceUnregistered(NsdServiceInfo arg0) {
+                serviceRegistered = false;
+                Log.d(TAG, "service unregistered");
             }
 
             @Override
@@ -128,11 +146,11 @@ public class NsdHelper {
     }
 
     public void registerService(int port) {
-        Log.d(Constants.TAG, "registerService port :: " + port);
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
         serviceInfo.setPort(port);
         serviceInfo.setServiceName(mServiceName);
         serviceInfo.setServiceType(SERVICE_TYPE);
+        Log.d(TAG, "serviceInfo :: " + serviceInfo);
 
         mNsdManager.registerService(
                 serviceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
@@ -140,9 +158,11 @@ public class NsdHelper {
     }
 
     public void discoverServices() {
-        Log.i(Constants.TAG,"NsdHelper.discoverServices()");
-        mNsdManager.discoverServices(
-                SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
+        if (serviceRegistered) {
+            Log.i(TAG, "NsdHelper.discoverServices() :: " + mDiscoveryListener);
+            mNsdManager.discoverServices(
+                    SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
+        }
     }
 
     public void stopDiscovery() {
@@ -155,5 +175,6 @@ public class NsdHelper {
 
     public void tearDown() {
         mNsdManager.unregisterService(mRegistrationListener);
+        mResolveListener = null;
     }
 }

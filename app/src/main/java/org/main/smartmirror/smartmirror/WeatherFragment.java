@@ -233,8 +233,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     // Refresh time and date displays to current preference setting
     public void updateTimeDisplay() {
-        Log.i(Constants.TAG, "getTimeFormat() :: " + mPreferences.getTimeFormat());
-        Log.i(Constants.TAG, clkTextClock.getFormat12Hour().toString());
         clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
         clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
         clkDateClock.setFormat12Hour(mPreferences.getDateFormat());

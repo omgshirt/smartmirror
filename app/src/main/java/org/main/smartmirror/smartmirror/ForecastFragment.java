@@ -69,6 +69,8 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
                 JSONObject today = dailyData.getJSONObject(i);
                 dailyForecasts[i] = new DailyForecast(today);
             }
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         } catch (JSONException jse) {
             jse.printStackTrace();
         }

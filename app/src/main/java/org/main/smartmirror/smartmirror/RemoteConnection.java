@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,35 +22,38 @@ import java.util.concurrent.BlockingQueue;
 
 public class RemoteConnection {
 
+    public static final String SERVER_STARTED = "server started";
     private Handler mUpdateHandler;
     private RemoteServer mServer;
-    private RemoteClient mClient;
+    private RemoteControlClient mRemoteControlClient;
+    private MainActivity mActivity;
 
-    private static final String TAG = Constants.TAG;
+    private static final String TAG = "RemoteConnection";
 
     private Socket mSocket;
     private int mPort = -1;
 
-    public RemoteConnection(Handler handler) {
+    public RemoteConnection(MainActivity activity, Handler handler) {
+        mActivity = activity;
         mUpdateHandler = handler;
         mServer = new RemoteServer(handler);
     }
 
     public void tearDown() {
-        if (mClient != null) {
+        if (mRemoteControlClient != null) {
             mServer.tearDown();
-            mClient.tearDown();
+            mRemoteControlClient.tearDown();
         }
     }
 
     public void connectToServer(InetAddress address, int port) {
-        mClient = new RemoteClient(address, port);
+        mRemoteControlClient = new RemoteControlClient(address, port);
     }
 
     // Send a message to the receiver
     public void sendMessage(String msg) {
-        if (mClient != null) {
-            mClient.sendMessage(msg);
+        if (mRemoteControlClient != null) {
+            mRemoteControlClient.sendMessage(msg);
         }
     }
 
@@ -65,10 +69,6 @@ public class RemoteConnection {
     public synchronized void updateMessages(String msg, boolean local) {
         Log.e(TAG, "Updating message: " + msg);
 
-        if (local) {
-            msg = "me: " + msg;
-        }
-
         Bundle messageBundle = new Bundle();
         messageBundle.putString("msg", msg);
 
@@ -79,13 +79,14 @@ public class RemoteConnection {
     }
 
     private synchronized void setSocket(Socket socket) {
-        Log.d(TAG, "setSocket being called.");
+        Log.d(TAG, "setSocket :: " + socket);
         if (socket == null) {
             Log.d(TAG, "Setting a null socket.");
         }
         if (mSocket != null) {
             if (mSocket.isConnected()) {
                 try {
+                    Log.d(TAG, "closing socket :: " + socket);
                     mSocket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -97,6 +98,16 @@ public class RemoteConnection {
 
     private Socket getSocket() {
         return mSocket;
+    }
+
+    private void showRemoteIcon(final String message, final boolean showIcon){
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.showToast(message, Toast.LENGTH_SHORT);
+                mActivity.showRemoteIcon(showIcon);
+            }
+        });
     }
 
     private class RemoteServer {
@@ -128,15 +139,20 @@ public class RemoteConnection {
                     mServerSocket = new ServerSocket(0);
                     setLocalPort(mServerSocket.getLocalPort());
 
+                    // send message confirm serverSocket is set
+                    updateMessages(SERVER_STARTED, true);
                     while (!Thread.currentThread().isInterrupted()) {
-                        Log.d(TAG, "ServerSocket Created, awaiting connection");
+                        Log.d(TAG, "ServerSocket Created :: " + mRemoteControlClient);
                         setSocket(mServerSocket.accept());
-                        Log.d(TAG, "Connected.");
-                        if (mClient == null) {
+                        Log.d(TAG, "ServerSocket Connected :: " + getSocket());
+                        showRemoteIcon(mActivity.getResources().getString(R.string.remote_connected), true);
+                        //if (mRemoteControlClient == null) {
                             int port = mSocket.getPort();
                             InetAddress address = mSocket.getInetAddress();
                             connectToServer(address, port);
-                        }
+                            Log.d(TAG, "new Client :: " + mSocket.toString());
+
+                        //}
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "Error creating ServerSocket: ", e);
@@ -146,21 +162,21 @@ public class RemoteConnection {
         }
     }
 
-    private class RemoteClient {
+    private class RemoteControlClient {
 
         private InetAddress mAddress;
-        private int PORT;
+        private int mPort;
 
         private final String CLIENT_TAG = "SmartRemoteClient";
 
         private Thread mSendThread;
         private Thread mRecThread;
 
-        public RemoteClient(InetAddress address, int port) {
+        public RemoteControlClient(InetAddress address, int port) {
 
-            Log.d(CLIENT_TAG, "Creating chatClient");
+            Log.d(TAG, "Creating RemoteClient :: " + address.toString());
             this.mAddress = address;
-            this.PORT = port;
+            this.mPort = port;
 
             mSendThread = new Thread(new SendingThread());
             mSendThread.start();
@@ -179,20 +195,20 @@ public class RemoteConnection {
             public void run() {
                 try {
                     if (getSocket() == null) {
-                        setSocket(new Socket(mAddress, PORT));
-                        Log.d(CLIENT_TAG, "Client-side socket initialized.");
+                        setSocket(new Socket(mAddress, mPort));
+                        Log.d(TAG, "Client-side socket initialized :: " + getSocket());
 
                     } else {
-                        Log.d(CLIENT_TAG, "Socket already initialized. skipping!");
+                        Log.d(TAG, "Socket already initialized. skipping!");
                     }
 
                     mRecThread = new Thread(new ReceivingThread());
                     mRecThread.start();
 
                 } catch (UnknownHostException e) {
-                    Log.d(CLIENT_TAG, "Initializing socket failed, UHE", e);
+                    Log.d(TAG, "Initializing socket failed, UHE", e);
                 } catch (IOException e) {
-                    Log.d(CLIENT_TAG, "Initializing socket failed, IOE.", e);
+                    Log.d(TAG, "Initializing socket failed, IOE.", e);
                 }
 
                 while (true) {
@@ -200,7 +216,7 @@ public class RemoteConnection {
                         String msg = mMessageQueue.take();
                         sendMessage(msg);
                     } catch (InterruptedException ie) {
-                        Log.d(CLIENT_TAG, "Message sending loop interrupted, exiting");
+                        Log.d(TAG, "Message sending loop interrupted, exiting");
                     }
                 }
             }
@@ -220,17 +236,18 @@ public class RemoteConnection {
                         String messageStr = null;
                         messageStr = input.readLine();
                         if (messageStr != null) {
-                            Log.d(CLIENT_TAG, "Read from the stream: " + messageStr);
+                            Log.d(TAG, "Read from the stream: " + messageStr);
                             updateMessages(messageStr, false);
                         } else {
-                            Log.d(CLIENT_TAG, "The nulls! The nulls!");
+                            Log.d(TAG, "Input is null");
                             break;
                         }
                     }
                     input.close();
-                    Log.i(CLIENT_TAG, "receive thread stopped");
+                    Log.i(TAG, "receive thread stopped");
+                    showRemoteIcon(mActivity.getResources().getString(R.string.remote_disconnected), false);
                 } catch (IOException e) {
-                    Log.e(CLIENT_TAG, "Server loop error: ", e);
+                    Log.e(TAG, "Server loop error: ", e);
                 }
             }
         }
@@ -239,17 +256,18 @@ public class RemoteConnection {
             try {
                 getSocket().close();
             } catch (IOException ioe) {
-                Log.e(CLIENT_TAG, "Error when closing server socket.");
+                Log.e(TAG, "Error when closing server socket.");
             }
+            mRemoteControlClient = null;
         }
 
         public void sendMessage(String msg) {
             try {
                 Socket socket = getSocket();
                 if (socket == null) {
-                    Log.d(CLIENT_TAG, "Socket is null, wtf?");
+                    Log.d(TAG, "Socket is null, wtf?");
                 } else if (socket.getOutputStream() == null) {
-                    Log.d(CLIENT_TAG, "Socket output stream is null, wtf?");
+                    Log.d(TAG, "Socket output stream is null, wtf?");
                 }
 
                 PrintWriter out = new PrintWriter(
@@ -257,15 +275,16 @@ public class RemoteConnection {
                                 new OutputStreamWriter(getSocket().getOutputStream())), true);
                 out.println(msg);
                 out.flush();
-                updateMessages(msg, true);
+                // leaving this in, though the mirror is not (currently) sending any messages to remote
+                //updateMessages(msg, true);
             } catch (UnknownHostException e) {
-                Log.d(CLIENT_TAG, "Unknown Host", e);
+                Log.d(TAG, "Unknown Host", e);
             } catch (IOException e) {
-                Log.d(CLIENT_TAG, "I/O Exception", e);
+                Log.d(TAG, "I/O Exception", e);
             } catch (Exception e) {
-                Log.d(CLIENT_TAG, "Error3", e);
+                Log.d(TAG, "Error3", e);
             }
-            Log.d(CLIENT_TAG, "Client sent message: " + msg);
+            Log.d(TAG, "Client sent message: " + msg);
         }
     }
 }
