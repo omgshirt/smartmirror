@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+            NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
         // Hide UI and actionbar
@@ -659,6 +659,9 @@ public class MainActivity extends AppCompatActivity
         switch (command) {
             case Constants.CALENDAR:
                 fragment = new CalendarFragment();
+                break;
+            case Constants.GMAIL:
+                fragment = new GmailFragment();
                 break;
             case Constants.CAMERA:
                 if (mPreferences.isCameraEnabled()) {

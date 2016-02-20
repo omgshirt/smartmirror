@@ -33,6 +33,7 @@ public class Constants {
     public static final String TIME = "current time";
     public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
+    public static final String GMAIL = "gmail";
 
     // ------------- NEWS ------------
     public static final String BUSINESS = "business";
@@ -102,7 +103,7 @@ public class Constants {
             BACK, BUSINESS,
             CAMERA, CALENDAR, CLOSE_WINDOW,
             CONDITIONS, FACEBOOK, FORECAST, GALLERY,
-            GO_BACK, GO_TO_SLEEP, HIDE_TIME,
+            GMAIL, GO_BACK, GO_TO_SLEEP, HIDE_TIME,
             HIDE_WEATHER, HIDE_WINDOW, LIGHT,
             MEDIA, MENU, NIGHT_LIGHT, NEWS,
             ONE, OPTIONS, QUOTES, SCIENCE,

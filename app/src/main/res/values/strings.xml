@@ -38,6 +38,7 @@
     <string name="title_traffic">Traffic</string>
     <string name="title_twitter">Twitter</string>
     <string name="title_weather">Weather</string>
+    <string name="title_gmail">Gmail</string>
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
