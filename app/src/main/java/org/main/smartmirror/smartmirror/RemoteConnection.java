@@ -110,6 +110,7 @@ public class RemoteConnection {
         });
     }
 
+    // Remote Server starts a server socket to listen for incoming connections.
     private class RemoteServer {
         ServerSocket mServerSocket = null;
         Thread mThread = null;
@@ -142,7 +143,7 @@ public class RemoteConnection {
                     // send message confirm serverSocket is set
                     updateMessages(SERVER_STARTED, true);
                     while (!Thread.currentThread().isInterrupted()) {
-                        Log.d(TAG, "ServerSocket Created :: " + mRemoteControlClient);
+                        Log.d(TAG, "ServerSocket Created, awaiting connection");
                         setSocket(mServerSocket.accept());
                         Log.d(TAG, "ServerSocket Connected :: " + getSocket());
                         showRemoteIcon(mActivity.getResources().getString(R.string.remote_connected), true);
@@ -151,9 +152,9 @@ public class RemoteConnection {
                             InetAddress address = mSocket.getInetAddress();
                             connectToServer(address, port);
                             Log.d(TAG, "new Client :: " + mSocket.toString());
-
                         //}
                     }
+                    Log.e(TAG, "ServerSocket closed");
                 } catch (IOException e) {
                     Log.e(TAG, "Error creating ServerSocket: ", e);
                     e.printStackTrace();

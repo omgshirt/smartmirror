@@ -194,11 +194,7 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
-        // Set up views and nav drawer.
-        // This needs to occur after Preferences is set in order to successfully retrieve GPS position.
         setContentView(R.layout.activity_main);
-
-        // Create Mira
         mira = Mira.getInstance(this);
 
         /*
@@ -237,17 +233,13 @@ public class MainActivity extends AppCompatActivity
         mRemoteHandler = new RemoteHandler();
         mRemoteConnection = new RemoteConnection(this, mRemoteHandler);
         mNsdHelper = new NsdHelper(this);
-        mNsdHelper.initializeNsd();
 
-        // speech icon turn it off for now
+        // Status Icons
+        imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
         imgSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
-        imgSpeechIcon.setVisibility(View.INVISIBLE);
         if (mPreferences.isVoiceEnabled()) {
             imgSpeechIcon.setVisibility(View.VISIBLE);
         }
-
-        imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
-        imgRemoteIcon.setVisibility(View.INVISIBLE);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -872,11 +864,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showRemoteIcon(boolean showIcon){
-        showIcon(imgRemoteIcon, showIcon);
+        if (showIcon && mPreferences.isRemoteEnabled()) {
+            showIcon(imgRemoteIcon, true);
+        } else if (!showIcon) {
+            showIcon(imgRemoteIcon, false);
+        }
     }
 
     public void showSpeechIcon(boolean showIcon) {
-        showIcon(imgSpeechIcon, showIcon);
+        if (showIcon && mPreferences.isVoiceEnabled()) {
+            showIcon(imgSpeechIcon, true);
+        } else if (!showIcon) {
+            showIcon(imgSpeechIcon, false);
+        }
     }
 
 

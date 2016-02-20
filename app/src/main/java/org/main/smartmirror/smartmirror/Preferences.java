@@ -578,6 +578,7 @@ public class Preferences implements LocationListener {
     public void setRemoteEnabled(boolean isEnabled) {
         try {
             mRemoteEnabled = isEnabled;
+            ((MainActivity)mActivity).showRemoteIcon(isEnabled);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
             edit.apply();

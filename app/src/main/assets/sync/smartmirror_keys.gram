@@ -55,9 +55,9 @@ show weather/1e1/
 show light/1e-3/
 small screen/1e-8/
 sleep/1e10/
-start listening/1e-10/
+start listening/1e-12/
 stay awake/1e-8/
-stop listening/1e-12/
+stop listening/1e-10/
 take a picture/1e-15/
 time twelve hour/1e-10/
 time twenty-four hour/1e-20/

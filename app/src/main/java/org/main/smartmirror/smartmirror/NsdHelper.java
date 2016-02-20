@@ -4,12 +4,9 @@ package org.main.smartmirror.smartmirror;
 import android.content.Context;
 import android.net.nsd.NsdServiceInfo;
 import android.net.nsd.NsdManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
-
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 public class NsdHelper {
 
@@ -19,28 +16,35 @@ public class NsdHelper {
     NsdManager.ResolveListener mResolveListener;
     NsdManager.DiscoveryListener mDiscoveryListener;
     NsdManager.RegistrationListener mRegistrationListener;
-
-    public static final String SERVICE_TYPE = "_http._tcp.";
-
-    public static final String TAG = "NsdHelper";
-    public String mServiceName = "NsdSmartMirror";
     private boolean serviceRegistered = false;
 
-    //private boolean serviceRegistered = false;
+    public static final String SERVICE_TYPE = "_http._tcp.";
+    public static final String TAG = "NsdHelper";
 
+    // unique device name
+    public String mDeviceName = APP_NAME;
+    // name given to this instance by the service
+    public String mServiceName;
+    public static final String APP_NAME = "SmartMirror";
 
     NsdServiceInfo mService;
 
     public NsdHelper(Context context) {
         mContext = context;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
+
+        // The device name is of the form "SmartMirror_ID" where ID is the device's system ID
+        // This is used to distinguish this machine from other broadcasters on the network.
+        mDeviceName += "_" + Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        //initializeRegistrationListener();
     }
 
     public void initializeNsd() {
-        initializeRegistrationListener();
+        //initializeRegistrationListener();
     }
 
     public void initializeDiscoveryListener() {
+        mResolveListener = new MyResolveListener();
         mDiscoveryListener = new MyDiscoveryListener();
         discoverServices();
     }
@@ -54,16 +58,13 @@ public class NsdHelper {
 
         @Override
         public void onServiceFound(NsdServiceInfo service) {
-
+            Log.d(TAG, "service found :: " + service);
             if (!service.getServiceType().equals(SERVICE_TYPE)) {
                 Log.d(TAG, "Unknown Service Type: " + service.getServiceType());
             } else if (service.getServiceName().equals(mServiceName)) {
                 Log.d(TAG, "Same machine: " + mServiceName);
-
-            } else if (service.getServiceName().contains(mServiceName)) {
-                // TODO: show remote connected message / icon?
-                ((MainActivity) mContext).showToast("Remote Connected", Toast.LENGTH_SHORT);
-                mNsdManager.resolveService(service, new MyResolveListener());
+            } else if (service.getServiceName().contains(APP_NAME)) {
+                mNsdManager.resolveService(service, mResolveListener);
             }
         }
 
@@ -71,8 +72,6 @@ public class NsdHelper {
         public void onServiceLost(NsdServiceInfo service) {
             Log.e(TAG, "service lost :: " + service);
             if (mService == service) {
-                // TODO remove remote connected icon?
-                ((MainActivity) mContext).showToast("Remote Disconnected", Toast.LENGTH_SHORT);
                 mService = null;
             }
         }
@@ -115,7 +114,7 @@ public class NsdHelper {
         }
 
     }
-
+    /*
     public void initializeRegistrationListener() {
         Log.i(TAG, "initializeRegistrationListener()");
         mRegistrationListener = new NsdManager.RegistrationListener() {
@@ -130,6 +129,7 @@ public class NsdHelper {
 
             @Override
             public void onRegistrationFailed(NsdServiceInfo arg0, int arg1) {
+                Log.e(TAG, "Registration Failed :: " + arg1);
             }
 
             @Override
@@ -144,14 +144,42 @@ public class NsdHelper {
 
         };
     }
+    */
+
+    public class MyRegistrationListener implements NsdManager.RegistrationListener {
+        @Override
+        public void onServiceRegistered(NsdServiceInfo nsdServiceInfo) {
+            mServiceName = nsdServiceInfo.getServiceName();
+            Log.d(TAG, "service registered as :: " + nsdServiceInfo);
+            serviceRegistered = true;
+            initializeDiscoveryListener();
+        }
+
+        @Override
+        public void onRegistrationFailed(NsdServiceInfo arg0, int arg1) {
+            serviceRegistered = false;
+            Log.e(TAG, "Registration Failed :: " + arg1);
+        }
+
+        @Override
+        public void onServiceUnregistered(NsdServiceInfo arg0) {
+            serviceRegistered = false;
+            Log.d(TAG, "ServiceUnregistered :: " + arg0);
+        }
+
+        @Override
+        public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+        }
+    }
 
     public void registerService(int port) {
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
         serviceInfo.setPort(port);
-        serviceInfo.setServiceName(mServiceName);
+        serviceInfo.setServiceName(mDeviceName);
         serviceInfo.setServiceType(SERVICE_TYPE);
         Log.d(TAG, "serviceInfo :: " + serviceInfo);
-
+        unregisterService();
+        mRegistrationListener = new MyRegistrationListener();
         mNsdManager.registerService(
                 serviceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
 
@@ -159,9 +187,11 @@ public class NsdHelper {
 
     public void discoverServices() {
         if (serviceRegistered) {
-            Log.i(TAG, "NsdHelper.discoverServices() :: " + mDiscoveryListener);
+            Log.i(TAG, "NsdHelper.discoverServices :: " + mDiscoveryListener);
             mNsdManager.discoverServices(
                     SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
+        } else {
+            Log.e(TAG, "NsdHelper.discoverServices SERVICE NOT REGISTERED");
         }
     }
 
@@ -171,6 +201,12 @@ public class NsdHelper {
 
     public NsdServiceInfo getChosenServiceInfo() {
         return mService;
+    }
+
+    public void unregisterService(){
+        if (mRegistrationListener != null) {
+            mNsdManager.unregisterService(mRegistrationListener);
+        }
     }
 
     public void tearDown() {
