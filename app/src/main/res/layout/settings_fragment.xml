@@ -311,11 +311,12 @@
             android:text="Time Display: 12hr"
             android:textColor="@color/white"
             android:textSize="20sp" />
-        <Button
-            android:id="@+id/change_account_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Change Login Information" />
+        <!-- Off for now -->
+        <!--<Button-->
+            <!--android:id="@+id/change_account_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:text="Change Login Information" />-->
     </LinearLayout>
 </ScrollView>
