@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 /**
  * Activity that handles the Account Credentials and Work address
+ * TODO This activity should also handle the different permissions we need!
  */
 public class AccountActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -27,7 +28,8 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         setContentView(R.layout.account_activity);
         mPreferences = Preferences.getInstance(this);
         findGoogleAccounts();
-        if (mPreferences.getWorkAddress() == null && mPreferences.getWorkAddress().isEmpty()) {
+        if (mPreferences.getWorkAddress() != null || !(mPreferences.getWorkAddress().isEmpty())) {
+        // Log.i("IF", mPreferences.getWorkAddress());
             startMain();
         }
     }
@@ -43,7 +45,7 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
     }
 
     /**
-     * Gets the google accounts that are tied to the device
+     * Finds the google accounts that are tied to the device
      */
     private void findGoogleAccounts() {
         Spinner googleAccountsPicker = (Spinner) findViewById(R.id.google_account_picker);
@@ -58,7 +60,8 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         } catch (Exception e) {
             Log.i("Exception", "Exception:" + e);
         }
-        accountsList.add("None");
+        // add a none option for privacy reasons off for now...
+        // accountsList.add("None");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, accountsList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         googleAccountsPicker.setAdapter(adapter);
@@ -71,10 +74,10 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
      * @param view current view
      */
     public void saveUserInputs(View view) {
-//        EditText facebookUsername = (EditText) findViewById(R.id.facebook_username);
-//        EditText facebookPassword = (EditText) findViewById(R.id.facebook_password);
-//        EditText twitterUsername = (EditText) findViewById(R.id.twitter_username);
-//        EditText twitterPassword = (EditText) findViewById(R.id.twitter_password);
+        // EditText facebookUsername = (EditText) findViewById(R.id.facebook_username);
+        // EditText facebookPassword = (EditText) findViewById(R.id.facebook_password);
+        // EditText twitterUsername = (EditText) findViewById(R.id.twitter_username);
+        // EditText twitterPassword = (EditText) findViewById(R.id.twitter_password);
         EditText workAddress = (EditText) findViewById(R.id.work_location);
         String strAddress = workAddress.getText().toString().replace(' ', '+');
         mPreferences.setWorkAddress(strAddress);

@@ -31,7 +31,7 @@ public class Preferences implements LocationListener {
     private final String TAG = "Preferences";
     private static Preferences mPreferences = null;
     private SharedPreferences mSharedPreferences;
-    private Activity mActivity;
+    private static Activity mActivity;
 
     //Google Account Email Preference
     public static final String PREFS_GMAIL = "accountName";
@@ -55,7 +55,7 @@ public class Preferences implements LocationListener {
     public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
     public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
 
-    public static final String PREFS_WORK_ADDRESS = "address";
+    public static final String PREFS_WORK_ADDRESS = "WORK_ADDRESS";
 
     // chance for TTS to happen (0-1)
     public static final float SPEECH_NEVER = 0;
@@ -333,10 +333,12 @@ public class Preferences implements LocationListener {
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
         mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
 
-        //Google Account Email Preferences
+        // Google Account Email Preferences
         mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
 
+        // Work address
         mWorkAddress = mSharedPreferences.getString(PREFS_WORK_ADDRESS, "");
+
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
         mMusicVolumeHolder = getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -389,6 +391,8 @@ public class Preferences implements LocationListener {
         if (mPreferences == null) {
             Log.d("Preferences", "Creating new prefs instance...");
             mPreferences = new Preferences(activity);
+        } else {
+            mActivity = activity;
         }
         return mPreferences;
     }
