@@ -3,6 +3,8 @@ package org.main.smartmirror.smartmirror;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,7 +14,9 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity that handles the Account Credentials and Work address
@@ -20,23 +24,22 @@ import java.util.ArrayList;
  */
 public class AccountActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private Preferences mPreferences;
+    private Preferences mPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account_activity);
-        mPreferences = Preferences.getInstance(this);
+        mPreference = Preferences.getInstance(this);
         findGoogleAccounts();
-        if (mPreferences.getWorkAddress() != null || !(mPreferences.getWorkAddress().isEmpty())) {
-        // Log.i("IF", mPreferences.getWorkAddress());
+        if (mPreference.getWorkLatitude() != 0.0 || mPreference.getWorkLongitude() != 0.0) {
             startMain();
         }
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mPreferences.setUserAccountName(parent.getItemAtPosition(position).toString());
+        mPreference.setUserAccountName(parent.getItemAtPosition(position).toString());
     }
 
     @Override
@@ -80,14 +83,29 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         // EditText twitterPassword = (EditText) findViewById(R.id.twitter_password);
         EditText workAddress = (EditText) findViewById(R.id.work_location);
         String strAddress = workAddress.getText().toString().replace(' ', '+');
-        mPreferences.setWorkAddress(strAddress);
+        convertAddress(strAddress);
         startMain();
+    }
+
+    private void convertAddress(String addressInput) {
+        Geocoder geocoder = new Geocoder(this);
+        List<Address> addressList;
+        try {
+            addressList = geocoder.getFromLocationName(addressInput, 5);
+            if (addressList != null) {
+                // interested in only the first result
+                mPreference.setWorkLatitude(addressList.get(0).getLatitude());
+                mPreference.setWorkLongitude(addressList.get(0).getLongitude());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Starts Main Activity
      */
-    public void startMain() {
+    private void startMain() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();

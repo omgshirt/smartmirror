@@ -12,9 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
+
+import java.sql.BatchUpdateException;
 
 
 public class SettingsFragment extends Fragment {
@@ -337,6 +340,17 @@ public class SettingsFragment extends Fragment {
         });
         swtTimeFormat.setChecked(mPreferences.isTimeFormat12hr());
         setTimeSwitchText();
+
+        // need to think more about this implementation
+        // Button changeAccountbtn = (Button) view.findViewById(R.id.change_account_button);
+        // changeAccountbtn.setOnClickListener(new View.OnClickListener() {
+            // @Override
+            // public void onClick(View v) {
+                // Intent intent = new Intent(getActivity(), AccountActivity.class);
+                // startActivity(intent);
+                // getActivity().finish();
+            // }
+        // });
 
         return view;
     }

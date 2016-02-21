@@ -152,5 +152,5 @@ public class Constants {
 
     //--------------TRAFFIC--------------
     public static final String DISTANCE_MATRIX_API =
-            "https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s,%s&destinations=%s&departure_time=now&traffic_model=best_guess&units=%s&key=%s";
+            "https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s,%s&destinations=%s,%s&departure_time=now&traffic_model=best_guess&units=%s&key=%s";
 }

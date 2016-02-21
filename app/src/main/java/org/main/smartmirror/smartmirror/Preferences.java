@@ -55,7 +55,8 @@ public class Preferences implements LocationListener {
     public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
     public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
 
-    public static final String PREFS_WORK_ADDRESS = "WORK_ADDRESS";
+    public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
+    public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
     // chance for TTS to happen (0-1)
     public static final float SPEECH_NEVER = 0;
@@ -77,6 +78,10 @@ public class Preferences implements LocationListener {
     public static final float VOL_MEDIUM = .5f;
     public static final float VOL_HIGH = .7f;
     public static final float VOL_VHIGH = 1.0f;
+
+    // default for work address
+    public static final float WORK_LAT = 0f;
+    public static final float WORK_LONG = 0f;
 
     // strings
     public static final String CMD_CAMERA_ON = "camera on";
@@ -152,7 +157,8 @@ public class Preferences implements LocationListener {
     private double mLatitude;
     private double mLongitude;
 
-    private String mWorkAddress;
+    private double mWorkLatitude;
+    private double mWorkLongitude;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
@@ -337,7 +343,8 @@ public class Preferences implements LocationListener {
         mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
 
         // Work address
-        mWorkAddress = mSharedPreferences.getString(PREFS_WORK_ADDRESS, "");
+        mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
+        mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
 
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
@@ -706,14 +713,25 @@ public class Preferences implements LocationListener {
         this.mLongitude = mLongitude;
     }
 
-    public String getWorkAddress() {
-        return mWorkAddress;
+    public double getWorkLatitude() {
+        return mWorkLatitude;
     }
 
-    public void setWorkAddress(String mWorkAddress) {
-        this.mWorkAddress = mWorkAddress;
+    public void setWorkLatitude(double mWorkLatitude) {
+        this.mWorkLatitude = mWorkLatitude;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putString(PREFS_WORK_ADDRESS, mWorkAddress);
+        edit.putFloat(PREFS_WORK_LAT, (float) mWorkLatitude);
+        edit.apply();
+    }
+
+    public double getWorkLongitude() {
+        return mWorkLongitude;
+    }
+
+    public void setWorkLongitude(double mWorkLongitude) {
+        this.mWorkLongitude = mWorkLongitude;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putFloat(PREFS_WORK_LONG, (float) mWorkLongitude);
         edit.apply();
     }
 

@@ -20,7 +20,8 @@ public class TrafficFragment extends Fragment {
     private Preferences mPreference;
     private String mCurrentLat;
     private String mCurrentLong;
-    private String mWorkAddress;
+    private String mWorkLat;
+    private String mWorkLong;
     private TextView txtDistance;
     private TextView txtTravelTime;
 
@@ -32,7 +33,8 @@ public class TrafficFragment extends Fragment {
         mPreference = Preferences.getInstance(getActivity());
         mCurrentLat = Double.toString(mPreference.getLatitude());
         mCurrentLong = Double.toString(mPreference.getLongitude());
-        mWorkAddress = (mPreference.getWorkAddress());
+        mWorkLat = Double.toString(mPreference.getWorkLatitude());
+        mWorkLong = Double.toString(mPreference.getWorkLongitude());
     }
 
     @Override
@@ -58,7 +60,7 @@ public class TrafficFragment extends Fragment {
         if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
             distanceMatrixUnit = "imperial";
         }
-        updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkAddress, distanceMatrixUnit, distanceMatrixKey));
+        updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
 
     }
 
