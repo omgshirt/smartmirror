@@ -65,12 +65,6 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                 for (twitter4j.Status status : statuses) {
                     //String rawJSON = TwitterObjectFactory.getRawJSON(status);
                     //String fileName = "statuses/" + status.getId() + ".json";
-                    /*System.out.println(status.getUser().getName() + "\n" + status.getText());
-                    TwitterFragment.mUser[i] = status.getUser().getName();
-                    TwitterFragment.mStatus[i] = status.getText();
-                    TwitterFragment.mUserAt[i] = status.getUser().getScreenName();
-                    TwitterFragment.mUrl[i] = Uri.parse(status.getUser().getProfileImageURLHttps());*/
-                    //System.out.println(TwitterFragment.mUser[i] + " @" + TwitterFragment.mUserAt[i] + "\n" + TwitterFragment.mStatus[i]);
 
                     TwitterFragment.mUsers.add(i,status.getUser().getName());
                     TwitterFragment.mTweets.add(i,status.getText());
@@ -101,7 +95,6 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
         ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
         try {
             for(int i = 0; i < statuses.size(); i++){
-                //CustomObject co = new CustomObject(mUser[i],mStatus[i],mUrl[i]);
                 CustomObject co = new CustomObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i));
                 objects.add(co);
             }

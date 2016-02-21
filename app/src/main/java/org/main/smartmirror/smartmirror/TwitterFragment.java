@@ -1,54 +1,31 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.BroadcastReceiver;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.tweetui.TweetView;
-
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Timer;
 
 import io.fabric.sdk.android.Fabric;
 
 public class TwitterFragment extends Fragment {
 
-    Handler mHandler = new Handler();
-
     Handler mTimerHandler = new Handler();
     int mDelay = 61000; //milliseconds
-
-    private Button mTwitterLogin;
-    private Button mTwitterGet;
-
-    public static String mUser[] = new String[100];
-    public static String mStatus[] = new String[100];
-    public static String mUserAt[] = new String[100];
-    public static Uri mUrl[] = new Uri[100]; // profile image url
 
     public static ListView twitterFeed;
 
@@ -66,29 +43,9 @@ public class TwitterFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.twitter_fragment, container, false);
 
-        mTwitterLogin = (Button)view.findViewById(R.id.toLogin);
-        mTwitterGet = (Button)view.findViewById(R.id.pullTweets);
-
-
         twitterFeed = (ListView)view.findViewById(R.id.list_twitter);
 
         twitterAsync();
-
-        mTwitterLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                twitterLogin();
-            }
-        });
-        mTwitterGet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                twitterAsync();
-
-            }
-        });
-
-
 
         mTimerHandler.postDelayed(new Runnable(){
             public void run(){
@@ -146,29 +103,6 @@ public class TwitterFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
-    private void pullTweets(final String query){
-        new Thread(){
-            public void run(){
-                final JSONObject json = FetchURL.getJSON(query);
-                if(json == null){
-                    mHandler.post(new Runnable(){
-                        public void run(){
-                            Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.twitter_error),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                } else {
-                    mHandler.post(new Runnable() {
-                        public void run(){
-                            Log.i("TWEETS ", json.toString());
-                            //renderTweets(json);
-                        }
-                    });
-                }
-            }
-        }.start();
-    }
     //to twitter login activity
     public void twitterLogin() {
         Intent intent = new Intent(getContext(), TwitterActivity.class);
