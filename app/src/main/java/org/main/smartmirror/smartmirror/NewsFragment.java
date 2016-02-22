@@ -91,8 +91,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         void onArticleSelected(String title, String body);
     }
 
-    public NewsFragment() {
-    }
+    public NewsFragment() {}
 
     public static NewsFragment newInstance(String section) {
         Bundle args = new Bundle();
@@ -202,12 +201,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         mArticleFullBody = article[x];
         mHeadline = hl[x];
         articleSelectedListener.onArticleSelected(mHeadline, mArticleFullBody);
-
-        /*Fragment fragment = new NewsBodyFragment();
-        FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.content_frame_3, fragment)
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .commit();*/
     }
 
     @Override
@@ -296,17 +289,14 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 case Constants.EIGHTH:
                     toNewsBodyFragment(7);
                     break;
-                /*default:
-                    if(message.contains(Constants.HELP) || message.contains(Constants.HIDE)) {
-                        txtNewsDesk.setText(mNewsSection.toUpperCase());
-                    }
-                    Log.d("News", "Got message:\"" + message + "\"");
-                    break;*/
+                default:
+                    txtNewsDesk.setText(mNewsSection.toUpperCase());
+
             }
-            if (message.contains(Constants.SCROLL_DOWN))
-                mScrollView.scrollBy(0, -((int) 0.3 * ((int) getResources().getDisplayMetrics().density * mScrollView.getHeight()) - mScrollView.getHeight()));
-            else if (!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, (int) 0.3 * ((int) getResources().getDisplayMetrics().density * mScrollView.getHeight()) - mScrollView.getHeight());
+            if(message.contains(Constants.SCROLL_DOWN))
+                mScrollView.scrollBy(0, -(0-mScrollView.getHeight()));
+            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
+                mScrollView.scrollBy(0, 0-mScrollView.getHeight());
         }
     };
 
@@ -335,93 +325,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }
 
-        /*
 
-        // -----CASE NEWS-----
-        if (!mCacheManager.containsKey(WORLD_CACHE)) {
-            Log.i(Constants.TAG,"News Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering News");
-            renderNews((JSONObject) mCacheManager.get(WORLD_CACHE));
-        }
-        else if (mCacheManager.isExpired(WORLD_CACHE)) {
-            Log.i(Constants.TAG, "NewsCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE SPORTS-----
-        if (!mCacheManager.containsKey(SPORTS_CACHE)) {
-            Log.i(Constants.TAG,"Sports Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Sports");
-            renderNews((JSONObject) mCacheManager.get(SPORTS_CACHE));
-        }
-        else if (mCacheManager.isExpired(SPORTS_CACHE)) {
-            Log.i(Constants.TAG, "SportsCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE TECHNOLOGY-----
-        if (!mCacheManager.containsKey(TECH_CACHE)) {
-            Log.i(Constants.TAG,"Tech Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Technology");
-            renderNews((JSONObject) mCacheManager.get(TECH_CACHE));
-        }
-        else if (mCacheManager.isExpired(TECH_CACHE)) {
-            Log.i(Constants.TAG, "TechCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE BUSINESS-----
-        if (!mCacheManager.containsKey(BUSINESS_CACHE)) {
-            Log.i(Constants.TAG,"Business Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Business");
-            renderNews((JSONObject) mCacheManager.get(BUSINESS_CACHE));
-        }
-        else if (mCacheManager.isExpired(BUSINESS_CACHE)) {
-            Log.i(Constants.TAG, "BusinessCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE MEDIA-----
-        if (!mCacheManager.containsKey(MEDIA_CACHE)) {
-            Log.i(Constants.TAG,"Media Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Media");
-            renderNews((JSONObject) mCacheManager.get(MEDIA_CACHE));
-        }
-        else if (mCacheManager.isExpired(MEDIA_CACHE)) {
-            Log.i(Constants.TAG, "MediaCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE TRAVEL-----
-        if (!mCacheManager.containsKey(TRAVEL_CACHE)) {
-            Log.i(Constants.TAG,"Travel Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Travel");
-            renderNews((JSONObject) mCacheManager.get(TRAVEL_CACHE));
-        }
-        else if (mCacheManager.isExpired(TRAVEL_CACHE)) {
-            Log.i(Constants.TAG, "TravelCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE SCIENCE-----
-        if (!mCacheManager.containsKey(SCIENCE_CACHE)) {
-            Log.i(Constants.TAG,"Science Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Science");
-            renderNews((JSONObject) mCacheManager.get(SCIENCE_CACHE));
-        }
-        else if (mCacheManager.isExpired(SCIENCE_CACHE)) {
-            Log.i(Constants.TAG, "ScienceCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        */
     }
 
     /**
@@ -443,21 +347,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }
 
-        /*if (mNewsSection.equals("world")  || mNewsSection.equals("news")) {
-            mCacheManager.registerCacheListener(WORLD_CACHE, this);
-        } else if (mNewsSection.equals("sports")) {
-            mCacheManager.registerCacheListener(SPORTS_CACHE, this);
-        } else if (mNewsSection.equals("technology")) {
-            mCacheManager.registerCacheListener(TECH_CACHE, this);
-        } else if (mNewsSection.equals("business")) {
-            mCacheManager.registerCacheListener(BUSINESS_CACHE, this);
-        } else if (mNewsSection.equals("media")) {
-            mCacheManager.registerCacheListener(MEDIA_CACHE, this);
-        } else if (mNewsSection.equals("travel")) {
-            mCacheManager.registerCacheListener(TRAVEL_CACHE, this);
-        } else if (mNewsSection.equals("science")) {
-            mCacheManager.registerCacheListener(SCIENCE_CACHE, this);
-        }*/
     }
 
     // when this goes out of view, halt listening
@@ -474,6 +363,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 Log.i("NEWS CACHE", "unregister " + cacheName);
             }
         }
+
     }
 
     // Get news headlines from api and display
@@ -511,21 +401,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }
 
-        /*if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
-            mCacheManager.addCache(WORLD_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("sports")) {
-            mCacheManager.addCache(SPORTS_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("technology")) {
-            mCacheManager.addCache(TECH_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("business")) {
-            mCacheManager.addCache(BUSINESS_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("media")) {
-            mCacheManager.addCache(MEDIA_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("travel")) {
-            mCacheManager.addCache(TRAVEL_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("science")) {
-            mCacheManager.addCache(SCIENCE_CACHE, data, DATA_UPDATE_FREQUENCY);
-        }*/
     }
 
     private void renderNews(JSONObject json) {
@@ -608,21 +483,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }
 
-        /*if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
-            if (cacheName.equals(WORLD_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("sports")) {
-            if (cacheName.equals(SPORTS_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("technology")) {
-            if (cacheName.equals(TECH_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("business")) {
-            if (cacheName.equals(BUSINESS_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("media")) {
-            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("travel")) {
-            if (cacheName.equals(TRAVEL_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("science")) {
-            if (cacheName.equals(SCIENCE_CACHE)) startNewsUpdate();
-        }*/
     }
 
     /**
