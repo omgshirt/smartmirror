@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.SpannedString;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,16 +25,31 @@ public class NewsBodyFragment extends Fragment {
     TextView mTxtHeadline;
     ScrollView mScrollView;
 
+    public NewsBodyFragment(){}
+
+    public static NewsBodyFragment NewInstance(String headline, String body){
+        Bundle args = new Bundle();
+        args.putString("headline", headline);
+        args.putString("body", body);
+        NewsBodyFragment fragment = new NewsBodyFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_body_fragment, container, false);
 
         // Initialize Items
-        mTxtBody = (TextView) view.findViewById(R.id.txtNewsBody);
-        mTxtHeadline = (TextView) view.findViewById(R.id.txtHeadline);
-        mScrollView = (ScrollView) view.findViewById(R.id.scrollView);
-        mTxtBody.setText("");
-        mTxtHeadline.setText("");
+        mTxtBody = (TextView)view.findViewById(R.id.txtNewsBody);
+        mTxtHeadline = (TextView)view.findViewById(R.id.txtHeadline);
+        mScrollView = (ScrollView)view.findViewById(R.id.scrollView);
 
+        Spanned body = Html.fromHtml(getArguments().getString("body"));
+        mTxtBody.setText(body);
+        mTxtHeadline.setText(getArguments().getString("headline"));
+
+
+        /*
         try {
             mTxtBody.setText(Html.fromHtml(NewsFragment.mArticleFullBody));
             mTxtHeadline.setText(NewsFragment.mHeadline);
@@ -40,6 +58,7 @@ public class NewsBodyFragment extends Fragment {
                     Toast.LENGTH_LONG).show();
             Log.i("NEWS BODY", "cannot draw, check your internet connection");
         }
+        */
 
         return view;
     }

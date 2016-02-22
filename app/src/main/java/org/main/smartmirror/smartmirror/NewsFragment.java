@@ -35,8 +35,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String mGuardURL = mPreURL + mDefNewsSection + mPostURL;
     public static String mNewsSection;
 
-    // time in minutes before news data is considered old and is discarded
-    private final int DATA_UPDATE_FREQUENCY = 1;
+    // time in seconds before news data is considered old and is discarded
+    private final int DATA_UPDATE_FREQUENCY = 600;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
 
@@ -70,7 +70,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private ImageView img7;
     private ImageView img8;
 
-    public static String mArticleFullBody = "";
+    //public static String mArticleFullBody = "";
     public static int numItems = 10;
     public static String article[] = new String[numItems];
     public static String hl[] = new String[numItems];
@@ -80,7 +80,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String body = "";
     public static String trailText = "";
     public static String webTitle = "";
-    public static String mHeadline = "";
+    //public static String mHeadline = "";
 
     ScrollView mScrollView;
 
@@ -91,7 +91,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         void onArticleSelected(String title, String body);
     }
 
-    public NewsFragment() {}
+    public NewsFragment() {
+    }
 
     public static NewsFragment newInstance(String section) {
         Bundle args = new Bundle();
@@ -198,9 +199,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     }
 
     public void toNewsBodyFragment(int x) {
-        mArticleFullBody = article[x];
-        mHeadline = hl[x];
-        articleSelectedListener.onArticleSelected(mHeadline, mArticleFullBody);
+        //mArticleFullBody = article[x];
+        //mHeadline = hl[x];
+        articleSelectedListener.onArticleSelected(hl[x], article[x]);
     }
 
     @Override
@@ -218,8 +219,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         super.onDetach();
         articleSelectedListener = null;
     }
-
+    
     public void startNewsUpdate() {
+        Log.i(Constants.TAG, "starting news update");
         mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
         updateNews(mGuardURL);
     }
@@ -293,10 +295,10 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     txtNewsDesk.setText(mNewsSection.toUpperCase());
 
             }
-            if(message.contains(Constants.SCROLL_DOWN))
-                mScrollView.scrollBy(0, -(0-mScrollView.getHeight()));
-            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, 0-mScrollView.getHeight());
+            if (message.contains(Constants.SCROLL_DOWN))
+                mScrollView.scrollBy(0, -((int) 0.3 * ((int) getResources().getDisplayMetrics().density * mScrollView.getHeight()) - mScrollView.getHeight()));
+            else if (!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
+                mScrollView.scrollBy(0, (int) 0.3 * ((int) getResources().getDisplayMetrics().density * mScrollView.getHeight()) - mScrollView.getHeight());
         }
     };
 
@@ -312,20 +314,16 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // TODO: 2/3/2016 add switch case so only current news section is checked/updated
         // TODO: 2/3/2016 don't update when null/not prev visited
 
-
-        for (String name : Constants.NEWS_DESKS) {
-            String cacheName = name + " cache";
-            if (!mCacheManager.containsKey(cacheName)) {
-                Log.i(Constants.TAG, cacheName + " does not exist, creating");
+        if (!mCacheManager.containsKey(mNewsSection)) {
+            Log.i(Constants.TAG, mNewsSection + " does not exist, creating");
+            startNewsUpdate();
+        } else {
+            renderNews((JSONObject) mCacheManager.get(mNewsSection));
+            if (mCacheManager.isExpired(mNewsSection)) {
+                Log.i(Constants.TAG, mNewsSection + " expired. Refreshing...");
                 startNewsUpdate();
-            } else if (mCacheManager.isExpired(name)) {
-                Log.i(Constants.TAG, cacheName + " expired. Refreshing...");
-                startNewsUpdate();
-                renderNews((JSONObject) mCacheManager.get(cacheName));
             }
         }
-
-
     }
 
     /**
@@ -340,10 +338,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 new IntentFilter("inputAction"));
 
         for (String name : Constants.NEWS_DESKS) {
-            String cacheName = name;
-            if (mNewsSection.equals(cacheName)) {
-                mCacheManager.registerCacheListener(cacheName, this);
-                Log.i("NEWS CACHE", "register " + cacheName);
+            if (name.equals(mNewsSection)) {
+                mCacheManager.registerCacheListener(name, this);
+                Log.i("NEWS CACHE", "register " + name);
             }
         }
 
@@ -354,16 +351,12 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
 
-        // TODO UNREGISTER ON PAUSE
-
         for (String name : Constants.NEWS_DESKS) {
-            String cacheName = name;
-            if (mNewsSection.equals(cacheName)) {
-                mCacheManager.unRegisterCacheListener(cacheName, this);
-                Log.i("NEWS CACHE", "unregister " + cacheName);
+            if (name.equals(mNewsSection)) {
+                mCacheManager.unRegisterCacheListener(name, this);
+                Log.i("NEWS CACHE", "unregister " + name);
             }
         }
-
     }
 
     // Get news headlines from api and display
@@ -374,7 +367,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 if (json == null) {
                     mHandler.post(new Runnable() {
                         public void run() {
-                            ((MainActivity) getActivity()).showToast(getString(R.string.err_news),
+                            ((MainActivity) getActivity()).showToast(getString(R.string.news_err),
                                     Gravity.CENTER, Toast.LENGTH_LONG);
                         }
                     });
@@ -394,10 +387,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private void updateNewsCache(JSONObject data) {
 
         for (String name : Constants.NEWS_DESKS) {
-            String cacheName = name;
-            if (mNewsSection.equals(cacheName)) {
-                mCacheManager.addCache(cacheName, data, DATA_UPDATE_FREQUENCY);
-                Log.i("NEWS CACHE", "updating " + cacheName);
+            if (name.equals(mNewsSection)) {
+                mCacheManager.addCache(name, data, DATA_UPDATE_FREQUENCY);
+                Log.i("NEWS CACHE", "updating " + name);
             }
         }
 
@@ -476,8 +468,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public void onCacheExpired(String cacheName) {
 
         for (String name : Constants.NEWS_DESKS) {
-            cacheName = name;
-            if (mNewsSection.equals(cacheName)) {
+            if (name.equals(mNewsSection)) {
                 startNewsUpdate();
                 Log.i("NEWS CACHE", "updating expired cache" + cacheName);
             }

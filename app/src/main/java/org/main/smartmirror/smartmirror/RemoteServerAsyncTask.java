@@ -29,7 +29,7 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         try {
             // Create a server socket and wait for incoming message
-            ServerSocket serverSocket = new ServerSocket(MainActivity.PORT);
+            ServerSocket serverSocket = new ServerSocket(100);
             serverSocket.setReuseAddress(true);
             Socket client = serverSocket.accept();
             ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
@@ -53,7 +53,7 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         if (result != null) {
-            mContext.startRemoteServer();
+            //mContext.startRemoteServer();
             mContext.handleRemoteCommand(result);
             //Log.d("Remote", "Command: " + result);
         }

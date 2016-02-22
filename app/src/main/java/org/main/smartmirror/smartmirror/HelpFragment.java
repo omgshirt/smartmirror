@@ -75,7 +75,7 @@ public class HelpFragment extends Fragment {
                 txtCurrentHelpContent.setText(strContent);
                 break;
             // night light
-            case Constants.LIGHT:
+            case Constants.NIGHT_LIGHT:
                 arrayContent = res.getStringArray(R.array.color_names);
                 strContent = stringSpace(arrayContent);
                 txtCurrentHelpHeader.setText("Color Options:");

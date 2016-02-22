@@ -75,8 +75,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     private boolean mShowFullAlerts = true;
 
     private CacheManager mCacheManager = null;
-    // time in minutes before weather data expires
-    private final int DATA_UPDATE_FREQUENCY = 1;
+    // time in seconds before weather data expires
+    private final int DATA_UPDATE_FREQUENCY = 600;
     public static final String WEATHER_CACHE = "weather cache";
 
     Handler mHandler = new Handler();
@@ -164,7 +164,11 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     startWeatherUpdate();
                     break;
                 case Preferences.CMD_TIME_12HR:
+                    mPreferences.setTimeFormat12hr();
+                    updateTimeDisplay();
+                    break;
                 case Preferences.CMD_TIME_24HR:
+                    mPreferences.setTimeFormat24hr();
                     updateTimeDisplay();
                     break;
                 case Constants.HIDE_TIME:
@@ -331,7 +335,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     }
 
     private void speakText(String text) {
-        ((MainActivity) getActivity()).startTTS(text);
+        ((MainActivity) getActivity()).speakText(text);
     }
 
     // Get weather data from API and display
@@ -342,7 +346,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 if (json == null) {
                     mHandler.post(new Runnable() {
                         public void run() {
-                            ((MainActivity) getActivity()).showToast(getString(R.string.err_weather_data),
+                            ((MainActivity) getActivity()).showToast(getString(R.string.weather_data_err),
                                     Gravity.CENTER, Toast.LENGTH_LONG);
                             updateWeatherCache(null);
                         }

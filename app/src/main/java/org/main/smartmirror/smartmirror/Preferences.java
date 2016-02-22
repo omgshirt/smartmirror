@@ -20,10 +20,10 @@ import android.util.Log;
 
 /**
  * Created by Brian on 10/22/2015.
- * <p/>
+ *
  * This is a singleton class to hold preferences for the application
  * Get the instance of it by using the getInstance() method
- * <p/>
+ *
  * Class is created at MainActivity start and loads the SharedPrefences for the application
  * Access is by getters and setters, which also handle file storage:
  */
@@ -36,17 +36,15 @@ public class Preferences implements LocationListener {
     //Google Account Email Preference
     public static final String PREFS_GMAIL = "accountName";
     //Google Account Email String
-    public static String mUserAccountPref = "";
+    private static String mUserAccountPref = "";
 
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
     public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
     public static final String PREFS_SPEECH_VOL = "MIRROR_PREFS_SPEECH_VOL";
 
-    public static final String PREFS_CAMERA_ENABLED = "MIRROR_PREFS_CAMERA_ENABLED";
     public static final String PREFS_VOICE_ENABLED = "MIRROR_PREFS_VOICE_ENABLED";
     public static final String PREFS_REMOTE_ENABLED = "MIRROR_PREFS_REMOTE_ENABLED";
-    public static final String PREFS_SPEECH_FREQ = "MIRROR_PREFS_SPEECH_FREQ";
 
     public static final String PREFS_WEATHER_UNIT = "MIRROR_PREFS_WEATHER_UNIT";
     public static final String PREFS_DATE_FORMAT = "MIRROR_PREFS_DATE_FORMAT";
@@ -57,13 +55,7 @@ public class Preferences implements LocationListener {
 
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
-
-    // chance for TTS to happen (0-1)
-    public static final float SPEECH_NEVER = 0;
-    public static final float SPEECH_RARE = .25f;
-    public static final float SPEECH_OFTEN = .5f;
-    public static final float SPEECH_ALWAYS = 1;
-
+    
     // Constants for screen brightness (0-255)
     public static final int BRIGHTNESS_VLOW = 10;
     public static final int BRIGHTNESS_LOW = 40;
@@ -71,68 +63,56 @@ public class Preferences implements LocationListener {
     public static final int BRIGHTNESS_HIGH = 130;
     public static final int BRIGHTNESS_VHIGH = 225;
 
-    // constants for volumes
+    // constant volumes
     public static final float VOL_OFF = 0f;
-    public static final float VOL_VLOW = .1f;
-    public static final float VOL_LOW = .3f;
-    public static final float VOL_MEDIUM = .5f;
-    public static final float VOL_HIGH = .7f;
+    public static final float VOL_VLOW = .2f;
+    public static final float VOL_LOW = .4f;
+    public static final float VOL_MEDIUM = .6f;
+    public static final float VOL_HIGH = .8f;
     public static final float VOL_VHIGH = 1.0f;
 
     // default for work address
     public static final float WORK_LAT = 0f;
     public static final float WORK_LONG = 0f;
-
-    // strings
-    public static final String CMD_CAMERA_ON = "camera on";
-    public static final String CMD_CAMERA_OFF = "camera off";
-
-    public static final String CMD_LIGHT_VLOW = "light very low";
+    
+    public static final String CMD_LIGHT_VLOW = "light min";
     public static final String CMD_LIGHT_LOW = "light low";
     public static final String CMD_LIGHT_MEDIUM = "light medium";
     public static final String CMD_LIGHT_HIGH = "light high";
-    public static final String CMD_LIGHT_VHIGH = "light very high";
-
+    public static final String CMD_LIGHT_VHIGH= "light max";
 
     public static final String CMD_SPEECH_OFF = "speech off";
-    public static final String CMD_SPEECH_VLOW = "speech very low";
+    public static final String CMD_SPEECH_VLOW = "speech min";
     public static final String CMD_SPEECH_LOW = "speech low";
     public static final String CMD_SPEECH_MEDIUM = "speech medium";
     public static final String CMD_SPEECH_HIGH = "speech high";
-    public static final String CMD_SPEECH_VHIGH = "speech very high";
+    public static final String CMD_SPEECH_VHIGH= "speech max";
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
 
-    public static final String CMD_SCREEN_VLOW = "screen very low";
-    public static final String CMD_SCREEN_LOW = "screen low";
-    public static final String CMD_SCREEN_MEDIUM = "screen medium";
-    public static final String CMD_SCREEN_HIGH = "screen high";
-    public static final String CMD_SCREEN_VHIGH = "screen very high";
-
-    public static final String CMD_SPEECH_NEVER = "speech never";
-    public static final String CMD_SPEECH_RARE = "speech rare";
-    public static final String CMD_SPEECH_OFTEN = "speech often";
-    public static final String CMD_SPEECH_ALWAYS = "speech always";
+    public static final String CMD_SCREEN_VLOW = "brightness min";
+    public static final String CMD_SCREEN_LOW = "brightness low";
+    public static final String CMD_SCREEN_MEDIUM = "brightness medium";
+    public static final String CMD_SCREEN_HIGH = "brightness high";
+    public static final String CMD_SCREEN_VHIGH= "brightness max";
 
     public static final String CMD_VOICE_OFF = "stop listening";
     public static final String CMD_VOICE_ON = "start listening";
 
     public static final String CMD_VOLUME_OFF = "volume off";
-    public static final String CMD_VOLUME_VLOW = "volume very low";
+    public static final String CMD_VOLUME_VLOW = "volume min";
     public static final String CMD_VOLUME_LOW = "volume low";
     public static final String CMD_VOLUME_MEDIUM = "volume medium";
     public static final String CMD_VOLUME_HIGH = "volume high";
-    public static final String CMD_VOLUME_VHIGH = "volume very high";
+    public static final String CMD_VOLUME_VHIGH= "volume max";
 
     public static final String CMD_WEATHER_ENGLISH = "weather english";
     public static final String CMD_WEATHER_METRIC = "weather metric";
 
     public static final String CMD_TIME_12HR = "time twelve hour";
-    public static final String CMD_TIME_24HR = "time twenty four hour";
+    public static final String CMD_TIME_24HR = "time twenty-four hour";
 
-    public static final String OFF = "off";
-    public static final String ON = "on";
     public static final String ENGLISH = "english";
     public static final String METRIC = "metric";
 
@@ -143,9 +123,7 @@ public class Preferences implements LocationListener {
     private int mLightBrightness;                   // Night light brightness
 
     private boolean mRemoteEnabled;                 // Enable / disable remote control connections
-    private boolean mCameraEnabled;                 // Enable / disable all camera-related actions
     private boolean mVoiceEnabled;                  // Enable / disable voice recognition UNTIL keyword spoken
-    private float mSpeechFrequency;                 // control how often TTS voice responses occur (0-1)
 
     private float mSystemVolume;                    // control general system volume
     private float mMusicVolume;                     // music stream volume
@@ -161,10 +139,10 @@ public class Preferences implements LocationListener {
     private double mWorkLongitude;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
-    private static final String TIME_FORMAT_24_HR = "k:mm";
-    private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
-    private static final String TIME_FORMAT_12_HR = "h:mm";
-    private static final String TIME_FORMAT_12_HR_SHORT = "h:mm";
+    public static final String TIME_FORMAT_24_HR = "H:mm";
+    public static final String TIME_FORMAT_24_HR_SHORT = "H:mm";
+    public static final String TIME_FORMAT_12_HR = "h:mm";
+    public static final String TIME_FORMAT_12_HR_SHORT = "h:mm";
 
 
     // Handle any messages sent from MainActivity
@@ -173,22 +151,12 @@ public class Preferences implements LocationListener {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            // TODO: if SettingsFragment is visible should we bypass this method and handle commands there?
             handleSettingsCommand(context, message);
         }
     };
 
     private void handleSettingsCommand(Context context, String command) {
         switch (command) {
-            //camera
-            case CMD_CAMERA_OFF:
-                speakText(R.string.cmd_camera_off);
-                setCameraEnabled(false);
-                break;
-            case CMD_CAMERA_ON:
-                speakText(R.string.cmd_camera_on);
-                setCameraEnabled(true);
-                break;
 
             // Light
             case CMD_LIGHT_VLOW:
@@ -207,7 +175,7 @@ public class Preferences implements LocationListener {
                 setLightBrightness(BRIGHTNESS_VHIGH);
                 break;
 
-            // Music
+            // Speech Volume
             case CMD_SPEECH_OFF:
                 setMusicVolume(VOL_OFF);
                 break;
@@ -229,11 +197,11 @@ public class Preferences implements LocationListener {
 
             // Remote
             case CMD_REMOTE_OFF:
-                speakText(R.string.cmd_remote_off);
+                speakText(R.string.speech_remote_off);
                 setRemoteEnabled(false);
                 break;
             case CMD_REMOTE_ON:
-                speakText(R.string.cmd_remote_on);
+                speakText(R.string.speech_remote_on);
                 setRemoteEnabled(true);
                 break;
 
@@ -254,28 +222,20 @@ public class Preferences implements LocationListener {
                 setScreenBrightness(BRIGHTNESS_VHIGH);
                 break;
 
-            // speech frequency
-            case CMD_SPEECH_NEVER:
-                setSpeechFrequency(SPEECH_NEVER);
-                break;
-            case CMD_SPEECH_RARE:
-                setSpeechFrequency(SPEECH_RARE);
-                break;
-            case CMD_SPEECH_OFTEN:
-                setSpeechFrequency(SPEECH_OFTEN);
-                break;
-            case CMD_SPEECH_ALWAYS:
-                setSpeechFrequency(SPEECH_ALWAYS);
-                break;
-
             // Voice recognition on / off
             case CMD_VOICE_OFF:
-                speakText(R.string.cmd_voice_recognition_off);
+                if (isVoiceEnabled())
+                    speakText(R.string.speech_voice_off);
+                else
+                    speakText(R.string.speech_voice_off_err);
                 setVoiceEnabled(false);
                 break;
 
             case CMD_VOICE_ON:
-                speakText(R.string.cmd_voice_recognition_on);
+                if (isVoiceEnabled())
+                    speakText(R.string.speech_voice_on_err);
+                else
+                    speakText(R.string.speech_voice_on);
                 setVoiceEnabled(true);
                 break;
 
@@ -301,11 +261,11 @@ public class Preferences implements LocationListener {
 
             // weather units
             case CMD_WEATHER_ENGLISH:
-                speakText(R.string.cmd_weather_english);
+                speakText(R.string.speech_weather_english);
                 setWeatherUnits(ENGLISH);
                 break;
             case CMD_WEATHER_METRIC:
-                speakText(R.string.cmd_weather_metric);
+                speakText(R.string.speech_weather_metric);
                 setWeatherUnits(METRIC);
                 break;
 
@@ -327,7 +287,6 @@ public class Preferences implements LocationListener {
         mSharedPreferences = mActivity.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
-        mSpeechFrequency = mSharedPreferences.getFloat(PREFS_SPEECH_FREQ, SPEECH_ALWAYS);
         mMusicVolume = mSharedPreferences.getFloat(PREFS_SPEECH_VOL, VOL_LOW);
         mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_LOW);
         mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
@@ -335,7 +294,6 @@ public class Preferences implements LocationListener {
         mWeatherUnits = mSharedPreferences.getString(PREFS_WEATHER_UNIT, ENGLISH);
 
         mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);
-        mCameraEnabled = mSharedPreferences.getBoolean(PREFS_CAMERA_ENABLED, true);
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
         mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
 
@@ -503,11 +461,11 @@ public class Preferences implements LocationListener {
     // returns the unicode string for deg C or deg F based on the WeatherIcons font set
     public String getTempString() {
         String units;
-        Context appContext = MainActivity.getContextForApplication();
+        // Context appContext = MainActivity.getContextForApplication();
         if (mWeatherUnits.equals(ENGLISH)) {
-            units = appContext.getResources().getString(R.string.weather_deg_f);
+            units = mActivity.getResources().getString(R.string.weather_deg_f);
         } else {
-            units = appContext.getResources().getString(R.string.weather_deg_c);
+            units = mActivity.getResources().getString(R.string.weather_deg_c);
         }
         return units;
     }
@@ -549,7 +507,6 @@ public class Preferences implements LocationListener {
      * @param format string for displaying time in SimpleDateFormat
      */
     public void setTimeFormat(String format) {
-        // might do some validation here
         mTimeFormat = format;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_TIME_FORMAT, mTimeFormat);
@@ -576,23 +533,7 @@ public class Preferences implements LocationListener {
         setTimeFormat(TIME_FORMAT_12_HR);
     }
 
-    /**
-     * @param frequency how often the TTS should speak (0-1)
-     */
-    public void setSpeechFrequency(float frequency) {
-        if (frequency < 0 || frequency > 1) return;
-        mSpeechFrequency = frequency;
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putFloat(PREFS_SPEECH_FREQ, mSpeechFrequency);
-        edit.apply();
-    }
-
-    public float getSpeechFrequency() {
-        return mSpeechFrequency;
-    }
-
-    /**
-     * Set brightness value used by night light
+    /** Set brightness value used by night light
      *
      * @param brightness int (0-255)
      */
@@ -654,7 +595,7 @@ public class Preferences implements LocationListener {
     public void setRemoteEnabled(boolean isEnabled) {
         try {
             mRemoteEnabled = isEnabled;
-            ((MainActivity) mActivity).setRemoteStatus(mRemoteEnabled);
+            ((MainActivity)mActivity).showRemoteIcon(isEnabled);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
             edit.apply();
@@ -669,32 +610,21 @@ public class Preferences implements LocationListener {
 
     /**
      * Sets the voice enabled status
-     *
-     * @param voiceEnabled boolean
+     * @param isEnabled boolean
      */
-    public void setVoiceEnabled(boolean voiceEnabled) {
-        this.mVoiceEnabled = voiceEnabled;
-        ((MainActivity) mActivity).showSpeechIcon(voiceEnabled);
+    public void setVoiceEnabled(boolean isEnabled) {
+        this.mVoiceEnabled = isEnabled;
+        ((MainActivity)mActivity).showSpeechIcon(isEnabled);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
         edit.apply();
     }
 
-    public boolean isCameraEnabled() {
-        return mCameraEnabled;
-    }
-
-    public void setCameraEnabled(boolean mCameraEnabled) {
-        this.mCameraEnabled = mCameraEnabled;
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putBoolean(PREFS_CAMERA_ENABLED, mCameraEnabled);
-        edit.apply();
-    }
 
     // helper sends a string to MainActivity to be spoken
     private void speakText(int stringId) {
         String text = mActivity.getResources().getString(stringId);
-        ((MainActivity) mActivity).startTTS(text);
+        ((MainActivity)mActivity).speakText(text);
     }
 
     public double getLatitude() {
