@@ -59,7 +59,8 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
 
     private void updateForecasts() {
         JSONObject json = (JSONObject) CacheManager.getInstance().get(WeatherFragment.WEATHER_CACHE);
-        if (json == null) return;
+
+        //if (json == null) return;
 
         // Get today plus next 3 days
         try {
@@ -68,6 +69,8 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
                 JSONObject today = dailyData.getJSONObject(i);
                 dailyForecasts[i] = new DailyForecast(today);
             }
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         } catch (JSONException jse) {
             jse.printStackTrace();
         }
@@ -142,7 +145,7 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     }
 
     private void speakText(String text) {
-        ((MainActivity) getActivity()).startTTS(text);
+        ((MainActivity) getActivity()).speakText(text);
     }
 
     @Override
