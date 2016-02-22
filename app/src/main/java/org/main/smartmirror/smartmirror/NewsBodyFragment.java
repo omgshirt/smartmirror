@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -27,9 +26,9 @@ public class NewsBodyFragment extends Fragment {
         View view = inflater.inflate(R.layout.news_body_fragment, container, false);
 
         // Initialize Items
-        mTxtBody = (TextView)view.findViewById(R.id.txtNewsBody);
-        mTxtHeadline = (TextView)view.findViewById(R.id.txtHeadline);
-        mScrollView = (ScrollView)view.findViewById(R.id.scrollView);
+        mTxtBody = (TextView) view.findViewById(R.id.txtNewsBody);
+        mTxtHeadline = (TextView) view.findViewById(R.id.txtHeadline);
+        mScrollView = (ScrollView) view.findViewById(R.id.scrollView);
         mTxtBody.setText("");
         mTxtHeadline.setText("");
 
@@ -54,19 +53,20 @@ public class NewsBodyFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            if(message.contains(Constants.SCROLL_DOWN))
-                mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
-            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
+            if (message.contains(Constants.SCROLL_DOWN))
+                mScrollView.scrollBy(0, -((int) 0.3 * ((int) getResources().getDisplayMetrics().density * mScrollView.getHeight()) - mScrollView.getHeight()));
+            else if (!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
+                mScrollView.scrollBy(0, (int) 0.3 * ((int) getResources().getDisplayMetrics().density * mScrollView.getHeight()) - mScrollView.getHeight());
         }
     };
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     * voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));

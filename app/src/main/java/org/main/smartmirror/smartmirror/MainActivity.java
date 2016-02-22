@@ -43,6 +43,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,10 +73,10 @@ public class MainActivity extends AppCompatActivity
     // Mira
     private Mira mira;
 
-    // Conent Frames
-    private FrameLayout contentFrame1;
-    private FrameLayout contentFrame2;
-    private FrameLayout contentFrame3;
+    // Content Frames
+    private ViewGroup contentFrame1;
+    private ViewGroup contentFrame2;
+    private ViewGroup contentFrame3;
 
     // Light Sensor
     private SensorManager mSensorManager;
@@ -196,9 +197,9 @@ public class MainActivity extends AppCompatActivity
          frame2 = help
          frame3 = data / variable
         */
-        contentFrame1 = (FrameLayout)findViewById(R.id.content_frame_1);
-        contentFrame2 = (FrameLayout)findViewById(R.id.content_frame_2);
-        contentFrame3 = (FrameLayout)findViewById(R.id.content_frame_3);
+        contentFrame1 = (LinearLayout) findViewById(R.id.content_frame_1);
+        contentFrame2 = (FrameLayout) findViewById(R.id.content_frame_2);
+        contentFrame3 = (FrameLayout) findViewById(R.id.content_frame_3);
 
 
         // Remote control and Light Sensor Init
@@ -220,13 +221,6 @@ public class MainActivity extends AppCompatActivity
         // Set up ScreenReceiver to hold screen on / off status
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-
-        //Google Account Picker
-        if ( mPreferences.getUserAccountName().equals("") ) {
-            Intent gAccPick = new Intent(MainActivity.this, AccountPickerActivity.class);
-            startActivity(gAccPick);
-        }
-        Log.i(Constants.TAG, mPreferences.getUserAccountName() + " TESTING ONCREATE");
 
         // speech icon turn it off for now
         mSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
@@ -516,7 +510,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void displayHelpFragment(Fragment fragment){
+    private void displayHelpFragment(Fragment fragment) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame_2, fragment);
         ft.commit();

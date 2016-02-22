@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
@@ -24,11 +23,7 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-public class NewsFragment extends Fragment implements CacheManager.CacheListener{
+public class NewsFragment extends Fragment implements CacheManager.CacheListener {
 
     // the guardian api
     public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
@@ -52,7 +47,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static final String SCIENCE_CACHE = "science";
     public static final String MEDIA_CACHE = "media";
     public static final String TRAVEL_CACHE = "travel";
-
 
 
     private CacheManager mCacheManager = null;
@@ -118,27 +112,27 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // Initialize Items
         // mNewsSection = "world";
 
-        mTxtHeadline1 = (TextView)view.findViewById(R.id.headline);
-        mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
-        mTxtHeadline3 = (TextView)view.findViewById(R.id.headline3);
-        mTxtHeadline4 = (TextView)view.findViewById(R.id.headline4);
-        mTxtHeadline5 = (TextView)view.findViewById(R.id.headline5);
-        mTxtHeadline6 = (TextView)view.findViewById(R.id.headline6);
-        mTxtHeadline7 = (TextView)view.findViewById(R.id.headline7);
-        mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
+        mTxtHeadline1 = (TextView) view.findViewById(R.id.headline);
+        mTxtHeadline2 = (TextView) view.findViewById(R.id.headline2);
+        mTxtHeadline3 = (TextView) view.findViewById(R.id.headline3);
+        mTxtHeadline4 = (TextView) view.findViewById(R.id.headline4);
+        mTxtHeadline5 = (TextView) view.findViewById(R.id.headline5);
+        mTxtHeadline6 = (TextView) view.findViewById(R.id.headline6);
+        mTxtHeadline7 = (TextView) view.findViewById(R.id.headline7);
+        mTxtHeadline8 = (TextView) view.findViewById(R.id.headline8);
 
-        txtNewsDesk = (TextView)view.findViewById(R.id.news_desk_title);
+        txtNewsDesk = (TextView) view.findViewById(R.id.news_desk_title);
 
-        img1 = (ImageView)view.findViewById(R.id.img1);
-        img2 = (ImageView)view.findViewById(R.id.img2);
-        img3 = (ImageView)view.findViewById(R.id.img3);
-        img4 = (ImageView)view.findViewById(R.id.img4);
-        img5 = (ImageView)view.findViewById(R.id.img5);
-        img6 = (ImageView)view.findViewById(R.id.img6);
-        img7 = (ImageView)view.findViewById(R.id.img7);
-        img8 = (ImageView)view.findViewById(R.id.img8);
+        img1 = (ImageView) view.findViewById(R.id.img1);
+        img2 = (ImageView) view.findViewById(R.id.img2);
+        img3 = (ImageView) view.findViewById(R.id.img3);
+        img4 = (ImageView) view.findViewById(R.id.img4);
+        img5 = (ImageView) view.findViewById(R.id.img5);
+        img6 = (ImageView) view.findViewById(R.id.img6);
+        img7 = (ImageView) view.findViewById(R.id.img7);
+        img8 = (ImageView) view.findViewById(R.id.img8);
 
-        mScrollView = (ScrollView)view.findViewById(R.id.scrollView2);
+        mScrollView = (ScrollView) view.findViewById(R.id.scrollView2);
 
         clearLayout();
 
@@ -203,24 +197,18 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         return view;
     }
 
-    public void toNewsBodyFragment(int x){
+    public void toNewsBodyFragment(int x) {
         mArticleFullBody = article[x];
         mHeadline = hl[x];
         articleSelectedListener.onArticleSelected(mHeadline, mArticleFullBody);
-
-        /*Fragment fragment = new NewsBodyFragment();
-        FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.content_frame_3, fragment)
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .commit();*/
     }
 
     @Override
-    public void onAttach(Context context){
+    public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            articleSelectedListener = (ArticleSelectedListener)context;
-        } catch (ClassCastException cce){
+            articleSelectedListener = (ArticleSelectedListener) context;
+        } catch (ClassCastException cce) {
             cce.printStackTrace();
         }
     }
@@ -231,7 +219,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         articleSelectedListener = null;
     }
 
-    public void startNewsUpdate(){
+    public void startNewsUpdate() {
         mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
         updateNews(mGuardURL);
     }
@@ -301,17 +289,14 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 case Constants.EIGHTH:
                     toNewsBodyFragment(7);
                     break;
-                /*default:
-                    if(message.contains(Constants.HELP) || message.contains(Constants.HIDE)) {
-                        txtNewsDesk.setText(mNewsSection.toUpperCase());
-                    }
-                    Log.d("News", "Got message:\"" + message + "\"");
-                    break;*/
+                default:
+                    txtNewsDesk.setText(mNewsSection.toUpperCase());
+
             }
             if(message.contains(Constants.SCROLL_DOWN))
-                mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
+                mScrollView.scrollBy(0, -(0-mScrollView.getHeight()));
             else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
+                mScrollView.scrollBy(0, 0-mScrollView.getHeight());
         }
     };
 
@@ -333,108 +318,23 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             if (!mCacheManager.containsKey(cacheName)) {
                 Log.i(Constants.TAG, cacheName + " does not exist, creating");
                 startNewsUpdate();
-            } else if (mCacheManager.isExpired(name)){
+            } else if (mCacheManager.isExpired(name)) {
                 Log.i(Constants.TAG, cacheName + " expired. Refreshing...");
                 startNewsUpdate();
                 renderNews((JSONObject) mCacheManager.get(cacheName));
             }
         }
 
-        /*
 
-        // -----CASE NEWS-----
-        if (!mCacheManager.containsKey(WORLD_CACHE)) {
-            Log.i(Constants.TAG,"News Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering News");
-            renderNews((JSONObject) mCacheManager.get(WORLD_CACHE));
-        }
-        else if (mCacheManager.isExpired(WORLD_CACHE)) {
-            Log.i(Constants.TAG, "NewsCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE SPORTS-----
-        if (!mCacheManager.containsKey(SPORTS_CACHE)) {
-            Log.i(Constants.TAG,"Sports Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Sports");
-            renderNews((JSONObject) mCacheManager.get(SPORTS_CACHE));
-        }
-        else if (mCacheManager.isExpired(SPORTS_CACHE)) {
-            Log.i(Constants.TAG, "SportsCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE TECHNOLOGY-----
-        if (!mCacheManager.containsKey(TECH_CACHE)) {
-            Log.i(Constants.TAG,"Tech Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Technology");
-            renderNews((JSONObject) mCacheManager.get(TECH_CACHE));
-        }
-        else if (mCacheManager.isExpired(TECH_CACHE)) {
-            Log.i(Constants.TAG, "TechCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE BUSINESS-----
-        if (!mCacheManager.containsKey(BUSINESS_CACHE)) {
-            Log.i(Constants.TAG,"Business Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Business");
-            renderNews((JSONObject) mCacheManager.get(BUSINESS_CACHE));
-        }
-        else if (mCacheManager.isExpired(BUSINESS_CACHE)) {
-            Log.i(Constants.TAG, "BusinessCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE MEDIA-----
-        if (!mCacheManager.containsKey(MEDIA_CACHE)) {
-            Log.i(Constants.TAG,"Media Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Media");
-            renderNews((JSONObject) mCacheManager.get(MEDIA_CACHE));
-        }
-        else if (mCacheManager.isExpired(MEDIA_CACHE)) {
-            Log.i(Constants.TAG, "MediaCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE TRAVEL-----
-        if (!mCacheManager.containsKey(TRAVEL_CACHE)) {
-            Log.i(Constants.TAG,"Travel Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Travel");
-            renderNews((JSONObject) mCacheManager.get(TRAVEL_CACHE));
-        }
-        else if (mCacheManager.isExpired(TRAVEL_CACHE)) {
-            Log.i(Constants.TAG, "TravelCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        // -----CASE SCIENCE-----
-        if (!mCacheManager.containsKey(SCIENCE_CACHE)) {
-            Log.i(Constants.TAG,"Science Cache does not exist, updating");
-            startNewsUpdate();
-            Log.i(Constants.TAG, "Rendering Science");
-            renderNews((JSONObject) mCacheManager.get(SCIENCE_CACHE));
-        }
-        else if (mCacheManager.isExpired(SCIENCE_CACHE)) {
-            Log.i(Constants.TAG, "ScienceCache expired. Refreshing...");
-            startNewsUpdate();
-        }
-
-        */
     }
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to
-     *  MainActivity from voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to
+     * MainActivity from voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
@@ -447,21 +347,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }
 
-        /*if (mNewsSection.equals("world")  || mNewsSection.equals("news")) {
-            mCacheManager.registerCacheListener(WORLD_CACHE, this);
-        } else if (mNewsSection.equals("sports")) {
-            mCacheManager.registerCacheListener(SPORTS_CACHE, this);
-        } else if (mNewsSection.equals("technology")) {
-            mCacheManager.registerCacheListener(TECH_CACHE, this);
-        } else if (mNewsSection.equals("business")) {
-            mCacheManager.registerCacheListener(BUSINESS_CACHE, this);
-        } else if (mNewsSection.equals("media")) {
-            mCacheManager.registerCacheListener(MEDIA_CACHE, this);
-        } else if (mNewsSection.equals("travel")) {
-            mCacheManager.registerCacheListener(TRAVEL_CACHE, this);
-        } else if (mNewsSection.equals("science")) {
-            mCacheManager.registerCacheListener(SCIENCE_CACHE, this);
-        }*/
     }
 
     // when this goes out of view, halt listening
@@ -478,23 +363,24 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 Log.i("NEWS CACHE", "unregister " + cacheName);
             }
         }
+
     }
 
     // Get news headlines from api and display
-    private void updateNews(final String query){
-        new Thread(){
-            public void run(){
+    private void updateNews(final String query) {
+        new Thread() {
+            public void run() {
                 final JSONObject json = FetchURL.getJSON(query);
-                if(json == null){
-                    mHandler.post(new Runnable(){
-                        public void run(){
-                            ((MainActivity)getActivity()).showToast(getString(R.string.err_news),
+                if (json == null) {
+                    mHandler.post(new Runnable() {
+                        public void run() {
+                            ((MainActivity) getActivity()).showToast(getString(R.string.err_news),
                                     Gravity.CENTER, Toast.LENGTH_LONG);
                         }
                     });
                 } else {
-                    mHandler.post(new Runnable(){
-                        public void run(){
+                    mHandler.post(new Runnable() {
+                        public void run() {
                             updateNewsCache(json);
                             //Log.i("NEWS ", json.toString());
                             renderNews(json);
@@ -504,7 +390,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }.start();
     }
-    private void updateNewsCache(JSONObject data){
+
+    private void updateNewsCache(JSONObject data) {
 
         for (String name : Constants.NEWS_DESKS) {
             String cacheName = name;
@@ -514,24 +401,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }
 
-        /*if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
-            mCacheManager.addCache(WORLD_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("sports")) {
-            mCacheManager.addCache(SPORTS_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("technology")) {
-            mCacheManager.addCache(TECH_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("business")) {
-            mCacheManager.addCache(BUSINESS_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("media")) {
-            mCacheManager.addCache(MEDIA_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("travel")) {
-            mCacheManager.addCache(TRAVEL_CACHE, data, DATA_UPDATE_FREQUENCY);
-        } else if (mNewsSection.equals("science")) {
-            mCacheManager.addCache(SCIENCE_CACHE, data, DATA_UPDATE_FREQUENCY);
-        }*/
     }
 
-    private void renderNews(JSONObject json){
+    private void renderNews(JSONObject json) {
         try {
             //Log.i("NEWS JSON", json.toString());
             JSONObject response = null;
@@ -553,8 +425,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 try {
                     thumbnail = fields.getString("thumbnail");
                     thumbs[i] = thumbnail;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     thumbs[i] = "@drawable/guardian";
                 }
                 i++;
@@ -593,12 +464,14 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             mTxtHeadline8.setText(Html.fromHtml(txt7));
             Picasso.with(getContext()).load(thumbs[7]).fit().centerInside().into(img8);
 
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("NEWS ERROR", e.toString());
         }
     }
 
-    /** Callback from CacheManager */
+    /**
+     * Callback from CacheManager
+     */
     @Override
     public void onCacheExpired(String cacheName) {
 
@@ -610,24 +483,11 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }
 
-        /*if (mNewsSection.equals("world") || mNewsSection.equals("news")) {
-            if (cacheName.equals(WORLD_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("sports")) {
-            if (cacheName.equals(SPORTS_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("technology")) {
-            if (cacheName.equals(TECH_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("business")) {
-            if (cacheName.equals(BUSINESS_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("media")) {
-            if (cacheName.equals(MEDIA_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("travel")) {
-            if (cacheName.equals(TRAVEL_CACHE)) startNewsUpdate();
-        } else if (mNewsSection.equals("science")) {
-            if (cacheName.equals(SCIENCE_CACHE)) startNewsUpdate();
-        }*/
     }
 
-    /** Callback from CacheManager */
+    /**
+     * Callback from CacheManager
+     */
     @Override
     public void onCacheChanged(String cacheName) {
         // In this case we do nothing, as calling startWeatherUpdate() will refresh the views.

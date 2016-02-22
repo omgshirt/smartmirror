@@ -31,7 +31,7 @@ import java.util.TimerTask;
  * Fragment that displays the inspirational quotes
  */
 public class QuoteFragment extends Fragment {
-    
+
     private ArrayList<String> mQuoteList;
     private ArrayList<String> mQuoteAuthor;
     private Runnable mRunnable;
@@ -99,7 +99,7 @@ public class QuoteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.quotes_fragment, container, false);
 
-        mTimerTask  = new TimerTask() {
+        mTimerTask = new TimerTask() {
             @Override
             public void run() {
                 getActivity().runOnUiThread(mRunnable);
@@ -119,7 +119,7 @@ public class QuoteFragment extends Fragment {
      * Method that handles loading the quotes from assets/quotes and saves
      * them into an array
      */
-    public void setUpQuotes(){
+    public void setUpQuotes() {
         // get the quotes
         AssetManager assetManager = getContext().getAssets();
         byte[] buffer;
@@ -142,12 +142,14 @@ public class QuoteFragment extends Fragment {
         setUpArrayLists(quotes);
     }
 
-    /**-
+    /**
+     * -
      * Sets up the two array lists that will contain the quote itself and
      * the author as two separate array lists
+     *
      * @param fullQuote the full quote with author
      */
-    public void setUpArrayLists(String[] fullQuote){
+    public void setUpArrayLists(String[] fullQuote) {
 
         mQuoteList = new ArrayList<>();
         mQuoteAuthor = new ArrayList<>();
@@ -155,8 +157,8 @@ public class QuoteFragment extends Fragment {
         //finds the index of where '\' occurs
         for (String quote : fullQuote) {
             int split = quote.indexOf("\\");
-            mQuoteList.add(quote.substring(0, split-1));
-            mQuoteAuthor.add(quote.substring(split+1));
+            mQuoteList.add(quote.substring(0, split - 1));
+            mQuoteAuthor.add(quote.substring(split + 1));
         }
     }
 
@@ -179,7 +181,7 @@ public class QuoteFragment extends Fragment {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             Log.d("Quotes", "Got message:\"" + message + "\"");
-            switch(message){
+            switch (message) {
                 case Constants.BACK:
                     getFragmentManager().popBackStack();
                     break;
@@ -187,12 +189,13 @@ public class QuoteFragment extends Fragment {
         }
     };
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     * voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));

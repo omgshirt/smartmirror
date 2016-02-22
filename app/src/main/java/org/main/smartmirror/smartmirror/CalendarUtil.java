@@ -20,10 +20,11 @@ public class CalendarUtil extends Activity {
 
     public static String DateToStr;
 
-    public static void setCalendarHeader(String dateToString){
+    public static void setCalendarHeader(String dateToString) {
         DateToStr = dateToString;
     }
-    public static String getCalendarHeader(){
+
+    public static String getCalendarHeader() {
         Date curDate = new Date();
         SimpleDateFormat format = new SimpleDateFormat();
         DateToStr = format.format(curDate);
@@ -34,14 +35,14 @@ public class CalendarUtil extends Activity {
         return DateToStr;
     }
 
-    public static  ArrayList<String> readCalendarEvent(Context context, ListView listView) {
+    public static ArrayList<String> readCalendarEvent(Context context, ListView listView) {
 
         //Day, Month, Year, Hour, Minute formatting
         ArrayList nameOfEvent = new ArrayList();
         Calendar beginTime = Calendar.getInstance();
 
         long startMillis = beginTime.getTimeInMillis();
-        long endMillis = startMillis + 36000000 ;
+        long endMillis = startMillis + 36000000;
         Cursor cursor = null;
         ContentResolver cr = context.getContentResolver();
 
@@ -73,17 +74,16 @@ public class CalendarUtil extends Activity {
         //fetching calendars id
         nameOfEvent.clear();
 
-        if(cursor.getCount()==0){
+        if (cursor.getCount() == 0) {
             nameOfEvent.add("No Events");
             ArrayAdapter<String> arrayAdapter =
                     new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nameOfEvent);
             // Set The Adapter
             listView.setAdapter(arrayAdapter);
-        }
-        else {
+        } else {
             for (int i = 0; i < CNames.length; i++) {
                 //If calendar name is what is stored in preferences, then add event to be displayed
-                 if (cursorNames.getString(0).equals(Preferences.getUserAccountName())) {
+                if (cursorNames.getString(0).equals(Preferences.getUserAccountName())) {
 
                     java.util.Date startT = new java.util.Date(cursor.getLong(3));
                     DateFormat formatter = new SimpleDateFormat("h:mm a");
@@ -100,8 +100,7 @@ public class CalendarUtil extends Activity {
                             new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nameOfEvent);
                     // Set The Adapter
                     listView.setAdapter(arrayAdapter);
-                }
-                else{ //If calendar name isn't what is in preferences, move to next
+                } else { //If calendar name isn't what is in preferences, move to next
                     cursor.moveToNext();
                     cursorNames.moveToNext();
                 }

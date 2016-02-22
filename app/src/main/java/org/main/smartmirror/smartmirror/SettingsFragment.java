@@ -12,9 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
+
+import java.sql.BatchUpdateException;
 
 
 public class SettingsFragment extends Fragment {
@@ -38,7 +41,8 @@ public class SettingsFragment extends Fragment {
         return fragment;
     }
 
-    public SettingsFragment() { }
+    public SettingsFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,7 @@ public class SettingsFragment extends Fragment {
         grpSysVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
+                switch (checkedId) {
                     case R.id.sys_vol_off:
                         mPreferences.setSystemVolume(Preferences.VOL_OFF);
                         break;
@@ -99,7 +103,7 @@ public class SettingsFragment extends Fragment {
         grpMusVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
+                switch (checkedId) {
                     case R.id.mus_vol_off:
                         mPreferences.setMusicVolume(Preferences.VOL_OFF);
                         break;
@@ -137,7 +141,7 @@ public class SettingsFragment extends Fragment {
             grpMusVolume.check(R.id.mus_vol_vhigh);
         }
 
-            // Speech Frequency radio group
+        // Speech Frequency radio group
         grpSpeechFreqGroup = (RadioGroup) view.findViewById(R.id.speech_frequency_group);
         grpSpeechFreqGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -172,11 +176,11 @@ public class SettingsFragment extends Fragment {
         }
 
         // Handle App Brightness radio group
-        grpAppBrightness = (RadioGroup)view.findViewById(R.id.brightness_group);
+        grpAppBrightness = (RadioGroup) view.findViewById(R.id.brightness_group);
         grpAppBrightness.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId) {
+                switch (checkedId) {
                     case R.id.brightness_vlow:
                         mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_VLOW);
                         break;
@@ -197,7 +201,7 @@ public class SettingsFragment extends Fragment {
         });
 
         int appBrightness = mPreferences.getAppBrightness();
-        switch (appBrightness){
+        switch (appBrightness) {
             case Preferences.BRIGHTNESS_VLOW:
                 grpAppBrightness.check(R.id.brightness_vlow);
                 break;
@@ -220,7 +224,7 @@ public class SettingsFragment extends Fragment {
         grpLightBrightness.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId) {
+                switch (checkedId) {
                     case R.id.light_vlow:
                         mPreferences.setLightBrightness(Preferences.BRIGHTNESS_VLOW);
                         break;
@@ -241,7 +245,7 @@ public class SettingsFragment extends Fragment {
         });
 
         int lightBrightness = mPreferences.getLightBrightness();
-        switch (lightBrightness){
+        switch (lightBrightness) {
             case Preferences.BRIGHTNESS_VLOW:
                 grpLightBrightness.check(R.id.light_vlow);
                 break;
@@ -337,6 +341,17 @@ public class SettingsFragment extends Fragment {
         swtTimeFormat.setChecked(mPreferences.isTimeFormat12hr());
         setTimeSwitchText();
 
+        // need to think more about this implementation
+        // Button changeAccountbtn = (Button) view.findViewById(R.id.change_account_button);
+        // changeAccountbtn.setOnClickListener(new View.OnClickListener() {
+            // @Override
+            // public void onClick(View v) {
+                // Intent intent = new Intent(getActivity(), AccountActivity.class);
+                // startActivity(intent);
+                // getActivity().finish();
+            // }
+        // });
+
         return view;
     }
 
@@ -389,7 +404,7 @@ public class SettingsFragment extends Fragment {
     };
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
@@ -402,23 +417,23 @@ public class SettingsFragment extends Fragment {
     }
 
     private void setVoiceSwitchText() {
-        setSwitchText(swtVoiceEnabled, "Voice Recognition: On", "Voice Recognition: Off" );
+        setSwitchText(swtVoiceEnabled, "Voice Recognition: On", "Voice Recognition: Off");
     }
 
     private void setWeatherSwitchText() {
-        setSwitchText(swtWeatherEnglish, "Weather Units: English", "Weather Units: Metric" );
+        setSwitchText(swtWeatherEnglish, "Weather Units: English", "Weather Units: Metric");
     }
 
-    private void setRemoteSwitchText(){
-        setSwitchText(swtRemoteEnabled, "Remote Control: On", "Remote Control: Off" );
+    private void setRemoteSwitchText() {
+        setSwitchText(swtRemoteEnabled, "Remote Control: On", "Remote Control: Off");
     }
 
-    private void setCameraSwitchText(){
-        setSwitchText(swtCameraEnabled, "Camera: On", "Camera: Off" );
+    private void setCameraSwitchText() {
+        setSwitchText(swtCameraEnabled, "Camera: On", "Camera: Off");
     }
 
     private void setTimeSwitchText() {
-        setSwitchText(swtTimeFormat , "Time Format: 12hr", "Time Format: 24hr");
+        setSwitchText(swtTimeFormat, "Time Format: 12hr", "Time Format: 24hr");
     }
 
     private void setSwitchText(Switch switchWidget, String isCheckedText, String notCheckedText) {

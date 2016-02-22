@@ -35,7 +35,7 @@ public class LightFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String[] colorNames = getResources().getStringArray(R.array.color_names);
         colorMap = new HashMap<>();
@@ -54,7 +54,7 @@ public class LightFragment extends Fragment {
         int brightness = Preferences.getInstance(getActivity()).getLightBrightness();
 
         // get the stored color, White if no value is set
-        SharedPreferences prefs = getActivity().getApplicationContext().getSharedPreferences(LIGHT_PREFS, Context.MODE_PRIVATE );
+        SharedPreferences prefs = getActivity().getApplicationContext().getSharedPreferences(LIGHT_PREFS, Context.MODE_PRIVATE);
         mColor = prefs.getInt(LIGHT_COLOR, getResources().getColor(R.color.white));
         view.setBackgroundColor(mColor);
         setWindowBrightness(brightness);
@@ -63,7 +63,7 @@ public class LightFragment extends Fragment {
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
@@ -100,7 +100,7 @@ public class LightFragment extends Fragment {
     }
 
     private void saveColor(int color) {
-        SharedPreferences prefs = getActivity().getApplicationContext().getSharedPreferences(LIGHT_PREFS, Context.MODE_PRIVATE );
+        SharedPreferences prefs = getActivity().getApplicationContext().getSharedPreferences(LIGHT_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = prefs.edit();
         edit.putInt(LIGHT_COLOR, color);
         edit.apply();

@@ -52,21 +52,22 @@ public class FacebookFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("Facebook ", "Got message:\"" + message +"\"");
-            if(message.contains(Constants.SCROLL_DOWN))
-                webview.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * webview.getContentHeight())-webview.getHeight()));
-            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                webview.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * webview.getContentHeight())-webview.getHeight());
+            Log.d("Facebook ", "Got message:\"" + message + "\"");
+            if (message.contains(Constants.SCROLL_DOWN))
+                webview.scrollBy(0, -((int) 0.3 * ((int) getResources().getDisplayMetrics().density * webview.getContentHeight()) - webview.getHeight()));
+            else if (!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
+                webview.scrollBy(0, (int) 0.3 * ((int) getResources().getDisplayMetrics().density * webview.getContentHeight()) - webview.getHeight());
 
         }
     };
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     * voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));

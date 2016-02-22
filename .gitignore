@@ -28,6 +28,8 @@ proguard/
 
 *.iml
 app/app.iml
+.idea/compiler.xml
+.idea/runConfigurations.xml
 .idea/encodings.xml
 .idea/gradle.xml
 .idea/misc.xml

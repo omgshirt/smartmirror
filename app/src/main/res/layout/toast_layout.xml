@@ -4,13 +4,14 @@
     android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimaryDark" >
-    <TextView android:id="@+id/text"
+    android:background="@color/colorPrimaryDark">
+
+    <TextView
+        android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorPrimary"
         android:textSize="18sp"
         android:padding="10dp"
-        android:gravity="center_vertical"
-        />
+        android:gravity="center_vertical" />
 </LinearLayout>

@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 /**
  * Created by Master N on 11/20/2015.
  */
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.TextureView;

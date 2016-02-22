@@ -20,10 +20,10 @@ import android.util.Log;
 
 /**
  * Created by Brian on 10/22/2015.
- *
+ * <p/>
  * This is a singleton class to hold preferences for the application
  * Get the instance of it by using the getInstance() method
- *
+ * <p/>
  * Class is created at MainActivity start and loads the SharedPrefences for the application
  * Access is by getters and setters, which also handle file storage:
  */
@@ -31,7 +31,7 @@ public class Preferences implements LocationListener {
     private final String TAG = "Preferences";
     private static Preferences mPreferences = null;
     private SharedPreferences mSharedPreferences;
-    private Activity mActivity;
+    private static Activity mActivity;
 
     //Google Account Email Preference
     public static final String PREFS_GMAIL = "accountName";
@@ -55,6 +55,9 @@ public class Preferences implements LocationListener {
     public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
     public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
 
+    public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
+    public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
+
     // chance for TTS to happen (0-1)
     public static final float SPEECH_NEVER = 0;
     public static final float SPEECH_RARE = .25f;
@@ -76,6 +79,10 @@ public class Preferences implements LocationListener {
     public static final float VOL_HIGH = .7f;
     public static final float VOL_VHIGH = 1.0f;
 
+    // default for work address
+    public static final float WORK_LAT = 0f;
+    public static final float WORK_LONG = 0f;
+
     // strings
     public static final String CMD_CAMERA_ON = "camera on";
     public static final String CMD_CAMERA_OFF = "camera off";
@@ -84,7 +91,7 @@ public class Preferences implements LocationListener {
     public static final String CMD_LIGHT_LOW = "light low";
     public static final String CMD_LIGHT_MEDIUM = "light medium";
     public static final String CMD_LIGHT_HIGH = "light high";
-    public static final String CMD_LIGHT_VHIGH= "light very high";
+    public static final String CMD_LIGHT_VHIGH = "light very high";
 
 
     public static final String CMD_SPEECH_OFF = "speech off";
@@ -92,7 +99,7 @@ public class Preferences implements LocationListener {
     public static final String CMD_SPEECH_LOW = "speech low";
     public static final String CMD_SPEECH_MEDIUM = "speech medium";
     public static final String CMD_SPEECH_HIGH = "speech high";
-    public static final String CMD_SPEECH_VHIGH= "speech very high";
+    public static final String CMD_SPEECH_VHIGH = "speech very high";
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
@@ -101,7 +108,7 @@ public class Preferences implements LocationListener {
     public static final String CMD_SCREEN_LOW = "screen low";
     public static final String CMD_SCREEN_MEDIUM = "screen medium";
     public static final String CMD_SCREEN_HIGH = "screen high";
-    public static final String CMD_SCREEN_VHIGH= "screen very high";
+    public static final String CMD_SCREEN_VHIGH = "screen very high";
 
     public static final String CMD_SPEECH_NEVER = "speech never";
     public static final String CMD_SPEECH_RARE = "speech rare";
@@ -116,7 +123,7 @@ public class Preferences implements LocationListener {
     public static final String CMD_VOLUME_LOW = "volume low";
     public static final String CMD_VOLUME_MEDIUM = "volume medium";
     public static final String CMD_VOLUME_HIGH = "volume high";
-    public static final String CMD_VOLUME_VHIGH= "volume very high";
+    public static final String CMD_VOLUME_VHIGH = "volume very high";
 
     public static final String CMD_WEATHER_ENGLISH = "weather english";
     public static final String CMD_WEATHER_METRIC = "weather metric";
@@ -150,14 +157,14 @@ public class Preferences implements LocationListener {
     private double mLatitude;
     private double mLongitude;
 
+    private double mWorkLatitude;
+    private double mWorkLongitude;
+
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     private static final String TIME_FORMAT_24_HR = "k:mm";
     private static final String TIME_FORMAT_24_HR_SHORT = "k:mm";
     private static final String TIME_FORMAT_12_HR = "h:mm";
     private static final String TIME_FORMAT_12_HR_SHORT = "h:mm";
-
-
-
 
 
     // Handle any messages sent from MainActivity
@@ -332,9 +339,12 @@ public class Preferences implements LocationListener {
         mVoiceEnabled = mSharedPreferences.getBoolean(PREFS_VOICE_ENABLED, true);
         mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
 
-        //Google Account Email Preferences
+        // Google Account Email Preferences
         mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
 
+        // Work address
+        mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
+        mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
 
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
@@ -346,12 +356,11 @@ public class Preferences implements LocationListener {
 
         // Find current lat and long positions.
         // This is not currently saved to the prefs file, system will re-discover location on start
-        LocationManager locationManager = (LocationManager)mActivity.getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
         if (locationManager != null) {
             if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            {
+                    || ContextCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
         }
@@ -367,15 +376,15 @@ public class Preferences implements LocationListener {
             }
         }
 
-        Log.d("Location","lat:" + Double.toString(mLatitude));
-        Log.d("Location","long:" + Double.toString(mLongitude));
+        Log.d("Location", "lat:" + Double.toString(mLatitude));
+        Log.d("Location", "long:" + Double.toString(mLongitude));
 
         LocalBroadcastManager.getInstance(mActivity).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
     }
 
     // Clean up any refs that might hang around to prevent leaks.
-    public void destroy(){
+    public void destroy() {
         Context appContext = MainActivity.getContextForApplication();
         LocalBroadcastManager.getInstance(appContext).unregisterReceiver(mMessageReceiver);
         setVolumesToSystemValues();
@@ -389,6 +398,8 @@ public class Preferences implements LocationListener {
         if (mPreferences == null) {
             Log.d("Preferences", "Creating new prefs instance...");
             mPreferences = new Preferences(activity);
+        } else {
+            mActivity = activity;
         }
         return mPreferences;
     }
@@ -398,9 +409,7 @@ public class Preferences implements LocationListener {
     }
 
     /**
-     *
      * @param vol set system volume (0-1)
-     *
      */
     public void setSystemVolume(float vol) {
         if (vol < 0 || vol > 1) return;
@@ -417,6 +426,7 @@ public class Preferences implements LocationListener {
 
     /**
      * Sets the volume for music stream
+     *
      * @param vol value to set (0-1)
      */
     public void setMusicVolume(float vol) {
@@ -435,7 +445,7 @@ public class Preferences implements LocationListener {
 
     public void setVolumesToSystemValues() {
         AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, mMusicVolumeHolder,  0);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, mMusicVolumeHolder, 0);
         am.setStreamVolume(AudioManager.STREAM_SYSTEM, mSystemVolumeHolder, 0);
     }
 
@@ -444,7 +454,7 @@ public class Preferences implements LocationListener {
     private void setStreamVolume(float vol, int stream) {
         AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
         int max = am.getStreamMaxVolume(stream);
-        int setVol = (int)(vol * max);
+        int setVol = (int) (vol * max);
         am.setStreamVolume(stream, setVol, 0);
     }
 
@@ -453,7 +463,8 @@ public class Preferences implements LocationListener {
         return am.getStreamVolume(stream);
     }
 
-    /** Sets weather display as english or metric
+    /**
+     * Sets weather display as english or metric
      *
      * @param unit Units to display
      */
@@ -468,7 +479,7 @@ public class Preferences implements LocationListener {
         }
     }
 
-    public String getWeatherUnits(){
+    public String getWeatherUnits() {
         return mWeatherUnits;
     }
 
@@ -478,6 +489,7 @@ public class Preferences implements LocationListener {
 
     /**
      * Converts fahrenheit temps to the appropriate unit, rounded to the nearest degree
+     *
      * @param temp temp in degrees F
      * @return converted temp
      */
@@ -485,17 +497,16 @@ public class Preferences implements LocationListener {
         if (mWeatherUnits.equals(METRIC)) {
             temp = (temp - 32) * 5 / 9;
         }
-        return (int)Math.round(temp);
+        return (int) Math.round(temp);
     }
 
     // returns the unicode string for deg C or deg F based on the WeatherIcons font set
     public String getTempString() {
         String units;
         Context appContext = MainActivity.getContextForApplication();
-        if ( mWeatherUnits.equals(ENGLISH) )  {
+        if (mWeatherUnits.equals(ENGLISH)) {
             units = appContext.getResources().getString(R.string.weather_deg_f);
-        }
-        else {
+        } else {
             units = appContext.getResources().getString(R.string.weather_deg_c);
         }
         return units;
@@ -503,6 +514,7 @@ public class Preferences implements LocationListener {
 
     /**
      * Converts mph into the appropriate unit, rounded to the nearest unit per hour
+     *
      * @param speed in mph
      * @return speed in converted units
      */
@@ -510,11 +522,12 @@ public class Preferences implements LocationListener {
         if (mWeatherUnits.equals(METRIC)) {
             speed *= 1.609;
         }
-        return (int)Math.round(speed);
+        return (int) Math.round(speed);
     }
 
 
-    /** Set the string used to format date display
+    /**
+     * Set the string used to format date display
      *
      * @param format string for displaying date in SimpleDateFormat
      */
@@ -530,7 +543,8 @@ public class Preferences implements LocationListener {
         return mDateFormat;
     }
 
-    /** Format time display for clock
+    /**
+     * Format time display for clock
      *
      * @param format string for displaying time in SimpleDateFormat
      */
@@ -563,7 +577,6 @@ public class Preferences implements LocationListener {
     }
 
     /**
-     *
      * @param frequency how often the TTS should speak (0-1)
      */
     public void setSpeechFrequency(float frequency) {
@@ -578,9 +591,10 @@ public class Preferences implements LocationListener {
         return mSpeechFrequency;
     }
 
-    /** Set brightness value used by night light
+    /**
+     * Set brightness value used by night light
      *
-     *  @param brightness int (0-255)
+     * @param brightness int (0-255)
      */
     public void setLightBrightness(int brightness) {
         if (brightness < 0 || brightness > 255) return;
@@ -592,13 +606,14 @@ public class Preferences implements LocationListener {
 
     }
 
-    public int getLightBrightness () {
+    public int getLightBrightness() {
         return mLightBrightness;
     }
 
-    /** Set brightness value for the application
+    /**
+     * Set brightness value for the application
      *
-     *  @param brightness int (0-255)
+     * @param brightness int (0-255)
      */
     public void setScreenBrightness(int brightness) {
         if (brightness < 0 || brightness > 255) return;
@@ -611,7 +626,7 @@ public class Preferences implements LocationListener {
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
             edit.apply();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -623,22 +638,23 @@ public class Preferences implements LocationListener {
         setScreenBrightness(mAppBrightness);
     }
 
-    public int getAppBrightness () {
+    public int getAppBrightness() {
         return mAppBrightness;
     }
 
     public boolean isRemoteEnabled() {
-        return  mRemoteEnabled;
+        return mRemoteEnabled;
     }
 
     /**
      * Set whether the app will broadcast for wifi connections
+     *
      * @param isEnabled boolean
      */
     public void setRemoteEnabled(boolean isEnabled) {
         try {
             mRemoteEnabled = isEnabled;
-            ((MainActivity)mActivity).setRemoteStatus(mRemoteEnabled);
+            ((MainActivity) mActivity).setRemoteStatus(mRemoteEnabled);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
             edit.apply();
@@ -653,11 +669,12 @@ public class Preferences implements LocationListener {
 
     /**
      * Sets the voice enabled status
+     *
      * @param voiceEnabled boolean
      */
     public void setVoiceEnabled(boolean voiceEnabled) {
         this.mVoiceEnabled = voiceEnabled;
-        ((MainActivity)mActivity).showSpeechIcon(voiceEnabled);
+        ((MainActivity) mActivity).showSpeechIcon(voiceEnabled);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
         edit.apply();
@@ -677,7 +694,7 @@ public class Preferences implements LocationListener {
     // helper sends a string to MainActivity to be spoken
     private void speakText(int stringId) {
         String text = mActivity.getResources().getString(stringId);
-        ((MainActivity)mActivity).startTTS(text);
+        ((MainActivity) mActivity).startTTS(text);
     }
 
     public double getLatitude() {
@@ -696,6 +713,28 @@ public class Preferences implements LocationListener {
         this.mLongitude = mLongitude;
     }
 
+    public double getWorkLatitude() {
+        return mWorkLatitude;
+    }
+
+    public void setWorkLatitude(double mWorkLatitude) {
+        this.mWorkLatitude = mWorkLatitude;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putFloat(PREFS_WORK_LAT, (float) mWorkLatitude);
+        edit.apply();
+    }
+
+    public double getWorkLongitude() {
+        return mWorkLongitude;
+    }
+
+    public void setWorkLongitude(double mWorkLongitude) {
+        this.mWorkLongitude = mWorkLongitude;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putFloat(PREFS_WORK_LONG, (float) mWorkLongitude);
+        edit.apply();
+    }
+
     // Location Listener Implementation
     @Override
     public void onLocationChanged(Location location) {
@@ -706,7 +745,7 @@ public class Preferences implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.i("Location", "onStatusChanged:" + Integer.toString(status) );
+        Log.i("Location", "onStatusChanged:" + Integer.toString(status));
     }
 
     @Override
@@ -720,15 +759,15 @@ public class Preferences implements LocationListener {
     }
 
     //Get User Gmail Account to be used in other fragments
-    public static String getUserAccountName(){
+    public static String getUserAccountName() {
         return mUserAccountPref;
     }
 
     //Set User Account if null
     public void setUserAccountName(String userAcc) {
-            mUserAccountPref = userAcc;
-            SharedPreferences.Editor edit = mSharedPreferences.edit();
-            edit.putString(PREFS_GMAIL, userAcc);
-            edit.apply();
-        }
+        mUserAccountPref = userAcc;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_GMAIL, userAcc);
+        edit.apply();
+    }
 }

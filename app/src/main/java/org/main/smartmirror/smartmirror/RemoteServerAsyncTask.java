@@ -45,6 +45,7 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
             return null;
         }
     }
+
     /*
      * (non-Javadoc)
      * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
@@ -54,10 +55,11 @@ public class RemoteServerAsyncTask extends AsyncTask<Void, Void, String> {
         if (result != null) {
             mContext.startRemoteServer();
             mContext.handleRemoteCommand(result);
-                //Log.d("Remote", "Command: " + result);
+            //Log.d("Remote", "Command: " + result);
         }
         //Log.i("Wifi", "Server stopped");
     }
+
     /*
      * (non-Javadoc)
      * @see android.os.AsyncTask#onPreExecute()
