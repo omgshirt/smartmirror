@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -65,7 +66,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     TwitterFragment.mUsers.add(i,status.getUser().getName());
                     TwitterFragment.mTweets.add(i,status.getText());
                     TwitterFragment.mUsersAt.add(i,status.getUser().getScreenName());
-                    TwitterFragment.mUri.add(i,Uri.parse(status.getUser().getProfileImageURLHttps()));
+                    TwitterFragment.mUri.add(i, Uri.parse(status.getUser().getProfileImageURLHttps()));
 
                     i++;
                 }

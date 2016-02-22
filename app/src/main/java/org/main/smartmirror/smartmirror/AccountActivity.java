@@ -83,11 +83,15 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         // EditText twitterPassword = (EditText) findViewById(R.id.twitter_password);
         EditText workAddress = (EditText) findViewById(R.id.work_location);
         String strAddress = workAddress.getText().toString().replace(' ', '+');
-        convertAddress(strAddress);
+        convertAddressToLatLong(strAddress);
         startMain();
     }
 
-    private void convertAddress(String addressInput) {
+    /**
+     * Converts the given address to latitude and longitude
+     * @param addressInput the given address
+     */
+    private void convertAddressToLatLong(String addressInput) {
         Geocoder geocoder = new Geocoder(this);
         List<Address> addressList;
         try {

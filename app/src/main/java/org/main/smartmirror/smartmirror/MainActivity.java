@@ -223,12 +223,6 @@ public class MainActivity extends AppCompatActivity
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
 
-        //Google Account Picker
-        if ( mPreferences.getUserAccountName().equals("") ) {
-            Intent gAccPick = new Intent(MainActivity.this, AccountPickerActivity.class);
-            startActivity(gAccPick);
-        }
-
         // Start Network Discovery Service (NSD) & create handler
         mRemoteHandler = new RemoteHandler();
         mRemoteConnection = new RemoteConnection(this, mRemoteHandler);
