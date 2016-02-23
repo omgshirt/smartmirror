@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
@@ -20,14 +21,12 @@ import android.widget.Switch;
 public class SettingsFragment extends Fragment {
 
     private Preferences mPreferences;
-    private RadioGroup grpSpeechFreqGroup;
     private RadioGroup grpAppBrightness;
     private RadioGroup grpLightBrightness;
     private RadioGroup grpSysVolume;
-    private RadioGroup grpMusVolume;
+    private RadioGroup grpSpeechVolume;
     private Switch swtVoiceEnabled;
     private Switch swtRemoteEnabled;
-    private Switch swtCameraEnabled;
     private Switch swtWeatherEnglish;
     private Switch swtTimeFormat;
 
@@ -38,7 +37,8 @@ public class SettingsFragment extends Fragment {
         return fragment;
     }
 
-    public SettingsFragment() { }
+    public SettingsFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class SettingsFragment extends Fragment {
         grpSysVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
+                switch (checkedId) {
                     case R.id.sys_vol_off:
                         mPreferences.setSystemVolume(Preferences.VOL_OFF);
                         break;
@@ -80,26 +80,13 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        float vol = mPreferences.getSystemVolume();
-        if (vol == Preferences.VOL_OFF) {
-            grpSysVolume.check(R.id.sys_vol_off);
-        } else if (vol == Preferences.VOL_VLOW) {
-            grpSysVolume.check(R.id.sys_vol_vlow);
-        } else if (vol == Preferences.VOL_LOW) {
-            grpSysVolume.check(R.id.sys_vol_low);
-        } else if (vol == Preferences.VOL_MEDIUM) {
-            grpSysVolume.check(R.id.sys_vol_medium);
-        } else if (vol == Preferences.VOL_HIGH) {
-            grpSysVolume.check(R.id.sys_vol_high);
-        } else if (vol == Preferences.VOL_VHIGH) {
-            grpSysVolume.check(R.id.sys_vol_vhigh);
-        }
+        setSystemVolume(mPreferences.getSystemVolume());
 
-        grpMusVolume = (RadioGroup) view.findViewById(R.id.mus_vol_group);
-        grpMusVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        grpSpeechVolume = (RadioGroup) view.findViewById(R.id.mus_vol_group);
+        grpSpeechVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
+                switch (checkedId) {
                     case R.id.mus_vol_off:
                         mPreferences.setMusicVolume(Preferences.VOL_OFF);
                         break;
@@ -122,61 +109,14 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        vol = mPreferences.getMusicVolume();
-        if (vol == Preferences.VOL_OFF) {
-            grpMusVolume.check(R.id.mus_vol_off);
-        } else if (vol == Preferences.VOL_VLOW) {
-            grpMusVolume.check(R.id.mus_vol_vlow);
-        } else if (vol == Preferences.VOL_LOW) {
-            grpMusVolume.check(R.id.mus_vol_low);
-        } else if (vol == Preferences.VOL_MEDIUM) {
-            grpMusVolume.check(R.id.mus_vol_medium);
-        } else if (vol == Preferences.VOL_HIGH) {
-            grpMusVolume.check(R.id.mus_vol_high);
-        } else if (vol == Preferences.VOL_VHIGH) {
-            grpMusVolume.check(R.id.mus_vol_vhigh);
-        }
+        setMusicVolume(mPreferences.getMusicVolume());
 
-            // Speech Frequency radio group
-        grpSpeechFreqGroup = (RadioGroup) view.findViewById(R.id.speech_frequency_group);
-        grpSpeechFreqGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.speech_never:
-                        mPreferences.setSpeechFrequency(Preferences.SPEECH_NEVER);
-                        break;
-                    case R.id.speech_rare:
-                        mPreferences.setSpeechFrequency(Preferences.SPEECH_RARE);
-                        break;
-                    case R.id.speech_often:
-                        mPreferences.setSpeechFrequency(Preferences.SPEECH_OFTEN);
-                        break;
-                    case R.id.speech_always:
-                        mPreferences.setSpeechFrequency(Preferences.SPEECH_ALWAYS);
-                        break;
-                }
-            }
-        });
-
-        // select the proper radio button based on current setting
-        float freq = mPreferences.getSpeechFrequency();
-        if (freq == Preferences.SPEECH_NEVER) {
-            grpSpeechFreqGroup.check(R.id.speech_never);
-        } else if (freq == Preferences.SPEECH_RARE) {
-            grpSpeechFreqGroup.check(R.id.speech_rare);
-        } else if (freq == Preferences.SPEECH_OFTEN) {
-            grpSpeechFreqGroup.check(R.id.speech_often);
-        } else if (freq == Preferences.SPEECH_ALWAYS) {
-            grpSpeechFreqGroup.check(R.id.speech_always);
-        }
-
-        // Handle App Brightness radio group
+        // App Brightness radio group
         grpAppBrightness = (RadioGroup)view.findViewById(R.id.brightness_group);
         grpAppBrightness.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId) {
+                switch (checkedId) {
                     case R.id.brightness_vlow:
                         mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_VLOW);
                         break;
@@ -196,31 +136,14 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        int appBrightness = mPreferences.getAppBrightness();
-        switch (appBrightness){
-            case Preferences.BRIGHTNESS_VLOW:
-                grpAppBrightness.check(R.id.brightness_vlow);
-                break;
-            case Preferences.BRIGHTNESS_LOW:
-                grpAppBrightness.check(R.id.brightness_low);
-                break;
-            case Preferences.BRIGHTNESS_MEDIUM:
-                grpAppBrightness.check(R.id.brightness_medium);
-                break;
-            case Preferences.BRIGHTNESS_HIGH:
-                grpAppBrightness.check(R.id.brightness_high);
-                break;
-            case Preferences.BRIGHTNESS_VHIGH:
-                grpAppBrightness.check(R.id.brightness_vhigh);
-                break;
-        }
+        setScreenBrightness(mPreferences.getAppBrightness());
 
         // Handle LightBrightness settings
         grpLightBrightness = (RadioGroup) view.findViewById(R.id.light_group);
         grpLightBrightness.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId) {
+                switch (checkedId) {
                     case R.id.light_vlow:
                         mPreferences.setLightBrightness(Preferences.BRIGHTNESS_VLOW);
                         break;
@@ -239,9 +162,269 @@ public class SettingsFragment extends Fragment {
                 }
             }
         });
+        setLightBrightness(mPreferences.getLightBrightness());
 
-        int lightBrightness = mPreferences.getLightBrightness();
-        switch (lightBrightness){
+
+        // Voice Enabled Switch
+        swtVoiceEnabled = (Switch) view.findViewById(R.id.switch_voice_enabled);
+        swtVoiceEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPreferences.setVoiceEnabled(isChecked);
+                if (isChecked) {
+                    swtVoiceEnabled.setText(getResources().getString(R.string.voice_on));
+                } else {
+                    swtVoiceEnabled.setText(getResources().getString(R.string.voice_off));
+                }
+            }
+        });
+        swtVoiceEnabled.setChecked(mPreferences.isVoiceEnabled());
+
+        // Remote Enabled Switch
+        swtRemoteEnabled = (Switch) view.findViewById(R.id.switch_remote_enabled);
+        swtRemoteEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPreferences.setRemoteEnabled(isChecked);
+                if (isChecked) {
+                    swtRemoteEnabled.setText(getResources().getString(R.string.remote_on));
+                } else {
+                    swtRemoteEnabled.setText(getResources().getString(R.string.remote_off));
+                }
+            }
+        });
+        swtRemoteEnabled.setChecked(mPreferences.isRemoteEnabled());
+
+        swtWeatherEnglish = (Switch) view.findViewById(R.id.switch_weather_units);
+        swtWeatherEnglish.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mPreferences.setWeatherUnits(Preferences.ENGLISH);
+                    swtWeatherEnglish.setText(getResources().getString(R.string.weather_english));
+                } else {
+                    mPreferences.setWeatherUnits(Preferences.METRIC);
+                    swtWeatherEnglish.setText(getResources().getString(R.string.weather_metric));
+                }
+            }
+        });
+        swtWeatherEnglish.setChecked(mPreferences.weatherIsEnglish());
+
+        swtTimeFormat = (Switch) view.findViewById(R.id.switch_time_format);
+        swtTimeFormat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mPreferences.setTimeFormat12hr();
+                    swtTimeFormat.setText(getResources().getString(R.string.time_format_12hr));
+                } else {
+                    mPreferences.setTimeFormat24hr();
+                    swtTimeFormat.setText(getResources().getString(R.string.time_format_24hr));
+                }
+            }
+        });
+        swtTimeFormat.setChecked(mPreferences.isTimeFormat12hr());
+
+        // need to think more about this implementation
+        // Button changeAccountbtn = (Button) view.findViewById(R.id.change_account_button);
+        // changeAccountbtn.setOnClickListener(new View.OnClickListener() {
+            // @Override
+            // public void onClick(View v) {
+                // Intent intent = new Intent(getActivity(), AccountActivity.class);
+                // startActivity(intent);
+                // getActivity().finish();
+            // }
+        // });
+
+        return view;
+    }
+
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // If commands are broadcast to this fragment, respond by updating the UI.
+    // Updates to Preferences are handled by the receiver for that class.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("SettingsFragment", "Got message:\"" + message + "\"");
+            Boolean checked = false;
+            switch (message) {
+
+                // screen brightness
+                case Preferences.CMD_SCREEN_VLOW:
+                    setScreenBrightness(Preferences.BRIGHTNESS_VLOW);
+                    break;
+                case Preferences.CMD_SCREEN_LOW:
+                    setScreenBrightness(Preferences.BRIGHTNESS_LOW);
+                    break;
+                case Preferences.CMD_SCREEN_MEDIUM:
+                    setScreenBrightness(Preferences.BRIGHTNESS_MEDIUM);
+                    break;
+                case Preferences.CMD_SCREEN_HIGH:
+                    setScreenBrightness(Preferences.BRIGHTNESS_HIGH);
+                    break;
+                case Preferences.CMD_SCREEN_VHIGH:
+                    setScreenBrightness(Preferences.BRIGHTNESS_VHIGH);
+                    break;
+
+                // Light
+                case Preferences.CMD_LIGHT_VLOW:
+                    setLightBrightness(Preferences.BRIGHTNESS_VLOW);
+                    break;
+                case Preferences.CMD_LIGHT_LOW:
+                    setLightBrightness(Preferences.BRIGHTNESS_LOW);
+                    break;
+                case Preferences.CMD_LIGHT_MEDIUM:
+                    setLightBrightness(Preferences.BRIGHTNESS_MEDIUM);
+                    break;
+                case Preferences.CMD_LIGHT_HIGH:
+                    setLightBrightness(Preferences.BRIGHTNESS_HIGH);
+                    break;
+                case Preferences.CMD_LIGHT_VHIGH:
+                    setLightBrightness(Preferences.BRIGHTNESS_VHIGH);
+                    break;
+
+                // system volume
+                case Preferences.CMD_VOLUME_OFF:
+                    setSystemVolume(Preferences.VOL_OFF);
+                    break;
+                case Preferences.CMD_VOLUME_VLOW:
+                    setSystemVolume(Preferences.VOL_VLOW);
+                    break;
+                case Preferences.CMD_VOLUME_LOW:
+                    setSystemVolume(Preferences.VOL_LOW);
+                    break;
+                case Preferences.CMD_VOLUME_MEDIUM:
+                    setSystemVolume(Preferences.VOL_MEDIUM);
+                    break;
+                case Preferences.CMD_VOLUME_HIGH:
+                    setSystemVolume(Preferences.VOL_HIGH);
+                    break;
+                case Preferences.CMD_VOLUME_VHIGH:
+                    setSystemVolume(Preferences.VOL_VHIGH);
+                    break;
+
+                // Speech Volume
+                case Preferences.CMD_SPEECH_OFF:
+                    setMusicVolume(Preferences.VOL_OFF);
+                    break;
+                case Preferences.CMD_SPEECH_VLOW:
+                    setMusicVolume(Preferences.VOL_VLOW);
+                    break;
+                case Preferences.CMD_SPEECH_LOW:
+                    setMusicVolume(Preferences.VOL_LOW);
+                    break;
+                case Preferences.CMD_SPEECH_MEDIUM:
+                    setMusicVolume(Preferences.VOL_MEDIUM);
+                    break;
+                case Preferences.CMD_SPEECH_HIGH:
+                    setMusicVolume(Preferences.VOL_HIGH);
+                    break;
+                case Preferences.CMD_SPEECH_VHIGH:
+                    setMusicVolume(Preferences.VOL_VHIGH);
+                    break;
+
+                // remote on / off
+                case Preferences.CMD_REMOTE_ON:
+                    checked = true;
+                case Preferences.CMD_REMOTE_OFF:
+                    swtRemoteEnabled.setChecked(checked);
+                    break;
+
+                // voice recognition on / off
+                case Preferences.CMD_VOICE_ON:
+                    checked = true;
+                case Preferences.CMD_VOICE_OFF:
+                    swtVoiceEnabled.setChecked(checked);
+                    break;
+
+                // weather english / metric
+                case Preferences.CMD_WEATHER_ENGLISH:
+                    checked = true;
+                case Preferences.CMD_WEATHER_METRIC:
+                    swtWeatherEnglish.setChecked(checked);
+                    break;
+
+                // time 12 / 24 hour
+                case Preferences.CMD_TIME_12HR:
+                    checked = true;
+                case Preferences.CMD_TIME_24HR:
+                    swtTimeFormat.setChecked(checked);
+            }
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    // Methods to update UI elements
+
+    public void setSystemVolume(float vol){
+        if (vol == Preferences.VOL_OFF) {
+            grpSysVolume.check(R.id.sys_vol_off);
+        } else if (vol == Preferences.VOL_VLOW) {
+            grpSysVolume.check(R.id.sys_vol_vlow);
+        } else if (vol == Preferences.VOL_LOW) {
+            grpSysVolume.check(R.id.sys_vol_low);
+        } else if (vol == Preferences.VOL_MEDIUM) {
+            grpSysVolume.check(R.id.sys_vol_medium);
+        } else if (vol == Preferences.VOL_HIGH) {
+            grpSysVolume.check(R.id.sys_vol_high);
+        } else if (vol == Preferences.VOL_VHIGH) {
+            grpSysVolume.check(R.id.sys_vol_vhigh);
+        }
+    }
+
+    public void setMusicVolume(float vol){
+        if (vol == Preferences.VOL_OFF) {
+            grpSpeechVolume.check(R.id.mus_vol_off);
+        } else if (vol == Preferences.VOL_VLOW) {
+            grpSpeechVolume.check(R.id.mus_vol_vlow);
+        } else if (vol == Preferences.VOL_LOW) {
+            grpSpeechVolume.check(R.id.mus_vol_low);
+        } else if (vol == Preferences.VOL_MEDIUM) {
+            grpSpeechVolume.check(R.id.mus_vol_medium);
+        } else if (vol == Preferences.VOL_HIGH) {
+            grpSpeechVolume.check(R.id.mus_vol_high);
+        } else if (vol == Preferences.VOL_VHIGH) {
+            grpSpeechVolume.check(R.id.mus_vol_vhigh);
+        }
+    }
+
+    public void setScreenBrightness(int brightness){
+        switch (brightness){
+            case Preferences.BRIGHTNESS_VLOW:
+                grpAppBrightness.check(R.id.brightness_vlow);
+                break;
+            case Preferences.BRIGHTNESS_LOW:
+                grpAppBrightness.check(R.id.brightness_low);
+                break;
+            case Preferences.BRIGHTNESS_MEDIUM:
+                grpAppBrightness.check(R.id.brightness_medium);
+                break;
+            case Preferences.BRIGHTNESS_HIGH:
+                grpAppBrightness.check(R.id.brightness_high);
+                break;
+            case Preferences.BRIGHTNESS_VHIGH:
+                grpAppBrightness.check(R.id.brightness_vhigh);
+                break;
+        }
+    }
+
+    public void setLightBrightness(int brightness){
+        switch (brightness){
             case Preferences.BRIGHTNESS_VLOW:
                 grpLightBrightness.check(R.id.light_vlow);
                 break;
@@ -257,175 +440,6 @@ public class SettingsFragment extends Fragment {
             case Preferences.BRIGHTNESS_VHIGH:
                 grpLightBrightness.check(R.id.light_vhigh);
                 break;
-        }
-
-        // Voice Enabled Switch
-        swtVoiceEnabled = (Switch) view.findViewById(R.id.switch_voice_enabled);
-        swtVoiceEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    mPreferences.setVoiceEnabled(true);
-                } else {
-                    mPreferences.setVoiceEnabled(false);
-                }
-                setVoiceSwitchText();
-            }
-        });
-        swtVoiceEnabled.setChecked(mPreferences.isVoiceEnabled());
-        setVoiceSwitchText();
-
-        // Camera Enabled Switch
-        swtCameraEnabled = (Switch) view.findViewById(R.id.switch_camera_enabled);
-        swtCameraEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    mPreferences.setCameraEnabled(true);
-                } else {
-                    mPreferences.setCameraEnabled(false);
-                }
-                setCameraSwitchText();
-            }
-        });
-        swtCameraEnabled.setChecked(mPreferences.isCameraEnabled());
-        setCameraSwitchText();
-
-        // Remote Enabled Switch
-        swtRemoteEnabled = (Switch) view.findViewById(R.id.switch_remote_enabled);
-        swtRemoteEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    mPreferences.setRemoteEnabled(true);
-                } else {
-                    mPreferences.setRemoteEnabled(false);
-                }
-                setRemoteSwitchText();
-            }
-        });
-        swtRemoteEnabled.setChecked(mPreferences.isRemoteEnabled());
-        setRemoteSwitchText();
-
-        swtWeatherEnglish = (Switch) view.findViewById(R.id.switch_weather_units);
-        swtWeatherEnglish.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    mPreferences.setWeatherUnits(Preferences.ENGLISH);
-                } else {
-                    mPreferences.setWeatherUnits(Preferences.METRIC);
-                }
-                setWeatherSwitchText();
-            }
-        });
-        swtWeatherEnglish.setChecked(mPreferences.weatherIsEnglish());
-        setWeatherSwitchText();
-
-        swtTimeFormat = (Switch) view.findViewById(R.id.switch_time_format);
-        swtTimeFormat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    mPreferences.setTimeFormat12hr();
-                } else {
-                    mPreferences.setTimeFormat24hr();
-                }
-                setTimeSwitchText();
-            }
-        });
-        swtTimeFormat.setChecked(mPreferences.isTimeFormat12hr());
-        setTimeSwitchText();
-
-        return view;
-    }
-
-    // ----------------------- Local Broadcast Receiver -----------------------
-
-    // If commands are broadcast to this fragment, respond by updating the UI
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("message");
-            Log.d("SettingsFragment", "Got message:\"" + message + "\"");
-            Boolean checked = false;
-            switch (message) {
-                case Preferences.CMD_CAMERA_ON:
-                    checked = true;
-                case Preferences.CMD_CAMERA_OFF:
-                    swtCameraEnabled.setChecked(checked);
-                    setCameraSwitchText();
-                    break;
-
-                case Preferences.CMD_REMOTE_ON:
-                    checked = true;
-                case Preferences.CMD_REMOTE_OFF:
-                    swtRemoteEnabled.setChecked(checked);
-                    setRemoteSwitchText();
-                    break;
-
-                case Preferences.CMD_VOICE_ON:
-                    checked = true;
-                case Preferences.CMD_VOICE_OFF:
-                    swtVoiceEnabled.setChecked(checked);
-                    setVoiceSwitchText();
-                    break;
-
-                case Preferences.CMD_WEATHER_ENGLISH:
-                    checked = true;
-                case Preferences.CMD_WEATHER_METRIC:
-                    swtWeatherEnglish.setChecked(checked);
-                    setWeatherSwitchText();
-                    break;
-
-                case Preferences.CMD_TIME_12HR:
-                    checked = true;
-                case Preferences.CMD_TIME_24HR:
-                    swtTimeFormat.setChecked(checked);
-                    setTimeSwitchText();
-            }
-        }
-    };
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-                new IntentFilter("inputAction"));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-    }
-
-    private void setVoiceSwitchText() {
-        setSwitchText(swtVoiceEnabled, "Voice Recognition: On", "Voice Recognition: Off" );
-    }
-
-    private void setWeatherSwitchText() {
-        setSwitchText(swtWeatherEnglish, "Weather Units: English", "Weather Units: Metric" );
-    }
-
-    private void setRemoteSwitchText(){
-        setSwitchText(swtRemoteEnabled, "Remote Control: On", "Remote Control: Off" );
-    }
-
-    private void setCameraSwitchText(){
-        setSwitchText(swtCameraEnabled, "Camera: On", "Camera: Off" );
-    }
-
-    private void setTimeSwitchText() {
-        setSwitchText(swtTimeFormat , "Time Format: 12hr", "Time Format: 24hr");
-    }
-
-    private void setSwitchText(Switch switchWidget, String isCheckedText, String notCheckedText) {
-        if (switchWidget.isChecked()) {
-            switchWidget.setText(isCheckedText);
-        } else {
-            switchWidget.setText(notCheckedText);
         }
     }
 }

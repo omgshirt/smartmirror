@@ -27,11 +27,10 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
  * Service that runs the Speech Recognition. In charge of receiving and
  * sending information (IPC)
  */
-public class VoiceService extends Service implements RecognitionListener{
+public class VoiceService extends Service implements RecognitionListener {
 
     private ArrayList<Messenger> mClients = new ArrayList<>();
-    private Messenger mMessenger = new Messenger( new IHandler());
-    private String mSpokenCommand;
+    private Messenger mMessenger = new Messenger(new IHandler());
     private SpeechRecognizer mSpeechRecognizer;
     private boolean mSpeechInitialized;
     public static final int STOP_SPEECH = 0;
@@ -60,6 +59,7 @@ public class VoiceService extends Service implements RecognitionListener{
 
     /**
      * Method that returns a binder for the calling Activity to bind and access this service
+     *
      * @param intent the current intent
      * @return the binder
      */
@@ -81,8 +81,9 @@ public class VoiceService extends Service implements RecognitionListener{
     /**
      * Starts voice capture, invoked by the calling Activity
      */
-    public void startVoice(){
-        if(mSpeechInitialized) {
+    public void startVoice() {
+        if (mSpeechInitialized) {
+            // issue a short delay
             Log.i("VR", "startVoice()");
             mSpeechRecognizer.startListening(KEYWORD_SEARCH);
         }
@@ -92,7 +93,7 @@ public class VoiceService extends Service implements RecognitionListener{
      * Stops voice capture
      */
 
-    public void stopVoice(){
+    public void stopVoice() {
         if (mSpeechInitialized) {
             mSpeechRecognizer.stop();
         }
@@ -100,10 +101,11 @@ public class VoiceService extends Service implements RecognitionListener{
 
     /**
      * Handles the speech results and prepares them to send them to calling activity
-     * @param message the voice capture
+     *
+     * @param message    the voice capture
      * @param resultType the result type
      */
-    public void speechResults(String message, int resultType){
+    public void speechResults(String message, int resultType) {
         Bundle bundle = new Bundle();
         // key is result so the calling activity can handle the message
         bundle.putString("result", message);
@@ -117,7 +119,7 @@ public class VoiceService extends Service implements RecognitionListener{
     /**
      * Sends a message back to the Activity that started this service
      */
-    public void sendMessage(Message msg){
+    public void sendMessage(Message msg) {
         try {
             mClients.get(0).send(msg);
         } catch (RemoteException e) {
@@ -136,12 +138,45 @@ public class VoiceService extends Service implements RecognitionListener{
         if (hypothesis != null) {
             String text = hypothesis.getHypstr().trim();
             Log.i("VR", "onPartialResult: \"" + text + "\"");
-
-            // if the partial result holds the full hypothesis, stop now and return result.
-            if (Constants.COMMAND_SET.contains(hypothesis.toString())) {
-                stopVoice();
-            }
+            findCommandInText(text);
         }
+    }
+
+    /**
+     * Look for recognized commands, starting with the last word.
+     * Also checks two word pairs (n-1) + (n) from end back towards front of string
+     * If a command is found, cancel voice listener and return that command.
+     *
+     * @param text string to evaluate
+     * @return true if the string contains a recognized command
+     */
+    public boolean findCommandInText(String text) {
+
+        String[] candidates = text.split("\\s+");
+        //for (int i = candidates.length - 1; i >= 0; i--) {
+        //for(int i = 0; i < candidates.length; i++) {
+            String candidate = "";
+
+            for (int j = 0; j < candidates.length; j++) {
+                candidate = (candidate + " " + candidates[j]).trim();
+                Log.i("VR", "looking for \"" + candidate + "\"");
+
+                if (Constants.COMMAND_SET.contains(candidate)) {
+                    Log.i("VR", "found command: " + candidate);
+                    cancelAndSendResult(candidate);
+                    return true;
+                }
+            }
+        //}
+        return false;
+    }
+
+    public void cancelAndSendResult(String text) {
+        //Log.i("VR", "cancelling voice. Result: \"" + text + "\"");
+        //Log.i(Constants.TAG, "cancelling voice. Result: \"" + text + "\"");
+        mSpeechRecognizer.cancel();
+        speechResults(text, RESULT_SPEECH);
+        startVoice();
     }
 
     /**
@@ -149,15 +184,18 @@ public class VoiceService extends Service implements RecognitionListener{
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        if(hypothesis != null) {
-            String hypstr = hypothesis.getHypstr().trim();
-            Log.i("VR", "onResult:\"" + hypstr + "\"");
-            //if (hypothesis.getHypstr().equals(MIRROR_KPS)) return;
-            speechResults(hypstr, RESULT_SPEECH);
+        if (hypothesis != null) {
+            String hyp = hypothesis.getHypstr().trim();
+            if (!findCommandInText(hyp)) {
+                Log.i("VR", "onResult: \"" + hyp + "\"");
+                speechResults(hyp, RESULT_SPEECH);
+                startVoice();
+            }
         } else {
             Log.i("VR", "onResult(), hypothesis null");
+            startVoice();
         }
-        startVoice();
+
     }
 
     /**
@@ -179,6 +217,7 @@ public class VoiceService extends Service implements RecognitionListener{
 
     /**
      * Method that handles the Error
+     *
      * @param error the error
      */
     @Override
@@ -223,11 +262,10 @@ public class VoiceService extends Service implements RecognitionListener{
             protected void onPostExecute(Exception result) {
                 if (result != null) {
                     Toast.makeText(VoiceService.this, result.toString(), Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     mSpeechInitialized = true;
                     if (mClients.size() > 0)
-                       startVoice();
+                        startVoice();
                 }
             }
         }.execute();
@@ -235,6 +273,7 @@ public class VoiceService extends Service implements RecognitionListener{
 
     /**
      * Method that sets up the recognizer
+     *
      * @param assetsDir the asset directory on the device
      * @throws IOException
      */
@@ -263,8 +302,8 @@ public class VoiceService extends Service implements RecognitionListener{
         mSpeechRecognizer.addKeyphraseSearch(MIRROR_KPS, MIRROR_KPS);
 
         // Create grammar-based search
-        File smGrammarSearch = new File(assetsDir, "sm-commands.gram");
-        mSpeechRecognizer.addGrammarSearch(GRAMMAR_SEARCH, smGrammarSearch);
+        //File smGrammarSearch = new File(assetsDir, "sm-commands.gram");
+        //mSpeechRecognizer.addGrammarSearch(GRAMMAR_SEARCH, smGrammarSearch);
     }
 
     /**
@@ -275,7 +314,7 @@ public class VoiceService extends Service implements RecognitionListener{
 
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what){
+            switch (msg.what) {
                 case INIT_SPEECH:
                     mClients.add(msg.replyTo);
                     break;
@@ -288,7 +327,7 @@ public class VoiceService extends Service implements RecognitionListener{
                     // We may want to discriminate between these options. Stop should process
                     // any audio in the queue, while cancel throws out any pending results.
                     //mClients.remove(msg.replyTo);
-                    if(mSpeechInitialized)
+                    if (mSpeechInitialized)
                         mSpeechRecognizer.cancel();
                     break;
                 default:

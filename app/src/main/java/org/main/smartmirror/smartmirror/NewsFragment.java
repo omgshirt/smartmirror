@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,7 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
-public class NewsFragment extends Fragment implements CacheManager.CacheListener{
+public class NewsFragment extends Fragment implements CacheManager.CacheListener {
 
     // the guardian api
     public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
@@ -34,8 +35,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String mGuardURL = mPreURL + mDefNewsSection + mPostURL;
     public static String mNewsSection;
 
-    // time in minutes before news data is considered old and is discarded
-    private final int DATA_UPDATE_FREQUENCY = 1;
+    // time in seconds before news data is considered old and is discarded
+    private final int DATA_UPDATE_FREQUENCY = 600;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
 
@@ -46,15 +47,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static final String SCIENCE_CACHE = "science";
     public static final String MEDIA_CACHE = "media";
     public static final String TRAVEL_CACHE = "travel";
-
-    public static final String[] NEWS_DESKS = {
-            "business",
-            "media",
-            "science",
-            "sports",
-            "tech",
-            "travel",
-            "world" };
 
 
     private CacheManager mCacheManager = null;
@@ -78,7 +70,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private ImageView img7;
     private ImageView img8;
 
-    public static String mArticleFullBody = "";
+    //public static String mArticleFullBody = "";
     public static int numItems = 10;
     public static String article[] = new String[numItems];
     public static String hl[] = new String[numItems];
@@ -88,18 +80,19 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String body = "";
     public static String trailText = "";
     public static String webTitle = "";
-    public static String mHeadline = "";
+    //public static String mHeadline = "";
 
     ScrollView mScrollView;
 
     Handler mHandler = new Handler();
-    ArticleSelectedListener articleSelectedListener;
+    private ArticleSelectedListener articleSelectedListener;
 
     public interface ArticleSelectedListener {
         void onArticleSelected(String title, String body);
     }
 
-    public NewsFragment() {}
+    public NewsFragment() {
+    }
 
     public static NewsFragment newInstance(String section) {
         Bundle args = new Bundle();
@@ -120,27 +113,27 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // Initialize Items
         // mNewsSection = "world";
 
-        mTxtHeadline1 = (TextView)view.findViewById(R.id.headline);
-        mTxtHeadline2 = (TextView)view.findViewById(R.id.headline2);
-        mTxtHeadline3 = (TextView)view.findViewById(R.id.headline3);
-        mTxtHeadline4 = (TextView)view.findViewById(R.id.headline4);
-        mTxtHeadline5 = (TextView)view.findViewById(R.id.headline5);
-        mTxtHeadline6 = (TextView)view.findViewById(R.id.headline6);
-        mTxtHeadline7 = (TextView)view.findViewById(R.id.headline7);
-        mTxtHeadline8 = (TextView)view.findViewById(R.id.headline8);
+        mTxtHeadline1 = (TextView) view.findViewById(R.id.headline);
+        mTxtHeadline2 = (TextView) view.findViewById(R.id.headline2);
+        mTxtHeadline3 = (TextView) view.findViewById(R.id.headline3);
+        mTxtHeadline4 = (TextView) view.findViewById(R.id.headline4);
+        mTxtHeadline5 = (TextView) view.findViewById(R.id.headline5);
+        mTxtHeadline6 = (TextView) view.findViewById(R.id.headline6);
+        mTxtHeadline7 = (TextView) view.findViewById(R.id.headline7);
+        mTxtHeadline8 = (TextView) view.findViewById(R.id.headline8);
 
-        txtNewsDesk = (TextView)view.findViewById(R.id.news_desk_title);
+        txtNewsDesk = (TextView) view.findViewById(R.id.news_desk_title);
 
-        img1 = (ImageView)view.findViewById(R.id.img1);
-        img2 = (ImageView)view.findViewById(R.id.img2);
-        img3 = (ImageView)view.findViewById(R.id.img3);
-        img4 = (ImageView)view.findViewById(R.id.img4);
-        img5 = (ImageView)view.findViewById(R.id.img5);
-        img6 = (ImageView)view.findViewById(R.id.img6);
-        img7 = (ImageView)view.findViewById(R.id.img7);
-        img8 = (ImageView)view.findViewById(R.id.img8);
+        img1 = (ImageView) view.findViewById(R.id.img1);
+        img2 = (ImageView) view.findViewById(R.id.img2);
+        img3 = (ImageView) view.findViewById(R.id.img3);
+        img4 = (ImageView) view.findViewById(R.id.img4);
+        img5 = (ImageView) view.findViewById(R.id.img5);
+        img6 = (ImageView) view.findViewById(R.id.img6);
+        img7 = (ImageView) view.findViewById(R.id.img7);
+        img8 = (ImageView) view.findViewById(R.id.img8);
 
-        mScrollView = (ScrollView)view.findViewById(R.id.scrollView2);
+        mScrollView = (ScrollView) view.findViewById(R.id.scrollView2);
 
         clearLayout();
 
@@ -205,18 +198,18 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         return view;
     }
 
-    public void toNewsBodyFragment(int x){
-        mArticleFullBody = article[x];
-        mHeadline = hl[x];
-        articleSelectedListener.onArticleSelected(mHeadline, mArticleFullBody);
+    public void toNewsBodyFragment(int x) {
+        //mArticleFullBody = article[x];
+        //mHeadline = hl[x];
+        articleSelectedListener.onArticleSelected(hl[x], article[x]);
     }
 
     @Override
-    public void onAttach(Context context){
+    public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            articleSelectedListener = (ArticleSelectedListener)context;
-        } catch (ClassCastException cce){
+            articleSelectedListener = (ArticleSelectedListener) context;
+        } catch (ClassCastException cce) {
             cce.printStackTrace();
         }
     }
@@ -227,7 +220,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         articleSelectedListener = null;
     }
 
-    public void startNewsUpdate(){
+    public void startNewsUpdate() {
+        Log.i(Constants.TAG, "starting news update");
         mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
         updateNews(mGuardURL);
     }
@@ -325,37 +319,33 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // TODO: 2/3/2016 add switch case so only current news section is checked/updated
         // TODO: 2/3/2016 don't update when null/not prev visited
 
-
-        for (String name : NEWS_DESKS) {
-            String cacheName = name;
-            if (!mCacheManager.containsKey(cacheName)) {
-                Log.i(Constants.TAG, cacheName + " does not exist, creating");
+        if (!mCacheManager.containsKey(mNewsSection)) {
+            Log.i(Constants.TAG, mNewsSection + " does not exist, creating");
+            startNewsUpdate();
+        } else {
+            renderNews((JSONObject) mCacheManager.get(mNewsSection));
+            if (mCacheManager.isExpired(mNewsSection)) {
+                Log.i(Constants.TAG, mNewsSection + " expired. Refreshing...");
                 startNewsUpdate();
-            } else if (mCacheManager.isExpired(name)){
-                Log.i(Constants.TAG, cacheName + " expired. Refreshing...");
-                startNewsUpdate();
-                renderNews((JSONObject) mCacheManager.get(cacheName));
             }
         }
-
-
     }
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to
-     *  MainActivity from voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to
+     * MainActivity from voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
 
-        for (String name : NEWS_DESKS) {
-            String cacheName = name;
-            if (mNewsSection.equals(cacheName)) {
-                mCacheManager.registerCacheListener(cacheName, this);
-                Log.i("NEWS CACHE", "register " + cacheName);
+        for (String name : Constants.NEWS_DESKS) {
+            if (name.equals(mNewsSection)) {
+                mCacheManager.registerCacheListener(name, this);
+                Log.i("NEWS CACHE", "register " + name);
             }
         }
 
@@ -366,34 +356,29 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
 
-        // TODO UNREGISTER ON PAUSE
-
-        for (String name : NEWS_DESKS) {
-            String cacheName = name;
-            if (mNewsSection.equals(cacheName)) {
-                mCacheManager.unRegisterCacheListener(cacheName, this);
-                Log.i("NEWS CACHE", "unregister " + cacheName);
+        for (String name : Constants.NEWS_DESKS) {
+            if (name.equals(mNewsSection)) {
+                mCacheManager.unRegisterCacheListener(name, this);
+                Log.i("NEWS CACHE", "unregister " + name);
             }
         }
-
     }
 
     // Get news headlines from api and display
-    private void updateNews(final String query){
-        new Thread(){
-            public void run(){
+    private void updateNews(final String query) {
+        new Thread() {
+            public void run() {
                 final JSONObject json = FetchURL.getJSON(query);
-                if(json == null){
-                    mHandler.post(new Runnable(){
-                        public void run(){
-                            Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.news_error),
-                                    Toast.LENGTH_LONG).show();
+                if (json == null) {
+                    mHandler.post(new Runnable() {
+                        public void run() {
+                            ((MainActivity) getActivity()).showToast(getString(R.string.news_err),
+                                    Gravity.CENTER, Toast.LENGTH_LONG);
                         }
                     });
                 } else {
-                    mHandler.post(new Runnable(){
-                        public void run(){
+                    mHandler.post(new Runnable() {
+                        public void run() {
                             updateNewsCache(json);
                             //Log.i("NEWS ", json.toString());
                             renderNews(json);
@@ -403,19 +388,19 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
         }.start();
     }
-    private void updateNewsCache(JSONObject data){
 
-        for (String name : NEWS_DESKS) {
-            String cacheName = name;
-            if (mNewsSection.equals(cacheName)) {
-                mCacheManager.addCache(cacheName, data, DATA_UPDATE_FREQUENCY);
-                Log.i("NEWS CACHE", "updating " + cacheName);
+    private void updateNewsCache(JSONObject data) {
+
+        for (String name : Constants.NEWS_DESKS) {
+            if (name.equals(mNewsSection)) {
+                mCacheManager.addCache(name, data, DATA_UPDATE_FREQUENCY);
+                Log.i("NEWS CACHE", "updating " + name);
             }
         }
 
     }
 
-    private void renderNews(JSONObject json){
+    private void renderNews(JSONObject json) {
         try {
             //Log.i("NEWS JSON", json.toString());
             JSONObject response = null;
@@ -437,8 +422,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 try {
                     thumbnail = fields.getString("thumbnail");
                     thumbs[i] = thumbnail;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     thumbs[i] = "@drawable/guardian";
                 }
                 i++;
@@ -477,18 +461,19 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             mTxtHeadline8.setText(Html.fromHtml(txt7));
             Picasso.with(getContext()).load(thumbs[7]).fit().centerInside().into(img8);
 
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("NEWS ERROR", e.toString());
         }
     }
 
-    /** Callback from CacheManager */
+    /**
+     * Callback from CacheManager
+     */
     @Override
     public void onCacheExpired(String cacheName) {
 
-        for (String name : NEWS_DESKS) {
-            cacheName = name;
-            if (mNewsSection.equals(cacheName)) {
+        for (String name : Constants.NEWS_DESKS) {
+            if (name.equals(mNewsSection)) {
                 startNewsUpdate();
                 Log.i("NEWS CACHE", "updating expired cache" + cacheName);
             }
@@ -496,7 +481,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
     }
 
-    /** Callback from CacheManager */
+    /**
+     * Callback from CacheManager
+     */
     @Override
     public void onCacheChanged(String cacheName) {
         // In this case we do nothing, as calling startWeatherUpdate() will refresh the views.

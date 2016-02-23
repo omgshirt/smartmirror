@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class TTSHelper{
+public class TTSHelper {
     private MainActivity mActivity;
 
     private static TextToSpeech mTextToSpeech = null;
@@ -33,7 +33,6 @@ public class TTSHelper{
                         @Override
                         public void onStart(String utteranceId) {
                             mIsSpeaking = true;
-                            Log.i(Constants.TAG,"TTS utterance start");
 
                             mActivity.runOnUiThread(new Runnable() {
                                 @Override
@@ -44,7 +43,7 @@ public class TTSHelper{
                         }
 
                         @Override
-                        public void onDone(String utteranceId){
+                        public void onDone(String utteranceId) {
                             mIsSpeaking = false;
                             mActivity.runOnUiThread(new Runnable() {
                                 @Override
@@ -69,24 +68,14 @@ public class TTSHelper{
         mTextToSpeech = new TextToSpeech(mActivity, mTextToSpeechListener);
     }
 
-    /** Check preferences for speech frequency. If successful, say the text
-     *
-     * @param text string to say
-     */
-    public void speakText(String text) {
-        Random rand = new Random();
-        Preferences prefs = Preferences.getInstance(mActivity);
-        if (rand.nextFloat() < prefs.getSpeechFrequency()) {
-            start(text);
-        }
-    }
 
     /**
      * Initialize a TTS engine if necessary, then speak the text.
      * This will bypass the Preferences setting for speech frequency.
+     *
      * @param text string to say
      */
-    public void start(final String text){
+    public void start(final String text) {
         mTextToSpeak = text;
         if (!mTtsInitialized) {
             Log.i("TextToSpeech", "not initialized");
@@ -111,7 +100,6 @@ public class TTSHelper{
         // String.valueOf(AudioManager.STREAM_NOTIFICATION); // param to set TTS to use NOTIFICATION stream
         if (mTextToSpeak != null) {
             mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
-            Log.i("TTS", "speak:\"" + mTextToSpeak + "\"");
         }
     }
 
@@ -119,7 +107,7 @@ public class TTSHelper{
         return mIsSpeaking;
     }
 
-    public void stop(){
+    public void stop() {
         if (mTextToSpeech != null && mTtsInitialized) {
             mTextToSpeech.stop();
             mIsSpeaking = false;
@@ -128,10 +116,9 @@ public class TTSHelper{
 
     /**
      * Clean up any resources and kill the TTS engine
-     *
      */
     public void destroy() {
-        if(mTextToSpeech != null){
+        if (mTextToSpeech != null) {
             mTextToSpeech.stop();
             mTextToSpeech.shutdown();
             mIsSpeaking = false;
@@ -143,6 +130,7 @@ public class TTSHelper{
 
     /**
      * Plays silence for the given duration. Adds to speech queue.
+     *
      * @param duration duration in MS
      */
     public void pause(int duration) {

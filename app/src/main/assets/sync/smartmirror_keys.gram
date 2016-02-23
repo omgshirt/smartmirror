@@ -1,76 +1,101 @@
-blue /1e4/
-calendar /1e-1/
-camera /1e-1/
-close window /1e-1/
-hide window /1e-1/
-conditions /1e-8/
-enable camera /1e-3/
-enable remote /1e-3/
-disable camera /1e-3/
-disable remote /1e-3/
-facebook /1e-5/
-forecast /1e-4/
-gallery /1e-2/
-gray /1e10/
-green /1e4/
-go to sleep /1e-21/
-go back /1e10/
-help /1e6/
-log me in /1e-3/
-magenta /1e-4/
-menu /1e4/
-news /1e12/
-night light /1e-9/
-orange /1.0/
-options /1e-2/
-purple /1e0/
-quotes /1e4/
-refresh /1e-4/
-red /1e12/
-settings /1e-4/
-scroll up /1e6/
-scroll down /1e6/
-sleep /1e12/
-start listening /1e-6/
-stop listening /1e-8/
-take a picture /1e-15/
+brightness min/1e-5/
+brightness low/1e5/
+brightness medium/1e-5/
+brightness high/1e5/
+brightness max/1e-10/
+calendar/1e-1/
+camera/1e-1/
+camera off/1e-3/
+camera on/1e-3/
+close screen/1e-6/
+close window/1e-6/
+conditions/1e-8/
 current time/1e8/
-show time/1e-3/
+facebook/1e-5/
+forecast/1e-4/
+full screen/1e-5/
+gallery/1e-2/
+go to sleep/1e-21/
+go back/1e4/
+help/1e6/
 hide time/1e-2/
+hide weather/1e1/
+hide screen/1e-4/
+light min/1e-5/
+light low/1e8/
+light medium/1e-10/
+light high/1e4/
+light max/1e-15/
+menu/1e4/
+maximize/1e-5/
+minimize/1e-5/
+mira sleep/1e-20/
+mira wake/1e-20/
+news/1e12/
+night light/1e-9/
+options/1e-2/
+open window/1e-10/
+photos/1e3/
+quotes/1e6/
+refresh/1e-4/
+remote on/1e-6/
+remote off/1e-6/
+settings/1e-4/
+scroll up/1e4/
+scroll down/1e4/
+speech off/1e5/
+speech min/1e-5/
+speech low/1e5/
+speech medium/1e-20/
+speech high/1e1/
+speech max/1e-15/
+show help/1e-4/
+show time/1e-1/
+show weather/1e1/
+show light/1e-3/
+small screen/1e-8/
+sleep/1e10/
+start listening/1e-12/
+stay awake/1e-8/
+stop listening/1e-10/
+take a picture/1e-15/
+time twelve hour/1e-10/
+time twenty-four hour/1e-20/
 traffic/1e1/
 twitter/1e1/
+volume off/1e1/
+volume min/1e-2/
+volume low/1e5/
+volume medium/1e-2/
+volume high/1e5/
+volume max/1e-2/
 wake/1e6/
-wake up/1e-4/
-weather/1e4/
-show weather/1e8/
-hide weather/1e8/
-weather english/1e2/
-weather metric/1e2/
-white/1e-1/
-yellow/1e2/
-traffic /1e1/
-twitter /1e1/
-wake /1e3/
-wake up /1e-3/
-weather english /1e2/
-weather metric /1e2/
-screen brightness very low /1e-5/
-screen brightness low /1e-5/
-screen brightness medium /1e-5/
-screen brightness high /1e-5/
-screen brightness very high /1e-5/
-sports /1e10/
-technology /1e3/
-business /1e5/
-world /1e2/
-science /1e3/
-travel /1e4/
-media /1e4/
-first /1e6/
-second /1e4/
-third /1e6/
-fourth /1e14/
-fifth /1e6/
-sixth /1e6/
-seventh /1e6/
-eighth /1e6/
+wake up/1e-2/
+weather english/1e-8/
+weather metric/1e-8/
+wide screen/1e-8/
+business/1e5/
+media/1e10/
+science/1e3/
+sports/1e8/
+technology/1e3/
+travel/1e4/
+world/1e8/
+first/1e6/
+second/1e4/
+third/1e6/
+fourth/1e10/
+fifth/1e10/
+sixth/1e6/
+seventh/1e6/
+eighth/1e10/
+ninth/1e10/
+one/1e8/
+two/1e10/
+three/1e6/
+four/1e20/
+five/1e8/
+six/1e4/
+seven/1e5/
+eight/1e4/
+nine/1e8/

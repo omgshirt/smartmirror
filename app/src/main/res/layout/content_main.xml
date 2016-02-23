@@ -1,43 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_frame_holder"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/content_frame_holder"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/app_bar_main"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:showIn="@layout/app_bar_main">
 
-    <ImageView
-        android:id="@+id/speech_icon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/transparent"
-        android:visibility="gone"
-        android:src="@drawable/ic_action_microphone"/>
+    <!-- status icons -->
+    <LinearLayout
+        android:gravity="end"
+        android:layout_width="match_parent"
+        android:layout_height="25dp">
 
-    <fragment
-        android:name="org.main.smartmirror.smartmirror.WeatherFragment"
+        <ImageView
+            android:id="@+id/speech_icon"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:layout_marginEnd="2dp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:contentDescription="speech icon"
+            android:src="@drawable/ic_action_microphone"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/remote_icon"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:contentDescription="remote control icon"
+            android:src="@drawable/white_remote_control_64"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/content_frame_1"
-        android:layout_alignParentTop="true"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:layout="@layout/weather_fragment" />
+        android:orientation="vertical">
+
+        <fragment
+            android:id="@+id/weather_fragment"
+            android:name="org.main.smartmirror.smartmirror.WeatherFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout="@layout/weather_fragment" />
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/content_frame_2"
-        android:layout_below="@+id/content_frame_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
-    </FrameLayout>
+        android:layout_below="@+id/content_frame_1" />
+
     <FrameLayout
         android:id="@+id/content_frame_3"
-        android:layout_below="@+id/content_frame_2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </FrameLayout>
-</RelativeLayout>
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/content_frame_2" />
+</LinearLayout>

@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,10 +34,10 @@ import java.util.Locale;
 
 /**
  * Fragment that displays the weather information
- *
+ * <p/>
  * Commands :
- *              "forecast" speaks the 3-day forecast
- *              "conditions" speaks the current conditions
+ * "forecast" speaks the 3-day forecast
+ * "conditions" speaks the current conditions
  */
 public class WeatherFragment extends Fragment implements CacheManager.CacheListener {
 
@@ -74,24 +75,22 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     private boolean mShowFullAlerts = true;
 
     private CacheManager mCacheManager = null;
-    // time in minutes before weather data expires
-    private final int DATA_UPDATE_FREQUENCY = 1;
+    // time in seconds before weather data expires
+    private final int DATA_UPDATE_FREQUENCY = 600;
     public static final String WEATHER_CACHE = "weather cache";
 
     Handler mHandler = new Handler();
 
-    public WeatherFragment() {}
+    public WeatherFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState == null) {
-            mPreferences = Preferences.getInstance(getActivity());
-            mCacheManager = CacheManager.getInstance();
-            weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
-        }
-        //dailyForecasts = new DailyForecast[3];
+        mPreferences = Preferences.getInstance(getActivity());
+        mCacheManager = CacheManager.getInstance();
+        weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
 
         mLatitude = Double.toString(mPreferences.getLatitude());
         mLongitude = Double.toString(mPreferences.getLongitude());
@@ -101,15 +100,15 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.weather_fragment, container, false);
 
-        layTimeLayout = (LinearLayout)view.findViewById(R.id.layout_time);
-        layWeatherLayout = (LinearLayout)view.findViewById(R.id.layout_weather);
-        txtCurrentHumidity = (TextView)view.findViewById(R.id.current_humidity);
-        txtCurrentTemp = (TextView)view.findViewById(R.id.current_temp);
-        txtCurrentWind = (TextView)view.findViewById(R.id.current_wind);
-        txtWeatherIcon = (TextView)view.findViewById(R.id.weather_icon);
-        txtDailyHigh = (TextView)view.findViewById(R.id.daily_high);
-        txtDailyLow = (TextView)view.findViewById(R.id.daily_low);
-        txtAlerts = (TextView)view.findViewById(R.id.alert_text);
+        layTimeLayout = (LinearLayout) view.findViewById(R.id.layout_time);
+        layWeatherLayout = (LinearLayout) view.findViewById(R.id.layout_weather);
+        txtCurrentHumidity = (TextView) view.findViewById(R.id.current_humidity);
+        txtCurrentTemp = (TextView) view.findViewById(R.id.current_temp);
+        txtCurrentWind = (TextView) view.findViewById(R.id.current_wind);
+        txtWeatherIcon = (TextView) view.findViewById(R.id.weather_icon);
+        txtDailyHigh = (TextView) view.findViewById(R.id.daily_high);
+        txtDailyLow = (TextView) view.findViewById(R.id.daily_low);
+        txtAlerts = (TextView) view.findViewById(R.id.alert_text);
 
         txtCurrentTemp.setTypeface(weatherFont);
         txtDailyHigh.setTypeface(weatherFont);
@@ -129,14 +128,14 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         }
 
 
-        clkTextClock = (TextClock)view.findViewById(R.id.time_clock);
-        clkDateClock = (TextClock)view.findViewById(R.id.date_clock);
+        clkTextClock = (TextClock) view.findViewById(R.id.time_clock);
+        clkDateClock = (TextClock) view.findViewById(R.id.date_clock);
         updateTimeDisplay();
 
         return view;
     }
 
-    public void startWeatherUpdate(){
+    public void startWeatherUpdate() {
         String darkSkyRequest = "https://api.forecast.io/forecast/%s/%s,%s?units=%s";
         String darkSkyKey = getActivity().getResources().getString(R.string.dark_sky_forecast_api_key);
         String weatherUnit = "si";
@@ -154,7 +153,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            Log.d(Constants.TAG, "Got message:\"" + message +"\"");
+            Log.d(Constants.TAG, "Got message:\"" + message + "\"");
             switch (message) {
 
                 case Constants.CONDITIONS:
@@ -165,7 +164,11 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     startWeatherUpdate();
                     break;
                 case Preferences.CMD_TIME_12HR:
+                    mPreferences.setTimeFormat12hr();
+                    updateTimeDisplay();
+                    break;
                 case Preferences.CMD_TIME_24HR:
+                    mPreferences.setTimeFormat24hr();
                     updateTimeDisplay();
                     break;
                 case Constants.HIDE_TIME:
@@ -199,20 +202,21 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         if (!mCacheManager.containsKey(WEATHER_CACHE)) {
             startWeatherUpdate();
         } else {
-            renderWeather( (JSONObject)mCacheManager.get(WEATHER_CACHE) );
+            renderWeather((JSONObject) mCacheManager.get(WEATHER_CACHE));
             if (mCacheManager.isExpired(WEATHER_CACHE)) {
-                Log.i(Constants.TAG, "WeatherCache expired. Refreshing..." );
+                Log.i(Constants.TAG, "WeatherCache expired. Refreshing...");
                 startWeatherUpdate();
             }
         }
     }
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     * voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
@@ -228,7 +232,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     }
 
     // Refresh time and date displays to current preference setting
-    public void updateTimeDisplay(){
+    public void updateTimeDisplay() {
         clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
         clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
         clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
@@ -294,14 +298,14 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         // add AM / PM as necessary
         if (mPreferences.isTimeFormat12hr()) {
             String AM_PM = " A M";
-            if (calendar.get(Calendar.AM_PM) == 1){
+            if (calendar.get(Calendar.AM_PM) == 1) {
                 AM_PM = " P M";
             }
             strMinute = strMinute + AM_PM;
         }
 
         String result = "the time is " + strHour + strMinute;
-        Log.i(Constants.TAG,"time: " + result);
+        Log.i(Constants.TAG, "time: " + result);
         speakText(result);
     }
 
@@ -310,14 +314,14 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         if (forecastToday == null) return;
 
         String text = " Current temperature is " + mCurrentTemp + " degrees. " +
-                    " High today " + forecastToday.maxTemp + ", " +
-                    " low " + forecastToday.minTemp + ". "
-                    // "Current humidity " + mCurrentHumidity + " percent. "
-                    ;
+                " High today " + forecastToday.maxTemp + ", " +
+                " low " + forecastToday.minTemp + ". "
+                // "Current humidity " + mCurrentHumidity + " percent. "
+                ;
 
         if (mCurrentWind > 1) {
             String speedUnits;
-            if( mPreferences.getWeatherUnits().equals(Preferences.METRIC))  {
+            if (mPreferences.getWeatherUnits().equals(Preferences.METRIC)) {
                 speedUnits = "kilometers per hour";
             } else {
                 speedUnits = "miles per hour";
@@ -325,31 +329,31 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             text += " Wind speed " + mCurrentWind + "  " + speedUnits;
         }
 
-        if ( !text.equals("") ) {
+        if (!text.equals("")) {
             speakText(text);
         }
     }
 
-    private void speakText(String text){
-        ((MainActivity) getActivity()).startTTS(text);
+    private void speakText(String text) {
+        ((MainActivity) getActivity()).speakText(text);
     }
 
     // Get weather data from API and display
-    private void updateWeatherData(final String request){
-        new Thread(){
-            public void run(){
+    private void updateWeatherData(final String request) {
+        new Thread() {
+            public void run() {
                 final JSONObject json = FetchURL.getJSON(request);
-                if(json == null){
-                    mHandler.post(new Runnable(){
-                        public void run(){
-                            Toast.makeText(getActivity(),
-                                    getActivity().getString(R.string.place_not_found),
-                                    Toast.LENGTH_LONG).show();
+                if (json == null) {
+                    mHandler.post(new Runnable() {
+                        public void run() {
+                            ((MainActivity) getActivity()).showToast(getString(R.string.weather_data_err),
+                                    Gravity.CENTER, Toast.LENGTH_LONG);
+                            updateWeatherCache(null);
                         }
                     });
                 } else {
-                    mHandler.post(new Runnable(){
-                        public void run(){
+                    mHandler.post(new Runnable() {
+                        public void run() {
                             Log.i(Constants.TAG, "New weather data downloaded");
                             updateWeatherCache(json);
                             renderWeather(json);
@@ -360,12 +364,12 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         }.start();
     }
 
-    private void updateWeatherCache(JSONObject data){
+    private void updateWeatherCache(JSONObject data) {
         // Update the WEATHER_CACHE stored in cacheManager or create new if it doesn't exist.
         mCacheManager.addCache(WEATHER_CACHE, data, DATA_UPDATE_FREQUENCY);
     }
 
-    private void renderWeather(JSONObject json){
+    private void renderWeather(JSONObject json) {
         try {
             // hourlyArray holds the next 24 hours of forecasts. Get index 0 for current temp data.
             JSONObject hourly = json.getJSONObject("hourly");
@@ -375,7 +379,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             String weatherDeg = getActivity().getString(R.string.weather_deg);
 
             // set current temp
-            mCurrentTemp = (int)Math.round(currentHour.getDouble("temperature"));
+            mCurrentTemp = (int) Math.round(currentHour.getDouble("temperature"));
             String tempFormat = mCurrentTemp + mPreferences.getTempString();
             txtCurrentTemp.setText(tempFormat);
 
@@ -385,7 +389,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             txtCurrentHumidity.setText(humidityText);
 
             // set Wind Speed & Direction
-            mCurrentWind = (int)Math.round(currentHour.getDouble("windSpeed"));
+            mCurrentWind = (int) Math.round(currentHour.getDouble("windSpeed"));
             String windFormat = "";
 
             /* // show wind units. Removed for now.
@@ -400,7 +404,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             if (currentHour.has("windBearing")) {
                 windBearing = getDirectionFromBearing(currentHour.getInt("windBearing"));
             }
-            String windSpeed =  windBearing + " " + getActivity().getString(R.string.weather_wind_strong) +
+            String windSpeed = windBearing + " " + getActivity().getString(R.string.weather_wind_strong) +
                     " " + mCurrentWind + " " + windFormat;
             txtCurrentWind.setText(windSpeed);
 
@@ -417,7 +421,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             // set current weather icon
             setWeatherIcon(getActivity(), weatherFont, txtWeatherIcon, currentHour.getString("icon"),
                     forecastToday.sunrise * 1000,
-                    forecastToday.sunset * 1000 );
+                    forecastToday.sunset * 1000);
 
             // Set the dailyHigh and dailyLow
             String maxIcon = getActivity().getString(R.string.weather_therm_high) + " " +
@@ -425,19 +429,19 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             txtDailyHigh.setText(maxIcon);
 
             String minIcon = getActivity().getString(R.string.weather_therm_low) + " " +
-                    forecastToday.minTemp+ weatherDeg;
+                    forecastToday.minTemp + weatherDeg;
             txtDailyLow.setText(minIcon);
 
             // ----------------- 2-Hour forecasts -------------
             for (int i = 1; i <= 7; i++) {
                 String resourceName = "forecast_" + i;
-                int layoutId = getContext().getResources().getIdentifier(resourceName, "id" ,
-                        getActivity().getPackageName() );
+                int layoutId = getContext().getResources().getIdentifier(resourceName, "id",
+                        getActivity().getPackageName());
                 LinearLayout forecastLayout = (LinearLayout) getActivity().findViewById(layoutId);
-                JSONObject forecast = hourlyArray.getJSONObject(i*2);
+                JSONObject forecast = hourlyArray.getJSONObject(i * 2);
 
                 // Forecast time
-                TextView timeForecast = (TextView)forecastLayout.findViewById(R.id.forecast_time);
+                TextView timeForecast = (TextView) forecastLayout.findViewById(R.id.forecast_time);
                 Date date = new Date(forecast.getLong("time") * 1000);
                 String shortTimeFormat = mPreferences.getShortTimeFormat();
                 SimpleDateFormat sdf = new SimpleDateFormat(shortTimeFormat, Locale.US);
@@ -445,20 +449,20 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 timeForecast.setText(time);
 
                 // Forecast temp
-                TextView tempForecast = (TextView)forecastLayout.findViewById(R.id.forecast_temp);
-                String textTmp = (int)Math.round(forecast.getDouble("temperature")) + weatherDeg;
+                TextView tempForecast = (TextView) forecastLayout.findViewById(R.id.forecast_temp);
+                String textTmp = (int) Math.round(forecast.getDouble("temperature")) + weatherDeg;
                 tempForecast.setText(textTmp);
                 tempForecast.setTypeface(weatherFont);
 
                 // forecast icon
-                TextView iconForecast = (TextView)forecastLayout.findViewById(R.id.forecast_image);
+                TextView iconForecast = (TextView) forecastLayout.findViewById(R.id.forecast_image);
                 String icon = forecast.getString("icon");
-                setWeatherIcon(getActivity(), weatherFont, iconForecast,  icon, forecastToday.sunrise, forecastToday.sunset);
+                setWeatherIcon(getActivity(), weatherFont, iconForecast, icon, forecastToday.sunrise, forecastToday.sunset);
 
                 TextView txtUmbrella = (TextView) forecastLayout.findViewById(R.id.forecast_umbrella);
                 TextView rainForecast = (TextView) forecastLayout.findViewById(R.id.forecast_rain);
 
-                int rainProb = (int)(forecast.getDouble("precipProbability") * 100);
+                int rainProb = (int) (forecast.getDouble("precipProbability") * 100);
 
                 // show chance of rain if >= 10%
                 if (rainProb >= 10) {
@@ -488,15 +492,14 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 txtAlerts.setVisibility(View.GONE);
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Log.e("DarkSky", "One or more fields not found in the JSON data");
         }
     }
 
 
-
-    public String getWeatherAlerts(){
+    public String getWeatherAlerts() {
         StringBuilder alertText = new StringBuilder();
         int i = 0;
         while (i < mWeatherAlerts.length()) {
@@ -518,7 +521,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
             title = mWeatherAlerts.getJSONObject(index).getString("title") + ". Expires " + expirationTime + "\n";
         } catch (JSONException jse) {
-           Log.e("DarkSky", "alert index not found");
+            Log.e("DarkSky", "alert index not found");
         }
         return title;
     }
@@ -527,7 +530,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         String description = "";
         try {
             description = mWeatherAlerts.getJSONObject(index).getString("description") + "\n";
-        } catch (JSONException jse){
+        } catch (JSONException jse) {
             Log.e("DarkSky", "alert index not found");
         }
         return description;
@@ -535,38 +538,50 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
 
     // choose weather icon based on iconType
-    public static void setWeatherIcon(Activity activity, Typeface font, TextView tv, String iconType, long sunrise, long sunset){
+    public static void setWeatherIcon(Activity activity, Typeface font, TextView tv, String iconType, long sunrise, long sunset) {
         String icon;
         if (activity == null) return;
-        switch(iconType) {
-            case "clear-day": icon = activity.getString(R.string.weather_sunny);
+        switch (iconType) {
+            case "clear-day":
+                icon = activity.getString(R.string.weather_sunny);
                 break;
-            case "clear-night": icon = activity.getString(R.string.weather_clear_night);
+            case "clear-night":
+                icon = activity.getString(R.string.weather_clear_night);
                 break;
-            case "cloudy" : icon = activity.getString(R.string.weather_cloudy);
+            case "cloudy":
+                icon = activity.getString(R.string.weather_cloudy);
                 break;
-            case "partly-cloudy-day" : icon = activity.getString(R.string.weather_cloudy_day);
+            case "partly-cloudy-day":
+                icon = activity.getString(R.string.weather_cloudy_day);
                 break;
-            case "partly-cloudy-night" :  icon = activity.getString(R.string.weather_partly_cloudy_night);
+            case "partly-cloudy-night":
+                icon = activity.getString(R.string.weather_partly_cloudy_night);
                 break;
-            case "drizzle" : icon = activity.getString(R.string.weather_drizzle);
+            case "drizzle":
+                icon = activity.getString(R.string.weather_drizzle);
                 break;
-            case "fog" : icon = activity.getString(R.string.weather_foggy);
+            case "fog":
+                icon = activity.getString(R.string.weather_foggy);
                 break;
-            case "rain" : icon = activity.getString(R.string.weather_rainy);
+            case "rain":
+                icon = activity.getString(R.string.weather_rainy);
                 break;
-            case "sleet" : icon = activity.getString(R.string.weather_sleet);
+            case "sleet":
+                icon = activity.getString(R.string.weather_sleet);
                 break;
-            case "snow" : icon = activity.getString(R.string.weather_snowy);
+            case "snow":
+                icon = activity.getString(R.string.weather_snowy);
                 break;
-            case "thunderstorm" : icon = activity.getString(R.string.weather_thunder);
+            case "thunderstorm":
+                icon = activity.getString(R.string.weather_thunder);
                 break;
-            case "wind" : icon = activity.getString(R.string.weather_wind_strong);
+            case "wind":
+                icon = activity.getString(R.string.weather_wind_strong);
                 break;
             // if we can't find the right icon, set it to generic day or night depending on time
             default:
                 long currentTime = new Date().getTime();
-                if(currentTime>=sunrise && currentTime<sunset) {
+                if (currentTime >= sunrise && currentTime < sunset) {
                     icon = activity.getString(R.string.weather_sunny);
                 } else {
                     icon = activity.getString(R.string.weather_clear_night);
@@ -578,13 +593,17 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         tv.setTypeface(font);
     }
 
-    /** Callback from CacheManager */
+    /**
+     * Callback from CacheManager
+     */
     @Override
     public void onCacheExpired(String cacheName) {
         if (cacheName.equals(WEATHER_CACHE)) startWeatherUpdate();
     }
 
-    /** Callback from CacheManager */
+    /**
+     * Callback from CacheManager
+     */
     @Override
     public void onCacheChanged(String cacheName) {
         // In this case we do nothing, as calling startWeatherUpdate() will refresh the views.
@@ -592,12 +611,13 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     /**
      * Given a wind bearing in degrees, returns the cardinal direction
+     *
      * @return String direction as abbreviation (NE, E, W...)
      */
-    public static String getDirectionFromBearing(final int bearing){
+    public static String getDirectionFromBearing(final int bearing) {
         if (bearing < 0 || bearing > 360) return "error";
         String[] directions = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
-        int index = ( (int)((bearing + 22.5) / 45)) % 8;
-        return directions[ index ];
+        int index = ((int) ((bearing + 22.5) / 45)) % 8;
+        return directions[index];
     }
 }
