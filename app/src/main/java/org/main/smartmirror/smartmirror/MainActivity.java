@@ -810,9 +810,6 @@ public class MainActivity extends AppCompatActivity
                     resetInteractionTimer();
                 }
                 break;
-            case Constants.TRAFFIC:
-                fragment = new TrafficFragment();
-                break;
             case Constants.TWITTER:
                 fragment = new TwitterFragment();
                 break;

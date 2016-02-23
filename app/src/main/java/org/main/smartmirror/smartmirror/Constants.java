@@ -47,7 +47,6 @@ public class Constants {
     public static final String SHOW_LIGHT = "show light";
     public static final String SHOW_HELP = "show help";
     public static final String TIME = "current time";
-    public static final String TRAFFIC = "traffic";
     public static final String TWITTER = "twitter";
 
     // ------------- NEWS ------------
@@ -127,8 +126,7 @@ public class Constants {
             SETTINGS, SEVEN, SEVENTH, SHOW_LIGHT, SHOW_HELP,
             SHOW_TIME, SHOW_WEATHER, SIX,
             SIXTH, SLEEP, SMALL_SCREEN, STAY_AWAKE, TAKE_PICTURE,
-            THIRD, THREE, TECHNOLOGY, TIME,
-            TRAFFIC, TRAVEL, TWITTER, TWO,
+            THIRD, THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
             "black", "blue", "gray", "green",
             "magenta", "orange", "purple",
