@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
@@ -302,10 +301,15 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     txtNewsDesk.setText(mNewsSection.toUpperCase());
 
             }
-            if(message.contains(Constants.SCROLL_DOWN))
+            /*if(message.contains(Constants.SCROLL_DOWN))
                 mScrollView.scrollBy(0, -(0-mScrollView.getHeight()));
             else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, 0-mScrollView.getHeight());
+                mScrollView.scrollBy(0, 0-mScrollView.getHeight());*/
+            if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
+                VoiceScroll sl = new VoiceScroll();
+                sl.voiceScrollView(message,mScrollView);
+            }
+
         }
     };
 

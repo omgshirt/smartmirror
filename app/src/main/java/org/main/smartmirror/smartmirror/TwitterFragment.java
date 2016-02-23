@@ -83,6 +83,17 @@ public class TwitterFragment extends Fragment {
                     break;
 
             }
+            if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
+                int position = 0;
+                if (message.contains(Constants.SCROLL_DOWN)) {
+                    position = position + 5;
+                } else if (message.contains(Constants.SCROLL_UP)) {
+                    position = position - 5;
+                    if (position < 0) position = 0;
+                }
+                VoiceScroll sl = new VoiceScroll();
+                sl.voiceListView(message,twitterFeed, position);
+            }
         }
     };
 
