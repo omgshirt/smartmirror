@@ -414,30 +414,25 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 response = json.getJSONObject("response");
                 results = response.getJSONArray("results").getJSONObject(i);
                 webTitle = results.getString("webTitle");
-                hl[i] = webTitle;
+                //hl[i] = webTitle;
+                mHeadline.add(webTitle);
                 fields = results.getJSONObject("fields");
                 body = fields.getString("body");
                 article[i] = body;
                 trailText = fields.getString("trailText");
-                snippets[i] = trailText;
+                //snippets[i] = trailText;
+                mSnippet.add(trailText);
                 try {
                     thumbnail = fields.getString("thumbnail");
-                    thumbs[i] = thumbnail;
+                    //thumbs[i] = thumbnail;
+                    mImageURI.add(Uri.parse(thumbnail));
                 } catch (Exception e) {
                     thumbs[i] = "@drawable/guardian";
                 }
                 i++;
             }
 
-            ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
-            try {
-                for(int j = 0; j < numArticles; j++){
-                    CustomObject co = new CustomObject(hl[j],snippets[j],Uri.parse(thumbs[j]));
-                    objects.add(co);
-                }
-                CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
-                newsFeed.setAdapter(customAdapter);
-            } catch (Exception e) {Log.i("NEWS", e.toString());}
+
 
             /*String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + snippets[0] + "<br>";
             mTxtHeadline1.setText(Html.fromHtml(txt0));
@@ -474,6 +469,15 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         } catch (Exception e) {
             Log.e("NEWS ERROR", e.toString());
         }
+        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+        try {
+            for(int j = 0; j < numArticles; j++){
+                CustomObject co = new CustomObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j));
+                objects.add(co);
+            }
+            CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
+            newsFeed.setAdapter(customAdapter);
+        } catch (Exception e) {Log.i("NEWS", e.toString());}
 
     }
 
