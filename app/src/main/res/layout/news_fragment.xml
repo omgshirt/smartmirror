@@ -14,7 +14,13 @@
         android:text="News Desk"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <ScrollView
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_news"
+        android:layout_gravity="center_horizontal" />
+
+    <!--<ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
@@ -196,5 +202,5 @@
                     android:text="New Text" />
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </ScrollView>-->
 </LinearLayout>

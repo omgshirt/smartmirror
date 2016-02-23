@@ -4,24 +4,25 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
-
 import org.json.JSONObject;
+
+import java.net.URI;
+import java.util.ArrayList;
 
 public class NewsFragment extends Fragment implements CacheManager.CacheListener {
 
@@ -36,22 +37,15 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String mNewsSection;
 
     // time in seconds before news data is considered old and is discarded
-    private final int DATA_UPDATE_FREQUENCY = 600;
+    private final int DATA_UPDATE_FREQUENCY = 1;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
 
-    public static final String WORLD_CACHE = "world";
-    public static final String SPORTS_CACHE = "sports";
-    public static final String TECH_CACHE = "tech";
-    public static final String BUSINESS_CACHE = "business";
-    public static final String SCIENCE_CACHE = "science";
-    public static final String MEDIA_CACHE = "media";
-    public static final String TRAVEL_CACHE = "travel";
 
 
     private CacheManager mCacheManager = null;
 
-    private TextView mTxtHeadline1;
+   /* private TextView mTxtHeadline1;
     private TextView mTxtHeadline2;
     private TextView mTxtHeadline3;
     private TextView mTxtHeadline4;
@@ -59,7 +53,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private TextView mTxtHeadline6;
     private TextView mTxtHeadline7;
     private TextView mTxtHeadline8;
-    private TextView txtNewsDesk;
+
 
     private ImageView img1;
     private ImageView img2;
@@ -68,14 +62,16 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private ImageView img5;
     private ImageView img6;
     private ImageView img7;
-    private ImageView img8;
+    private ImageView img8;*/
+
+    private TextView txtNewsDesk;
 
     //public static String mArticleFullBody = "";
-    public static int numItems = 10;
-    public static String article[] = new String[numItems];
-    public static String hl[] = new String[numItems];
-    public static String snippets[] = new String[numItems];
-    public static String thumbs[] = new String[numItems];
+    public static int numArticles = 10;
+    public static String article[] = new String[numArticles];
+    public static String hl[] = new String[numArticles];
+    public static String snippets[] = new String[numArticles];
+    public static String thumbs[] = new String[numArticles];
     public static String thumbnail = "";
     public static String body = "";
     public static String trailText = "";
@@ -83,6 +79,10 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     //public static String mHeadline = "";
 
     ScrollView mScrollView;
+    ListView newsFeed;
+    public static ArrayList<String> mHeadline = new ArrayList<String>();
+    public static ArrayList<String> mSnippet = new ArrayList<String>();
+    public static ArrayList<Uri> mImageURI = new ArrayList<Uri>();
 
     Handler mHandler = new Handler();
     private ArticleSelectedListener articleSelectedListener;
@@ -112,8 +112,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         //
         // Initialize Items
         // mNewsSection = "world";
+        txtNewsDesk = (TextView) view.findViewById(R.id.news_desk_title);
 
-        mTxtHeadline1 = (TextView) view.findViewById(R.id.headline);
+        /*mTxtHeadline1 = (TextView) view.findViewById(R.id.headline);
         mTxtHeadline2 = (TextView) view.findViewById(R.id.headline2);
         mTxtHeadline3 = (TextView) view.findViewById(R.id.headline3);
         mTxtHeadline4 = (TextView) view.findViewById(R.id.headline4);
@@ -121,8 +122,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         mTxtHeadline6 = (TextView) view.findViewById(R.id.headline6);
         mTxtHeadline7 = (TextView) view.findViewById(R.id.headline7);
         mTxtHeadline8 = (TextView) view.findViewById(R.id.headline8);
-
-        txtNewsDesk = (TextView) view.findViewById(R.id.news_desk_title);
 
         img1 = (ImageView) view.findViewById(R.id.img1);
         img2 = (ImageView) view.findViewById(R.id.img2);
@@ -133,9 +132,10 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         img7 = (ImageView) view.findViewById(R.id.img7);
         img8 = (ImageView) view.findViewById(R.id.img8);
 
-        mScrollView = (ScrollView) view.findViewById(R.id.scrollView2);
+        mScrollView = (ScrollView) view.findViewById(R.id.scrollView2);*/
+        newsFeed = (ListView) view.findViewById(R.id.list_news);
 
-        clearLayout();
+        //clearLayout();
 
         mNewsSection = getArguments().getString("arrI");
         //mGuardURL = mGuardURL + mGuardAPIKey;
@@ -146,7 +146,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         txtNewsDesk.setText(mNewsSection.toUpperCase());
 
         // set onClickListener
-        mTxtHeadline1.setOnClickListener(new View.OnClickListener() {
+        /*mTxtHeadline1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toNewsBodyFragment(0);
@@ -193,7 +193,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             public void onClick(View v) {
                 toNewsBodyFragment(7);
             }
-        });
+        });*/
+        startNewsUpdate();
 
         return view;
     }
@@ -226,7 +227,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         updateNews(mGuardURL);
     }
 
-    private void clearLayout() {
+    /*private void clearLayout() {
         mTxtHeadline1.setText("");
         mTxtHeadline2.setText("");
         mTxtHeadline3.setText("");
@@ -245,7 +246,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         img6.setImageResource(android.R.color.transparent);
         img7.setImageResource(android.R.color.transparent);
         img8.setImageResource(android.R.color.transparent);
-    }
+    }*/
 
 
     // ----------------------- Local Broadcast Receiver -----------------------
@@ -409,7 +410,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
             int i = 0;
 
-            while (i < numItems) {
+            while (i < numArticles) {
                 response = json.getJSONObject("response");
                 results = response.getJSONArray("results").getJSONObject(i);
                 webTitle = results.getString("webTitle");
@@ -428,8 +429,17 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 i++;
             }
 
+            ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+            try {
+                for(int j = 0; j < numArticles; j++){
+                    CustomObject co = new CustomObject(hl[j],snippets[j],Uri.parse(thumbs[j]));
+                    objects.add(co);
+                }
+                CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
+                newsFeed.setAdapter(customAdapter);
+            } catch (Exception e) {Log.i("NEWS", e.toString());}
 
-            String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + snippets[0] + "<br>";
+            /*String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + snippets[0] + "<br>";
             mTxtHeadline1.setText(Html.fromHtml(txt0));
             Picasso.with(getContext()).load(thumbs[0]).fit().centerInside().into(img1);
 
@@ -459,11 +469,12 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
             String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + snippets[7] + "<br>";
             mTxtHeadline8.setText(Html.fromHtml(txt7));
-            Picasso.with(getContext()).load(thumbs[7]).fit().centerInside().into(img8);
+            Picasso.with(getContext()).load(thumbs[7]).fit().centerInside().into(img8);*/
 
         } catch (Exception e) {
             Log.e("NEWS ERROR", e.toString());
         }
+
     }
 
     /**
