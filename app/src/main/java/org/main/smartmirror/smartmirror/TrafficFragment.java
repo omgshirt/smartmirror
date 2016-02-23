@@ -17,6 +17,7 @@ import org.json.JSONObject;
  * Fragment that handles the traffic information
  */
 public class TrafficFragment extends Fragment {
+    private ImageView mTrafficIcon;
     private Preferences mPreference;
     private String mCurrentLat;
     private String mCurrentLong;
@@ -40,6 +41,7 @@ public class TrafficFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.traffic_fragment, container, false);
+        mTrafficIcon = (ImageView) view.findViewById(R.id.traffic_icon);
         txtDistance = (TextView) view.findViewById(R.id.traffic_distance);
         txtTravelTime = (TextView) view.findViewById(R.id.traffic_delay);
         return view;
@@ -60,8 +62,12 @@ public class TrafficFragment extends Fragment {
         if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
             distanceMatrixUnit = "imperial";
         }
-        updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
-
+        if (mPreference.getWorkLatitude() == 0.0 && mPreference.getWorkLongitude() == 0.0) {
+            mTrafficIcon.setVisibility(View.INVISIBLE);
+            txtDistance.setText("No Traffic Information.");
+        } else {
+            updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
+        }
     }
 
     /**
@@ -85,7 +91,7 @@ public class TrafficFragment extends Fragment {
             if ((tripTimeTraffic - tripTime) < 0) {
                 tripCost = Math.abs(tripTimeTraffic - tripTime);
                 trafficFlow = "slower";
-            } else if((tripTimeTraffic - tripTime) == 0){
+            } else if ((tripTimeTraffic - tripTime) == 0) {
                 trafficFlow = "no delay";
             }
 

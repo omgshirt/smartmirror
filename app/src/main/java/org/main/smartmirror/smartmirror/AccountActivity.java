@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * Activity that handles the Account Credentials and Work address
- * TODO This activity should also handle the different permissions we need!
+ * TODO Convert to Fragment
  */
 public class AccountActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -82,13 +82,16 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         // EditText twitterUsername = (EditText) findViewById(R.id.twitter_username);
         // EditText twitterPassword = (EditText) findViewById(R.id.twitter_password);
         EditText workAddress = (EditText) findViewById(R.id.work_location);
-        String strAddress = workAddress.getText().toString().replace(' ', '+');
-        convertAddressToLatLong(strAddress);
+        if (!(workAddress.getText().toString().equals(""))) {
+            String strAddress = workAddress.getText().toString().replace(' ', '+');
+            convertAddressToLatLong(strAddress);
+        }
         startMain();
     }
 
     /**
      * Converts the given address to latitude and longitude
+     *
      * @param addressInput the given address
      */
     private void convertAddressToLatLong(String addressInput) {
