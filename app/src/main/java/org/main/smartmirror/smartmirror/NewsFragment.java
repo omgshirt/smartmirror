@@ -67,11 +67,11 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private TextView txtNewsDesk;
 
     //public static String mArticleFullBody = "";
-    public static int numArticles = 10;
-    public static String article[] = new String[numArticles];
-    public static String hl[] = new String[numArticles];
-    public static String snippets[] = new String[numArticles];
-    public static String thumbs[] = new String[numArticles];
+    public int numArticles = 10;
+    public String article[] = new String[numArticles];
+    public String hl[] = new String[numArticles];
+    public String snippets[] = new String[numArticles];
+    public String thumbs[] = new String[numArticles];
     public static String thumbnail = "";
     public static String body = "";
     public static String trailText = "";
@@ -83,6 +83,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static ArrayList<String> mHeadline = new ArrayList<String>();
     public static ArrayList<String> mSnippet = new ArrayList<String>();
     public static ArrayList<Uri> mImageURI = new ArrayList<Uri>();
+    public static ArrayList<String> mFullArticle = new ArrayList<String>();
 
     Handler mHandler = new Handler();
     private ArticleSelectedListener articleSelectedListener;
@@ -202,7 +203,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public void toNewsBodyFragment(int x) {
         //mArticleFullBody = article[x];
         //mHeadline = hl[x];
-        articleSelectedListener.onArticleSelected(hl[x], article[x]);
+        //articleSelectedListener.onArticleSelected(hl[x], article[x]);
+        articleSelectedListener.onArticleSelected(mHeadline.get(x), mFullArticle.get(x));
     }
 
     @Override
@@ -296,13 +298,16 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     txtNewsDesk.setText(mNewsSection.toUpperCase());
 
             }
-            /*if(message.contains(Constants.SCROLL_DOWN))
-                mScrollView.scrollBy(0, -(0-mScrollView.getHeight()));
-            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, 0-mScrollView.getHeight());*/
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
+                int position = 0;
+                if (message.contains(Constants.SCROLL_DOWN)) {
+                    position = position + 5;
+                } else if (message.contains(Constants.SCROLL_UP)) {
+                    position = position - 5;
+                    if (position < 0) position = 0;
+                }
                 VoiceScroll sl = new VoiceScroll();
-                sl.voiceScrollView(message,mScrollView);
+                sl.voiceListView(message,newsFeed, position);
             }
 
         }
@@ -418,7 +423,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 mHeadline.add(webTitle);
                 fields = results.getJSONObject("fields");
                 body = fields.getString("body");
-                article[i] = body;
+                //article[i] = body;
+                mFullArticle.add(body);
                 trailText = fields.getString("trailText");
                 //snippets[i] = trailText;
                 mSnippet.add(trailText);
