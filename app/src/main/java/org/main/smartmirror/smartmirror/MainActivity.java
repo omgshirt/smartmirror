@@ -561,6 +561,7 @@ public class MainActivity extends AppCompatActivity
      * @param addToBackStack if fragment should be added to back stack
      */
     private void displayFragment(Fragment fragment, String tag, boolean addToBackStack) {
+        Log.i(Constants.TAG, "Displaying fragment :: " + tag);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame_3, fragment, tag);
         if (!isFinishing()) {
@@ -726,7 +727,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Refuse commands if they would re-load the currently visible fragment
-        if (getSupportFragmentManager().findFragmentByTag(command) != null) {
+        if (command.equals(mCurrentFragment)) {
             return;
         }
 
