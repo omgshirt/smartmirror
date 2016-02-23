@@ -39,14 +39,10 @@ public class NsdHelper {
         //initializeRegistrationListener();
     }
 
-    public void initializeNsd() {
-        //initializeRegistrationListener();
-    }
-
     public void initializeDiscoveryListener() {
         mResolveListener = new MyResolveListener();
         mDiscoveryListener = new MyDiscoveryListener();
-        discoverServices();
+        //discoverServices();
     }
 
     public class MyDiscoveryListener implements NsdManager.DiscoveryListener {
@@ -110,41 +106,9 @@ public class NsdHelper {
                 return;
             }
             mService = serviceInfo;
-            //((MainActivity)mContext).connectToRemote(mService);
+            //((MainActivity)mContext).connectToRemote(mService); //Only if we want mirrors to initiate connections
         }
-
     }
-    /*
-    public void initializeRegistrationListener() {
-        Log.i(TAG, "initializeRegistrationListener()");
-        mRegistrationListener = new NsdManager.RegistrationListener() {
-
-            @Override
-            public void onServiceRegistered(NsdServiceInfo nsdServiceInfo) {
-                mServiceName = nsdServiceInfo.getServiceName();
-                Log.d(TAG, "service registered as :: " + nsdServiceInfo);
-                serviceRegistered = true;
-                initializeDiscoveryListener();
-            }
-
-            @Override
-            public void onRegistrationFailed(NsdServiceInfo arg0, int arg1) {
-                Log.e(TAG, "Registration Failed :: " + arg1);
-            }
-
-            @Override
-            public void onServiceUnregistered(NsdServiceInfo arg0) {
-                serviceRegistered = false;
-                Log.d(TAG, "service unregistered");
-            }
-
-            @Override
-            public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            }
-
-        };
-    }
-    */
 
     public class MyRegistrationListener implements NsdManager.RegistrationListener {
         @Override
@@ -169,10 +133,12 @@ public class NsdHelper {
 
         @Override
         public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            serviceRegistered = true;
         }
     }
 
     public void registerService(int port) {
+
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
         serviceInfo.setPort(port);
         serviceInfo.setServiceName(mDeviceName);
@@ -183,6 +149,12 @@ public class NsdHelper {
         mNsdManager.registerService(
                 serviceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
 
+    }
+
+    public void unregisterService(){
+        if (mRegistrationListener != null && !serviceRegistered) {
+            mNsdManager.unregisterService(mRegistrationListener);
+        }
     }
 
     public void discoverServices() {
@@ -203,11 +175,7 @@ public class NsdHelper {
         return mService;
     }
 
-    public void unregisterService(){
-        if (mRegistrationListener != null) {
-            mNsdManager.unregisterService(mRegistrationListener);
-        }
-    }
+
 
     public void tearDown() {
         mNsdManager.unregisterService(mRegistrationListener);

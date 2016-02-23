@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // start NSD
-        mNsdHelper.discoverServices();
+        //mNsdHelper.discoverServices();
 
         mPreferences.setVolumesToPrefValues();
         stopLightSensor();
@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity
         stopUITimer();
 
         //stop NSD. This will prevent discovery while sleeping....
-        mNsdHelper.stopDiscovery();
+        //mNsdHelper.stopDiscovery();
     }
 
     @Override
@@ -458,8 +458,6 @@ public class MainActivity extends AppCompatActivity
         contentFrame2.setVisibility(frameTwo);
         contentFrame3.setVisibility(frameThree);
     }
-
-
 
     // Restores the screen off to the duration set when the application first ran.
     protected void setDefaultScreenOffTimeout() {
@@ -706,7 +704,7 @@ public class MainActivity extends AppCompatActivity
 
 
     /**
-     * Adjust the visible content frames if required by the command. Currently exmpty.
+     * Adjust the visible content frames if required by the command. Currently empty.
      * @param command command to be executed
      */
     private void setContentVisibility(String command) {
@@ -725,6 +723,11 @@ public class MainActivity extends AppCompatActivity
 
         if (DEBUG) {
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
+        }
+
+        // Refuse commands if they would re-load the currently visible fragment
+        if (getSupportFragmentManager().findFragmentByTag(command) != null) {
+            return;
         }
 
         // look for news desk
@@ -865,6 +868,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void showRemoteDisabledIcon(boolean showIcon){
+        if (showIcon && !mPreferences.isRemoteEnabled()){
+            // TODO: show the remote disabled icon
+        } else {
+            // TODO: hide the remote disabled icon
+        }
+    }
+
     public void showSpeechIcon(boolean showIcon) {
         if (showIcon && mPreferences.isVoiceEnabled()) {
             showIcon(imgSpeechIcon, true);
@@ -899,6 +910,16 @@ public class MainActivity extends AppCompatActivity
 
         // show the command to the user
         showToast(input, Toast.LENGTH_SHORT);
+
+        // reduce duplicate commands to one?
+        switch (input) {
+            case Preferences.CMD_DISABLE_REMOTE:
+                input = Preferences.CMD_REMOTE_OFF;
+                break;
+            case Preferences.CMD_ENABLE_REMOTE:
+                input = Preferences.CMD_REMOTE_ON;
+                break;
+        }
 
         wakeScreenAndDisplay(input);
     }
@@ -1018,6 +1039,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void unregisterNsdService(){
+        mNsdHelper.unregisterService();
+    }
+
     public void connectToRemote(NsdServiceInfo service) {
         if (service != null) {
             Log.d(NsdHelper.TAG, "Connecting to server :: " + service.toString());
@@ -1026,6 +1051,7 @@ public class MainActivity extends AppCompatActivity
             Log.d(NsdHelper.TAG, "No service to connect to!");
         }
     }
+
 
     /**
      * Callback from RemoteServerAsyncTask when a command is received from the remote control.
