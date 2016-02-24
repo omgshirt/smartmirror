@@ -14,10 +14,6 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
-//import com.google.api.services.gmail.Gmail;
-//import com.google.api.services.gmail.GmailScopes;
-//import com.google.api.services.gmail.model.*;
-//import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Thread;
 import com.google.api.services.gmail.model.ListThreadsResponse;
@@ -41,7 +37,6 @@ import java.util.List;
 public class GmailFragment extends Fragment {
 
     public static List<String> threadList = new ArrayList<>();
-    public static ArrayList<String> labelLR = new ArrayList<>();
     ArrayAdapter<String> arrayAdapter;
     public static ListView listView;
     public static TextView textView;
@@ -50,10 +45,8 @@ public class GmailFragment extends Fragment {
     private static String PREF_ACCOUNT_NAME = "";
 
     //SCOPES
-    //private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS };
-    //private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM, GmailScopes.GMAIL_MODIFY, GmailScopes.GMAIL_INSERT, GmailScopes.GMAIL_COMPOSE};
-    //private static final String[] SCOPES = {"https://mail.google.com/", "https://www.googleapis.com/auth/gmail.readonly/", "https://www.googleapis.com/auth/gmail.modify/"};
-    private static final String[] SCOPES = {"oauth2:googleapis.com/auth/gmail.readonly"};
+    private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM};
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.gmail_fragment, container, false);
@@ -69,7 +62,7 @@ public class GmailFragment extends Fragment {
                 .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
         mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
         arrayAdapter =
-                new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, labelLR);
+                new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, threadList);
         listView.setAdapter(arrayAdapter);
         return view;
     }
@@ -167,71 +160,38 @@ public class GmailFragment extends Fragment {
          * @return List of Strings labels.
          * @throws IOException
          */
-        //THIS IS THE METHOD THAT IS CAUSING PROBLEMS: Dont delete commented code unless we fix
         private List<String> getDataFromApi() throws IOException {
             // Get the labels in the user's account.
             String user = "me";
            // String query = "is:sent";
-           // List<String> labelId = new ArrayList<>();
-            //labelId.add("INBOX");
             textView.setText("Unread Threads");
             Log.i(Constants.TAG, "Before Thread Response Call");
-            //THE TWO LINES BELOW (one statement) is causing issues. The log.i statement "After thread..." never gets called.
             ListThreadsResponse threadResponse =
                     mService.users().threads().list(user).setMaxResults(Long.valueOf(10)).execute();
             List<Thread> threads = threadResponse.getThreads();
             for (Thread thread : threads) { System.out.println("Thread ID: " + thread.getId()); }
-            //ListLabelsResponse lR = mService.users().labels().list(user).execute();
-            //ArrayList<String> labels = new ArrayList<>();
             Log.i(Constants.TAG, "After Thread Response Call");
-            //List<Thread> threads = new ArrayList<Thread>();
            // threads = threadResponse.getThreads();
-//            while(threadResponse.getThreads()!=null){
+//            while(threadResponse.getThreads()!=null) {
 //                threads.addAll(threadResponse.getThreads());
-//                if(threadResponse.getNextPageToken() != null){
+//                if (threadResponse.getNextPageToken() != null) {
 //                    String pageToken = threadResponse.getNextPageToken();
 //                    threadResponse = mService.users().threads().list(user).setPageToken(pageToken).execute();
-//                }
-//                else{
+//                } else {
 //                    break;
 //                }
-//            while(lR.getLabels()!=null){
-//                labels.addAll(lR.getLabels());
-//                if(threadResponse.getNextPageToken() != null){
-//                    String pageToken = threadResponse.getNextPageToken();
-//                    threadResponse = mService.users().threads().list(user).setPageToken(pageToken).execute();
-//                }
-//                else{
-//                    break;
-//                }
-          //  }
-//            for(Thread thread : threads){
-//                threadList.add(thread.toPrettyString());
-//                System.out.println(thread.toPrettyString());
 //            }
-
-//            for (Label label : lR.getLabels()) {
-//                //if(label.getName().equals("INBOX")) {
-//                    Label labelCount = mService.users().labels().get(user, label.getId()).execute();
-//                    labelLR.add(label.getName() + " " + labelCount.getThreadsUnread());
-////                String id = label.getId();
-////                List<String> labeli = new ArrayList<>();
-////                labeli.add(id);
-////                ListThreadsResponse threadResponse =
-////                    mService.users().threads().list(user).setLabelIds(labeli).execute();
-//                Log.i(Constants.TAG, "AFTER BOTH");
-//                    //textView.setText("Unread Mail: " + Integer.toString(labelCount.getThreadsUnread()));
-//                //}
-//            }
-//
-//            labelLR.add("TESTING THIS S");
+            //threadList = null;
+            for(Thread thread : threads){
+                threadList.add(thread.toPrettyString());
+                System.out.println(thread.toPrettyString());
+            }
 
 //            ArrayAdapter<String> arrayAdapter =
 //                    new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, labels);
-//            ArrayAdapter<String> arrayAdapter =
-//                    new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, threadList);
-            // Set The Adapter
-            //listView.setAdapter(arrayAdapter);
+//           arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, threadList);
+//          //   Set The Adapter
+//            listView.setAdapter(arrayAdapter);
 
 //            for (Thread thread : threadResponse.getThreads()) {
 //                if(thread.size()!=0) {
@@ -242,7 +202,6 @@ public class GmailFragment extends Fragment {
 //                }
 //            }
             return threadList;
-            //return threads; changed from List<String> to void
         }
 
         @Override
