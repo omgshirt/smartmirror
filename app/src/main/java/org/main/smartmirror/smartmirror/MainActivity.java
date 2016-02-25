@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity
 
     private ImageView imgSpeechIcon;
     private ImageView imgRemoteIcon;
+    private ImageView imgRemoteDisabledIcon;
 
     // Set initial fragments & track displayed views
     private String mInitialFragment = Constants.NEWS;
@@ -228,8 +229,12 @@ public class MainActivity extends AppCompatActivity
         mRemoteConnection = new RemoteConnection(this, mRemoteHandler);
         mNsdHelper = new NsdHelper(this);
 
-        // Status Icons
+        // Status Icons: Remote / Remote Disabled / Speech
         imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
+        imgRemoteDisabledIcon = (ImageView)findViewById(R.id.remote_dc_icon);
+        if (!mPreferences.isRemoteEnabled()) {
+            imgRemoteDisabledIcon.setVisibility(View.VISIBLE);
+        }
         imgSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
         if (mPreferences.isVoiceEnabled()) {
             imgSpeechIcon.setVisibility(View.VISIBLE);
@@ -294,7 +299,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // start NSD
-        mNsdHelper.discoverServices();
+        //mNsdHelper.discoverServices();
 
         mPreferences.setVolumesToPrefValues();
         stopLightSensor();
@@ -325,7 +330,7 @@ public class MainActivity extends AppCompatActivity
         stopUITimer();
 
         //stop NSD. This will prevent discovery while sleeping....
-        mNsdHelper.stopDiscovery();
+        //mNsdHelper.stopDiscovery();
     }
 
     @Override
@@ -459,8 +464,6 @@ public class MainActivity extends AppCompatActivity
         contentFrame3.setVisibility(frameThree);
     }
 
-
-
     // Restores the screen off to the duration set when the application first ran.
     protected void setDefaultScreenOffTimeout() {
         // sanity check to prevent screen lockout from super-short screen timeout settings.
@@ -491,7 +494,7 @@ public class MainActivity extends AppCompatActivity
      protected void resetInteractionTimer() {
         stopUITimer();
         mUITimer = new Timer();
-        Log.i(Constants.TAG, "Interaction timer set :: " + mInteractionTimeout + " ms");
+        //Log.i(Constants.TAG, "Interaction timer set :: " + mInteractionTimeout + " ms");
         mUITimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -503,7 +506,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void stopUITimer() {
         if (mUITimer != null) {
-            Log.i(Constants.TAG, "Interaction timer cancelled");
+            //Log.i(Constants.TAG, "Interaction timer cancelled");
             mUITimer.cancel();
         }
     }
@@ -563,6 +566,7 @@ public class MainActivity extends AppCompatActivity
      * @param addToBackStack if fragment should be added to back stack
      */
     private void displayFragment(Fragment fragment, String tag, boolean addToBackStack) {
+        Log.i(Constants.TAG, "Displaying fragment :: " + tag);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame_3, fragment, tag);
         if (!isFinishing()) {
@@ -706,7 +710,7 @@ public class MainActivity extends AppCompatActivity
 
 
     /**
-     * Adjust the visible content frames if required by the command. Currently exmpty.
+     * Adjust the visible content frames if required by the command. Currently empty.
      * @param command command to be executed
      */
     private void setContentVisibility(String command) {
@@ -727,6 +731,11 @@ public class MainActivity extends AppCompatActivity
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         }
 
+        // Refuse commands if they would re-load the currently visible fragment
+        if (command.equals(mCurrentFragment)) {
+            return;
+        }
+
         // look for news desk
         if (Constants.DESK_HASH.contains(command)) {
             fragment = NewsFragment.newInstance(command);
@@ -744,7 +753,6 @@ public class MainActivity extends AppCompatActivity
             case Constants.CLOSE_SCREEN:
             case Constants.CLOSE_WINDOW:
             case Constants.HIDE_SCREEN:
-                //fragment = new BlankFragment();
                 setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case Constants.FACEBOOK:
@@ -828,7 +836,6 @@ public class MainActivity extends AppCompatActivity
 
         if (fragment != null) {
             mCurrentFragment = command;
-            //boolean addToBackStack = !(fragment instanceof BlankFragment);
             displayFragment(fragment, command, true);
             showViewIfHidden(contentFrame3);
         }
@@ -847,21 +854,29 @@ public class MainActivity extends AppCompatActivity
      * Show or hide the given icon
      *
      * @param icon ImageView to be adjusted
-     * @param showIcon true to display icon, false to hide
+     * @param display true to display icon, false to hide
      */
-    public void showIcon(ImageView icon, boolean showIcon) {
-        if (showIcon) {
+    public void showIcon(ImageView icon, boolean display) {
+        if (display) {
             icon.setVisibility(View.VISIBLE);
         } else {
             icon.setVisibility(View.GONE);
         }
     }
 
-    public void showRemoteIcon(boolean showIcon){
-        if (showIcon && mPreferences.isRemoteEnabled()) {
+    public void showRemoteIcon(boolean display){
+        if (display && mPreferences.isRemoteEnabled()) {
             showIcon(imgRemoteIcon, true);
-        } else if (!showIcon) {
+        } else if (!display) {
             showIcon(imgRemoteIcon, false);
+        }
+    }
+
+    public void showRemoteDisabledIcon(boolean display){
+        if (display && !mPreferences.isRemoteEnabled()){
+            showIcon(imgRemoteDisabledIcon, true);
+        } else {
+            showIcon(imgRemoteDisabledIcon, false);
         }
     }
 
@@ -899,6 +914,15 @@ public class MainActivity extends AppCompatActivity
 
         // show the command to the user
         showToast(input, Toast.LENGTH_SHORT);
+
+        switch (input) {
+            case Preferences.CMD_DISABLE_REMOTE:
+                input = Preferences.CMD_REMOTE_OFF;
+                break;
+            case Preferences.CMD_ENABLE_REMOTE:
+                input = Preferences.CMD_REMOTE_ON;
+                break;
+        }
 
         wakeScreenAndDisplay(input);
     }
@@ -1018,6 +1042,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void unregisterNsdService(){
+        mNsdHelper.unregisterService();
+    }
+
     public void connectToRemote(NsdServiceInfo service) {
         if (service != null) {
             Log.d(NsdHelper.TAG, "Connecting to server :: " + service.toString());
@@ -1025,6 +1053,10 @@ public class MainActivity extends AppCompatActivity
         } else {
             Log.d(NsdHelper.TAG, "No service to connect to!");
         }
+    }
+
+    public void disconnectRemote(){
+        mRemoteConnection.stopRemoteClient();
     }
 
     /**

@@ -141,6 +141,7 @@ public class Constants {
             Preferences.CMD_LIGHT_VLOW,
 
             Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
+            Preferences.CMD_ENABLE_REMOTE, Preferences.CMD_DISABLE_REMOTE,
 
             Preferences.CMD_SCREEN_HIGH, Preferences.CMD_SCREEN_LOW,
             Preferences.CMD_SCREEN_MEDIUM, Preferences.CMD_SCREEN_VHIGH,

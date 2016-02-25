@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -42,6 +43,18 @@ public class RemoteConnection {
     public void tearDown() {
         if (mRemoteControlClient != null) {
             mServer.tearDown();
+            mRemoteControlClient.tearDown();
+        }
+    }
+
+    public void stopServer(){
+        if (mServer != null) {
+            mServer.tearDown();
+        }
+    }
+
+    public void stopRemoteClient(){
+        if (mRemoteControlClient !=null) {
             mRemoteControlClient.tearDown();
         }
     }
@@ -198,7 +211,6 @@ public class RemoteConnection {
                     if (getSocket() == null) {
                         setSocket(new Socket(mAddress, mPort));
                         Log.d(TAG, "Client-side socket initialized :: " + getSocket());
-
                     } else {
                         Log.d(TAG, "Socket already initialized. skipping!");
                     }
@@ -246,16 +258,23 @@ public class RemoteConnection {
                     }
                     input.close();
                     Log.i(TAG, "receive thread stopped");
-                    showRemoteIcon(mActivity.getResources().getString(R.string.remote_disconnected), false);
+                    //showRemoteIcon(mActivity.getResources().getString(R.string.remote_disconnected),
+                    //        false);
+                } catch (SocketException se) {
+                    Log.e(TAG, "Socket Exception: ", se);
                 } catch (IOException e) {
                     Log.e(TAG, "Server loop error: ", e);
+                    tearDown();
                 }
+                showRemoteIcon(mActivity.getResources().getString(R.string.remote_disconnected),
+                        false);
             }
         }
 
         public void tearDown() {
             try {
                 getSocket().close();
+                mSocket = null;
             } catch (IOException ioe) {
                 Log.e(TAG, "Error when closing server socket.");
             }
