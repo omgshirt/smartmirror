@@ -590,9 +590,11 @@ public class Preferences implements LocationListener {
     }
 
     /**
-     * Set whether the app will register on the network.
+     * Set enable / disabled status for remote control.
+     * Disabling will unregister the service and shows remote disabled icon
+     * Enabling registers the service
      *
-     * @param isEnabled boolean
+     * @param isEnabled enable or disable the remote control
      */
     public void setRemoteEnabled(boolean isEnabled) {
         if (mRemoteEnabled == isEnabled) return;
@@ -607,6 +609,7 @@ public class Preferences implements LocationListener {
         try {
             mRemoteEnabled = isEnabled;
             if (!mRemoteEnabled) {
+                // when disabling, hide remote connected icon
                 ((MainActivity) mActivity).showRemoteIcon(false);
             }
             ((MainActivity) mActivity).showRemoteDisabledIcon(!mRemoteEnabled);

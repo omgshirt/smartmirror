@@ -13,7 +13,7 @@ public class NsdHelper {
     Context mContext;
 
     NsdManager mNsdManager;
-    NsdManager.ResolveListener mResolveListener;
+    //NsdManager.ResolveListener mResolveListener;
     NsdManager.DiscoveryListener mDiscoveryListener;
     NsdManager.RegistrationListener mRegistrationListener;
     private boolean serviceRegistered = false;
@@ -40,7 +40,7 @@ public class NsdHelper {
     }
 
     public void initializeDiscoveryListener() {
-        mResolveListener = new MyResolveListener();
+        //mResolveListener = new MyResolveListener();
         mDiscoveryListener = new MyDiscoveryListener();
         //discoverServices();
     }
@@ -60,7 +60,7 @@ public class NsdHelper {
             } else if (service.getServiceName().equals(mServiceName)) {
                 Log.d(TAG, "Same machine: " + mServiceName);
             } else if (service.getServiceName().contains(APP_NAME)) {
-                mNsdManager.resolveService(service, mResolveListener);
+                mNsdManager.resolveService(service, new MyResolveListener());
             }
         }
 
@@ -179,6 +179,6 @@ public class NsdHelper {
 
     public void tearDown() {
         mNsdManager.unregisterService(mRegistrationListener);
-        mResolveListener = null;
+        //mResolveListener = null;
     }
 }

@@ -40,8 +40,8 @@ open window/1e-10/
 photos/1e3/
 quotes/1e6/
 refresh/1e-4/
-remote on/1e-20/
-remote off/1e-13/
+remote on/1e-10/
+remote off/1e-7/
 settings/1e-4/
 scroll up/1e4/
 scroll down/1e4/
