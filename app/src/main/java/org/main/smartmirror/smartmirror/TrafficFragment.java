@@ -62,7 +62,9 @@ public class TrafficFragment extends Fragment {
         if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
             distanceMatrixUnit = "imperial";
         }
-        if (mPreference.getWorkLatitude() == 0.0 && mPreference.getWorkLongitude() == 0.0) {
+        if (mPreference.getWorkLatitude() == 0.0 || mPreference.getWorkLongitude() == 0.0) {
+            // TODO Handle this properly by hiding this fragment
+            // temporary for now
             mTrafficIcon.setVisibility(View.INVISIBLE);
             txtDistance.setText("No Traffic Information.");
         } else {

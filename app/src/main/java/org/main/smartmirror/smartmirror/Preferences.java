@@ -20,10 +20,10 @@ import android.util.Log;
 
 /**
  * Created by Brian on 10/22/2015.
- *
+ * <p/>
  * This is a singleton class to hold preferences for the application
  * Get the instance of it by using the getInstance() method
- *
+ * <p/>
  * Class is created at MainActivity start and loads the SharedPrefences for the application
  * Access is by getters and setters, which also handle file storage:
  */
@@ -53,9 +53,11 @@ public class Preferences implements LocationListener {
     public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
     public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
 
+    public static final String PREFS_FIRST_TIME_RUN = "MIRROR_FIRST_TIME_RUN";
+
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
-    
+
     // Constants for screen brightness (0-255)
     public static final int BRIGHTNESS_VLOW = 10;
     public static final int BRIGHTNESS_LOW = 40;
@@ -74,19 +76,19 @@ public class Preferences implements LocationListener {
     // default for work address
     public static final float WORK_LAT = 0f;
     public static final float WORK_LONG = 0f;
-    
+
     public static final String CMD_LIGHT_VLOW = "light min";
     public static final String CMD_LIGHT_LOW = "light low";
     public static final String CMD_LIGHT_MEDIUM = "light medium";
     public static final String CMD_LIGHT_HIGH = "light high";
-    public static final String CMD_LIGHT_VHIGH= "light max";
+    public static final String CMD_LIGHT_VHIGH = "light max";
 
     public static final String CMD_SPEECH_OFF = "speech off";
     public static final String CMD_SPEECH_VLOW = "speech min";
     public static final String CMD_SPEECH_LOW = "speech low";
     public static final String CMD_SPEECH_MEDIUM = "speech medium";
     public static final String CMD_SPEECH_HIGH = "speech high";
-    public static final String CMD_SPEECH_VHIGH= "speech max";
+    public static final String CMD_SPEECH_VHIGH = "speech max";
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
@@ -95,7 +97,7 @@ public class Preferences implements LocationListener {
     public static final String CMD_SCREEN_LOW = "brightness low";
     public static final String CMD_SCREEN_MEDIUM = "brightness medium";
     public static final String CMD_SCREEN_HIGH = "brightness high";
-    public static final String CMD_SCREEN_VHIGH= "brightness max";
+    public static final String CMD_SCREEN_VHIGH = "brightness max";
 
     public static final String CMD_VOICE_OFF = "stop listening";
     public static final String CMD_VOICE_ON = "start listening";
@@ -105,7 +107,7 @@ public class Preferences implements LocationListener {
     public static final String CMD_VOLUME_LOW = "volume low";
     public static final String CMD_VOLUME_MEDIUM = "volume medium";
     public static final String CMD_VOLUME_HIGH = "volume high";
-    public static final String CMD_VOLUME_VHIGH= "volume max";
+    public static final String CMD_VOLUME_VHIGH = "volume max";
 
     public static final String CMD_WEATHER_ENGLISH = "weather english";
     public static final String CMD_WEATHER_METRIC = "weather metric";
@@ -130,7 +132,9 @@ public class Preferences implements LocationListener {
     private int mMusicVolumeHolder;
     private int mSystemVolumeHolder;
     private String mTimeFormat;
-    private String mWeatherUnits;                      // Weather display format (English / metric)
+    private String mWeatherUnits;                   // Weather display format (English / metric)
+
+    private boolean mFirstTimeRun;
 
     private double mLatitude;
     private double mLongitude;
@@ -533,7 +537,8 @@ public class Preferences implements LocationListener {
         setTimeFormat(TIME_FORMAT_12_HR);
     }
 
-    /** Set brightness value used by night light
+    /**
+     * Set brightness value used by night light
      *
      * @param brightness int (0-255)
      */
@@ -595,7 +600,7 @@ public class Preferences implements LocationListener {
     public void setRemoteEnabled(boolean isEnabled) {
         try {
             mRemoteEnabled = isEnabled;
-            ((MainActivity)mActivity).showRemoteIcon(isEnabled);
+            ((MainActivity) mActivity).showRemoteIcon(isEnabled);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
             edit.apply();
@@ -610,11 +615,12 @@ public class Preferences implements LocationListener {
 
     /**
      * Sets the voice enabled status
+     *
      * @param isEnabled boolean
      */
     public void setVoiceEnabled(boolean isEnabled) {
         this.mVoiceEnabled = isEnabled;
-        ((MainActivity)mActivity).showSpeechIcon(isEnabled);
+        ((MainActivity) mActivity).showSpeechIcon(isEnabled);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_VOICE_ENABLED, mVoiceEnabled);
         edit.apply();
@@ -624,7 +630,7 @@ public class Preferences implements LocationListener {
     // helper sends a string to MainActivity to be spoken
     private void speakText(int stringId) {
         String text = mActivity.getResources().getString(stringId);
-        ((MainActivity)mActivity).speakText(text);
+        ((MainActivity) mActivity).speakText(text);
     }
 
     public double getLatitude() {
@@ -648,6 +654,7 @@ public class Preferences implements LocationListener {
     }
 
     public void setWorkLatitude(double mWorkLatitude) {
+        Log.i("WORKLAT", "" + mWorkLatitude);
         this.mWorkLatitude = mWorkLatitude;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putFloat(PREFS_WORK_LAT, (float) mWorkLatitude);
@@ -659,6 +666,7 @@ public class Preferences implements LocationListener {
     }
 
     public void setWorkLongitude(double mWorkLongitude) {
+        Log.i("WORKLONG", "" + mWorkLongitude);
         this.mWorkLongitude = mWorkLongitude;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putFloat(PREFS_WORK_LONG, (float) mWorkLongitude);
@@ -686,6 +694,17 @@ public class Preferences implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    public void setFirstTimrRun(boolean mFirstTimeRun) {
+        this.mFirstTimeRun = mFirstTimeRun;
+//        SharedPreferences.Editor edit = mSharedPreferences.edit();
+//        edit.putBoolean(PREFS_FIRST_TIME_RUN, mFirstTimeRun);
+//        edit.commit();
+    }
+
+    public boolean getFirstTimeRun() {
+        return mFirstTimeRun;
     }
 
     //Get User Gmail Account to be used in other fragments

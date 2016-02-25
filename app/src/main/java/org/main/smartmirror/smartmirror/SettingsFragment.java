@@ -112,7 +112,7 @@ public class SettingsFragment extends Fragment {
         setMusicVolume(mPreferences.getMusicVolume());
 
         // App Brightness radio group
-        grpAppBrightness = (RadioGroup)view.findViewById(R.id.brightness_group);
+        grpAppBrightness = (RadioGroup) view.findViewById(R.id.brightness_group);
         grpAppBrightness.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -225,16 +225,14 @@ public class SettingsFragment extends Fragment {
         });
         swtTimeFormat.setChecked(mPreferences.isTimeFormat12hr());
 
-        // need to think more about this implementation
-        // Button changeAccountbtn = (Button) view.findViewById(R.id.change_account_button);
-        // changeAccountbtn.setOnClickListener(new View.OnClickListener() {
-            // @Override
-            // public void onClick(View v) {
-                // Intent intent = new Intent(getActivity(), AccountActivity.class);
-                // startActivity(intent);
-                // getActivity().finish();
-            // }
-        // });
+        Button changeAccountbtn = (Button) view.findViewById(R.id.change_account_button);
+        changeAccountbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AccountActivity.class);
+                startActivity(intent);
+            }
+        });
 
         return view;
     }
@@ -371,7 +369,7 @@ public class SettingsFragment extends Fragment {
 
     // Methods to update UI elements
 
-    public void setSystemVolume(float vol){
+    public void setSystemVolume(float vol) {
         if (vol == Preferences.VOL_OFF) {
             grpSysVolume.check(R.id.sys_vol_off);
         } else if (vol == Preferences.VOL_VLOW) {
@@ -387,7 +385,7 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    public void setMusicVolume(float vol){
+    public void setMusicVolume(float vol) {
         if (vol == Preferences.VOL_OFF) {
             grpSpeechVolume.check(R.id.mus_vol_off);
         } else if (vol == Preferences.VOL_VLOW) {
@@ -403,8 +401,8 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    public void setScreenBrightness(int brightness){
-        switch (brightness){
+    public void setScreenBrightness(int brightness) {
+        switch (brightness) {
             case Preferences.BRIGHTNESS_VLOW:
                 grpAppBrightness.check(R.id.brightness_vlow);
                 break;
@@ -423,8 +421,8 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    public void setLightBrightness(int brightness){
-        switch (brightness){
+    public void setLightBrightness(int brightness) {
+        switch (brightness) {
             case Preferences.BRIGHTNESS_VLOW:
                 grpLightBrightness.check(R.id.light_vlow);
                 break;

@@ -263,11 +263,11 @@
             android:text="@string/time_format_24hr"
             android:textSize="18sp" />
         <!-- Off for now -->
-        <!--<Button-->
-            <!--android:id="@+id/change_account_button"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:text="Change Login Information" />-->
+        <Button
+            android:id="@+id/change_account_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Change Login Information" />
     </LinearLayout>
 </ScrollView>
