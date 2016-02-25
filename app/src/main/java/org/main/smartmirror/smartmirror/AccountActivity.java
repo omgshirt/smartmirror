@@ -47,14 +47,15 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
+        Fabric.with(this, new TwitterCore(authConfig));
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
         findGoogleAccounts();
         if (mPreference.getWorkLatitude() != 0.0 || mPreference.getWorkLongitude() != 0.0) {
             startMain();
         }
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
-        Fabric.with(this, new TwitterCore(authConfig));
+
 
         mTwitterLoginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
 
