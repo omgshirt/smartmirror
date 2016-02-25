@@ -41,7 +41,7 @@ public class NsdHelper {
 
     public void initializeDiscoveryListener() {
         //mResolveListener = new MyResolveListener();
-        mDiscoveryListener = new MyDiscoveryListener();
+        //mDiscoveryListener = new MyDiscoveryListener();
         //discoverServices();
     }
 
@@ -174,8 +174,6 @@ public class NsdHelper {
     public NsdServiceInfo getChosenServiceInfo() {
         return mService;
     }
-
-
 
     public void tearDown() {
         mNsdManager.unregisterService(mRegistrationListener);

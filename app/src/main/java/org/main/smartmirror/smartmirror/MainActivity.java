@@ -229,9 +229,12 @@ public class MainActivity extends AppCompatActivity
         mRemoteConnection = new RemoteConnection(this, mRemoteHandler);
         mNsdHelper = new NsdHelper(this);
 
-        // Status Icons
+        // Status Icons: Remote / Remote Disabled / Speech
         imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
         imgRemoteDisabledIcon = (ImageView)findViewById(R.id.remote_dc_icon);
+        if (!mPreferences.isRemoteEnabled()) {
+            imgRemoteDisabledIcon.setVisibility(View.VISIBLE);
+        }
         imgSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
         if (mPreferences.isVoiceEnabled()) {
             imgSpeechIcon.setVisibility(View.VISIBLE);
@@ -491,7 +494,7 @@ public class MainActivity extends AppCompatActivity
      protected void resetInteractionTimer() {
         stopUITimer();
         mUITimer = new Timer();
-        Log.i(Constants.TAG, "Interaction timer set :: " + mInteractionTimeout + " ms");
+        //Log.i(Constants.TAG, "Interaction timer set :: " + mInteractionTimeout + " ms");
         mUITimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -503,7 +506,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void stopUITimer() {
         if (mUITimer != null) {
-            Log.i(Constants.TAG, "Interaction timer cancelled");
+            //Log.i(Constants.TAG, "Interaction timer cancelled");
             mUITimer.cancel();
         }
     }
@@ -750,7 +753,6 @@ public class MainActivity extends AppCompatActivity
             case Constants.CLOSE_SCREEN:
             case Constants.CLOSE_WINDOW:
             case Constants.HIDE_SCREEN:
-                //fragment = new BlankFragment();
                 setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
                 break;
             case Constants.FACEBOOK:
@@ -834,7 +836,6 @@ public class MainActivity extends AppCompatActivity
 
         if (fragment != null) {
             mCurrentFragment = command;
-            //boolean addToBackStack = !(fragment instanceof BlankFragment);
             displayFragment(fragment, command, true);
             showViewIfHidden(contentFrame3);
         }
@@ -914,7 +915,6 @@ public class MainActivity extends AppCompatActivity
         // show the command to the user
         showToast(input, Toast.LENGTH_SHORT);
 
-        // reduce duplicate commands to one?
         switch (input) {
             case Preferences.CMD_DISABLE_REMOTE:
                 input = Preferences.CMD_REMOTE_OFF;
@@ -1055,6 +1055,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void disconnectRemote(){
+        mRemoteConnection.stopRemoteClient();
+    }
 
     /**
      * Callback from RemoteServerAsyncTask when a command is received from the remote control.

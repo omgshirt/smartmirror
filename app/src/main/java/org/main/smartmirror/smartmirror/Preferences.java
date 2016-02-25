@@ -604,6 +604,7 @@ public class Preferences implements LocationListener {
                 ((MainActivity) mActivity).registerNsdService();
             } else {
                 ((MainActivity) mActivity).unregisterNsdService();
+                ((MainActivity) mActivity).disconnectRemote();
             }
         }
         try {
