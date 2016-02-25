@@ -4,15 +4,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import twitter4j.Paging;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
-import twitter4j.TwitterObjectFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -85,10 +82,10 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String message) {
 
-        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+        ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
         try {
             for(int i = 0; i < statuses.size(); i++){
-                CustomObject co = new CustomObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i));
+                CustomListViewObject co = new CustomListViewObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i));
                 objects.add(co);
             }
             CustomAdapter customAdapter = new CustomAdapter(MainActivity.getContextForApplication(), objects);

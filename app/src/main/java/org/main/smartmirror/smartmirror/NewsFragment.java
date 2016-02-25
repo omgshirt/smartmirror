@@ -15,13 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
 
-import java.net.URI;
 import java.util.ArrayList;
 
 public class NewsFragment extends Fragment implements CacheManager.CacheListener {
@@ -37,7 +35,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String mNewsSection;
 
     // time in seconds before news data is considered old and is discarded
-    private final int DATA_UPDATE_FREQUENCY = 1;
+    private final int DATA_UPDATE_FREQUENCY = 1000;
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
 
@@ -60,10 +58,10 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     //public static String mHeadline = "";
 
     ListView newsFeed;
-    public static ArrayList<String> mHeadline = new ArrayList<String>();
-    public static ArrayList<String> mSnippet = new ArrayList<String>();
-    public static ArrayList<Uri> mImageURI = new ArrayList<Uri>();
-    public static ArrayList<String> mFullArticle = new ArrayList<String>();
+    public ArrayList<String> mHeadline = new ArrayList<String>();
+    public ArrayList<String> mSnippet = new ArrayList<String>();
+    public ArrayList<Uri> mImageURI = new ArrayList<Uri>();
+    public ArrayList<String> mFullArticle = new ArrayList<String>();
 
     Handler mHandler = new Handler();
     private ArticleSelectedListener articleSelectedListener;
@@ -98,7 +96,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
         //clearLayout();
 
-        mNewsSection = getArguments().getString("arrI");
+        mNewsSection = getArguments().getString("arrI"); // change arrI
         //mGuardURL = mGuardURL + mGuardAPIKey;
         mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
 
@@ -321,13 +319,14 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-
-        for (String name : Constants.NEWS_DESKS) {
+        mCacheManager.unRegisterCacheListener(mNewsSection, this);
+        Log.i("NEWS CACHE", "unregister " + mNewsSection);
+        /*for (String name : Constants.NEWS_DESKS) {
             if (name.equals(mNewsSection)) {
                 mCacheManager.unRegisterCacheListener(name, this);
                 Log.i("NEWS CACHE", "unregister " + name);
             }
-        }
+        }*/
     }
 
     // Get news headlines from api and display
@@ -403,18 +402,18 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             Log.e("NEWS ERROR", e.toString());
         }
 
-        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+        ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
         CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
-        newsFeed.setAdapter(customAdapter);
+
         try {
             for(int j = 0; j < numArticles; j++){
-                CustomObject co = new CustomObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j));
+                CustomListViewObject co = new CustomListViewObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j));
                 objects.add(co);
                 customAdapter.notifyDataSetChanged();
             }
 
         } catch (Exception e) {Log.i("NEWS", e.toString());}
-
+        newsFeed.setAdapter(customAdapter);
     }
 
     /**
@@ -422,13 +421,16 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
      */
     @Override
     public void onCacheExpired(String cacheName) {
-
-        for (String name : Constants.NEWS_DESKS) {
+        if (cacheName.equals(mNewsSection)) {
+            startNewsUpdate();
+            Log.i("NEWS CACHE", "updating expired cache" + cacheName);
+        }
+        /*for (String name : Constants.NEWS_DESKS) {
             if (name.equals(mNewsSection)) {
                 startNewsUpdate();
                 Log.i("NEWS CACHE", "updating expired cache" + cacheName);
             }
-        }
+        }*/
 
     }
 
