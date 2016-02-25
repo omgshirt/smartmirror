@@ -13,7 +13,6 @@ import android.widget.TextView;
  * Class that handles the help dialog which shows the commands the user can issue
  */
 public class HelpFragment extends Fragment {
-    private static final String DIALOG_TITLE = "Help";
 
     public static HelpFragment newInstance(String fragName) {
         Bundle args = new Bundle();
@@ -45,17 +44,17 @@ public class HelpFragment extends Fragment {
         String[] arrayContent;
         // Modes
         arrayContent = res.getStringArray(R.array.modes_list);
-        strContent = stringSpace(arrayContent);
+        strContent = buildupStringFromArrays(arrayContent);
         txtModeHeader.setText("Mode");
         txtModeContent.setText(strContent);
         // News
         arrayContent = res.getStringArray(R.array.guardian_sections);
-        strContent = stringSpace(arrayContent);
+        strContent = buildupStringFromArrays(arrayContent);
         txtNewsHelpHeader.setText("News");
         txtNewsHelpContent.setText(strContent);
         // General
         arrayContent = res.getStringArray(R.array.general_help);
-        strContent = stringSpace(arrayContent);
+        strContent = buildupStringFromArrays(arrayContent);
         txtHelpHeader.setText("General Help");
         txtHelpContent.setText(strContent);
 
@@ -63,21 +62,21 @@ public class HelpFragment extends Fragment {
             // facebook
             case Constants.FACEBOOK:
                 arrayContent = res.getStringArray(R.array.facebook_help);
-                strContent = stringSpace(arrayContent);
+                strContent = buildupStringFromArrays(arrayContent);
                 txtCurrentHelpHeader.setText(name.substring(0, 1).toUpperCase() + name.substring(1) + " - Help");
                 txtCurrentHelpContent.setText(strContent);
                 break;
             // camera
             case Constants.CAMERA:
                 arrayContent = res.getStringArray(R.array.camera_help);
-                strContent = stringSpace(arrayContent);
+                strContent = buildupStringFromArrays(arrayContent);
                 txtCurrentHelpHeader.setText("Controls");
                 txtCurrentHelpContent.setText(strContent);
                 break;
             // night light
             case Constants.NIGHT_LIGHT:
                 arrayContent = res.getStringArray(R.array.color_names);
-                strContent = stringSpace(arrayContent);
+                strContent = buildupStringFromArrays(arrayContent);
                 txtCurrentHelpHeader.setText("Color Options:");
                 txtCurrentHelpContent.setText(strContent);
                 break;
@@ -89,7 +88,13 @@ public class HelpFragment extends Fragment {
         return view;
     }
 
-    public String stringSpace(String[] string) {
+    /**
+     * Builds up a single string from an array to be used in a TextView
+     *
+     * @param string the array to be converted
+     * @return the converted string.
+     */
+    public String buildupStringFromArrays(String[] string) {
         String str = "";
         for (int i = 0; i < string.length; i++) {
             // capitalize the first letter in the arrays
