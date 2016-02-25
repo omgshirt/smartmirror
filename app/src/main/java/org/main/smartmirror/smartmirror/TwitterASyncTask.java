@@ -23,8 +23,6 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
     // fallback tokens, replaced once user signs in
     public static String TWITTER_ACCESS_TOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
     public static String TWITTER_ACCESS_SECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
-    /*final String TWITTER_ACCESS_TOKEN = TwitterActivity.mAuthToken;
-    final String TWITTER_ACCESS_SECRET = TwitterActivity.mAuthSecret;*/
     public static String accToken;
     private AccessToken accessToken;
     Twitter twitter;
@@ -44,8 +42,6 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     cb.setOAuthAccessTokenSecret(TWITTER_ACCESS_SECRET);
                     cb.setJSONStoreEnabled(true);
                     //cb.setApplicationOnlyAuthEnabled(true);
-                    //.setOAuthAccessToken(TwitterActivity.mAuthToken)
-                    //.setOAuthAccessTokenSecret(TwitterActivity.mAuthToken);
 
 
             accessToken = new AccessToken(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET);

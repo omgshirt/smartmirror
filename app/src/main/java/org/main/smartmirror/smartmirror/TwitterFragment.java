@@ -70,19 +70,6 @@ public class TwitterFragment extends Fragment {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             Log.d("TwitterArrayList ", "Got message:\"" + message +"\"");
-            switch (message) {
-                case Constants.mGet:
-                    twitterAsync();
-                    break;
-                case Constants.mRefresh:
-                    twitterAsync();
-                    Toast.makeText(getActivity(),"TwitterArrayList Feed Refreshed",Toast.LENGTH_LONG).show();
-                    break;
-                case Constants.mLogin:
-                    twitterLogin();
-                    break;
-
-            }
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
                 int position = 0;
                 if (message.contains(Constants.SCROLL_DOWN)) {
@@ -112,12 +99,6 @@ public class TwitterFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-    }
-
-    //to twitter login activity
-    public void twitterLogin() {
-        Intent intent = new Intent(getContext(), TwitterActivity.class);
-        startActivity(intent);
     }
 
 

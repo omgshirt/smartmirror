@@ -45,25 +45,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
     private CacheManager mCacheManager = null;
 
-   /* private TextView mTxtHeadline1;
-    private TextView mTxtHeadline2;
-    private TextView mTxtHeadline3;
-    private TextView mTxtHeadline4;
-    private TextView mTxtHeadline5;
-    private TextView mTxtHeadline6;
-    private TextView mTxtHeadline7;
-    private TextView mTxtHeadline8;
-
-
-    private ImageView img1;
-    private ImageView img2;
-    private ImageView img3;
-    private ImageView img4;
-    private ImageView img5;
-    private ImageView img6;
-    private ImageView img7;
-    private ImageView img8;*/
-
     private TextView txtNewsDesk;
 
     //public static String mArticleFullBody = "";
@@ -78,7 +59,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public static String webTitle = "";
     //public static String mHeadline = "";
 
-    ScrollView mScrollView;
     ListView newsFeed;
     public static ArrayList<String> mHeadline = new ArrayList<String>();
     public static ArrayList<String> mSnippet = new ArrayList<String>();
@@ -110,30 +90,10 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
         mCacheManager = CacheManager.getInstance();
-        //
+
         // Initialize Items
         // mNewsSection = "world";
         txtNewsDesk = (TextView) view.findViewById(R.id.news_desk_title);
-
-        /*mTxtHeadline1 = (TextView) view.findViewById(R.id.headline);
-        mTxtHeadline2 = (TextView) view.findViewById(R.id.headline2);
-        mTxtHeadline3 = (TextView) view.findViewById(R.id.headline3);
-        mTxtHeadline4 = (TextView) view.findViewById(R.id.headline4);
-        mTxtHeadline5 = (TextView) view.findViewById(R.id.headline5);
-        mTxtHeadline6 = (TextView) view.findViewById(R.id.headline6);
-        mTxtHeadline7 = (TextView) view.findViewById(R.id.headline7);
-        mTxtHeadline8 = (TextView) view.findViewById(R.id.headline8);
-
-        img1 = (ImageView) view.findViewById(R.id.img1);
-        img2 = (ImageView) view.findViewById(R.id.img2);
-        img3 = (ImageView) view.findViewById(R.id.img3);
-        img4 = (ImageView) view.findViewById(R.id.img4);
-        img5 = (ImageView) view.findViewById(R.id.img5);
-        img6 = (ImageView) view.findViewById(R.id.img6);
-        img7 = (ImageView) view.findViewById(R.id.img7);
-        img8 = (ImageView) view.findViewById(R.id.img8);
-
-        mScrollView = (ScrollView) view.findViewById(R.id.scrollView2);*/
         newsFeed = (ListView) view.findViewById(R.id.list_news);
 
         //clearLayout();
@@ -439,50 +399,20 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             }
 
 
-
-            /*String txt0 = "<b>" + hl[0] + "</b> " + "<br>" + snippets[0] + "<br>";
-            mTxtHeadline1.setText(Html.fromHtml(txt0));
-            Picasso.with(getContext()).load(thumbs[0]).fit().centerInside().into(img1);
-
-            String txt1 = "<b>" + hl[1] + "</b> " + "<br>" + snippets[1] + "<br>";
-            mTxtHeadline2.setText(Html.fromHtml(txt1));
-            Picasso.with(getContext()).load(thumbs[1]).fit().centerInside().into(img2);
-
-            String txt2 = "<b>" + hl[2] + "</b> " + "<br>" + snippets[2] + "<br>";
-            mTxtHeadline3.setText(Html.fromHtml(txt2));
-            Picasso.with(getContext()).load(thumbs[2]).fit().centerInside().into(img3);
-
-            String txt3 = "<b>" + hl[3] + "</b> " + "<br>" + snippets[3] + "<br>";
-            mTxtHeadline4.setText(Html.fromHtml(txt3));
-            Picasso.with(getContext()).load(thumbs[3]).fit().centerInside().into(img4);
-
-            String txt4 = "<b>" + hl[4] + "</b> " + "<br>" + snippets[4] + "<br>";
-            mTxtHeadline5.setText(Html.fromHtml(txt4));
-            Picasso.with(getContext()).load(thumbs[4]).fit().centerInside().into(img5);
-
-            String txt5 = "<b>" + hl[5] + "</b> " + "<br>" + snippets[5] + "<br>";
-            mTxtHeadline6.setText(Html.fromHtml(txt5));
-            Picasso.with(getContext()).load(thumbs[5]).fit().centerInside().into(img6);
-
-            String txt6 = "<b>" + hl[6] + "</b> " + "<br>" + snippets[6] + "<br>";
-            mTxtHeadline7.setText(Html.fromHtml(txt6));
-            Picasso.with(getContext()).load(thumbs[6]).fit().centerInside().into(img7);
-
-            String txt7 = "<b>" + hl[7] + "</b> " + "<br>" + snippets[7] + "<br>";
-            mTxtHeadline8.setText(Html.fromHtml(txt7));
-            Picasso.with(getContext()).load(thumbs[7]).fit().centerInside().into(img8);*/
-
         } catch (Exception e) {
             Log.e("NEWS ERROR", e.toString());
         }
+
         ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+        CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
+        newsFeed.setAdapter(customAdapter);
         try {
             for(int j = 0; j < numArticles; j++){
                 CustomObject co = new CustomObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j));
                 objects.add(co);
+                customAdapter.notifyDataSetChanged();
             }
-            CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
-            newsFeed.setAdapter(customAdapter);
+
         } catch (Exception e) {Log.i("NEWS", e.toString());}
 
     }
@@ -507,7 +437,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
      */
     @Override
     public void onCacheChanged(String cacheName) {
-        // In this case we do nothing, as calling startWeatherUpdate() will refresh the views.
+        // In this case we do nothing, as calling startNewsUpdate() will refresh the views.
     }
 
 }
