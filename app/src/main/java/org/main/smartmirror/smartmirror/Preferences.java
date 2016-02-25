@@ -654,7 +654,6 @@ public class Preferences implements LocationListener {
     }
 
     public void setWorkLatitude(double mWorkLatitude) {
-        Log.i("WORKLAT", "" + mWorkLatitude);
         this.mWorkLatitude = mWorkLatitude;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putFloat(PREFS_WORK_LAT, (float) mWorkLatitude);
@@ -666,7 +665,6 @@ public class Preferences implements LocationListener {
     }
 
     public void setWorkLongitude(double mWorkLongitude) {
-        Log.i("WORKLONG", "" + mWorkLongitude);
         this.mWorkLongitude = mWorkLongitude;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putFloat(PREFS_WORK_LONG, (float) mWorkLongitude);
@@ -698,9 +696,6 @@ public class Preferences implements LocationListener {
 
     public void setFirstTimrRun(boolean mFirstTimeRun) {
         this.mFirstTimeRun = mFirstTimeRun;
-//        SharedPreferences.Editor edit = mSharedPreferences.edit();
-//        edit.putBoolean(PREFS_FIRST_TIME_RUN, mFirstTimeRun);
-//        edit.commit();
     }
 
     public boolean getFirstTimeRun() {

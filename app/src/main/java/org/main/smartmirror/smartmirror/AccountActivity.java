@@ -20,7 +20,6 @@ import java.util.List;
 
 /**
  * Activity that handles the Account Credentials and Work address
- * TODO Convert to Fragment
  */
 public class AccountActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -31,8 +30,6 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
-        Log.i("mWorkLat", "" + mPreference.getWorkLatitude());
-        Log.i("mWorkLong", "" + mPreference.getWorkLongitude());
         findGoogleAccounts();
         if (!mPreference.getFirstTimeRun()) {
             if (mPreference.getWorkLatitude() != 0.0 || mPreference.getWorkLongitude() != 0.0) {
