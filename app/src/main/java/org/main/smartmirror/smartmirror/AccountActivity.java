@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * Activity that handles the Account Credentials and Work address
+ * TODO handle all the permissions for MainActivity Here.
  */
 public class AccountActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -86,6 +87,10 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         if (!(workAddress.getText().toString().equals(""))) {
             String strAddress = workAddress.getText().toString().replace(' ', '+');
             convertAddressToLatLong(strAddress);
+        } else {
+            // I think I need this...?
+            mPreference.setWorkLatitude(0.0);
+            mPreference.setWorkLongitude(0.0);
         }
         startMain();
     }
