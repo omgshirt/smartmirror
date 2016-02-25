@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity
 
     private ImageView imgSpeechIcon;
     private ImageView imgRemoteIcon;
+    private ImageView imgRemoteDisabledIcon;
 
     // Set initial fragments & track displayed views
     private String mInitialFragment = Constants.NEWS;
@@ -230,6 +231,7 @@ public class MainActivity extends AppCompatActivity
 
         // Status Icons
         imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
+        imgRemoteDisabledIcon = (ImageView)findViewById(R.id.remote_dc_icon);
         imgSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
         if (mPreferences.isVoiceEnabled()) {
             imgSpeechIcon.setVisibility(View.VISIBLE);
@@ -850,29 +852,29 @@ public class MainActivity extends AppCompatActivity
      * Show or hide the given icon
      *
      * @param icon ImageView to be adjusted
-     * @param showIcon true to display icon, false to hide
+     * @param display true to display icon, false to hide
      */
-    public void showIcon(ImageView icon, boolean showIcon) {
-        if (showIcon) {
+    public void showIcon(ImageView icon, boolean display) {
+        if (display) {
             icon.setVisibility(View.VISIBLE);
         } else {
             icon.setVisibility(View.GONE);
         }
     }
 
-    public void showRemoteIcon(boolean showIcon){
-        if (showIcon && mPreferences.isRemoteEnabled()) {
+    public void showRemoteIcon(boolean display){
+        if (display && mPreferences.isRemoteEnabled()) {
             showIcon(imgRemoteIcon, true);
-        } else if (!showIcon) {
+        } else if (!display) {
             showIcon(imgRemoteIcon, false);
         }
     }
 
-    public void showRemoteDisabledIcon(boolean showIcon){
-        if (showIcon && !mPreferences.isRemoteEnabled()){
-            // TODO: show the remote disabled icon
+    public void showRemoteDisabledIcon(boolean display){
+        if (display && !mPreferences.isRemoteEnabled()){
+            showIcon(imgRemoteDisabledIcon, true);
         } else {
-            // TODO: hide the remote disabled icon
+            showIcon(imgRemoteDisabledIcon, false);
         }
     }
 
