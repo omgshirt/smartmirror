@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity
     private ImageView imgSpeechIcon;
     private ImageView imgRemoteIcon;
     private ImageView imgRemoteDisabledIcon;
+    private ImageView imgStayAwakeIcon;
 
     // Set initial fragments & track displayed views
     private String mInitialFragment = Constants.NEWS;
@@ -119,7 +120,11 @@ public class MainActivity extends AppCompatActivity
     private Runnable uiTimerRunnable = new Runnable() {
         @Override
         public void run() {
-            clearScreenOnFlag();
+            if (!mPreferences.isStayingAwake()) {
+                clearScreenOnFlag();
+            } else {
+                Log.i(Constants.TAG, "Screen set to stay awake");
+            }
         }
     };
 
@@ -229,16 +234,23 @@ public class MainActivity extends AppCompatActivity
         mRemoteConnection = new RemoteConnection(this, mRemoteHandler);
         mNsdHelper = new NsdHelper(this);
 
-        // Status Icons: Remote / Remote Disabled / Speech
+        // Status Icons: Remote / Remote Disabled / Speech / Stay Awake
         imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
         imgRemoteDisabledIcon = (ImageView)findViewById(R.id.remote_dc_icon);
         if (!mPreferences.isRemoteEnabled()) {
             imgRemoteDisabledIcon.setVisibility(View.VISIBLE);
         }
+
         imgSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
         if (mPreferences.isVoiceEnabled()) {
             imgSpeechIcon.setVisibility(View.VISIBLE);
         }
+
+        imgStayAwakeIcon = (ImageView) findViewById(R.id.stay_awake_icon);
+        if (mPreferences.isStayingAwake()) {
+            imgStayAwakeIcon.setVisibility(View.VISIBLE);
+        }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -407,6 +419,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void enterLightSleep() {
 
+        mPreferences.setStayAwake(false);
         mirrorSleepState = LIGHT_SLEEP;
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
         resetInteractionTimer();
@@ -808,16 +821,6 @@ public class MainActivity extends AppCompatActivity
                 enterLightSleep();
                 command = mCurrentFragment;
                 break;
-            case Constants.STAY_AWAKE:
-                // Screen awake for 7 days
-                if (mInteractionTimeout == 604800000) {
-                    speakText(getResources().getString(R.string.speech_stay_awake_err));
-                }else {
-                    speakText(getResources().getString(R.string.speech_stay_awake));
-                    mInteractionTimeout = 604800000;
-                    resetInteractionTimer();
-                }
-                break;
             case Constants.TRAFFIC:
                 fragment = new TrafficFragment();
                 break;
@@ -865,27 +868,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showRemoteIcon(boolean display){
-        if (display && mPreferences.isRemoteEnabled()) {
-            showIcon(imgRemoteIcon, true);
-        } else if (!display) {
-            showIcon(imgRemoteIcon, false);
-        }
+        showIcon(imgRemoteIcon, display);
     }
 
     public void showRemoteDisabledIcon(boolean display){
-        if (display && !mPreferences.isRemoteEnabled()){
-            showIcon(imgRemoteDisabledIcon, true);
-        } else {
-            showIcon(imgRemoteDisabledIcon, false);
-        }
+        showIcon(imgRemoteDisabledIcon, display);
     }
 
-    public void showSpeechIcon(boolean showIcon) {
-        if (showIcon && mPreferences.isVoiceEnabled()) {
-            showIcon(imgSpeechIcon, true);
-        } else if (!showIcon) {
-            showIcon(imgSpeechIcon, false);
-        }
+    public void showSpeechIcon(boolean display) {
+        showIcon(imgSpeechIcon, (display && !isTTSSpeaking()));
+    }
+
+    public void showStayAwakeIcon(boolean display) {
+         showIcon(imgStayAwakeIcon, display);
     }
 
 

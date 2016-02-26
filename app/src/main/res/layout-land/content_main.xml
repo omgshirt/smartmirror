@@ -45,6 +45,15 @@
             android:contentDescription="remote control disconnected icon"
             android:src="@drawable/remote_dc_128"
             android:visibility="gone" />
+        <ImageView
+            android:id="@+id/stay_awake_icon"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:contentDescription="stay awake icon"
+            android:src="@drawable/zzz_stay_awake"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout

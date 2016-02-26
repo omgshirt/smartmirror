@@ -28,7 +28,7 @@ public class Constants {
     public static final String SCROLL_UP = "scroll up";
     public static final String SCROLL_DOWN = "scroll down";
     public static final String SLEEP = "sleep";
-    public static final String STAY_AWAKE = "stay awake";
+
     public static final String SMALL_SCREEN = "small screen";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
@@ -126,7 +126,7 @@ public class Constants {
             SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
             SETTINGS, SEVEN, SEVENTH, SHOW_LIGHT, SHOW_HELP,
             SHOW_TIME, SHOW_WEATHER, SIX,
-            SIXTH, SLEEP, SMALL_SCREEN, STAY_AWAKE, TAKE_PICTURE,
+            SIXTH, SLEEP, SMALL_SCREEN, TAKE_PICTURE,
             THIRD, THREE, TECHNOLOGY, TIME,
             TRAFFIC, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
@@ -157,7 +157,9 @@ public class Constants {
 
             Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
             Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
-            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC
+            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC,
+
+            Preferences.CMD_STAY_AWAKE
     };
 
     public static HashSet<String> createCommandSet() {

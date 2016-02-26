@@ -11,7 +11,7 @@ close screen/1e-6/
 close window/1e-6/
 conditions/1e-4/
 current time/1e8/
-enable remote/1e-5/
+enable remote/1e-8/
 disable remote/1e-5/
 facebook/1e-5/
 forecast/1e-1/
@@ -56,7 +56,7 @@ show time/1e-1/
 show weather/1e1/
 show light/1e-3/
 small screen/1e-8/
-sleep/1e10/
+sleep/1e14/
 start listening/1e-12/
 stay awake/1e-8/
 stop listening/1e-10/
