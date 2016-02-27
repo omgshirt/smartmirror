@@ -728,13 +728,13 @@ public class Preferences implements LocationListener {
     }
 
     public void setStayAwake(boolean stayAwake) {
-        if (mStayAwake) {
+        if (mStayAwake && stayAwake) {
             speakText(R.string.speech_stay_awake_err);
-        } else {
+        } else if (stayAwake){
             speakText(R.string.speech_stay_awake);
         }
         mStayAwake = stayAwake;
-        ((MainActivity)mActivity).showStayAwakeIcon(true);
+        ((MainActivity)mActivity).showStayAwakeIcon(mStayAwake);
     }
 
     public boolean isStayingAwake(){

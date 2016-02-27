@@ -39,6 +39,7 @@ public class Constants {
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
+    public static final String LIGHT = "light";
     public static final String NEWS = "news";
     public static final String NIGHT_LIGHT = "night light";
     public static final String PHOTOS = "photos";

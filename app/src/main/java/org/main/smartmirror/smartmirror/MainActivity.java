@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity
     public static final int AWAKE = 2;
 
     // Sleep state & wakelocks
+    private boolean nightLightOnWake = false;           // tracks if device should wake into LightFragment
     private int mirrorSleepState;
     private int defaultScreenTimeout;
     private final int WAKELOCK_TIMEOUT = 100;            // Wakelock should be held only briefly to trigger screen wake
@@ -101,10 +102,10 @@ public class MainActivity extends AppCompatActivity
     private final int SLEEP_DELAY = 5000;                           // Timeout for lightSleep -> sleep transition
     private PowerManager mPowerManager;
 
-    // TTS
+    // Text to Speech - TTS
     private TTSHelper mTTSHelper;
 
-    // NSD
+    // Network Service Discovery - NSD
     NsdHelper mNsdHelper;
     private Handler mRemoteHandler;
     private RemoteConnection mRemoteConnection;
@@ -318,10 +319,13 @@ public class MainActivity extends AppCompatActivity
         startSpeechRecognition();
 
         // on first load show initialFragment
-        if (mCurrentFragment == null || mCurrentFragment == Constants.CALENDAR) { //Temporary Fix TODO: Fix
+        if (mCurrentFragment == null) {
             wakeScreenAndDisplay(mInitialFragment);
+        } else if (nightLightOnWake) {
+            // If the mirror was woken with NIGHT_LIGHT command, change to that fragment immediately.
+            nightLightOnWake = false;
+            wakeScreenAndDisplay(Constants.NIGHT_LIGHT);
         }
-        // if the system was put to sleep fr
     }
 
     @SuppressWarnings("deprecation")
@@ -418,7 +422,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void enterLightSleep() {
-
+        if (mirrorSleepState == ASLEEP) return;
         mPreferences.setStayAwake(false);
         mirrorSleepState = LIGHT_SLEEP;
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
@@ -659,6 +663,7 @@ public class MainActivity extends AppCompatActivity
             handleHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP) {
+                if (command.equals(Constants.NIGHT_LIGHT)) nightLightOnWake = true;
                 exitSleep();
             } else {
                 exitLightSleep();
@@ -917,6 +922,9 @@ public class MainActivity extends AppCompatActivity
             case Preferences.CMD_ENABLE_REMOTE:
                 input = Preferences.CMD_REMOTE_ON;
                 break;
+            case Constants.SHOW_LIGHT:
+                input = Constants.NIGHT_LIGHT;
+                break;
         }
 
         wakeScreenAndDisplay(input);
@@ -1061,7 +1069,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleRemoteCommand(String command) {
         Log.i(Constants.TAG, "remote msg :: " + command);
-        if (command.equals("light")) {
+        if (command.equals(Constants.LIGHT)) {
             command = Constants.NIGHT_LIGHT;
         }
         if (mPreferences.isRemoteEnabled())
@@ -1069,9 +1077,7 @@ public class MainActivity extends AppCompatActivity
         else {
             Log.i(Constants.TAG, "Remote Disabled. Command ignored: \"" + command + "\"");
         }
-
     }
-
 
     // --------------------------- LIGHT SENSOR --------------------------------------
 
