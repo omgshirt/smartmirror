@@ -404,7 +404,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
         ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
         CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
-
         try {
             for(int j = 0; j < numArticles; j++){
                 CustomListViewObject co = new CustomListViewObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j));

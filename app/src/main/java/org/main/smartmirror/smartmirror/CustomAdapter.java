@@ -58,7 +58,7 @@ public class CustomAdapter extends BaseAdapter {
         try {
             holder.header.setText(objects.get(position).getProp1());
             holder.snippet.setText(objects.get(position).getProp2());
-            Picasso.with(context).load(objects.get(position).getProp3()).fit().centerInside().into(holder.thumbnail);
+            Picasso.with(MainActivity.getContextForApplication()).load(objects.get(position).getProp3()).fit().centerInside().into(holder.thumbnail);
         } catch (Exception e) {}
 
 
