@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import twitter4j.Paging;
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
@@ -25,6 +26,9 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
     Twitter twitter;
     List<twitter4j.Status> statuses;
     Paging paging;
+    private final int DATA_UPDATE_FREQUENCY = 61;
+    public static final String TWITTER_CACHE = "twitter cache";
+
 
     @Override
     protected String doInBackground(String[] params) {
@@ -48,6 +52,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
             // pulling tweets commented out for now
             paging = new Paging(5); // MAX 200 IN ONE CALL
             statuses = twitter.getHomeTimeline(paging);
+            updateTwitterCache(statuses);
 
             try {
 
@@ -66,11 +71,11 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
 
             } catch (Exception e) {
-                Log.i("TWITTER Parse ", "Didnt work");
+                Log.i("TWITTER Parse ", e.toString());
             }
 
         }catch (Exception e) {
-            Log.i("ERR ", "Something's not right, max call limit reached");
+            Log.i("ERR ", e.toString());
 
         }
 
@@ -93,6 +98,11 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
         } catch (Exception e) {}
 
 
+    }
+
+    public void updateTwitterCache(List<twitter4j.Status> data) {
+        // Update the TWITTER_CACHE stored in cacheManager or create new if it doesn't exist.
+        TwitterFragment.mCacheManager.addCache(TWITTER_CACHE, data, DATA_UPDATE_FREQUENCY);
     }
 
 }

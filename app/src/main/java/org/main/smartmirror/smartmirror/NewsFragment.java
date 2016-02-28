@@ -39,8 +39,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
     // I've updated NewsFragment to show the DataManager class. Create items as required.
 
-
-
     private CacheManager mCacheManager = null;
 
     private TextView txtNewsDesk;
@@ -103,56 +101,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         //updateNews(mGuardURL);
 
         txtNewsDesk.setText(mNewsSection.toUpperCase());
-
-        // set onClickListener
-        /*mTxtHeadline1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toNewsBodyFragment(0);
-            }
-        });
-        mTxtHeadline2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toNewsBodyFragment(1);
-            }
-        });
-        mTxtHeadline3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toNewsBodyFragment(2);
-            }
-        });
-        mTxtHeadline4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toNewsBodyFragment(3);
-            }
-        });
-        mTxtHeadline5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toNewsBodyFragment(4);
-            }
-        });
-        mTxtHeadline6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toNewsBodyFragment(5);
-            }
-        });
-        mTxtHeadline7.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toNewsBodyFragment(6);
-            }
-        });
-        mTxtHeadline8.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toNewsBodyFragment(7);
-            }
-        });*/
         startNewsUpdate();
 
         return view;
@@ -187,26 +135,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         updateNews(mGuardURL);
     }
 
-    /*private void clearLayout() {
-        mTxtHeadline1.setText("");
-        mTxtHeadline2.setText("");
-        mTxtHeadline3.setText("");
-        mTxtHeadline4.setText("");
-        mTxtHeadline5.setText("");
-        mTxtHeadline6.setText("");
-        mTxtHeadline7.setText("");
-        mTxtHeadline8.setText("");
-        txtNewsDesk.setText("");
-
-        img1.setImageResource(android.R.color.transparent);
-        img2.setImageResource(android.R.color.transparent);
-        img3.setImageResource(android.R.color.transparent);
-        img4.setImageResource(android.R.color.transparent);
-        img5.setImageResource(android.R.color.transparent);
-        img6.setImageResource(android.R.color.transparent);
-        img7.setImageResource(android.R.color.transparent);
-        img8.setImageResource(android.R.color.transparent);
-    }*/
 
 
     // ----------------------- Local Broadcast Receiver -----------------------
@@ -321,12 +249,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         mCacheManager.unRegisterCacheListener(mNewsSection, this);
         Log.i("NEWS CACHE", "unregister " + mNewsSection);
-        /*for (String name : Constants.NEWS_DESKS) {
-            if (name.equals(mNewsSection)) {
-                mCacheManager.unRegisterCacheListener(name, this);
-                Log.i("NEWS CACHE", "unregister " + name);
-            }
-        }*/
     }
 
     // Get news headlines from api and display
@@ -424,12 +346,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             startNewsUpdate();
             Log.i("NEWS CACHE", "updating expired cache" + cacheName);
         }
-        /*for (String name : Constants.NEWS_DESKS) {
-            if (name.equals(mNewsSection)) {
-                startNewsUpdate();
-                Log.i("NEWS CACHE", "updating expired cache" + cacheName);
-            }
-        }*/
 
     }
 

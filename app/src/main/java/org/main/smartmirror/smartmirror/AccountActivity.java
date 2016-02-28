@@ -79,7 +79,6 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
                 mAuthSecret = result.data.getAuthToken().secret;
                 TwitterASyncTask.TWITTER_ACCESS_TOKEN = mAuthToken;
                 TwitterASyncTask.TWITTER_ACCESS_SECRET = mAuthSecret;
-                finish();
             }
 
             @Override
