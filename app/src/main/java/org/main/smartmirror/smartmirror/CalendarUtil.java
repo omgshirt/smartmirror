@@ -16,6 +16,7 @@ import android.widget.ListView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -122,7 +123,7 @@ public class CalendarUtil {
 
                     eventList.add("\n" + eventTime + "\n" + eventName + "\n");
 
-                    Log.i(Constants.TAG,  cursor.getColumnNames().toString());
+                    Log.i(Constants.TAG, Arrays.toString(cursor.getColumnNames()));
 
                     //cursor.moveToNext();
                     //cursorNames.moveToNext();
