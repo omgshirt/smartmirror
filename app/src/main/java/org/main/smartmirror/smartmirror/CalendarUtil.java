@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -45,11 +46,12 @@ public class CalendarUtil {
     public static List<String> readCalendarEvent(Context context, ListView listView) {
 
         //Day, Month, Year, Hour, Minute formatting
-        List<String> nameOfEvent = new ArrayList<>();
-        Calendar beginTime = Calendar.getInstance();
+        //List<String> nameOfEvent = new ArrayList<>();
 
-        long startMillis = beginTime.getTimeInMillis();
-        long endMillis = startMillis + FIVE_DAYS ;
+        //Calendar beginTime = ;
+
+        long startMillis = Calendar.getInstance().getTimeInMillis();
+        long endMillis = startMillis + FIVE_DAYS;
 
         ContentResolver cr = context.getContentResolver();
 
@@ -61,7 +63,8 @@ public class CalendarUtil {
                 new String[]{"calendar_id", "title", "description",
                         "dtstart", "dtend", "eventLocation"}, null,
                 null, "dtstart ASC");
-        cursor.moveToFirst();
+
+
         // fetching calendars name
         //String CNames[] = new String[cursor.getCount()];
 
@@ -76,26 +79,25 @@ public class CalendarUtil {
                 new String[]{"calendar_displayName"}, null,
                 null, null);
 
+        assert cursor != null;
+        cursor.moveToFirst();
+        assert cursorNames != null;
         cursorNames.moveToFirst();
 
-        //fetching calendars id
-        nameOfEvent.clear();
+        //fetching calendars id - DON'T NEED
+        //nameOfEvent.clear();
+
+        // Moved adapter code here so we don't create a new one for each item
+        List<String> eventList = new ArrayList<>();
+        ArrayAdapter<String> arrayAdapter =
+                new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, eventList);
+        listView.setAdapter(arrayAdapter);
 
         if (cursor.getCount() == 0) {
-            nameOfEvent.add("No Events");
-            ArrayAdapter<String> arrayAdapter =
-                    new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nameOfEvent);
-            // Set The Adapter
-            listView.setAdapter(arrayAdapter);
+            eventList.add("No Events Found");
         } else {
-            // Moved adapter code here so we don't create a new one for each item
-            List<String> eventList = new ArrayList<>();
-            ArrayAdapter<String> arrayAdapter =
-                    new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, eventList);
-            listView.setAdapter(arrayAdapter);
-
             // populate the adapter
-            for (int i = 0; i < cursor.getCount(); i++) {
+            do {
                 //If calendar name is what is stored in preferences, then add event to be displayed
                 if (cursorNames.getString(0).equals(Preferences.getUserAccountName())) {
 
@@ -112,7 +114,7 @@ public class CalendarUtil {
 
                     // Set times to bold
                     SpannableString eventTime = new SpannableString(startTime + " - " + endTime);
-                    eventTime.setSpan(new StyleSpan(Typeface.BOLD) ,0, eventTime.length(), 0);
+                    eventTime.setSpan(new StyleSpan(Typeface.BOLD), 0, eventTime.length(), 0);
                     /*
                     eventList.add("\n" + cursor.getString(1) + "\n" + startTime + " - " + endTime
                             + "\n" + cursorNames.getString(0) + "\n" + cursor.getString(0));
@@ -120,15 +122,17 @@ public class CalendarUtil {
 
                     eventList.add("\n" + eventTime + "\n" + eventName + "\n");
 
-                    cursor.moveToNext();
-                    cursorNames.moveToNext();
+                    Log.i(Constants.TAG,  cursor.getColumnNames().toString());
+
+                    //cursor.moveToNext();
+                    //cursorNames.moveToNext();
 
                 } else { //If calendar name isn't what is in preferences, move to next
-                    cursor.moveToNext();
-                    cursorNames.moveToNext();
+                    //cursor.moveToNext();
+                    //cursorNames.moveToNext();
                 }
-            }
+            } while (cursor.moveToNext());
         }
-        return nameOfEvent;
+        return eventList;
     }
 }
