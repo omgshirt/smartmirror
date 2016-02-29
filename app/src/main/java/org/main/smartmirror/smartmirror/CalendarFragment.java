@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CalendarFragment extends Fragment {
 
@@ -22,11 +23,13 @@ public class CalendarFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
         Log.i(Constants.TAG, Preferences.getUserAccountName() + "In onCreateView in CalendarFragment");
         listView = (ListView) rootView.findViewById(R.id.listViewNames);
+
         String calHeader = CalendarUtil.getCalendarHeader();
         calendarHeader = (TextView) rootView.findViewById(R.id.calendarTitle);
         calendarHeader.setText(calHeader);
-        ArrayList eventNames;
-        eventNames = CalendarUtil.readCalendarEvent(getActivity(), listView);
+
+        //ArrayList eventNames;
+        List<String> eventNames = CalendarUtil.readCalendarEvent(getActivity(), listView);
         System.out.println(eventNames);
         return rootView;
     }

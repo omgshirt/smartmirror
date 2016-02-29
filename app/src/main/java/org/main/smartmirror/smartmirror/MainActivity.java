@@ -743,103 +743,108 @@ public class MainActivity extends AppCompatActivity
      * @param command command to process
      */
     private void handleCommand(String command) {
-        Fragment fragment = null;
+        // first, see if this fragment exists in the back stack. Use if found.
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(command);
 
         if (DEBUG) {
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         }
 
         // Refuse commands if they would re-load the currently visible fragment
+        /*
         if (command.equals(mCurrentFragment)) {
             return;
         }
+        */
 
         // look for news desk
         if (Constants.DESK_HASH.contains(command)) {
             fragment = NewsFragment.newInstance(command);
         }
 
-        // Create fragment based on the command. If the input string is not a fragment,
+        // Create a new fragment based on the command. If the input string is not a fragment,
         // broadcast the command to all registered receivers for evaluation.
-        switch (command) {
-            case Constants.CALENDAR:
-                fragment = new CalendarFragment();
-                break;
-            case Constants.CAMERA:
-                fragment = new CameraFragment();
-                break;
-            case Constants.CLOSE_SCREEN:
-            case Constants.CLOSE_WINDOW:
-            case Constants.HIDE_SCREEN:
-                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
-                break;
-            case Constants.FACEBOOK:
-                fragment = new FacebookFragment();
-                break;
-            case Constants.FORECAST:
-                fragment = new ForecastFragment();
-                break;
-            case Constants.GALLERY:
-                fragment = new GalleryFragment();
-                break;
-            case Constants.BACK:
-            case Constants.GO_BACK:
-                if (frame3Visibility != View.INVISIBLE) {
-                    // Can't go back if the window is closed.
-                    getSupportFragmentManager().popBackStack();
-                }
-                break;
-            case Constants.MAXIMIZE:
-            case Constants.FULL_SCREEN:
-                setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
-                break;
-            case Constants.MINIMIZE:
-            case Constants.SMALL_SCREEN:
-                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
-                break;
-            case Constants.NIGHT_LIGHT:
-            case Constants.SHOW_LIGHT:
-                // Night light always starts in full screen
-                setContentFrameVisibility(View.GONE, View.GONE, View.VISIBLE);
-                fragment = new LightFragment();
-                break;
-            case Constants.NEWS:
-                //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
-                fragment = NewsFragment.newInstance("world");
-                break;
-            case Constants.OPEN_WINDOW:
-                showViewIfHidden(contentFrame3);
-                break;
-            case Constants.PHOTOS:
-                // create photos fragment
-                break;
-            case Constants.QUOTES:
-                fragment = new QuoteFragment();
-                break;
-            case Constants.SETTINGS:
-            case Constants.OPTIONS:
-                fragment = SettingsFragment.newInstance();
-                break;
-            case Constants.SLEEP:
-            case Constants.GO_TO_SLEEP:
-            case Constants.MIRA_SLEEP:
-                enterLightSleep();
-                command = mCurrentFragment;
-                break;
-            case Constants.TRAFFIC:
-                fragment = new TrafficFragment();
-                break;
-            case Constants.TWITTER:
-                fragment = new TwitterFragment();
-                break;
-            case Constants.WAKE:
-                break;
-            case Constants.WIDE_SCREEN:
-                setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
-                break;
-            default:
-                broadcastMessage("inputAction", command);
-                break;
+        if (fragment == null) {
+            switch (command) {
+                case Constants.CALENDAR:
+                    fragment = new CalendarFragment();
+                    break;
+                case Constants.CAMERA:
+                    fragment = new CameraFragment();
+                    break;
+                case Constants.CLOSE_SCREEN:
+                case Constants.CLOSE_WINDOW:
+                case Constants.HIDE_SCREEN:
+                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+                    break;
+                case Constants.FACEBOOK:
+                    fragment = new FacebookFragment();
+                    break;
+                case Constants.FORECAST:
+                    fragment = new ForecastFragment();
+                    break;
+                case Constants.GALLERY:
+                    fragment = new GalleryFragment();
+                    break;
+                case Constants.BACK:
+                case Constants.GO_BACK:
+                    if (frame3Visibility != View.INVISIBLE) {
+                        // Can't go back if the window is closed.
+                        getSupportFragmentManager().popBackStack();
+                    }
+                    break;
+                case Constants.MAXIMIZE:
+                case Constants.FULL_SCREEN:
+                    setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
+                    break;
+                case Constants.MINIMIZE:
+                case Constants.SMALL_SCREEN:
+                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                    break;
+                case Constants.NIGHT_LIGHT:
+                case Constants.SHOW_LIGHT:
+                    // Night light always starts in full screen
+                    setContentFrameVisibility(View.GONE, View.GONE, View.VISIBLE);
+                    fragment = new LightFragment();
+                    break;
+                case Constants.NEWS:
+                    //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
+                    fragment = NewsFragment.newInstance("world");
+                    break;
+                case Constants.OPEN_WINDOW:
+                    showViewIfHidden(contentFrame3);
+                    break;
+                case Constants.PHOTOS:
+                    // create photos fragment
+                    break;
+                case Constants.QUOTES:
+                    fragment = new QuoteFragment();
+                    break;
+                case Constants.SETTINGS:
+                case Constants.OPTIONS:
+                    fragment = SettingsFragment.newInstance();
+                    break;
+                case Constants.SLEEP:
+                case Constants.GO_TO_SLEEP:
+                case Constants.MIRA_SLEEP:
+                    enterLightSleep();
+                    command = mCurrentFragment;
+                    break;
+                case Constants.TRAFFIC:
+                    fragment = new TrafficFragment();
+                    break;
+                case Constants.TWITTER:
+                    fragment = new TwitterFragment();
+                    break;
+                case Constants.WAKE:
+                    break;
+                case Constants.WIDE_SCREEN:
+                    setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
+                    break;
+                default:
+                    broadcastMessage("inputAction", command);
+                    break;
+            }
         }
 
         if (fragment != null) {

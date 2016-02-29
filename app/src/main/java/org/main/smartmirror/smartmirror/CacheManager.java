@@ -145,7 +145,7 @@ public class CacheManager {
      */
     public void unRegisterCacheListener(String key, CacheListener listener) {
         if (mListenersMap.containsKey(key)) {
-            Log.i(Constants.TAG, "CacheManager removing :: " + listener);
+            Log.i(Constants.TAG, "CacheManager unregistering :: " + listener);
             mListenersMap.get(key).remove(listener);
         }
     }
