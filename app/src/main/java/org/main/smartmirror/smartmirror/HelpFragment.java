@@ -94,7 +94,7 @@ public class HelpFragment extends Fragment {
                 getActivity().runOnUiThread(mRunnable);
             }
         };
-        
+
         mTimer.scheduleAtFixedRate(mTimerTask, 0, displayLength);
 
         String name = getArguments().getString("name");
