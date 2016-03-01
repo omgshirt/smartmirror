@@ -167,7 +167,7 @@ public class GmailHomeFragment extends Fragment {
                 if(label.getName().equals("INBOX")) {
                     Label labelCount = mService.users().labels().get(user, label.getId()).execute();
                     labels.add(label.getName() + " " + labelCount.getThreadsUnread());
-                    textView.setText("Unread Mail: " + Integer.toString(labelCount.getThreadsUnread()));
+                    textView.setText("Inbox: " + Integer.toString(labelCount.getThreadsUnread()));
                 }
             }
             return labels;
