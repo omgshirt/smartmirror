@@ -123,7 +123,7 @@ public class Constants {
             SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
             SETTINGS, SEVEN, SEVENTH, SHOW_LIGHT, SHOW_HELP,
             SHOW_TIME, SHOW_WEATHER, SIX,
-            SIXTH, SLEEP, SMALL_SCREEN, STAY_AWAKE, TAKE_PICTURE,
+            SIXTH, SLEEP, SMALL_SCREEN, TAKE_PICTURE,
             THIRD, THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
             "black", "blue", "gray", "green",

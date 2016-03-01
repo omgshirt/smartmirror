@@ -831,9 +831,6 @@ public class MainActivity extends AppCompatActivity
                     enterLightSleep();
                     command = mCurrentFragment;
                     break;
-                case Constants.TRAFFIC:
-                    fragment = new TrafficFragment();
-                    break;
                 case Constants.TWITTER:
                     fragment = new TwitterFragment();
                     break;

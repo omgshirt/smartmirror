@@ -41,28 +41,11 @@
         android:text="Twitter"
         android:textAppearance="?android:textAppearanceLarge" />
 
-    <EditText
-        android:id="@+id/twitter_username"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/twitter_title"
-        android:layout_marginBottom="15dp"
-        android:hint="Username"
-        android:inputType="text" />
-
-    <EditText
-        android:id="@+id/twitter_password"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/twitter_username"
-        android:hint="Password"
-        android:inputType="textPassword" />
-
     <com.twitter.sdk.android.core.identity.TwitterLoginButton
         android:id="@+id/twitter_login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_below="@id/twitter_title" />
 
     <TextView
         android:id="@+id/google_account"
