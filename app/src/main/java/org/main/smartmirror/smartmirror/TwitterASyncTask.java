@@ -19,8 +19,8 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
     // fallback tokens, replaced once user signs in
-    public static String TWITTER_ACCESS_TOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
-    public static String TWITTER_ACCESS_SECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
+    public static String TWITTER_ACCESS_TOKEN = "4313842942-zRoKUcEECkUZoWLfEWnomOjzIaXaJJeIIRuT7Nh";
+    public static String TWITTER_ACCESS_SECRET = "uwwdTUEs9gRQwnvDoeEEquQBkoA9KTdK3kdsgwKm1PHCY";
     public static String accToken;
     private AccessToken accessToken;
     Twitter twitter;
