@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -14,20 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
-import twitter4j.Status;
 
 public class TwitterFragment extends Fragment implements CacheManager.CacheListener{
-
-    Handler mTimerHandler = new Handler();
-    int mDelay = 61000; //milliseconds
 
     public static ListView twitterFeed;
 
@@ -39,7 +32,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
     public static CacheManager mCacheManager = null;
 
     // time in seconds before twitter data is considered old and is discarded
-    private final int DATA_UPDATE_FREQUENCY = 61;
+    public static final int DATA_UPDATE_FREQUENCY = 61;
     public static final String TWITTER_CACHE = "twitter cache";
 
 
@@ -48,21 +41,9 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
         Fabric.with(getActivity(), new Twitter(authConfig));
-
         View view = inflater.inflate(R.layout.twitter_fragment, container, false);
         mCacheManager = CacheManager.getInstance();
-
         twitterFeed = (ListView)view.findViewById(R.id.list_twitter);
-
-        // twitterAsync();
-
-        /*mTimerHandler.postDelayed(new Runnable(){
-            public void run(){
-                System.out.println("TIMER EXPIRED UPDATING TWITTER");
-                twitterAsync();
-                mTimerHandler.postDelayed(this, mDelay);
-            }
-        }, mDelay);*/
 
         return view;
     }
@@ -93,16 +74,12 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
         }
     };
 
-    public void twitterAsync() {
-        new TwitterASyncTask().execute();
-    }
-
     public void renderTwitter() {
         ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
         CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
         try {
             for(int i = 0; i < 10; i++){
-                CustomListViewObject co = new CustomListViewObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i));
+                CustomListViewObject co = new CustomListViewObject(mUsers.get(i),mTweets.get(i),mUri.get(i));
                 objects.add(co);
                 customAdapter.notifyDataSetChanged();
             }
@@ -150,12 +127,12 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
     }
 
     public void startTwitterUpdate() {
-        twitterAsync();
+        new TwitterASyncTask().execute();
     }
 
     @Override
     public void onCacheExpired(String cacheName) {
-        //if (cacheName.equals(TWITTER_CACHE)) startTwitterUpdate();
+        if (cacheName.equals(TWITTER_CACHE)) startTwitterUpdate();
         Log.i("TWITTER CACHE", "updating expired cache" + cacheName);
 
     }
