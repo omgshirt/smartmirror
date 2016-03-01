@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,21 +45,12 @@ public class NewsBodyFragment extends Fragment {
         mTxtHeadline = (TextView)view.findViewById(R.id.txtHeadline);
         mScrollView = (ScrollView)view.findViewById(R.id.scrollView);
 
-        Spanned body = Html.fromHtml(getArguments().getString("body"));
-        mTxtBody.setText(body);
-        mTxtHeadline.setText(getArguments().getString("headline"));
-
-
-        /*
         try {
-            mTxtBody.setText(Html.fromHtml(NewsFragment.mArticleFullBody));
-            mTxtHeadline.setText(NewsFragment.mHeadline);
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "Check your internet connection",
-                    Toast.LENGTH_LONG).show();
-            Log.i("NEWS BODY", "cannot draw, check your internet connection");
-        }
-        */
+            Spanned body = Html.fromHtml(getArguments().getString("body"));
+            mTxtBody.setText(body);
+            mTxtHeadline.setText(getArguments().getString("headline"));
+        } catch (Exception e) {((MainActivity) getActivity()).showToast(getString(R.string.news_err),
+                Gravity.CENTER, Toast.LENGTH_LONG);}
 
         return view;
     }
@@ -72,10 +64,10 @@ public class NewsBodyFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            if (message.contains(Constants.SCROLL_DOWN))
-                mScrollView.scrollBy(0, -((int) 0.3 * ((int) getResources().getDisplayMetrics().density * mScrollView.getHeight()) - mScrollView.getHeight()));
-            else if (!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, (int) 0.3 * ((int) getResources().getDisplayMetrics().density * mScrollView.getHeight()) - mScrollView.getHeight());
+            if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
+                VoiceScroll sl = new VoiceScroll();
+                sl.voiceScrollView(message,mScrollView);
+            }
         }
     };
 
