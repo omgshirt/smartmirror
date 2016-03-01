@@ -25,10 +25,7 @@ import java.util.ArrayList;
 public class NewsFragment extends Fragment implements CacheManager.CacheListener {
 
     // the guardian api
-    public static String mDefaultGuardURL = "http://content.guardianapis.com/search?show-fields=" +
-            "all&order-by=newest&q=world&api-key=";
     public static String mDefNewsSection = "world";
-    //public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&q=";
     public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&order-by=newest&q=";
     public static String mPostURL = "&api-key=";
     public static String mGuardURL = mPreURL + mDefNewsSection + mPostURL;
@@ -43,17 +40,11 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
     private TextView txtNewsDesk;
 
-    //public static String mArticleFullBody = "";
     public int numArticles = 10;
-    public String article[] = new String[numArticles];
-    public String hl[] = new String[numArticles];
-    public String snippets[] = new String[numArticles];
-    public String thumbs[] = new String[numArticles];
     public static String thumbnail = "";
     public static String body = "";
     public static String trailText = "";
     public static String webTitle = "";
-    //public static String mHeadline = "";
 
     ListView newsFeed;
     public ArrayList<String> mHeadline = new ArrayList<String>();
@@ -73,13 +64,12 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
     public static NewsFragment newInstance(String section) {
         Bundle args = new Bundle();
-        args.putString("arrI", section);
+        args.putString("newsSection", section);
         NewsFragment fragment = new NewsFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    static String mNewURL;
     static String mGuardAPIKey;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,18 +77,11 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         View view = inflater.inflate(R.layout.news_fragment, container, false);
         mCacheManager = CacheManager.getInstance();
 
-        // Initialize Items
-        // mNewsSection = "world";
         txtNewsDesk = (TextView) view.findViewById(R.id.news_desk_title);
         newsFeed = (ListView) view.findViewById(R.id.list_news);
 
-        //clearLayout();
-
-        mNewsSection = getArguments().getString("arrI"); // change arrI
-        //mGuardURL = mGuardURL + mGuardAPIKey;
+        mNewsSection = getArguments().getString("newsSection");
         mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
-
-        //updateNews(mGuardURL);
 
         txtNewsDesk.setText(mNewsSection.toUpperCase());
         startNewsUpdate();
@@ -107,9 +90,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     }
 
     public void toNewsBodyFragment(int x) {
-        //mArticleFullBody = article[x];
-        //mHeadline = hl[x];
-        //articleSelectedListener.onArticleSelected(hl[x], article[x]);
         articleSelectedListener.onArticleSelected(mHeadline.get(x), mFullArticle.get(x));
     }
 
@@ -179,6 +159,14 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 case Constants.EIGHT:
                 case Constants.EIGHTH:
                     toNewsBodyFragment(7);
+                    break;
+                case Constants.NINE:
+                case Constants.NINTH:
+                    toNewsBodyFragment(8);
+                    break;
+                case Constants.TEN:
+                case Constants.TENTH:
+                    toNewsBodyFragment(9);
                     break;
                 default:
                     txtNewsDesk.setText(mNewsSection.toUpperCase());
@@ -303,22 +291,16 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 response = json.getJSONObject("response");
                 results = response.getJSONArray("results").getJSONObject(i);
                 webTitle = results.getString("webTitle");
-                //hl[i] = webTitle;
                 mHeadline.add(webTitle);
                 fields = results.getJSONObject("fields");
                 body = fields.getString("body");
-                //article[i] = body;
                 mFullArticle.add(body);
                 trailText = fields.getString("trailText");
-                //snippets[i] = trailText;
                 mSnippet.add(trailText);
                 try {
                     thumbnail = fields.getString("thumbnail");
-                    //thumbs[i] = thumbnail;
                     mImageURI.add(Uri.parse(thumbnail));
-                } catch (Exception e) {
-                    thumbs[i] = "@drawable/guardian";
-                }
+                } catch (Exception e) {}
                 i++;
             }
 

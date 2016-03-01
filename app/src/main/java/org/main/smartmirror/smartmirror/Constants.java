@@ -104,6 +104,8 @@ public class Constants {
     public static final String EIGHTH = "eighth";
     public static final String NINE = "nine";
     public static final String NINTH = "ninth";
+    public static final String TEN = "ten";
+    public static final String TENTH = "tenth";
 
 
     // used to initialize COMMAND_SET
