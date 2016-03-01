@@ -228,7 +228,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-        mCacheManager.unRegisterCacheListener(WEATHER_CACHE, this);
+        mCacheManager.unRegisterCacheListener(this);
     }
 
     // Refresh time and date displays to current preference setting

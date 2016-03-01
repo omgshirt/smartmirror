@@ -28,7 +28,7 @@ public class Constants {
     public static final String SCROLL_UP = "scroll up";
     public static final String SCROLL_DOWN = "scroll down";
     public static final String SLEEP = "sleep";
-    public static final String STAY_AWAKE = "stay awake";
+
     public static final String SMALL_SCREEN = "small screen";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
@@ -39,6 +39,7 @@ public class Constants {
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
+    public static final String LIGHT = "light";
     public static final String NEWS = "news";
     public static final String NIGHT_LIGHT = "night light";
     public static final String PHOTOS = "photos";
@@ -152,7 +153,9 @@ public class Constants {
 
             Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
             Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
-            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC
+            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC,
+
+            Preferences.CMD_STAY_AWAKE
     };
 
     public static HashSet<String> createCommandSet() {

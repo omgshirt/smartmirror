@@ -12,8 +12,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * CacheManager holds a hashMap of DataCache objects. Eventually, this will require an interface
- * that links to the code to update a particular cache when it expires.
+ * CacheManager holds a hashMap of DataCache objects. Periodically a thread will check all registered
+ * objects and notify listeners when the data has expired.
+ *
+ * To receive notifications when a cache has changed or expired, use the CacheListener interface.
  */
 public class CacheManager {
 
@@ -71,9 +73,9 @@ public class CacheManager {
     /**
      * Add a cache object to the CacheManager. This will overwrite any object with the same name.
      *
-     * @param key  key used to tag this item
+     * @param key  name of the item
      * @param data data to store.
-     * @param time time in seconds until the cache is considered expired
+     * @param time time (in seconds) until the cache is considered expired
      */
     public void addCache(String key, Object data, int time) {
         cacheMap.put(key, new DataCache<>(data, time));
@@ -98,7 +100,7 @@ public class CacheManager {
      * Delete the cache object given by 'key'
      *
      * @param key key to delete
-     * @return returns TRUE if cache was deleted, FALSE if key doesn't exist
+     * @return returns TRUE if cache was deleted, FALSE on failure or key not found
      */
     public boolean deleteCache(String key) {
         if (cacheMap.containsKey(key)) {
@@ -143,7 +145,7 @@ public class CacheManager {
      */
     public void unRegisterCacheListener(String key, CacheListener listener) {
         if (mListenersMap.containsKey(key)) {
-            Log.i(Constants.TAG, "CacheManager removing :: " + listener);
+            Log.i(Constants.TAG, "CacheManager unregistering :: " + listener);
             mListenersMap.get(key).remove(listener);
         }
     }

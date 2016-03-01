@@ -117,6 +117,8 @@ public class Preferences implements LocationListener {
     public static final String CMD_TIME_12HR = "time twelve hour";
     public static final String CMD_TIME_24HR = "time twenty-four hour";
 
+    public static final String CMD_STAY_AWAKE = "stay awake";
+
     public static final String ENGLISH = "english";
     public static final String METRIC = "metric";
 
@@ -138,6 +140,7 @@ public class Preferences implements LocationListener {
 
     private boolean mFirstTimeRun;
 
+    private boolean mStayAwake;                     // if true, screen will stay on until cancelled
     private double mLatitude;
     private double mLongitude;
 
@@ -282,6 +285,11 @@ public class Preferences implements LocationListener {
             case CMD_TIME_24HR:
                 setTimeFormat24hr();
                 break;
+
+            case CMD_STAY_AWAKE:
+                setStayAwake(true);
+                break;
+
             default:
                 break;
         }
@@ -744,5 +752,19 @@ public class Preferences implements LocationListener {
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_GMAIL, userAcc);
         edit.apply();
+    }
+
+    public void setStayAwake(boolean stayAwake) {
+        if (mStayAwake && stayAwake) {
+            speakText(R.string.speech_stay_awake_err);
+        } else if (stayAwake){
+            speakText(R.string.speech_stay_awake);
+        }
+        mStayAwake = stayAwake;
+        ((MainActivity)mActivity).showStayAwakeIcon(mStayAwake);
+    }
+
+    public boolean isStayingAwake(){
+        return mStayAwake;
     }
 }

@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity
     private ImageView imgSpeechIcon;
     private ImageView imgRemoteIcon;
     private ImageView imgRemoteDisabledIcon;
+    private ImageView imgStayAwakeIcon;
 
     // Set initial fragments & track displayed views
     private String mInitialFragment = Constants.NEWS;
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity
     public static final int AWAKE = 2;
 
     // Sleep state & wakelocks
+    private boolean nightLightOnWake = false;           // tracks if device should wake into LightFragment
     private int mirrorSleepState;
     private int defaultScreenTimeout;
     private final int WAKELOCK_TIMEOUT = 100;            // Wakelock should be held only briefly to trigger screen wake
@@ -100,10 +102,10 @@ public class MainActivity extends AppCompatActivity
     private final int SLEEP_DELAY = 5000;                           // Timeout for lightSleep -> sleep transition
     private PowerManager mPowerManager;
 
-    // TTS
+    // Text to Speech - TTS
     private TTSHelper mTTSHelper;
 
-    // NSD
+    // Network Service Discovery - NSD
     NsdHelper mNsdHelper;
     private Handler mRemoteHandler;
     private RemoteConnection mRemoteConnection;
@@ -119,7 +121,11 @@ public class MainActivity extends AppCompatActivity
     private Runnable uiTimerRunnable = new Runnable() {
         @Override
         public void run() {
-            clearScreenOnFlag();
+            if (!mPreferences.isStayingAwake()) {
+                clearScreenOnFlag();
+            } else {
+                Log.i(Constants.TAG, "Screen set to stay awake");
+            }
         }
     };
 
@@ -229,16 +235,23 @@ public class MainActivity extends AppCompatActivity
         mRemoteConnection = new RemoteConnection(this, mRemoteHandler);
         mNsdHelper = new NsdHelper(this);
 
-        // Status Icons: Remote / Remote Disabled / Speech
+        // Status Icons: Remote / Remote Disabled / Speech / Stay Awake
         imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
         imgRemoteDisabledIcon = (ImageView)findViewById(R.id.remote_dc_icon);
         if (!mPreferences.isRemoteEnabled()) {
             imgRemoteDisabledIcon.setVisibility(View.VISIBLE);
         }
+
         imgSpeechIcon = (ImageView) findViewById(R.id.speech_icon);
         if (mPreferences.isVoiceEnabled()) {
             imgSpeechIcon.setVisibility(View.VISIBLE);
         }
+
+        imgStayAwakeIcon = (ImageView) findViewById(R.id.stay_awake_icon);
+        if (mPreferences.isStayingAwake()) {
+            imgStayAwakeIcon.setVisibility(View.VISIBLE);
+        }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -306,10 +319,13 @@ public class MainActivity extends AppCompatActivity
         startSpeechRecognition();
 
         // on first load show initialFragment
-        if (mCurrentFragment == null || mCurrentFragment == Constants.CALENDAR) { //Temporary Fix TODO: Fix
+        if (mCurrentFragment == null) {
             wakeScreenAndDisplay(mInitialFragment);
+        } else if (nightLightOnWake) {
+            // If the mirror was woken with NIGHT_LIGHT command, change to that fragment immediately.
+            nightLightOnWake = false;
+            wakeScreenAndDisplay(Constants.NIGHT_LIGHT);
         }
-        // if the system was put to sleep fr
     }
 
     @SuppressWarnings("deprecation")
@@ -406,7 +422,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void enterLightSleep() {
-
+        if (mirrorSleepState == ASLEEP) return;
+        mPreferences.setStayAwake(false);
         mirrorSleepState = LIGHT_SLEEP;
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
         resetInteractionTimer();
@@ -555,7 +572,6 @@ public class MainActivity extends AppCompatActivity
 
     private void displayHelpFragment(Fragment fragment) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         ft.replace(R.id.content_frame_2, fragment, Constants.HELP);
         ft.commit();
     }
@@ -648,6 +664,7 @@ public class MainActivity extends AppCompatActivity
             handleHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP) {
+                if (command.equals(Constants.NIGHT_LIGHT)) nightLightOnWake = true;
                 exitSleep();
             } else {
                 exitLightSleep();
@@ -727,110 +744,108 @@ public class MainActivity extends AppCompatActivity
      * @param command command to process
      */
     private void handleCommand(String command) {
-        Fragment fragment = null;
+        // first, see if this fragment exists in the back stack. Use if found.
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(command);
 
         if (DEBUG) {
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
         }
 
         // Refuse commands if they would re-load the currently visible fragment
+        /*
         if (command.equals(mCurrentFragment)) {
             return;
         }
+        */
 
         // look for news desk
         if (Constants.DESK_HASH.contains(command)) {
             fragment = NewsFragment.newInstance(command);
         }
 
-        // Create fragment based on the command. If the input string is not a fragment,
+        // Create a new fragment based on the command. If the input string is not a fragment,
         // broadcast the command to all registered receivers for evaluation.
-        switch (command) {
-            case Constants.CALENDAR:
-                fragment = new CalendarFragment();
-                break;
-            case Constants.CAMERA:
-                fragment = new CameraFragment();
-                break;
-            case Constants.CLOSE_SCREEN:
-            case Constants.CLOSE_WINDOW:
-            case Constants.HIDE_SCREEN:
-                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
-                break;
-            case Constants.FACEBOOK:
-                fragment = new FacebookFragment();
-                break;
-            case Constants.FORECAST:
-                fragment = new ForecastFragment();
-                break;
-            case Constants.GALLERY:
-                fragment = new GalleryFragment();
-                break;
-            case Constants.BACK:
-            case Constants.GO_BACK:
-                if (frame3Visibility != View.INVISIBLE) {
-                    // Can't go back if the window is closed.
-                    getSupportFragmentManager().popBackStack();
-                }
-                break;
-            case Constants.MAXIMIZE:
-            case Constants.FULL_SCREEN:
-                setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
-                break;
-            case Constants.MINIMIZE:
-            case Constants.SMALL_SCREEN:
-                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
-                break;
-            case Constants.NIGHT_LIGHT:
-            case Constants.SHOW_LIGHT:
-                // Night light always starts in full screen
-                setContentFrameVisibility(View.GONE, View.GONE, View.VISIBLE);
-                fragment = new LightFragment();
-                break;
-            case Constants.NEWS:
-                //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
-                fragment = NewsFragment.newInstance("world");
-                break;
-            case Constants.OPEN_WINDOW:
-                showViewIfHidden(contentFrame3);
-                break;
-            case Constants.PHOTOS:
-                // create photos fragment
-                break;
-            case Constants.QUOTES:
-                fragment = new QuoteFragment();
-                break;
-            case Constants.SETTINGS:
-            case Constants.OPTIONS:
-                fragment = SettingsFragment.newInstance();
-                break;
-            case Constants.SLEEP:
-            case Constants.GO_TO_SLEEP:
-            case Constants.MIRA_SLEEP:
-                enterLightSleep();
-                command = mCurrentFragment;
-                break;
-            case Constants.STAY_AWAKE:
-                // Screen awake for 7 days
-                if (mInteractionTimeout == 604800000) {
-                    speakText(getResources().getString(R.string.speech_stay_awake_err));
-                }else {
-                    speakText(getResources().getString(R.string.speech_stay_awake));
-                    mInteractionTimeout = 604800000;
-                    resetInteractionTimer();
-                }
-                break;
-            case Constants.TWITTER:
-                fragment = new TwitterFragment();
-                break;
-            case Constants.WAKE:
-                break;
-            case Constants.WIDE_SCREEN:
-                setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
-                break;
-            default:
-                broadcastMessage("inputAction", command);
-                break;
+        if (fragment == null) {
+            switch (command) {
+                case Constants.CALENDAR:
+                    fragment = new CalendarFragment();
+                    break;
+                case Constants.CAMERA:
+                    fragment = new CameraFragment();
+                    break;
+                case Constants.CLOSE_SCREEN:
+                case Constants.CLOSE_WINDOW:
+                case Constants.HIDE_SCREEN:
+                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+                    break;
+                case Constants.FACEBOOK:
+                    fragment = new FacebookFragment();
+                    break;
+                case Constants.FORECAST:
+                    fragment = new ForecastFragment();
+                    break;
+                case Constants.GALLERY:
+                    fragment = new GalleryFragment();
+                    break;
+                case Constants.BACK:
+                case Constants.GO_BACK:
+                    if (frame3Visibility != View.INVISIBLE) {
+                        // Can't go back if the window is closed.
+                        getSupportFragmentManager().popBackStack();
+                    }
+                    break;
+                case Constants.MAXIMIZE:
+                case Constants.FULL_SCREEN:
+                    setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
+                    break;
+                case Constants.MINIMIZE:
+                case Constants.SMALL_SCREEN:
+                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                    break;
+                case Constants.NIGHT_LIGHT:
+                case Constants.SHOW_LIGHT:
+                    // Night light always starts in full screen
+                    setContentFrameVisibility(View.GONE, View.GONE, View.VISIBLE);
+                    fragment = new LightFragment();
+                    break;
+                case Constants.NEWS:
+                    //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
+                    fragment = NewsFragment.newInstance("world");
+                    break;
+                case Constants.OPEN_WINDOW:
+                    showViewIfHidden(contentFrame3);
+                    break;
+                case Constants.PHOTOS:
+                    // create photos fragment
+                    break;
+                case Constants.QUOTES:
+                    fragment = new QuoteFragment();
+                    break;
+                case Constants.SETTINGS:
+                case Constants.OPTIONS:
+                    fragment = SettingsFragment.newInstance();
+                    break;
+                case Constants.SLEEP:
+                case Constants.GO_TO_SLEEP:
+                case Constants.MIRA_SLEEP:
+                    enterLightSleep();
+                    command = mCurrentFragment;
+                    break;
+                case Constants.TRAFFIC:
+                    fragment = new TrafficFragment();
+                    break;
+                case Constants.TWITTER:
+                    fragment = new TwitterFragment();
+                    break;
+                case Constants.WAKE:
+                    break;
+                case Constants.WIDE_SCREEN:
+                    setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
+                    break;
+                default:
+                    broadcastMessage("inputAction", command);
+                    break;
+            }
         }
 
         if (fragment != null) {
@@ -864,27 +879,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showRemoteIcon(boolean display){
-        if (display && mPreferences.isRemoteEnabled()) {
-            showIcon(imgRemoteIcon, true);
-        } else if (!display) {
-            showIcon(imgRemoteIcon, false);
-        }
+        showIcon(imgRemoteIcon, display);
     }
 
     public void showRemoteDisabledIcon(boolean display){
-        if (display && !mPreferences.isRemoteEnabled()){
-            showIcon(imgRemoteDisabledIcon, true);
-        } else {
-            showIcon(imgRemoteDisabledIcon, false);
-        }
+        showIcon(imgRemoteDisabledIcon, display);
     }
 
-    public void showSpeechIcon(boolean showIcon) {
-        if (showIcon && mPreferences.isVoiceEnabled()) {
-            showIcon(imgSpeechIcon, true);
-        } else if (!showIcon) {
-            showIcon(imgSpeechIcon, false);
-        }
+    public void showSpeechIcon(boolean display) {
+        showIcon(imgSpeechIcon, (display && !isTTSSpeaking()));
+    }
+
+    public void showStayAwakeIcon(boolean display) {
+         showIcon(imgStayAwakeIcon, display);
     }
 
 
@@ -920,6 +927,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Preferences.CMD_ENABLE_REMOTE:
                 input = Preferences.CMD_REMOTE_ON;
+                break;
+            case Constants.SHOW_LIGHT:
+                input = Constants.NIGHT_LIGHT;
                 break;
         }
 
@@ -1065,7 +1075,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleRemoteCommand(String command) {
         Log.i(Constants.TAG, "remote msg :: " + command);
-        if (command.equals("light")) {
+        if (command.equals(Constants.LIGHT)) {
             command = Constants.NIGHT_LIGHT;
         }
         if (mPreferences.isRemoteEnabled())
@@ -1073,9 +1083,7 @@ public class MainActivity extends AppCompatActivity
         else {
             Log.i(Constants.TAG, "Remote Disabled. Command ignored: \"" + command + "\"");
         }
-
     }
-
 
     // --------------------------- LIGHT SENSOR --------------------------------------
 

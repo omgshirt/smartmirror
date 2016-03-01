@@ -113,11 +113,11 @@ public class RemoteConnection {
         return mSocket;
     }
 
-    private void showRemoteIcon(final String message, final boolean showIcon){
+    private void showRemoteIconAndToast(final String toastMessage, final boolean showIcon){
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mActivity.showToast(message, Toast.LENGTH_SHORT);
+                mActivity.showToast(toastMessage, Toast.LENGTH_SHORT);
                 mActivity.showRemoteIcon(showIcon);
             }
         });
@@ -159,7 +159,7 @@ public class RemoteConnection {
                         Log.d(TAG, "ServerSocket Created, awaiting connection");
                         setSocket(mServerSocket.accept());
                         Log.d(TAG, "ServerSocket Connected :: " + getSocket());
-                        showRemoteIcon(mActivity.getResources().getString(R.string.remote_connected), true);
+                        showRemoteIconAndToast(mActivity.getResources().getString(R.string.remote_connected), true);
                         //if (mRemoteControlClient == null) {
                             int port = mSocket.getPort();
                             InetAddress address = mSocket.getInetAddress();
@@ -258,7 +258,7 @@ public class RemoteConnection {
                     }
                     input.close();
                     Log.i(TAG, "receive thread stopped");
-                    //showRemoteIcon(mActivity.getResources().getString(R.string.remote_disconnected),
+                    //showRemoteIconAndToast(mActivity.getResources().getString(R.string.remote_disconnected),
                     //        false);
                 } catch (SocketException se) {
                     Log.e(TAG, "Socket Exception: ", se);
@@ -266,7 +266,7 @@ public class RemoteConnection {
                     Log.e(TAG, "Server loop error: ", e);
                     tearDown();
                 }
-                showRemoteIcon(mActivity.getResources().getString(R.string.remote_disconnected),
+                showRemoteIconAndToast(mActivity.getResources().getString(R.string.remote_disconnected),
                         false);
             }
         }

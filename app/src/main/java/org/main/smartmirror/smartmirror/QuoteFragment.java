@@ -46,7 +46,7 @@ public class QuoteFragment extends Fragment {
     private ArrayList<Integer> mAvailableQuotes;
     private final int fadeInTime = 3000;
     private final int fadeOutTime = 3000;
-    private final int quoteDisplayLength = 30000;
+    private final int quoteDisplayLength = 24000;
     private final int totalDisplayTime = fadeInTime + quoteDisplayLength + fadeOutTime;
 
     @Override
@@ -55,7 +55,7 @@ public class QuoteFragment extends Fragment {
 
         mTimer = new Timer();
         // Loading Font Face
-        mQuoteFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/DancingScript-Regular.otf");
+        mQuoteFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/PTM55FT.ttf");
 
         // Set-up the fade in
         Animation fadeIn = new AlphaAnimation(0, 1);
@@ -112,6 +112,7 @@ public class QuoteFragment extends Fragment {
         txtQuoteContent = (TextView) view.findViewById(R.id.quote_content);
         // Apply the font
         txtQuoteContent.setTypeface(mQuoteFont);
+        txtQuoteAuthor.setTypeface(mQuoteFont);
         return view;
     }
 
@@ -197,20 +198,15 @@ public class QuoteFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-                new IntentFilter("inputAction"));
+
+        //LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+        //        new IntentFilter("inputAction"));
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mTimerTask.cancel();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mTimerTask.cancel();
+        //LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 }
