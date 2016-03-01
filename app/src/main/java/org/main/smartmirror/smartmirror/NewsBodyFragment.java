@@ -4,12 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.SpannedString;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,17 @@ public class NewsBodyFragment extends Fragment {
     TextView mTxtHeadline;
     ScrollView mScrollView;
 
+    public NewsBodyFragment(){}
+
+    public static NewsBodyFragment NewInstance(String headline, String body){
+        Bundle args = new Bundle();
+        args.putString("headline", headline);
+        args.putString("body", body);
+        NewsBodyFragment fragment = new NewsBodyFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_body_fragment, container, false);
 
@@ -30,17 +44,13 @@ public class NewsBodyFragment extends Fragment {
         mTxtBody = (TextView)view.findViewById(R.id.txtNewsBody);
         mTxtHeadline = (TextView)view.findViewById(R.id.txtHeadline);
         mScrollView = (ScrollView)view.findViewById(R.id.scrollView);
-        mTxtBody.setText("");
-        mTxtHeadline.setText("");
 
         try {
-            mTxtBody.setText(Html.fromHtml(NewsFragment.mArticleFullBody));
-            mTxtHeadline.setText(NewsFragment.mHeadline);
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "Check your internet connection",
-                    Toast.LENGTH_LONG).show();
-            Log.i("NEWS BODY", "cannot draw, check your internet connection");
-        }
+            Spanned body = Html.fromHtml(getArguments().getString("body"));
+            mTxtBody.setText(body);
+            mTxtHeadline.setText(getArguments().getString("headline"));
+        } catch (Exception e) {((MainActivity) getActivity()).showToast(getString(R.string.news_err),
+                Gravity.CENTER, Toast.LENGTH_LONG);}
 
         return view;
     }
@@ -54,19 +64,20 @@ public class NewsBodyFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            if(message.contains(Constants.SCROLL_DOWN))
-                mScrollView.scrollBy(0, -((int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight()));
-            else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                mScrollView.scrollBy(0, (int)0.3*((int)getResources().getDisplayMetrics().density * mScrollView.getHeight())-mScrollView.getHeight());
+            if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
+                VoiceScroll sl = new VoiceScroll();
+                sl.voiceScrollView(message,mScrollView);
+            }
         }
     };
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     * voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));

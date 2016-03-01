@@ -215,6 +215,7 @@ public class GmailFragment extends Fragment {
                 Message message2 = mService.users().messages().get(user, message.getId()).execute();
                 byte[] bytes = Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().toPrettyString().replaceAll(" ", "")); // base64 decoded bytes
                 String s = new String(bytes, "UTF-8");
+
                 //String mailBody = new String(Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().toPrettyString().replaceAll(" ", "+")));
                 //messageList.add(mailBody);
                 //String mailBody = new String(Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().toPrettyString()));

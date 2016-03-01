@@ -154,6 +154,7 @@ public class VoiceService extends Service implements RecognitionListener {
 
         String[] candidates = text.split("\\s+");
         for (int i = candidates.length - 1; i >= 0; i--) {
+        //for(int i = 0; i < candidates.length; i++) {
             String candidate = "";
 
             for (int j = i; j < candidates.length; j++) {

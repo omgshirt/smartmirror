@@ -29,13 +29,12 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.forecast_fragment, container, false);
-
-        dailyForecasts = new DailyForecast[DAYS_TO_CONVERT];
+        if (savedInstanceState == null)
+            dailyForecasts = new DailyForecast[DAYS_TO_CONVERT];
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
 
         return view;
@@ -44,8 +43,8 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     @Override
     public void onStart() {
         super.onStart();
-
         updateForecasts();
+        renderForecasts();
         // need to move this so it doesn't speak every damned time
         speakWeatherForecast();
 
@@ -60,21 +59,26 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
 
     private void updateForecasts() {
         JSONObject json = (JSONObject) CacheManager.getInstance().get(WeatherFragment.WEATHER_CACHE);
-        if (json == null) return;
 
-        // Get today plus next 3 days
+        // If cache is empty, return
+        if (json == null || json.length() == 0) {
+            Log.e(Constants.TAG, "forecast: json is null or 0");
+            return;
+        }
+
+        // Create dailyForecasts, which includes the next 3 days
         try {
             JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
             for (int i = 0; i < dailyForecasts.length; i++) {
                 JSONObject today = dailyData.getJSONObject(i);
                 dailyForecasts[i] = new DailyForecast(today);
+                Log.i(Constants.TAG, "DailyForecast :: " + dailyForecasts[i]);
             }
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         } catch (JSONException jse) {
             jse.printStackTrace();
         }
-
-        renderForecasts();
-
     }
 
     private void renderForecasts() {
@@ -117,33 +121,27 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     // compile and say weather forecast for the next 3 days
     private void speakWeatherForecast() {
 
-        if (dailyForecasts == null) return;
-
-        String today = "Today " + dailyForecasts[0].summary +
-                " high of " + dailyForecasts[0].maxTemp +
-                " degrees, low tonight " + dailyForecasts[0].minTemp + ". ";
-
-        String tomorrow = "Tomorrow " + dailyForecasts[1].summary +
+        String forecast = "Tomorrow " + dailyForecasts[1].summary +
                 " high of " + dailyForecasts[1].maxTemp +
                 " degrees, low " + dailyForecasts[1].minTemp + ". ";
 
-        Date date = new Date(dailyForecasts[2].forecastTime * 1000);
-        SimpleDateFormat sdf = new SimpleDateFormat("cccc", Locale.US);
-        String dayThreeName = sdf.format(date);
+        for (int i = 2; i <= 3; i ++) {
+            Date date = new Date(dailyForecasts[i].forecastTime * 1000);
+            SimpleDateFormat sdf = new SimpleDateFormat("cccc", Locale.US);
+            String dayName = sdf.format(date);
 
-        String nextDay = dayThreeName + ", " + dailyForecasts[2].summary +
-                " high of " + dailyForecasts[2].maxTemp +
-                ", low of " + dailyForecasts[2].minTemp +
-                " degrees.";
-
-        String forecast = today + tomorrow + nextDay;
+            forecast += dayName + ", " + dailyForecasts[i].summary +
+                    " high of " + dailyForecasts[i].maxTemp +
+                    ", low of " + dailyForecasts[i].minTemp +
+                    " degrees. ";
+        }
         if (!forecast.equals("")) {
             speakText(forecast);
         }
     }
 
     private void speakText(String text) {
-        ((MainActivity) getActivity()).startTTS(text);
+        ((MainActivity) getActivity()).speakText(text);
     }
 
     @Override

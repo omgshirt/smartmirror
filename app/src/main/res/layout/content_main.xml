@@ -1,35 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_frame_holder"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <ImageView
-        android:id="@+id/speech_icon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_action_microphone"
-        android:visibility="gone" />
+    <!-- status icons -->
+    <LinearLayout
+        android:gravity="end"
+        android:layout_width="match_parent"
+        android:layout_height="25dp">
 
-    <FrameLayout
+        <ImageView
+            android:id="@+id/speech_icon"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:layout_marginEnd="2dp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:contentDescription="speech icon"
+            android:src="@drawable/ic_action_microphone"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/remote_icon"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:contentDescription="remote control icon"
+            android:src="@drawable/remote_128"
+            android:visibility="gone" />
+        <ImageView
+            android:id="@+id/remote_dc_icon"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:contentDescription="remote control disconnected icon"
+            android:src="@drawable/remote_dc_128"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/content_frame_1"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="2">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <fragment
             android:id="@+id/weather_fragment"
@@ -44,17 +66,15 @@
             android:layout_height="wrap_content"/>
         </LinearLayout>
 
-    </FrameLayout>
-
     <FrameLayout
         android:id="@+id/content_frame_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/content_frame_1"></FrameLayout>
+        android:layout_below="@+id/content_frame_1" />
 
     <FrameLayout
         android:id="@+id/content_frame_3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/content_frame_2"></FrameLayout>
-</RelativeLayout>
+        android:layout_below="@+id/content_frame_2" />
+</LinearLayout>

@@ -77,7 +77,7 @@ import java.util.concurrent.TimeUnit;
  * Fragment that handles the Camera taking and uploading functionality.
  */
 @TargetApi(23)
-public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback  {
+public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
 
     private TextView mCountDownText;
     private static Drive service;
@@ -354,7 +354,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      *
      * @param text The message to show
      */
-    private void showToast(final String text){
+    private void showToast(final String text) {
         ((MainActivity) getActivity()).showToast(text, Toast.LENGTH_SHORT);
     }
 
@@ -363,7 +363,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      *
      * @param text the countdown to display.
      */
-    private void showCameraFeedback(final String text){
+    private void showCameraFeedback(final String text) {
         mCountDownText.setText(text);
     }
 
@@ -373,7 +373,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * @param text The message to speak.
      */
     private void speakCountdown(final String text) {
-        ((MainActivity) getActivity()).startTTS(text);
+        ((MainActivity) getActivity()).speakText(text);
     }
 
     /**
@@ -614,7 +614,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     }
 
     private void openCamera(int width, int height) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (getActivity().checkSelfPermission(Manifest.permission.CAMERA)
                     != PackageManager.PERMISSION_GRANTED) {
                 return;
@@ -901,7 +901,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
-    private  class ImageSaver implements Runnable {
+    private class ImageSaver implements Runnable {
 
         /**
          * The JPEG image
@@ -926,8 +926,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 FileOutputStream output = new FileOutputStream(mFile);
                 output.write(bytes);
                 saveFileToDrive();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 mImage.close();
@@ -1026,8 +1025,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 //                    }
                 } catch (UserRecoverableAuthIOException e) {
                     e.printStackTrace();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -1035,7 +1033,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         t.start();
     }
 
-    public static String getCurrentDateTime(){
+    public static String getCurrentDateTime() {
         Date curDateTime = new Date();
         SimpleDateFormat format = new SimpleDateFormat();
         dateTimeStr = format.format(curDateTime);
@@ -1046,7 +1044,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         return dateTimeStr;
     }
 
-    public static void setCurrentDateTime(String dateTimeString){
+    public static void setCurrentDateTime(String dateTimeString) {
         dateTimeStr = dateTimeString;
     }
 

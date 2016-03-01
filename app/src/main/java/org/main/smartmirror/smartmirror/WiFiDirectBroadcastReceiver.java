@@ -25,7 +25,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         this.mChannel = channel;
         this.mActivity = activity;
 
-        mPeerListListener = activity;
+        //mPeerListListener = activity;
     }
 
     @Override
@@ -39,9 +39,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 // Wifi P2P is enabled
             } else {
                 // Wi-Fi P2P is not enabled
-                CharSequence text = mActivity.getString(R.string.wifi_not_enabled);
-                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
-                toast.show();
+                //String text = mActivity.getString(R.string.wifi_not_enabled);
+                //mActivity.showToast(text, Toast.LENGTH_SHORT);
                 Log.e("WiFi", "wifi not enabled");
             }
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
@@ -54,29 +53,29 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 mManager.requestPeers(mChannel, mPeerListListener);
             }
 
-            Log.i("Wifi","Wifi p2p peers have changed");
+            Log.i("Wifi", "Wifi p2p peers have changed");
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             // Respond to new connection or disconnections
             if (mManager == null) {
                 return;
             }
 
-            Log.i("Wifi","Wifi p2p connections changed");
+            Log.i("Wifi", "Wifi p2p connections changed");
 
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             if (networkInfo.isConnected()) {
                 // we are connected with the other device, request connection
                 // info to find group owner IP
-                Toast.makeText(mActivity, "Remote Connected", Toast.LENGTH_SHORT).show();
-                mManager.requestConnectionInfo(mChannel, mActivity);
+                mActivity.showToast("Remote Connected", Toast.LENGTH_SHORT);
+                //mManager.requestConnectionInfo(mChannel, mActivity);
             } else {
-                Toast.makeText(mActivity, "Cannot Connect to Remote" ,Toast.LENGTH_SHORT).show();
-                mActivity.discoverWifiP2pPeers();
+                mActivity.showToast("Cannot Connect to Remote", Toast.LENGTH_SHORT);
+                //mActivity.discoverWifiP2pPeers();
             }
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
             // Respond to this device's wifi state changing
-            Log.i("Wifi","Device's wifi state has changed");
+            Log.i("Wifi", "Device's wifi state has changed");
         }
     }
 }

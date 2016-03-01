@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -34,33 +34,25 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden" />
+
+        <!-- Account Activity -->
+        <activity
+            android:name=".AccountActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Google Account Setup Activity -->
-        <activity
-            android:name=".AccountPickerActivity"
-            android:label="@string/app_name"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait">
-        </activity>
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-         <meta-data
+        <meta-data
             android:name="io.fabric.ApiKey"
             android:value="1845667fbf9d1ae63f10e4f7c8e386eaf3255b3f" />
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
-        <activity
-            android:name=".TwitterActivity"
-            android:label="@string/app_name" />
 
         <!-- Services -->
         <service android:name=".VoiceService"></service>

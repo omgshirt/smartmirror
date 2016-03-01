@@ -14,10 +14,10 @@
         android:id="@+id/calendarTitle"
         android:layout_gravity="center"
         android:textSize="30dp"
-        android:text=""/>
+        android:text="" />
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/listViewNames"/>
+        android:id="@+id/listViewNames" />
 </LinearLayout>
