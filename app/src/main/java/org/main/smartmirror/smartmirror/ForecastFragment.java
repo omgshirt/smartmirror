@@ -4,6 +4,7 @@ package org.main.smartmirror.smartmirror;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,7 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
 
         dailyForecasts = new DailyForecast[DAYS_TO_CONVERT];
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
-
+        updateForecasts();
         return view;
     }
 
@@ -44,7 +45,7 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     public void onStart() {
         super.onStart();
 
-        updateForecasts();
+        renderForecasts();
         // need to move this so it doesn't speak every damned time
         speakWeatherForecast();
 
@@ -68,15 +69,13 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
             for (int i = 0; i < dailyForecasts.length; i++) {
                 JSONObject today = dailyData.getJSONObject(i);
                 dailyForecasts[i] = new DailyForecast(today);
+                Log.i(Constants.TAG, "DailyForecast :: " + dailyForecasts[i]);
             }
         } catch (NullPointerException npe) {
             npe.printStackTrace();
         } catch (JSONException jse) {
             jse.printStackTrace();
         }
-
-        renderForecasts();
-
     }
 
     private void renderForecasts() {
@@ -119,7 +118,7 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     // compile and say weather forecast for the next 3 days
     private void speakWeatherForecast() {
 
-        if (dailyForecasts == null) return;
+        if (dailyForecasts[0] == null) return;
 
         String today = "Today " + dailyForecasts[0].summary +
                 " high of " + dailyForecasts[0].maxTemp +

@@ -13,10 +13,22 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Activity that handles the Account Credentials and Work address
@@ -25,10 +37,18 @@ import java.util.List;
 public class AccountActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private Preferences mPreference;
+    private TwitterLoginButton mTwitterLoginButton;
+    private TwitterSession mSession;
+    private long mUserID;
+    public static String mScreenName;
+    public static String mAuthToken;
+    public static String mAuthSecret;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
+        Fabric.with(this, new TwitterCore(authConfig));
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
         findGoogleAccounts();
@@ -37,6 +57,43 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
                 startMain();
             }
         }
+
+
+        mTwitterLoginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
+
+        mTwitterLoginButton.setCallback(new Callback<TwitterSession>() {
+            @Override
+            public void success(Result<TwitterSession> result) {
+                String output = "Status: " +
+                        "Your login was successful " +
+                        result.data.getUserName() +
+                        "\nAuth Token Received: " +
+                        result.data.getAuthToken().token;
+
+                mSession = result.data;
+                mUserID = mSession.getUserId();
+                mScreenName = mSession.getUserName();
+                String msg = "@" + mSession.getUserName() + " logged in! (#" + mUserID + ")";
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                Long id = mSession.getId();
+                Log.i("ID: ", id.toString());
+                mAuthToken = result.data.getAuthToken().token;
+                mAuthSecret = result.data.getAuthToken().secret;
+                TwitterASyncTask.TWITTER_ACCESS_TOKEN = mAuthToken;
+                TwitterASyncTask.TWITTER_ACCESS_SECRET = mAuthSecret;
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                Log.d("TwitterKit", "Login with TwitterArrayList failure", exception);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

@@ -92,6 +92,8 @@ public class Preferences implements LocationListener {
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
+    public static final String CMD_ENABLE_REMOTE = "enable remote";
+    public static final String CMD_DISABLE_REMOTE = "disable remote";
 
     public static final String CMD_SCREEN_VLOW = "brightness min";
     public static final String CMD_SCREEN_LOW = "brightness low";
@@ -595,14 +597,30 @@ public class Preferences implements LocationListener {
     }
 
     /**
-     * Set whether the app will broadcast for wifi connections
+     * Set enable / disabled status for remote control.
+     * Disabling will unregister the service and shows remote disabled icon
+     * Enabling registers the service
      *
-     * @param isEnabled boolean
+     * @param isEnabled enable or disable the remote control
      */
     public void setRemoteEnabled(boolean isEnabled) {
+        if (mRemoteEnabled == isEnabled) return;
+
+        if (mActivity instanceof MainActivity) {
+            if (isEnabled) {
+                ((MainActivity) mActivity).registerNsdService();
+            } else {
+                ((MainActivity) mActivity).unregisterNsdService();
+                ((MainActivity) mActivity).disconnectRemote();
+            }
+        }
         try {
             mRemoteEnabled = isEnabled;
-            ((MainActivity) mActivity).showRemoteIcon(isEnabled);
+            if (!mRemoteEnabled) {
+                // when disabling, hide remote connected icon
+                ((MainActivity) mActivity).showRemoteIcon(false);
+            }
+            ((MainActivity) mActivity).showRemoteDisabledIcon(!mRemoteEnabled);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putBoolean(PREFS_REMOTE_ENABLED, mRemoteEnabled);
             edit.apply();

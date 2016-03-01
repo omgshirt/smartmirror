@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class CustomAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
-    private ArrayList<CustomObject> objects;
+    private ArrayList<CustomListViewObject> objects;
     Context context;
 
     private class ViewHolder {
@@ -26,7 +26,7 @@ public class CustomAdapter extends BaseAdapter {
         ImageView thumbnail;
     }
 
-    public CustomAdapter(Context context, ArrayList<CustomObject> objects) {
+    public CustomAdapter(Context context, ArrayList<CustomListViewObject> objects) {
         inflater = LayoutInflater.from(context);
         this.objects = objects;
     }
@@ -35,7 +35,7 @@ public class CustomAdapter extends BaseAdapter {
         return objects.size();
     }
 
-    public CustomObject getItem(int position) {
+    public CustomListViewObject getItem(int position) {
         return objects.get(position);
     }
 
@@ -58,7 +58,7 @@ public class CustomAdapter extends BaseAdapter {
         try {
             holder.header.setText(objects.get(position).getProp1());
             holder.snippet.setText(objects.get(position).getProp2());
-            Picasso.with(context).load(objects.get(position).getProp3()).fit().centerInside().into(holder.thumbnail);
+            Picasso.with(MainActivity.getContextForApplication()).load(objects.get(position).getProp3()).fit().centerInside().into(holder.thumbnail);
         } catch (Exception e) {}
 
 

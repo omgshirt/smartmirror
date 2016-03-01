@@ -81,13 +81,8 @@ public class Constants {
     public static final String TAKE_PICTURE = "take a picture";
 
     //--------------TWITTER--------------
-    public static final String TWITTER_CONSUMER_KEY = "mQ51h9ZbAz9Xk2AZtsUBJAGlx"; // from twitter
-    public static final String TWITTER_CONSUMER_SECRET = "uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt"; // from twitter
-    public static final String TWITTER_FABRIC_CONSUMER_KEY = "GAZWTz0pd3bduld0PzZMexSrH"; // from fabric, enabled for guest auth
-    public static final String TWITTER_FABRIC_CONSUMER_SECRET = "oUtQGP4NX9L9ZGVZ8mvYSqaJ3dJCzMDtjLcojybwrT9PL9keud"; // from fabric, enabled for guest auth
-    public static final String mLogin = "log me in";
-    public static final String mGet = "get";
-    public static final String mRefresh = "refresh";
+    public static final String TWITTER_CONSUMER_KEY = "W9cvqANm0cXASr4MyzIUKDiaK";
+    public static final String TWITTER_CONSUMER_SECRET = "WP9HyhszNP2x4Y9WGPtF5DfXT23v55O515PrukTCpkewuuNngT";
 
     //--------------NEWS--------------
     public static final String ONE = "one";
@@ -108,6 +103,8 @@ public class Constants {
     public static final String EIGHTH = "eighth";
     public static final String NINE = "nine";
     public static final String NINTH = "ninth";
+    public static final String TEN = "ten";
+    public static final String TENTH = "tenth";
 
 
     // used to initialize COMMAND_SET
@@ -139,6 +136,7 @@ public class Constants {
             Preferences.CMD_LIGHT_VLOW,
 
             Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
+            Preferences.CMD_ENABLE_REMOTE, Preferences.CMD_DISABLE_REMOTE,
 
             Preferences.CMD_SCREEN_HIGH, Preferences.CMD_SCREEN_LOW,
             Preferences.CMD_SCREEN_MEDIUM, Preferences.CMD_SCREEN_VHIGH,

@@ -10,10 +10,14 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/thumbnail"
-            android:src="@drawable/tw__ic_logo_blue" />
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentEnd="false"
+            android:src="@android:drawable/ic_delete" />
 
         <TextView
             android:layout_width="wrap_content"

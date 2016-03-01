@@ -90,10 +90,10 @@ public class TrafficFragment extends Fragment {
             double tripCost = tripTimeTraffic - tripTime;
 
             String trafficFlow = "faster";
-            if ((tripTimeTraffic - tripTime) < 0) {
-                tripCost = Math.abs(tripTimeTraffic - tripTime);
+            if ((tripCost) < 0) {
+                tripCost = Math.abs(tripCost);
                 trafficFlow = "slower";
-            } else if ((tripTimeTraffic - tripTime) == 0) {
+            } else if(tripCost == 0){
                 trafficFlow = "no delay";
             }
 
@@ -103,7 +103,10 @@ public class TrafficFragment extends Fragment {
             }
 
             txtDistance.setText("Distance: " + tripDistance + " " + units);
-            txtTravelTime.setText("Travel Time: " + tripTime + " minutes (" + tripCost + " minute(s) " + trafficFlow + ".)");
+
+            String minute = " minute ";
+            if (tripCost > 1) minute = " minutes ";
+            txtTravelTime.setText("Travel Time: " + tripTime + " minutes (" + tripCost + minute + trafficFlow + ".)");
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -57,7 +57,7 @@ public class LightFragment extends Fragment {
         SharedPreferences prefs = getActivity().getApplicationContext().getSharedPreferences(LIGHT_PREFS, Context.MODE_PRIVATE);
         mColor = prefs.getInt(LIGHT_COLOR, getResources().getColor(R.color.white));
         view.setBackgroundColor(mColor);
-        setWindowBrightness(brightness);
+        //setWindowBrightness(brightness);
 
         return view;
     }

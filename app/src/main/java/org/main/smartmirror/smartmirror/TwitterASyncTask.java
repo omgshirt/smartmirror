@@ -4,15 +4,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import twitter4j.Paging;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
-import twitter4j.TwitterObjectFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -21,15 +18,14 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterASyncTask extends AsyncTask<String, Void, String> {
 
     // fallback tokens, replaced once user signs in
-    public static String TWITTER_ACCESS_TOKEN = "4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG";
-    public static String TWITTER_ACCESS_SECRET = "BbK7Ls2rwXrutUOnKsE5pZx8EajxRgUiMZO6P39edBZFZ";
-    /*final String TWITTER_ACCESS_TOKEN = TwitterActivity.mAuthToken;
-    final String TWITTER_ACCESS_SECRET = TwitterActivity.mAuthSecret;*/
+    public static String TWITTER_ACCESS_TOKEN = "4313842942-zRoKUcEECkUZoWLfEWnomOjzIaXaJJeIIRuT7Nh";
+    public static String TWITTER_ACCESS_SECRET = "uwwdTUEs9gRQwnvDoeEEquQBkoA9KTdK3kdsgwKm1PHCY";
     public static String accToken;
     private AccessToken accessToken;
     Twitter twitter;
     List<twitter4j.Status> statuses;
     Paging paging;
+
 
     @Override
     protected String doInBackground(String[] params) {
@@ -43,18 +39,15 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     cb.setOAuthAccessToken(TWITTER_ACCESS_TOKEN);
                     cb.setOAuthAccessTokenSecret(TWITTER_ACCESS_SECRET);
                     cb.setJSONStoreEnabled(true);
-                    //cb.setApplicationOnlyAuthEnabled(true);
-                    //.setOAuthAccessToken(TwitterActivity.mAuthToken)
-                    //.setOAuthAccessTokenSecret(TwitterActivity.mAuthToken);
 
 
             accessToken = new AccessToken(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET);
             accToken = accessToken.toString();
             twitter = new TwitterFactory(cb.build()).getInstance(accessToken);
 
-            // pulling tweets commented out for now
             paging = new Paging(5); // MAX 200 IN ONE CALL
             statuses = twitter.getHomeTimeline(paging);
+            updateTwitterCache(statuses);
 
             try {
 
@@ -67,17 +60,16 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                     TwitterFragment.mTweets.add(i,status.getText());
                     TwitterFragment.mUsersAt.add(i,status.getUser().getScreenName());
                     TwitterFragment.mUri.add(i, Uri.parse(status.getUser().getProfileImageURLHttps()));
-
                     i++;
                 }
 
 
             } catch (Exception e) {
-                Log.i("TWITTER Parse ", "Didnt work");
+                Log.i("TWITTER Parse ", e.toString());
             }
 
         }catch (Exception e) {
-            Log.i("ERR ", "Something's not right, max call limit reached");
+            Log.i("ERR ", e.toString());
 
         }
 
@@ -89,10 +81,10 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String message) {
 
-        ArrayList<CustomObject> objects = new ArrayList<CustomObject>();
+        ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
         try {
             for(int i = 0; i < statuses.size(); i++){
-                CustomObject co = new CustomObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i));
+                CustomListViewObject co = new CustomListViewObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i));
                 objects.add(co);
             }
             CustomAdapter customAdapter = new CustomAdapter(MainActivity.getContextForApplication(), objects);
@@ -100,6 +92,11 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
         } catch (Exception e) {}
 
 
+    }
+
+    public void updateTwitterCache(List<twitter4j.Status> data) {
+        // Update the TWITTER_CACHE stored in cacheManager or create new if it doesn't exist.
+        TwitterFragment.mCacheManager.addCache(TwitterFragment.TWITTER_CACHE, data, TwitterFragment.DATA_UPDATE_FREQUENCY);
     }
 
 }

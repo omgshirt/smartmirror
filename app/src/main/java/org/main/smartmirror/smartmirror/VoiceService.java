@@ -153,11 +153,11 @@ public class VoiceService extends Service implements RecognitionListener {
     public boolean findCommandInText(String text) {
 
         String[] candidates = text.split("\\s+");
-        //for (int i = candidates.length - 1; i >= 0; i--) {
+        for (int i = candidates.length - 1; i >= 0; i--) {
         //for(int i = 0; i < candidates.length; i++) {
             String candidate = "";
 
-            for (int j = 0; j < candidates.length; j++) {
+            for (int j = i; j < candidates.length; j++) {
                 candidate = (candidate + " " + candidates[j]).trim();
                 Log.i("VR", "looking for \"" + candidate + "\"");
 
@@ -167,7 +167,7 @@ public class VoiceService extends Service implements RecognitionListener {
                     return true;
                 }
             }
-        //}
+        }
         return false;
     }
 
