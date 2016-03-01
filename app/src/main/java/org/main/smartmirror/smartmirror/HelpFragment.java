@@ -7,12 +7,38 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Class that handles the help dialog which shows the commands the user can issue
  */
 public class HelpFragment extends Fragment {
+
+    private Runnable mRunnable;
+    private Timer mTimer;
+    private TextView txtCurrentHelpHeader;
+    private TextView txtCurrentHelpContent;
+    private TextView txtModeHeader;
+    private TextView txtModeContent;
+    private TextView txtNewsHelpHeader;
+    private TextView txtNewsHelpContent;
+    private TextView txtHelpHeader;
+    private TextView txtHelpContent;
+    private TimerTask mTimerTask;
+
+    private final int fadeInTime = 2000;
+    private final int fadeOutTime = 2000;
+    private final int displayLength = 20000;
+    private final int offset = fadeInTime + displayLength + fadeInTime;
+
 
     public static HelpFragment newInstance(String fragName) {
         Bundle args = new Bundle();
@@ -23,21 +49,66 @@ public class HelpFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mTimer = new Timer();
+
+        // Set-up the fade in
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator());
+        fadeIn.setDuration(fadeInTime);
+
+        // Set-up the fade out
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
+        fadeOut.setStartOffset(fadeInTime + displayLength);
+        fadeOut.setDuration(fadeOutTime);
+
+        // Create our animation
+        final AnimationSet animation = new AnimationSet(false);
+        animation.addAnimation(fadeIn);
+        animation.addAnimation(fadeOut);
+
+        mRunnable = new Runnable() {
+            @Override
+            public void run() {
+                txtCurrentHelpContent.setAnimation(animation);
+                txtCurrentHelpHeader.setAnimation(animation);
+                txtHelpContent.setAnimation(animation);
+                txtHelpHeader.setAnimation(animation);
+                txtModeContent.setAnimation(animation);
+                txtModeHeader.setAnimation(animation);
+                txtNewsHelpContent.setAnimation(animation);
+                txtNewsHelpHeader.setAnimation(animation);
+            }
+        };
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.help_fragment, container, false);
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(mRunnable);
+            }
+        };
+        
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, displayLength);
+
         String name = getArguments().getString("name");
         Log.i(Constants.TAG, name);
         Resources res = getResources();
 
-        TextView txtCurrentHelpHeader = (TextView) view.findViewById(R.id.fragment_help_header);
-        TextView txtCurrentHelpContent = (TextView) view.findViewById(R.id.fragment_help_content);
-        TextView txtModeHeader = (TextView) view.findViewById(R.id.mode_header);
-        TextView txtModeContent = (TextView) view.findViewById(R.id.mode_content);
-        TextView txtNewsHelpHeader = (TextView) view.findViewById(R.id.news_header);
-        TextView txtNewsHelpContent = (TextView) view.findViewById(R.id.news_content);
-        TextView txtHelpHeader = (TextView) view.findViewById(R.id.general_help_header);
-        TextView txtHelpContent = (TextView) view.findViewById(R.id.general_help_content);
+        txtCurrentHelpHeader = (TextView) view.findViewById(R.id.fragment_help_header);
+        txtCurrentHelpContent = (TextView) view.findViewById(R.id.fragment_help_content);
+        txtModeHeader = (TextView) view.findViewById(R.id.mode_header);
+        txtModeContent = (TextView) view.findViewById(R.id.mode_content);
+        txtNewsHelpHeader = (TextView) view.findViewById(R.id.news_header);
+        txtNewsHelpContent = (TextView) view.findViewById(R.id.news_content);
+        txtHelpHeader = (TextView) view.findViewById(R.id.general_help_header);
+        txtHelpContent = (TextView) view.findViewById(R.id.general_help_content);
 
         // set the default help!
         String strContent;
@@ -102,5 +173,15 @@ public class HelpFragment extends Fragment {
             str += string[i] + "\n";
         }
         return str;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }

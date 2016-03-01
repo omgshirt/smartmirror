@@ -565,6 +565,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void displayFragment(Fragment fragment, String tag, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         ft.replace(R.id.content_frame_3, fragment, tag);
         if (!isFinishing()) {
             if (addToBackStack) {
