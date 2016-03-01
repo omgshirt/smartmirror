@@ -266,9 +266,12 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 } else {
                     mHandler.post(new Runnable() {
                         public void run() {
-                            updateNewsCache(json);
-                            //Log.i("NEWS ", json.toString());
-                            renderNews(json);
+                            try {
+                                updateNewsCache(json);
+                                //Log.i("NEWS ", json.toString());
+                                renderNews(json);
+                            } catch (Exception e) {Log.i("render news", e.toString());}
+
                         }
                     });
                 }
