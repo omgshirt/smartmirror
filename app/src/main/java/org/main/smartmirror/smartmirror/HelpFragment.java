@@ -97,7 +97,7 @@ public class HelpFragment extends Fragment {
     public String buildupStringFromArrays(String[] string) {
         String str = "";
         for (int i = 0; i < string.length; i++) {
-            // capitalize the first letter in the arrays
+            // capitalize the first letters in the arrays and append a new line.
             string[i] = string[i].substring(0, 1).toUpperCase() + string[i].substring(1);
             str += string[i] + "\n";
         }

@@ -32,8 +32,8 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
         findGoogleAccounts();
-        if (!mPreference.getFirstTimeRun()) {
-            if (mPreference.getWorkLatitude() != 0.0 || mPreference.getWorkLongitude() != 0.0) {
+        if (mPreference.getFirstTimeRun()) {
+            if (mPreference.isWorkAddressSet()) {
                 startMain();
             }
         }

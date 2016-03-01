@@ -304,6 +304,8 @@ public class Preferences implements LocationListener {
         // Google Account Email Preferences
         mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
 
+        mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, false);
+
         // Work address
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
@@ -671,6 +673,14 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public boolean isWorkAddressSet() {
+        if (getWorkLongitude() == 0.0 || getWorkLatitude() == 0.0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     // Location Listener Implementation
     @Override
     public void onLocationChanged(Location location) {
@@ -696,6 +706,9 @@ public class Preferences implements LocationListener {
 
     public void setFirstTimrRun(boolean mFirstTimeRun) {
         this.mFirstTimeRun = mFirstTimeRun;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putBoolean(PREFS_FIRST_TIME_RUN, mFirstTimeRun);
+        edit.commit();
     }
 
     public boolean getFirstTimeRun() {

@@ -552,6 +552,7 @@ public class MainActivity extends AppCompatActivity
 
     private void displayHelpFragment(Fragment fragment) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         ft.replace(R.id.content_frame_2, fragment, Constants.HELP);
         ft.commit();
     }

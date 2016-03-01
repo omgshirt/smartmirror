@@ -230,6 +230,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), AccountActivity.class);
+                mPreferences.setFirstTimrRun(false);
                 startActivity(intent);
             }
         });
