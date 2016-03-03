@@ -1,14 +1,10 @@
 package org.main.smartmirror.smartmirror;
 
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.fasterxml.jackson.core.json.UTF8JsonGenerator;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -18,13 +14,9 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Base64;
 import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
-import com.google.api.services.gmail.model.Thread;
-import com.google.api.services.gmail.model.ListThreadsResponse;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,20 +31,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-//Gmail fragment should get messages one by one
-
 public class GmailFragment extends Fragment {
 
-    //public static List<String> threadList = new ArrayList<>();
     public static List<String> messageList = new ArrayList<>();
-    //ArrayAdapter<String> arrayAdapter;
-    public static ListView listView;
-    public static TextView textView;
+    public static TextView textViewTitle;
+    public static TextView textViewTo;
+    public static String mTo;
+    public static TextView textViewFrom;
+    public static String mFrom;
+    public static TextView textViewSubject;
+    public static String mSubject;
+    public static ListView listViewBody;
+    public static String mBody;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private static String PREF_ACCOUNT_NAME = "";
 
-    //SCOPES
+    //SCOPES - Note: When adding/deleting scopes, it is necessary to reauthorize by:
+    //               1. Remove SmartMirror from Google Account by going to Connected Apps and Services
+    //               2. Run Google Account Picker (Navin uses the OldCalendarFragment code)
+    //Otherwise, changes won't take place.
     private static final String[] SCOPES = {
             GmailScopes.GMAIL_LABELS,
             GmailScopes.GMAIL_READONLY,
@@ -63,10 +61,16 @@ public class GmailFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.gmail_fragment, container, false);
-        textView = (TextView)view.findViewById(R.id.gmailTitle);
+
+        textViewTitle = (TextView)view.findViewById(R.id.gmailTitle);
+        textViewTo = (TextView)view.findViewById(R.id.messageTo);
+        textViewFrom = (TextView)view.findViewById(R.id.messageFrom);
+        textViewSubject = (TextView)view.findViewById(R.id.messageSubject);
+        listViewBody = (ListView) view.findViewById(R.id.messageBody);
+
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-        listView = (ListView)view.findViewById(R.id.gmailMessageList);
 
         PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
 
@@ -74,10 +78,9 @@ public class GmailFragment extends Fragment {
                 getActivity().getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff())
                 .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+
         mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
-//        ArrayAdapter<String> arrayAdapter =
-//                new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
-//        listView.setAdapter(arrayAdapter);
+
         return view;
     }
 
@@ -189,22 +192,7 @@ public class GmailFragment extends Fragment {
             // Get the labels in the user's account.
             String user = "me";
             String query = "in:inbox is:unread";
-            textView.setText("Inbox");
-            Log.i(Constants.TAG, "Before Thread Response Call");
-//            ListThreadsResponse threadResponse =
-//                    mService.users().threads().list(user).setQ(query).setMaxResults(Long.valueOf(1)).execute();
-//            List<Thread> threads = threadResponse.getThreads();
-////            for (Thread thread : threads) {
-////                //System.out.println("Thread ID: " + thread.getId());
-////                //System.out.println("Thread Info: " + thread.getMessages().size());
-////            }
-//            Log.i(Constants.TAG, "After Thread Response Call");
-//
-//            for(Thread thread : threads){
-//               // threadList.add(thread.toPrettyString());
-//                threadList.add(thread.getMessages().toString());
-//                //System.out.println(thread.toPrettyString());
-//            }
+            textViewTitle.setText("Inbox");
 
             ListMessagesResponse messageResponse =
                     mService.users().messages().list(user).setQ(query).setMaxResults(Long.valueOf(1)).execute();
@@ -212,33 +200,45 @@ public class GmailFragment extends Fragment {
             List<Message> messages = messageResponse.getMessages();
 
             for(Message message : messages){
+
                 Message message2 = mService.users().messages().get(user, message.getId()).execute();
-                byte[] bytes = Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().toPrettyString().replaceAll(" ", "")); // base64 decoded bytes
-                String s = new String(bytes, "UTF-8");
 
-                //String mailBody = new String(Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().toPrettyString().replaceAll(" ", "+")));
-                //messageList.add(mailBody);
-                //String mailBody = new String(Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().toPrettyString()));
+                int headerSize = message2.getPayload().getHeaders().size();
+                //Get who message is from
+                for(int i = 0; i < headerSize; i++ ) {
+                    if (message2.getPayload().getHeaders().get(i).getName().toString().equals("From")) {
+                        mFrom = new String(message2.getPayload().getHeaders().get(i).getValue().toString());
+                    }
+                }
+                //Get subject of message
+                for(int j = 0; j < headerSize; j++){
+                    if(message2.getPayload().getHeaders().get(j).getName().toString().equals("Subject")){
+                        mSubject = new String(message2.getPayload().getHeaders().get(j).getValue().toString());
+                    }
+                }
+                //Get who message is to
+                for(int k = 0; k < headerSize; k++){
+                    if(message2.getPayload().getHeaders().get(k).getName().toString().equals(("To"))){
+                        mTo = new String(message2.getPayload().getHeaders().get(k).getValue().toString());
+                    }
+                }
 
-                messageList.add(s);
-
+                //Get the body of the message
+                byte[] bodyBytes = Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().getData().trim().toString()); // get body
+                mBody = new String(bodyBytes, "UTF-8");
+                messageList.add(mBody);
             }
-            Log.i(Constants.TAG, "After Thread Response Call");
             return messageList;
         }
 
         @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
         protected void onPostExecute(List<String> output) {
-            if (output == null || output.size() == 0) {
-            } else {
-                ArrayAdapter<String> arrayAdapter =
-                        new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
-                listView.setAdapter(arrayAdapter);
-            }
+            textViewTo.setText("To: " + mTo + "\n");
+            textViewFrom.setText("From: " + mFrom + "\n");
+            textViewSubject.setText("Subject: " + mSubject + "\n");
+            ArrayAdapter<String> arrayAdapter =
+                    new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
+            listViewBody.setAdapter(arrayAdapter);
         }
     }
 }
