@@ -1,75 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginEnd="15dp"
     android:layout_marginStart="15dp"
-    android:layout_marginEnd="15dp">
+    android:orientation="vertical">
 
-    <!-- current fragment -->
-    <TextView
-        android:id="@+id/fragment_help_header"
-        android:gravity="center_horizontal"
-        android:layout_marginStart="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+    <RelativeLayout
+        android:id="@+id/help_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <!-- current fragment -->
+        <TextView
+            android:id="@+id/fragment_help_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <TextView
-        android:id="@+id/fragment_help_content"
-        android:gravity="center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/fragment_help_header" />
+        <View
+            android:id="@+id/help_divider"
+            style="@style/Divider"
+            android:layout_below="@id/fragment_help_header" />
 
-    <!-- available sections -->
-    <TextView
-        android:id="@+id/mode_header"
-        android:gravity="center_horizontal"
-        android:layout_below="@+id/fragment_help_content"
-        android:layout_marginStart="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:id="@+id/fragment_help_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/fragment_help_header" />
 
-    <TextView
-        android:id="@+id/mode_content"
-        android:gravity="center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/mode_header" />
+        <!-- available sections -->
+        <TextView
+            android:id="@+id/mode_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/fragment_help_content"
+            android:layout_marginStart="5dp"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <!-- news sections -->
-    <TextView
-        android:id="@+id/news_header"
-        android:gravity="center_horizontal"
-        android:layout_below="@+id/mode_content"
-        android:layout_marginStart="9dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <View
+            android:layout_below="@id/mode_header"
+            style="@style/Divider"/>
 
-    <TextView
-        android:id="@+id/news_content"
-        android:gravity="center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/news_header" />
+        <TextView
+            android:id="@+id/mode_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mode_header" />
 
-    <!-- general help -->
-    <TextView
-        android:id="@+id/general_help_header"
-        android:gravity="center_horizontal"
-        android:layout_below="@+id/news_content"
-        android:layout_marginStart="9dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <!-- news sections -->
+        <TextView
+            android:id="@+id/news_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/mode_content"
+            android:layout_marginStart="9dp"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <TextView
-        android:id="@+id/general_help_content"
-        android:gravity="center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/general_help_header" />
+        <View
+            android:layout_below="@id/news_header"
+            style="@style/Divider" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/news_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/news_header" />
+
+        <!-- general help -->
+        <TextView
+            android:id="@+id/general_help_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/news_content"
+            android:layout_marginStart="9dp"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <View
+            android:layout_below="@id/general_help_header"
+            style="@style/Divider" />
+
+        <TextView
+            android:id="@+id/general_help_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/general_help_header" />
+    </RelativeLayout>
+
+</LinearLayout>

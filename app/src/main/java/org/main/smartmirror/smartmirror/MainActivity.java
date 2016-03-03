@@ -570,8 +570,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Display the HelpFragment within content_frame_2
+     *
+     * @param fragment fragment to show
+     */
     private void displayHelpFragment(Fragment fragment) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         ft.replace(R.id.content_frame_2, fragment, Constants.HELP);
         ft.commit();
     }

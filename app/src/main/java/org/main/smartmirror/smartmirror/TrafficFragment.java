@@ -3,10 +3,12 @@ package org.main.smartmirror.smartmirror;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,9 +18,9 @@ import org.json.JSONObject;
 /**
  * Fragment that handles the traffic information
  */
-public class TrafficFragment extends Fragment {
-    private ImageView mTrafficIcon;
+public class TrafficFragment extends Fragment implements CacheManager.CacheListener {
     private Preferences mPreference;
+    private RelativeLayout mTrafficLayout;
     private String mCurrentLat;
     private String mCurrentLong;
     private String mWorkLat;
@@ -26,11 +28,16 @@ public class TrafficFragment extends Fragment {
     private TextView txtDistance;
     private TextView txtTravelTime;
 
-    Handler mHandler = new Handler();
+    private Handler mHandler = new Handler();
+    private CacheManager mCacheManager = null;
+    // time in seconds before treffic data expires 10 minute default
+    private final int DATA_UPDATE_FREQUENCY = 600;
+    public static final String TRAFFIC_CACHE = "traffic cache";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mCacheManager = CacheManager.getInstance();
         mPreference = Preferences.getInstance(getActivity());
         mCurrentLat = Double.toString(mPreference.getLatitude());
         mCurrentLong = Double.toString(mPreference.getLongitude());
@@ -41,7 +48,7 @@ public class TrafficFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.traffic_fragment, container, false);
-        mTrafficIcon = (ImageView) view.findViewById(R.id.traffic_icon);
+        mTrafficLayout = (RelativeLayout) view.findViewById(R.id.traffic_layout);
         txtDistance = (TextView) view.findViewById(R.id.traffic_distance);
         txtTravelTime = (TextView) view.findViewById(R.id.traffic_delay);
         return view;
@@ -50,7 +57,30 @@ public class TrafficFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        startTrafficUpdate();
+        // Check for any cached traffic data.
+        // If a cache exists, render it to the view.
+        // Update the cache if it has expired.
+        if (!mCacheManager.containsKey(TRAFFIC_CACHE)) {
+            startTrafficUpdate();
+        } else {
+            renderTraffic((JSONObject) mCacheManager.get(TRAFFIC_CACHE));
+            if (mCacheManager.isExpired(TRAFFIC_CACHE)) {
+                Log.i(Constants.TAG, "TrafficCache expired. Refreshing...");
+                startTrafficUpdate();
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mCacheManager.registerCacheListener(TRAFFIC_CACHE, this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mCacheManager.unRegisterCacheListener(this);
     }
 
     /**
@@ -62,14 +92,16 @@ public class TrafficFragment extends Fragment {
         if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
             distanceMatrixUnit = "imperial";
         }
-        if (mPreference.getWorkLatitude() == 0.0 || mPreference.getWorkLongitude() == 0.0) {
-            // TODO Handle this properly by hiding this fragment
-            // temporary for now
-            mTrafficIcon.setVisibility(View.INVISIBLE);
-            txtDistance.setText("No Traffic Information.");
+        if (!mPreference.isWorkAddressSet()) {
+            // traffic wasn't set so let's hide it.
+            hideTraffic();
         } else {
             updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
         }
+    }
+
+    private void hideTraffic() {
+        mTrafficLayout.setVisibility(View.GONE);
     }
 
     /**
@@ -93,7 +125,7 @@ public class TrafficFragment extends Fragment {
             if ((tripCost) < 0) {
                 tripCost = Math.abs(tripCost);
                 trafficFlow = "slower";
-            } else if(tripCost == 0){
+            } else if (tripCost == 0) {
                 trafficFlow = "no delay";
             }
 
@@ -137,20 +169,42 @@ public class TrafficFragment extends Fragment {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getActivity(),
-                                    "error no traffic found",
-                                    Toast.LENGTH_LONG).show();
+                            ((MainActivity) getActivity()).showToast("error no traffic found",
+                                    Gravity.CENTER, Toast.LENGTH_LONG);
+                            updateTrafficCache(null);
                         }
                     });
                 } else {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            updateTrafficCache(json);
                             renderTraffic(json);
                         }
                     });
                 }
             }
         }.start();
+    }
+
+    /**
+     * Handles the update to the traffic cache
+     * @param data the data to cache
+     */
+    private void updateTrafficCache(JSONObject data){
+        mCacheManager.addCache(TRAFFIC_CACHE, data, DATA_UPDATE_FREQUENCY);
+    }
+
+    // refresh the traffic when the cache has expired.
+    @Override
+    public void onCacheExpired(String cacheName) {
+        if (cacheName.equals(TRAFFIC_CACHE)) startTrafficUpdate();
+    }
+
+    // we don't need to listen to the cache changing
+    // since we're handling the refresh in onCacheExpired
+    @Override
+    public void onCacheChanged(String cacheName) {
+
     }
 }
