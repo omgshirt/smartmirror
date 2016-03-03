@@ -11,11 +11,11 @@ public class Constants {
     public static final String TAG = "SmartMirror";
 
     //-------------- DISPLAY -----------
-    public static final String BACK = "back";
     public static final String CLOSE_WINDOW = "close window";
     public static final String CLOSE_SCREEN = "close screen";
     public static final String FULL_SCREEN = "full screen";
     public static final String GO_BACK = "go back";
+    public static final String GO_FORWARD = "go forward";
     public static final String GO_TO_SLEEP = "go to sleep";
     public static final String HIDE_SCREEN = "hide screen";
     public static final String MAXIMIZE = "maximize";
@@ -110,11 +110,10 @@ public class Constants {
 
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {
-            BACK, BUSINESS,
-            CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
+            BUSINESS, CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
             CONDITIONS, EIGHT, EIGHTH, FACEBOOK, FIVE,
             FORECAST, FOUR, FULL_SCREEN, GALLERY,
-            GO_BACK, GO_TO_SLEEP, HELP, HIDE_TIME,
+            GO_BACK, GO_FORWARD, GO_TO_SLEEP, HELP, HIDE_TIME,
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
             MEDIA, MENU, MINIMIZE,
             MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,

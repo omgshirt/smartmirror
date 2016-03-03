@@ -46,7 +46,7 @@ public class CalendarUtil {
     }
 
     /**
-     * Format the given date object to "Thursday, Jan 5, 2016"
+     * Format the given date object
      * @param curDate date object to format
      * @return String
      */

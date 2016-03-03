@@ -540,6 +540,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     *  Move forward to next command in queue.
+     */
+    public void goForward() {
+        // TODO: implement a deque, forward sends next command
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -768,13 +775,15 @@ public class MainActivity extends AppCompatActivity
         // broadcast the command to all registered receivers for evaluation.
         if (fragment == null) {
             switch (command) {
-                case Constants.BACK:
                 case Constants.GO_BACK:
                     if (frame3Visibility != View.INVISIBLE) {
                         // Can't go back if the window is closed.
                         getSupportFragmentManager().popBackStack();
                     }
                     break;
+                case Constants.GO_FORWARD:
+                    goForward();
+                    return;
                 case Constants.CALENDAR:
                     fragment = new CalendarFragment();
                     break;
@@ -1076,9 +1085,11 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleRemoteCommand(String command) {
         Log.i(Constants.TAG, "remote msg :: " + command);
+
         if (command.equals(Constants.LIGHT)) {
             command = Constants.NIGHT_LIGHT;
         }
+
         if (mPreferences.isRemoteEnabled())
             wakeScreenAndDisplay(command);
         else {

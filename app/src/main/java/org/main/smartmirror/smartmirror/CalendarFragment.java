@@ -23,7 +23,7 @@ public class CalendarFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
         LinearLayout calendarLayout = (LinearLayout) rootView.findViewById(R.id.calendar_layout);
 
-        // read events for the next five days and add to view
+        // read events for the next five days
         List<CalendarEvent> events = CalendarUtil.getCalendarEvents(getContext(), CalendarUtil.FIVE_DAYS);
 
         // Display error if no events found
@@ -42,6 +42,7 @@ public class CalendarFragment extends Fragment {
             // create a copy of calendar_item xml.
             View eventLayout = inflater.inflate(R.layout.calendar_item, null);
 
+
             // Check if this event happens on the same day as previous event, if not, display Date info
             calendar.setTime(event.start);
             int thisEventDay = calendar.get(Calendar.DAY_OF_YEAR);
@@ -50,12 +51,6 @@ public class CalendarFragment extends Fragment {
                 txtEventHeader.setText(CalendarUtil.getCalendarHeader(event.start));
                 txtEventHeader.setGravity(Gravity.CENTER_HORIZONTAL);
                 txtEventHeader.setVisibility(View.VISIBLE);
-
-                LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                llp.setMargins(0, 10, 0, 0);
-                txtEventHeader.setLayoutParams(llp);
-
                 prevEventDay = thisEventDay;
             }
 
@@ -67,6 +62,14 @@ public class CalendarFragment extends Fragment {
             // Set event description
             TextView txtEventDesc = (TextView) eventLayout.findViewById(R.id.event_description);
             txtEventDesc.setText(event.description);
+
+            Log.i(Constants.TAG, event.description + " :: day :: " + thisEventDay);
+
+            // Add 10dp marginTop. This sucks...
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            llp.setMargins(0, 0, 0, 6);
+            txtEventDesc.setLayoutParams(llp);
 
             // Add this event to calendarLayout
             calendarLayout.addView(eventLayout);

@@ -3,7 +3,7 @@ brightness low/1e5/
 brightness medium/1e-5/
 brightness high/1e5/
 brightness max/1e-10/
-calendar/1e-4/
+calendar/1e-12/
 camera/1e-1/
 camera off/1e-3/
 camera on/1e-3/
@@ -19,6 +19,7 @@ full screen/1e-5/
 gallery/1e-2/
 go to sleep/1e-15/
 go back/1e4/
+go forward/1e3/
 help/1e9/
 hide time/1e-2/
 hide weather/1e1/
@@ -63,7 +64,6 @@ stop listening/1e-10/
 take a picture/1e-15/
 time twelve hour/1e-10/
 time twenty-four hour/1e-20/
-traffic/1e1/
 twitter/1e1/
 volume off/1e1/
 volume min/1e-2/
@@ -71,8 +71,8 @@ volume low/1e5/
 volume medium/1e-2/
 volume high/1e5/
 volume max/1e-2/
-wake/1e6/
-wake up/1e-2/
+wake/1e10/
+wake up/1e-4/
 weather english/1e-8/
 weather metric/1e-8/
 wide screen/1e-8/
