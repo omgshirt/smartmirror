@@ -88,7 +88,6 @@ public class GmailFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (isGooglePlayServicesAvailable()) {
-            messageList.clear();
             refreshResults();
         }
     }
@@ -191,7 +190,7 @@ public class GmailFragment extends Fragment {
         private List<String> getDataFromApi() throws IOException {
             // Get the labels in the user's account.
             String user = "me";
-            String query = "in:inbox is:unread";
+            String query = "in:inbox is:unread category:primary";
             textViewTitle.setText("Inbox");
 
             ListMessagesResponse messageResponse =

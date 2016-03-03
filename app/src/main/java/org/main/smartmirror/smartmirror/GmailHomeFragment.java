@@ -44,6 +44,7 @@ public class GmailHomeFragment extends Fragment {
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private static String PREF_ACCOUNT_NAME = "";
+    public static int numUnreadPrimary;
     private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
 
 
@@ -159,17 +160,26 @@ public class GmailHomeFragment extends Fragment {
         private List<String> getDataFromApi() throws IOException {
             // Get the labels in the user's account.
             String user = "me";
-            List<String> labels = new ArrayList<String>();
-            ListLabelsResponse listResponse =
-                    mService.users().labels().list(user).execute();
+            String query = "in:inbox is:unread category:primary";
 
-            for (Label label : listResponse.getLabels()) {
-                if(label.getName().equals("INBOX")) {
-                    Label labelCount = mService.users().labels().get(user, label.getId()).execute();
-                    labels.add(label.getName() + " " + labelCount.getThreadsUnread());
-                    textView.setText("Inbox: " + Integer.toString(labelCount.getThreadsUnread()));
-                }
-            }
+            ListMessagesResponse messageResponse =
+                    mService.users().messages().list(user).setQ(query).execute();
+
+            List<Message> messages = messageResponse.getMessages();
+            numUnreadPrimary = messages.size();
+            textView.setText("Inbox: " + numUnreadPrimary);
+
+            List<String> labels = new ArrayList<String>();
+//            ListLabelsResponse listResponse =
+//                    mService.users().labels().list(user).execute();
+//
+//            for (Label label : listResponse.getLabels()) {
+//                if(label.getName().equals("INBOX")) {
+//                    Label labelCount = mService.users().labels().get(user, label.getId()).execute();
+//                    labels.add(label.getName() + " " + labelCount.getThreadsUnread());
+//                    //textView.setText("Inbox: " + Integer.toString(labelCount.getThreadsUnread()));
+//                }
+//            }
             return labels;
         }
 
