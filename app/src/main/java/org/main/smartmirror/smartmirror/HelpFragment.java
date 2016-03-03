@@ -36,8 +36,8 @@ public class HelpFragment extends Fragment {
 
     private final int fadeInTime = 2000;
     private final int fadeOutTime = 2000;
-    private final int displayLength = 20000;
-    private final int offset = fadeInTime + displayLength + fadeInTime;
+    private final int displayLength = 4000;
+    private final int offset = fadeInTime + displayLength + fadeOutTime;
 
 
     public static HelpFragment newInstance(String fragName) {
@@ -64,6 +64,7 @@ public class HelpFragment extends Fragment {
         fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
         fadeOut.setStartOffset(fadeInTime + displayLength);
         fadeOut.setDuration(fadeOutTime);
+        //fadeOut.setFillAfter(true);
 
         // Create our animation
         final AnimationSet animation = new AnimationSet(false);

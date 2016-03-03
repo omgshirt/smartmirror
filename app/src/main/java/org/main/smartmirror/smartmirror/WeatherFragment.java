@@ -517,7 +517,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         String title = "";
         try {
             long expirationEpochTime = Long.parseLong(mWeatherAlerts.getJSONObject(index).getString("expires"));
-            String expirationTime = new SimpleDateFormat(mPreferences.getTimeFormat()).format(new Date(expirationEpochTime));
+            String expirationTime = new SimpleDateFormat(mPreferences.getTimeFormat(), Locale.US)
+                    .format(new Date(expirationEpochTime));
 
             title = mWeatherAlerts.getJSONObject(index).getString("title") + ". Expires " + expirationTime + "\n";
         } catch (JSONException jse) {

@@ -3,7 +3,7 @@ brightness low/1e5/
 brightness medium/1e-5/
 brightness high/1e5/
 brightness max/1e-10/
-calendar/1e-1/
+calendar/1e-4/
 camera/1e-1/
 camera off/1e-3/
 camera on/1e-3/

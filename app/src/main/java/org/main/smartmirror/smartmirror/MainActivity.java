@@ -570,8 +570,9 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void displayHelpFragment(Fragment fragment) {
+    private void displayHelpFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = HelpFragment.newInstance(getCurrentFragment());
         ft.replace(R.id.content_frame_2, fragment, Constants.HELP);
         ft.commit();
     }
@@ -701,7 +702,7 @@ public class MainActivity extends AppCompatActivity
                 if (frame3Visibility == View.VISIBLE) {
                     setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 }
-                displayHelpFragment(HelpFragment.newInstance(getCurrentFragment()));
+                displayHelpFragment();
             }
         }
         closeMenuDrawer(command);
@@ -745,18 +746,18 @@ public class MainActivity extends AppCompatActivity
      */
     private void handleCommand(String command) {
         // first, see if this fragment exists in the back stack. Use if found.
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(command);
+        //Fragment fragment = getSupportFragmentManager().findFragmentByTag(command);
+
+        Fragment fragment = null;
 
         if (DEBUG) {
-            Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command:\"" + command + "\"");
+            Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command: \"" + command + "\"");
         }
 
-        // Refuse commands if they would re-load the currently visible fragment
-        /*
+        // ignore duplicate commands
         if (command.equals(mCurrentFragment)) {
             return;
         }
-        */
 
         // look for news desk
         if (Constants.DESK_HASH.contains(command)) {
@@ -767,6 +768,13 @@ public class MainActivity extends AppCompatActivity
         // broadcast the command to all registered receivers for evaluation.
         if (fragment == null) {
             switch (command) {
+                case Constants.BACK:
+                case Constants.GO_BACK:
+                    if (frame3Visibility != View.INVISIBLE) {
+                        // Can't go back if the window is closed.
+                        getSupportFragmentManager().popBackStack();
+                    }
+                    break;
                 case Constants.CALENDAR:
                     fragment = new CalendarFragment();
                     break;
@@ -787,12 +795,8 @@ public class MainActivity extends AppCompatActivity
                 case Constants.GALLERY:
                     fragment = new GalleryFragment();
                     break;
-                case Constants.BACK:
-                case Constants.GO_BACK:
-                    if (frame3Visibility != View.INVISIBLE) {
-                        // Can't go back if the window is closed.
-                        getSupportFragmentManager().popBackStack();
-                    }
+                case Constants.HELP:
+                case Constants.SHOW_HELP:
                     break;
                 case Constants.MAXIMIZE:
                 case Constants.FULL_SCREEN:
