@@ -52,7 +52,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SensorEventListener,NewsFragment.ArticleSelectedListener {
+        SensorEventListener, NewsFragment.ArticleSelectedListener {
 
     // Globals, prefs, debug flags
     public static final boolean DEBUG = true;
@@ -162,7 +162,6 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * handles the messages from VoiceService to this Activity
-     *
      */
     public class IHandler extends Handler {
         @Override
@@ -219,9 +218,9 @@ public class MainActivity extends AppCompatActivity
          frame2 = help
          frame3 = data / variable
         */
-        contentFrame1 = (ViewGroup)findViewById(R.id.content_frame_1);
-        contentFrame2 = (ViewGroup)findViewById(R.id.content_frame_2);
-        contentFrame3 = (ViewGroup)findViewById(R.id.content_frame_3);
+        contentFrame1 = (ViewGroup) findViewById(R.id.content_frame_1);
+        contentFrame2 = (ViewGroup) findViewById(R.id.content_frame_2);
+        contentFrame3 = (ViewGroup) findViewById(R.id.content_frame_3);
 
         initializeLightSensor();
 
@@ -245,8 +244,8 @@ public class MainActivity extends AppCompatActivity
         mNsdHelper = new NsdHelper(this);
 
         // Status Icons: Remote / Remote Disabled / Speech / Stay Awake
-        imgRemoteIcon = (ImageView)findViewById(R.id.remote_icon);
-        imgRemoteDisabledIcon = (ImageView)findViewById(R.id.remote_dc_icon);
+        imgRemoteIcon = (ImageView) findViewById(R.id.remote_icon);
+        imgRemoteDisabledIcon = (ImageView) findViewById(R.id.remote_dc_icon);
         if (!mPreferences.isRemoteEnabled()) {
             imgRemoteDisabledIcon.setVisibility(View.VISIBLE);
         }
@@ -442,21 +441,21 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Makes a view visible if it is currently INVISIBLE or GONE
+     *
      * @param view view to show
      */
-    public void showViewIfHidden(View view){
+    public void showViewIfHidden(View view) {
         if (viewHidden(view)) {
             view.setVisibility(View.VISIBLE);
         }
     }
 
-    public boolean viewHidden(View view){
+    public boolean viewHidden(View view) {
         return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
     }
 
     /**
      * Sets the visibility of the content frames and sets these values to be recalled later.
-     *
      */
     protected void setContentFrameValues(int frameOne, int frameTwo, int frameThree) {
         frame1Visibility = frameOne;
@@ -504,10 +503,11 @@ public class MainActivity extends AppCompatActivity
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    /** Start a timer to track interval between user interactions.
-    * When expired, clear the screen on flag so the screen can time out per system settings.
-    */
-     protected void resetInteractionTimer() {
+    /**
+     * Start a timer to track interval between user interactions.
+     * When expired, clear the screen on flag so the screen can time out per system settings.
+     */
+    protected void resetInteractionTimer() {
         stopUITimer();
         mUITimer = new Timer();
         //Log.i(Constants.TAG, "Interaction timer set :: " + mInteractionTimeout + " ms");
@@ -599,6 +599,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Remove the fragment given by tag if it exists
+     *
      * @param tag tag to remove
      */
     private void removeFragment(String tag) {
@@ -618,13 +619,14 @@ public class MainActivity extends AppCompatActivity
      * @param duration int duration: ex. Toast.LENGTH_LONG
      */
     public void showToast(String text, int duration) {
-            showToast(text, Gravity.TOP | Gravity.CENTER_HORIZONTAL, duration);
+        showToast(text, Gravity.TOP | Gravity.CENTER_HORIZONTAL, duration);
     }
 
     /**
      * Show a toast with given gravity for duration
-     * @param text text to show
-     * @param gravity View.Gravity
+     *
+     * @param text     text to show
+     * @param gravity  View.Gravity
      * @param duration Toast.Duration
      */
     @SuppressWarnings("deprecation")
@@ -648,10 +650,10 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Entry point for processing user commands.
-     *
+     * <p/>
      * If sleeping, this will ignore commands except those which cause a state transition to "awake".
      * If command would wake the application, trigger proper state change and handle the command.
-     *
+     * <p/>
      * Actions related to commands are processed in this order: Wake the screen, hide the help fragment,
      * close menu drawer, set content frame visibility, then change fragments and / or broadcast command to
      * command listeners.
@@ -690,20 +692,21 @@ public class MainActivity extends AppCompatActivity
      */
     public void handleHelpFragment(String command) {
 
+        boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
+
         if (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP)) {
-            boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
-            Log.i(Constants.TAG, "helpIsVisible :: " + helpIsVisible);
-            if (helpIsVisible) {
-                // remove HelpFragment if visible
-                removeFragment(Constants.HELP);
-            } else  {
-                // If frame3 is in any visible state, return it to 'small screen' proportion
-                if (frame3Visibility == View.VISIBLE) {
-                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
-                }
-                displayHelpFragment();
+            // If frame3 is in any visible state, return it to 'small screen' proportion
+            if (frame3Visibility == View.VISIBLE) {
+                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
             }
+            displayHelpFragment();
         }
+
+        if (helpIsVisible) {
+            // remove HelpFragment if visible
+            removeFragment(Constants.HELP);
+        }
+
         closeMenuDrawer(command);
     }
 
@@ -730,6 +733,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Adjust the visible content frames if required by the command. Currently empty.
+     *
      * @param command command to be executed
      */
     private void setContentVisibility(String command) {
@@ -764,7 +768,7 @@ public class MainActivity extends AppCompatActivity
                     if (frame3Visibility != View.INVISIBLE) {
                         mForwardStack.add(getCurrentFragment());
                         // Pop back stack if there's any previous fragments
-                        if (getSupportFragmentManager().getBackStackEntryCount() > 0 )
+                        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
                             getSupportFragmentManager().popBackStack();
                     }
                     break;
@@ -863,7 +867,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Show or hide the given icon
      *
-     * @param icon ImageView to be adjusted
+     * @param icon    ImageView to be adjusted
      * @param display true to display icon, false to hide
      */
     public void showIcon(ImageView icon, boolean display) {
@@ -874,11 +878,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void showRemoteIcon(boolean display){
+    public void showRemoteIcon(boolean display) {
         showIcon(imgRemoteIcon, display);
     }
 
-    public void showRemoteDisabledIcon(boolean display){
+    public void showRemoteDisabledIcon(boolean display) {
         showIcon(imgRemoteDisabledIcon, display);
     }
 
@@ -887,7 +891,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showStayAwakeIcon(boolean display) {
-         showIcon(imgStayAwakeIcon, display);
+        showIcon(imgStayAwakeIcon, display);
     }
 
 
@@ -1038,7 +1042,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // --------------------------- REMOTE CONTROL -----------------------------
-    
+
     public void registerNsdService() {
         if (mRemoteConnection.getLocalPort() > -1) {
             mNsdHelper.registerService(mRemoteConnection.getLocalPort());
@@ -1047,7 +1051,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void unregisterNsdService(){
+    public void unregisterNsdService() {
         mNsdHelper.unregisterService();
     }
 
@@ -1060,7 +1064,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void disconnectRemote(){
+    public void disconnectRemote() {
         mRemoteConnection.stopRemoteClient();
     }
 
