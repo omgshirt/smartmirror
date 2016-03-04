@@ -41,7 +41,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -70,13 +74,12 @@ public class MainActivity extends AppCompatActivity
 
     // Set initial fragments & track displayed views
     private String mInitialFragment = Constants.NEWS;
-    private String mCurrentFragment;
+    private Stack<Fragment> mForwardStack;
 
     // FrameSize maintains the size of the content window between state changes
     private int frame1Visibility = View.VISIBLE;
     private int frame2Visibility = View.VISIBLE;
     private int frame3Visibility = View.VISIBLE;
-
 
     // Light Sensor
     private SensorManager mSensorManager;
@@ -90,9 +93,11 @@ public class MainActivity extends AppCompatActivity
     public static final int LIGHT_SLEEP = 1;
     public static final int AWAKE = 2;
 
-    // Sleep state & wakelocks
+    // Sleep state
     private boolean nightLightOnWake = false;           // tracks if device should wake into LightFragment
     private int mirrorSleepState;
+
+    // Interaction Timer / Wakelock
     private int defaultScreenTimeout;
     private final int WAKELOCK_TIMEOUT = 100;            // Wakelock should be held only briefly to trigger screen wake
     private PowerManager.WakeLock mWakeLock;
@@ -181,6 +186,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void handleMessage(Message msg) {
             String command = msg.getData().getString("msg");
+            assert command != null;
             if (command.equals(RemoteConnection.SERVER_STARTED)) {
                 // Server Socket has been created
                 registerNsdService();
@@ -203,6 +209,9 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
         mira = Mira.getInstance(this);
+
+        if (mForwardStack == null)
+            mForwardStack = new Stack<>();
 
         /*
          content frames hold data displays.
@@ -293,7 +302,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * If this is called by the device waking up, it will trigger a new call to handleCommand(),
-     * reloading the last visible fragment saved in mCurrentFragment
+     * reloading the last visible fragment
      */
     @SuppressWarnings("deprecation")
     @Override
@@ -307,19 +316,12 @@ public class MainActivity extends AppCompatActivity
         addScreenOnFlag();
         resetInteractionTimer();
 
-        if (mPowerManager.isScreenOn()) {
-            mPreferences.resetScreenBrightness();
-        }
-
-        // start NSD
-        //mNsdHelper.discoverServices();
-
         mPreferences.setVolumesToPrefValues();
         stopLightSensor();
         startSpeechRecognition();
 
         // on first load show initialFragment
-        if (mCurrentFragment == null) {
+        if (getCurrentFragment() == null) {
             wakeScreenAndDisplay(mInitialFragment);
         } else if (nightLightOnWake) {
             // If the mirror was woken with NIGHT_LIGHT command, change to that fragment immediately.
@@ -344,9 +346,6 @@ public class MainActivity extends AppCompatActivity
             startLightSensor();
         }
         stopUITimer();
-
-        //stop NSD. This will prevent discovery while sleeping....
-        //mNsdHelper.stopDiscovery();
     }
 
     @Override
@@ -456,7 +455,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Sets all content frames and adjusts view to new values
+     * Sets the visibility of the content frames and sets these values to be recalled later.
      *
      */
     protected void setContentFrameValues(int frameOne, int frameTwo, int frameThree) {
@@ -540,13 +539,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     *  Move forward to next command in queue.
-     */
-    public void goForward() {
-        // TODO: implement a deque, forward sends next command
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -579,7 +571,7 @@ public class MainActivity extends AppCompatActivity
 
     private void displayHelpFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Fragment fragment = HelpFragment.newInstance(getCurrentFragment());
+        Fragment fragment = HelpFragment.newInstance(getCurrentFragment().getTag());
         ft.replace(R.id.content_frame_2, fragment, Constants.HELP);
         ft.commit();
     }
@@ -752,18 +744,10 @@ public class MainActivity extends AppCompatActivity
      * @param command command to process
      */
     private void handleCommand(String command) {
-        // first, see if this fragment exists in the back stack. Use if found.
-        //Fragment fragment = getSupportFragmentManager().findFragmentByTag(command);
-
         Fragment fragment = null;
 
         if (DEBUG) {
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command: \"" + command + "\"");
-        }
-
-        // ignore duplicate commands
-        if (command.equals(mCurrentFragment)) {
-            return;
         }
 
         // look for news desk
@@ -776,14 +760,18 @@ public class MainActivity extends AppCompatActivity
         if (fragment == null) {
             switch (command) {
                 case Constants.GO_BACK:
+                    // Can't go back if the window is closed.
                     if (frame3Visibility != View.INVISIBLE) {
-                        // Can't go back if the window is closed.
-                        getSupportFragmentManager().popBackStack();
+                        mForwardStack.add(getCurrentFragment());
+                        // Pop back stack if there's any previous fragments
+                        if (getSupportFragmentManager().getBackStackEntryCount() > 0 )
+                            getSupportFragmentManager().popBackStack();
                     }
                     break;
                 case Constants.GO_FORWARD:
-                    goForward();
-                    return;
+                    if (!mForwardStack.isEmpty())
+                        fragment = mForwardStack.pop();
+                    break;
                 case Constants.CALENDAR:
                     fragment = new CalendarFragment();
                     break;
@@ -842,7 +830,6 @@ public class MainActivity extends AppCompatActivity
                 case Constants.GO_TO_SLEEP:
                 case Constants.MIRA_SLEEP:
                     enterLightSleep();
-                    command = mCurrentFragment;
                     break;
                 case Constants.TWITTER:
                     fragment = new TwitterFragment();
@@ -859,19 +846,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (fragment != null) {
-            mCurrentFragment = command;
             displayFragment(fragment, command, true);
             showViewIfHidden(contentFrame3);
         }
     }
 
     /**
-     * Gets the fragment currently being viewed.
+     * Gets the fragment currently being viewed within content_frame_3.
      *
-     * @return String fragment name
+     * @return Fragment
      */
-    protected String getCurrentFragment() {
-        return mCurrentFragment;
+    protected Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(R.id.content_frame_3);
     }
 
     /**

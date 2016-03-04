@@ -74,18 +74,12 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
                 dailyForecasts[i] = new DailyForecast(today);
                 Log.i(Constants.TAG, "DailyForecast :: " + dailyForecasts[i]);
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-        } catch (JSONException jse) {
+        }  catch (JSONException jse) {
             jse.printStackTrace();
         }
     }
 
     private void renderForecasts() {
-
-        //layForecast.removeAllViewsInLayout();
-        // LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        //LinearLayout layForecast = (LinearLayout) inflater.inflate(R.layout.forecast_fragment, null, false);
 
         // render days 1,2,3
         try {
@@ -120,24 +114,29 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
 
     // compile and say weather forecast for the next 3 days
     private void speakWeatherForecast() {
+        try {
+            String forecast = "Tomorrow " + dailyForecasts[1].summary +
+                    " high of " + dailyForecasts[1].maxTemp +
+                    " degrees, low " + dailyForecasts[1].minTemp + ". ";
 
-        String forecast = "Tomorrow " + dailyForecasts[1].summary +
-                " high of " + dailyForecasts[1].maxTemp +
-                " degrees, low " + dailyForecasts[1].minTemp + ". ";
+            for (int i = 2; i <= 3; i++) {
+                Date date = new Date(dailyForecasts[i].forecastTime * 1000);
+                SimpleDateFormat sdf = new SimpleDateFormat("cccc", Locale.US);
+                String dayName = sdf.format(date);
 
-        for (int i = 2; i <= 3; i ++) {
-            Date date = new Date(dailyForecasts[i].forecastTime * 1000);
-            SimpleDateFormat sdf = new SimpleDateFormat("cccc", Locale.US);
-            String dayName = sdf.format(date);
-
-            forecast += dayName + ", " + dailyForecasts[i].summary +
-                    " high of " + dailyForecasts[i].maxTemp +
-                    ", low of " + dailyForecasts[i].minTemp +
-                    " degrees. ";
+                forecast += dayName + ", " + dailyForecasts[i].summary +
+                        " high of " + dailyForecasts[i].maxTemp +
+                        ", low of " + dailyForecasts[i].minTemp +
+                        " degrees. ";
+            }
+            if (!forecast.equals("")) {
+                speakText(forecast);
+            }
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         }
-        if (!forecast.equals("")) {
-            speakText(forecast);
-        }
+
+
     }
 
     private void speakText(String text) {
@@ -153,6 +152,7 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     public void onCacheChanged(String cacheName) {
         if (cacheName.equals(WeatherFragment.WEATHER_CACHE)) {
             updateForecasts();
+            renderForecasts();
         }
     }
 }

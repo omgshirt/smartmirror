@@ -1,8 +1,3 @@
-brightness min/1e-5/
-brightness low/1e5/
-brightness medium/1e-5/
-brightness high/1e5/
-brightness max/1e-10/
 calendar/1e-12/
 camera/1e-1/
 camera off/1e-3/
@@ -24,11 +19,6 @@ help/1e9/
 hide time/1e-2/
 hide weather/1e1/
 hide screen/1e-4/
-light min/1e-5/
-light low/1e8/
-light medium/1e-10/
-light high/1e4/
-light max/1e-15/
 menu/1e4/
 maximize/1e-5/
 minimize/1e-5/
