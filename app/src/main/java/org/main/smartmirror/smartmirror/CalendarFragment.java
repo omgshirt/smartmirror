@@ -39,7 +39,6 @@ public class CalendarFragment extends Fragment {
             // create a copy of calendar_item xml.
             View eventLayout = inflater.inflate(R.layout.calendar_item, null);
 
-
             // Check if this event happens on the same day as previous event, if not, display Date info
             calendar.setTime(event.start);
             int thisEventDay = calendar.get(Calendar.DAY_OF_YEAR);

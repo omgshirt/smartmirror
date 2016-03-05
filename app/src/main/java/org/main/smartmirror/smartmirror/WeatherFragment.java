@@ -467,12 +467,14 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 // show chance of rain if >= 10%
                 if (rainProb >= 10) {
 
-                    // umbrella icon
+                    // umbrella icon : disabled
+                    /*
                     txtUmbrella.setTypeface(weatherFont);
                     txtUmbrella.setText(getActivity().getResources().getString(R.string.weather_umbrella));
                     txtUmbrella.setVisibility(View.VISIBLE);
+                    */
 
-                    // forecast chance of rain
+                    // Chance of rain
                     String chanceOfRain = Integer.toString(rainProb) + "%";
                     rainForecast.setText(chanceOfRain);
                     rainForecast.setVisibility(View.VISIBLE);

@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="0dp"
+    android:paddingLeft="10dp"
     android:orientation="vertical"
-    android:padding="15dp"
     tools:context="org.main.smartmirror.smartmirror.TrafficFragment">
 
     <ImageView
@@ -18,13 +19,13 @@
         android:id="@+id/traffic_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/traffic_icon" />
+        android:layout_toEndOf="@id/traffic_icon" />
 
     <TextView
         android:id="@+id/traffic_delay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/traffic_distance"
-        android:layout_toRightOf="@id/traffic_icon" />
+        android:layout_toEndOf="@id/traffic_icon" />
 
 </RelativeLayout>

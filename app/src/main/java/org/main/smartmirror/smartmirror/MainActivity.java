@@ -1044,7 +1044,7 @@ public class MainActivity extends AppCompatActivity
     // --------------------------- REMOTE CONTROL -----------------------------
 
     public void registerNsdService() {
-        if (mRemoteConnection.getLocalPort() > -1) {
+        if (mRemoteConnection.getLocalPort() > -1 && mPreferences.isRemoteEnabled()) {
             mNsdHelper.registerService(mRemoteConnection.getLocalPort());
         } else {
             Log.d(Constants.TAG, "ServerSocket isn't bound.");

@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,13 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.zip.Inflater;
 
 public class ForecastFragment extends Fragment implements CacheManager.CacheListener {
 
     private Typeface weatherFont;
     private DailyForecast[] dailyForecasts;
-    private final int DAYS_TO_CONVERT = 4;
+    private final int DAYS_TO_CONVERT = 6;
 
     public ForecastFragment() {
         // Required empty public constructor
@@ -32,10 +34,15 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.forecast_fragment, container, false);
-        if (savedInstanceState == null)
-            dailyForecasts = new DailyForecast[DAYS_TO_CONVERT];
+        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.forecast_fragment, container, false);
         weatherFont = Typeface.createFromAsset(getActivity().getAssets(), "fonts/weather.ttf");
+
+        if (savedInstanceState == null) {
+            dailyForecasts = new DailyForecast[DAYS_TO_CONVERT];
+            updateForecasts();
+            renderForecasts(view);
+            speakWeatherForecast();
+        }
 
         return view;
     }
@@ -43,10 +50,6 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     @Override
     public void onStart() {
         super.onStart();
-        updateForecasts();
-        renderForecasts();
-        // need to move this so it doesn't speak every damned time
-        speakWeatherForecast();
 
         CacheManager.getInstance().registerCacheListener(WeatherFragment.WEATHER_CACHE, this);
     }
@@ -66,30 +69,34 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
             return;
         }
 
-        // Create dailyForecasts, which includes the next 3 days
+        // Create dailyForecasts for 4 days, including current day
         try {
             JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
             for (int i = 0; i < dailyForecasts.length; i++) {
                 JSONObject today = dailyData.getJSONObject(i);
                 dailyForecasts[i] = new DailyForecast(today);
-                Log.i(Constants.TAG, "DailyForecast :: " + dailyForecasts[i]);
+                //Log.i(Constants.TAG, "DailyForecast :: " + dailyForecasts[i]);
             }
-        }  catch (JSONException jse) {
+        } catch (JSONException jse) {
             jse.printStackTrace();
         }
     }
 
-    private void renderForecasts() {
+    /**
+     * Show the forecast
+     * @param view LinearLayout to add forecast items
+     */
+    private void renderForecasts(LinearLayout view) {
 
         // render days 1,2,3
         try {
             for (int i = 1; i < dailyForecasts.length; i++) {
+
                 String resourceName = "daily_forecast_" + i;
                 int layoutId = getContext().getResources().getIdentifier(resourceName, "id",
                         getActivity().getPackageName());
-                LinearLayout forecastLayout = (LinearLayout) getActivity().findViewById(layoutId);
+                LinearLayout forecastLayout = (LinearLayout) view.findViewById(layoutId);
 
-                //LinearLayout forecastItem = (LinearLayout) inflater.inflate(R.layout.forecast_item, null);
                 TextView txtDay = (TextView) forecastLayout.findViewById(R.id.daily_forecast_day);
                 TextView txtForecastIcon = (TextView) forecastLayout.findViewById(R.id.daily_forecast_icon);
                 TextView txtHighTemp = (TextView) forecastLayout.findViewById(R.id.daily_forecast_temp);
@@ -102,10 +109,13 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
                 String icon = dailyForecasts[i].icon;
                 WeatherFragment.setWeatherIcon(getActivity(), weatherFont, txtForecastIcon, icon,
                         dailyForecasts[i].sunrise, dailyForecasts[i].sunset);
+                txtForecastIcon.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);
 
-                String textTmp = Math.round(dailyForecasts[i].maxTemp) + getResources().getString(R.string.weather_deg);
-                txtHighTemp.setText(textTmp);
+                String textTemp = Math.round(dailyForecasts[i].maxTemp) +
+                        getResources().getString(R.string.weather_deg);
+                txtHighTemp.setText(textTemp);
                 txtHighTemp.setTypeface(weatherFont);
+                txtHighTemp.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
             }
         } catch (NullPointerException npe) {
             npe.printStackTrace();
@@ -115,11 +125,14 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     // compile and say weather forecast for the next 3 days
     private void speakWeatherForecast() {
         try {
+            /*
             String forecast = "Tomorrow " + dailyForecasts[1].summary +
                     " high of " + dailyForecasts[1].maxTemp +
                     " degrees, low " + dailyForecasts[1].minTemp + ". ";
+            */
+            String forecast = "";
 
-            for (int i = 2; i <= 3; i++) {
+            for (int i = 1; i <= 3; i++) {
                 Date date = new Date(dailyForecasts[i].forecastTime * 1000);
                 SimpleDateFormat sdf = new SimpleDateFormat("cccc", Locale.US);
                 String dayName = sdf.format(date);
@@ -152,7 +165,7 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     public void onCacheChanged(String cacheName) {
         if (cacheName.equals(WeatherFragment.WEATHER_CACHE)) {
             updateForecasts();
-            renderForecasts();
+            renderForecasts( (LinearLayout)getView() );
         }
     }
 }

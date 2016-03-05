@@ -224,12 +224,20 @@ public class Preferences implements LocationListener {
 
             // weather units
             case CMD_WEATHER_ENGLISH:
-                speakText(R.string.speech_weather_english);
-                setWeatherUnits(ENGLISH);
+                if (weatherIsEnglish()) {
+                    speakText(R.string.speech_weather_english_err);
+                } else {
+                    speakText(R.string.speech_weather_english);
+                    setWeatherUnits(ENGLISH);
+                }
                 break;
             case CMD_WEATHER_METRIC:
-                speakText(R.string.speech_weather_metric);
-                setWeatherUnits(METRIC);
+                if (!weatherIsEnglish()) {
+                    speakText(R.string.speech_weather_metric_err);
+                } else {
+                    speakText(R.string.speech_weather_metric);
+                    setWeatherUnits(METRIC);
+                }
                 break;
 
             // time display
@@ -511,13 +519,14 @@ public class Preferences implements LocationListener {
      * Disabling will unregister the service and shows remote disabled icon
      * Enabling registers the service
      *
-     * @param isEnabled enable or disable the remote control
+     * @param enable enable or disable the remote control
      */
-    public void setRemoteEnabled(boolean isEnabled) {
-        if (mRemoteEnabled == isEnabled) return;
+    public void setRemoteEnabled(boolean enable) {
+        if (mRemoteEnabled == enable) return;
+        mRemoteEnabled = enable;
 
         if (mActivity instanceof MainActivity) {
-            if (isEnabled) {
+            if (enable) {
                 ((MainActivity) mActivity).registerNsdService();
             } else {
                 ((MainActivity) mActivity).unregisterNsdService();
@@ -525,7 +534,6 @@ public class Preferences implements LocationListener {
             }
         }
         try {
-            mRemoteEnabled = isEnabled;
             if (!mRemoteEnabled) {
                 // when disabling, hide remote connected icon
                 ((MainActivity) mActivity).showRemoteIcon(false);

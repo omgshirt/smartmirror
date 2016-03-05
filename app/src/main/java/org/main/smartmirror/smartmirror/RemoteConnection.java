@@ -78,6 +78,10 @@ public class RemoteConnection {
         mPort = port;
     }
 
+    public InetAddress getAddress() {
+        return mServer.mServerSocket.getInetAddress();
+    }
+
 
     public synchronized void updateMessages(String msg, boolean local) {
         Log.e(TAG, "Updating message: " + msg);
@@ -152,8 +156,9 @@ public class RemoteConnection {
                     // used.  Just grab an available one  and advertise it via Nsd.
                     mServerSocket = new ServerSocket(0);
                     setLocalPort(mServerSocket.getLocalPort());
-
-                    // send message confirm serverSocket is set
+                    Log.d(TAG, "mServerSocket port :: " + mServerSocket.getLocalPort());
+                    Log.d(TAG, "mServerSocket addr :: " + mServerSocket.getInetAddress());
+                    // send message confirming serverSocket is set
                     updateMessages(SERVER_STARTED, true);
                     while (!Thread.currentThread().isInterrupted()) {
                         Log.d(TAG, "ServerSocket Created, awaiting connection");

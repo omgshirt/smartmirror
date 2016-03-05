@@ -83,14 +83,22 @@
     <!-- Text to Speech phrases -->
     <string name="speech_voice_on">I\'m listening</string>
     <string name="speech_voice_on_err">I\'m already listening</string>
+
     <string name="speech_voice_off">I\'ll ignore you</string>
     <string name="speech_voice_off_err">I\'m still ignoring you</string>
+
     <string name="speech_stay_awake">I\'ll stay awake. Say \'sleep\' to cancel.</string>
     <string name="speech_stay_awake_err">I\'m staying awake until you say \'sleep\'.</string>
+
     <string name="speech_remote_on">Remote control on</string>
     <string name="speech_remote_off">Remote control off</string>
+
     <string name="speech_weather_english">Weather display English</string>
+    <string name="speech_weather_english_err">Weather display is currently set to English units</string>
+
     <string name="speech_weather_metric">Weather display metric</string>
+    <string name="speech_weather_metric_err">Weather display is already set to metric</string>
+
     <string name="speech_remote_off_err">The remote is disabled.</string>
 
     <!-- api keys -->
