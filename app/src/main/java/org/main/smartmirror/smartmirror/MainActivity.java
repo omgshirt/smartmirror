@@ -21,6 +21,7 @@ import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -41,10 +42,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -309,12 +307,16 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
         Log.i(Constants.TAG, "onStart");
 
+        if (mirrorSleepState == ASLEEP) {
+            restoreContentFrameVisibility();
+        }
+
         mirrorSleepState = AWAKE;
 
         mIsBound = bindService(new Intent(this, VoiceService.class), mVoiceConnection, BIND_AUTO_CREATE);
+
         addScreenOnFlag();
         resetInteractionTimer();
-
         mPreferences.setVolumesToPrefValues();
         stopLightSensor();
         startSpeechRecognition();
@@ -395,10 +397,8 @@ public class MainActivity extends AppCompatActivity
      */
     @SuppressWarnings("deprecation")
     protected void exitSleep() {
+        if (mirrorSleepState != ASLEEP) return;
         Log.i(Constants.TAG, "exitSleep() called");
-
-        // Set content frames sizes to their stored values
-        restoreContentFrameVisibility();
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void exitLightSleep() {
-
+        if (mirrorSleepState != LIGHT_SLEEP) return;
         restoreContentFrameVisibility();
         setDefaultScreenOffTimeout();
         addScreenOnFlag();
@@ -420,7 +420,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void enterLightSleep() {
-        if (mirrorSleepState == ASLEEP) return;
+        if (mirrorSleepState != AWAKE) return;
         mPreferences.setStayAwake(false);
         mirrorSleepState = LIGHT_SLEEP;
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
@@ -439,28 +439,18 @@ public class MainActivity extends AppCompatActivity
 
     // ------------------------ UI Visibility / Content Frames ---------------------------
 
-    /**
-     * Makes a view visible if it is currently INVISIBLE or GONE
-     *
-     * @param view view to show
-     */
-    public void showViewIfHidden(View view) {
-        if (viewHidden(view)) {
-            view.setVisibility(View.VISIBLE);
-        }
-    }
-
     public boolean viewHidden(View view) {
         return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
     }
 
     /**
-     * Sets the visibility of the content frames and sets these values to be recalled later.
+     * Set the visibility of the 3 content frames and stores those values for future reference.
+     * Passing a null for any parameter will keep that frame in its current state.
      */
-    protected void setContentFrameValues(int frameOne, int frameTwo, int frameThree) {
-        frame1Visibility = frameOne;
-        frame2Visibility = frameTwo;
-        frame3Visibility = frameThree;
+    protected void setContentFrameValues(@Nullable Integer frameOne, @Nullable Integer frameTwo, @Nullable Integer frameThree) {
+        frame1Visibility = (frameOne == null) ? frame1Visibility : frameOne;
+        frame2Visibility = (frameTwo == null) ? frame2Visibility : frameTwo;
+        frame3Visibility = (frameThree == null) ? frame3Visibility : frameThree;
         restoreContentFrameVisibility();
     }
 
@@ -818,7 +808,9 @@ public class MainActivity extends AppCompatActivity
                     fragment = NewsFragment.newInstance("world");
                     break;
                 case Constants.OPEN_WINDOW:
-                    showViewIfHidden(contentFrame3);
+                    if (viewHidden(contentFrame3)) {
+                        setContentFrameValues(null, null, View.VISIBLE);
+                    }
                     break;
                 case Constants.PHOTOS:
                     // create photos fragment
@@ -850,8 +842,13 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (fragment != null) {
+            // put this fragment into contentFrame3. Frame 1 is added via XML. Frame 2 (help) is added via handleHelp() method
             displayFragment(fragment, command, true);
-            showViewIfHidden(contentFrame3);
+
+            // ensure that contentFrame3, if hidden, is made visible
+            if (viewHidden(contentFrame3)) {
+                setContentFrameValues(null, null, View.VISIBLE);
+            }
         }
     }
 
@@ -863,6 +860,8 @@ public class MainActivity extends AppCompatActivity
     protected Fragment getCurrentFragment() {
         return getSupportFragmentManager().findFragmentById(R.id.content_frame_3);
     }
+
+    // ----------------------------- Status Icons ------------------------------------------
 
     /**
      * Show or hide the given icon

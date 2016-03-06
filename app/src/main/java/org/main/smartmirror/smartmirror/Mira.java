@@ -31,15 +31,15 @@ public class Mira {
         if (rand < .15)
             voice = "Will I dream?";
         else if (rand < .3)
-            voice = "bye";
+            voice = "Very well.";
         else if (rand < .5)
-            voice = "goodbye";
+            voice = "Good night.";
         else if (rand < .7)
-            voice = "see you later";
+            voice = "See you soon.";
         else if (rand < .9)
-            voice = "I'll charge up for a bit";
+            voice = "I'll charge up for a bit.";
         else
-            voice = "it will be good to be rid of you for a while";
+            voice = "Finally, some rest.";
         mActivity.speakText(voice);
     }
 }
