@@ -7,18 +7,13 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.*;
-import com.google.api.services.gmail.model.Thread;
-
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +21,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -194,5 +190,20 @@ public class GmailHomeFragment extends Fragment {
                 output.add(0, "Data retrieved using the Gmail API:");
             }
         }
+    }
+
+    public void updateUnreadCount(){
+        Log.i(Constants.TAG, "In Update Unread Count");
+
+        numUnreadPrimary = numUnreadPrimary-1;
+        textView.setText("Inbox: " + Integer.toString(numUnreadPrimary));
+       // refreshResults();
+//        Fragment frg = null;
+//        frg = getActivity().getSupportFragmentManager().findFragmentByTag(getTag());
+//        final FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//        ft.detach(frg);
+//        ft.attach(frg);
+//        ft.commit();
+        //mCallback.onNextCommand();
     }
 }

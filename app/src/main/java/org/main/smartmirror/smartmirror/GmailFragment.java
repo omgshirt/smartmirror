@@ -1,7 +1,10 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,8 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.ModifyMessageRequest;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +29,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.io.IOException;
@@ -32,6 +38,25 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GmailFragment extends Fragment {
+
+    OnNextMessageListener mCallback;
+
+    // Container Activity must implement this interface
+    public interface OnNextMessageListener {
+        public void onNextCommand();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            Log.i(Constants.TAG, "In onAttach");
+            mCallback = (OnNextMessageListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnNextMessageListener");
+        }
+    }
 
     public static List<String> messageList = new ArrayList<>();
     public static TextView textViewTitle;
@@ -43,6 +68,9 @@ public class GmailFragment extends Fragment {
     public static String mSubject;
     public static ListView listViewBody;
     public static String mBody;
+
+    public static Button nextM;
+
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private static String PREF_ACCOUNT_NAME = "";
@@ -70,6 +98,9 @@ public class GmailFragment extends Fragment {
         textViewSubject = (TextView)view.findViewById(R.id.messageSubject);
         listViewBody = (ListView) view.findViewById(R.id.messageBody);
 
+        nextM = (Button)view.findViewById(R.id.nextMessage);
+
+
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
@@ -80,6 +111,19 @@ public class GmailFragment extends Fragment {
                 .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
 
         mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
+
+        nextM.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+//                mCallback.onNextCommand();
+                Fragment frg = null;
+                frg = getActivity().getSupportFragmentManager().findFragmentByTag(getTag());
+                final FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.detach(frg);
+                ft.attach(frg);
+                ft.commit();
+            }
+        });
 
         return view;
     }
@@ -92,15 +136,15 @@ public class GmailFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//    }
 
     @Override
     public void onActivityResult(
@@ -188,19 +232,29 @@ public class GmailFragment extends Fragment {
          * @throws IOException
          */
         private List<String> getDataFromApi() throws IOException {
+
             // Get the labels in the user's account.
             String user = "me";
             String query = "in:inbox is:unread category:primary";
             textViewTitle.setText("Inbox");
+            List<String> labelsToRemove = new ArrayList<String>();
+            labelsToRemove.add("UNREAD");
+
 
             ListMessagesResponse messageResponse =
                     mService.users().messages().list(user).setQ(query).setMaxResults(Long.valueOf(1)).execute();
 
             List<Message> messages = messageResponse.getMessages();
 
+            ModifyMessageRequest mods = new ModifyMessageRequest()
+                    .setRemoveLabelIds(labelsToRemove);
+
             for(Message message : messages){
 
                 Message message2 = mService.users().messages().get(user, message.getId()).execute();
+
+                Message message1 = mService.users().messages().modify(user, message.getId(), mods).execute();
+
 
                 int headerSize = message2.getPayload().getHeaders().size();
                 //Get who message is from
@@ -231,6 +285,11 @@ public class GmailFragment extends Fragment {
         }
 
         @Override
+        protected void onPreExecute() {
+            messageList.clear();
+        }
+
+        @Override
         protected void onPostExecute(List<String> output) {
             textViewTo.setText("To: " + mTo + "\n");
             textViewFrom.setText("From: " + mFrom + "\n");
@@ -238,6 +297,8 @@ public class GmailFragment extends Fragment {
             ArrayAdapter<String> arrayAdapter =
                     new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
             listViewBody.setAdapter(arrayAdapter);
+
+            mCallback.onNextCommand();
         }
     }
 }
