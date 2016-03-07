@@ -2,9 +2,11 @@ package org.main.smartmirror.smartmirror;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Build;
 import android.os.Bundle;
 import android.security.KeyPairGeneratorSpec;
 import android.support.v7.app.AppCompatActivity;
@@ -32,10 +34,11 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.crypto.Cipher;
@@ -63,11 +66,18 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            mKeyStore = KeyStore.getInstance(Constants.KEY_STORE);
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            mKeyStore = KeyStore.getInstance(Constants.KEY_STORE);
+//            mKeyStore.load(null);
+//        } catch (KeyStoreException e) {
+//            e.printStackTrace();
+//        } catch (CertificateException e) {
+//            e.printStackTrace();
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
         Fabric.with(this, new TwitterCore(authConfig));
         setContentView(R.layout.account_activity);
@@ -76,6 +86,7 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         setUpTwitterButton();
         if (mPreference.getFirstTimeRun()) {
             // generate the keys
+            // createNewKeys();
         } else {
             // we don't care if the values are empty
             // each fragment should handle this
@@ -109,6 +120,10 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     *
+     */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void createNewKeys() {
         try {
             // Create new key if needed
@@ -131,20 +146,6 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         } catch (Exception e) {
             Toast.makeText(this, "Exception " + e.getMessage() + " occured", Toast.LENGTH_LONG).show();
             Log.e(Constants.TAG, Log.getStackTraceString(e));
-        }
-        refreshKeys();
-    }
-
-    private void refreshKeys() {
-        ArrayList keyAliases = new ArrayList<>();
-        try {
-            Enumeration<String> aliases = mKeyStore.aliases();
-            while (aliases.hasMoreElements()) {
-                keyAliases.add(aliases.nextElement());
-            }
-        }
-        catch(Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -216,7 +217,9 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         EditText facebookUsername = (EditText) findViewById(R.id.facebook_username);
         EditText facebookPassword = (EditText) findViewById(R.id.facebook_password);
         if (facebookPassword.getText().toString().equals("") && facebookUsername.getText().toString().equals("")) {
-            encryptString(facebookUsername + "::" + facebookPassword);
+//            encryptString(facebookUsername.getText().toString() + "::" + facebookPassword.getText().toString());
+//            facebookPassword = null;
+//            facebookUsername = null;
         }
         EditText workAddress = (EditText) findViewById(R.id.work_location);
         // since by default the work lat and long is set to -1 we are OK
@@ -229,7 +232,7 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
     }
 
     /**
-     * Encripts a string to the android KeyStore. This might not be the best
+     * Encrypts a string to the android KeyStore. This might not be the best
      * way of doing it since make two copies of the plain text string. Further
      * investigation needs to be made here to make a better implementation.
      *
@@ -241,7 +244,7 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
             RSAPublicKey publicKey = (RSAPublicKey) privateKeyEntry.getCertificate().getPublicKey();
 
             // Encrypt the text
-            Cipher input = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidOpenSSL");
+            Cipher input = Cipher.getInstance("AES/CFB8/NoPadding");
             input.init(Cipher.ENCRYPT_MODE, publicKey);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -252,7 +255,8 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
 
             byte[] vals = outputStream.toByteArray();
             // save to preferences.
-            mPreference.setFacebookUsername(Base64.encodeToString(vals, Base64.DEFAULT));
+            mPreference.setFacebookCredentials(Base64.encodeToString(vals, Base64.DEFAULT));
+            Log.i("Facebook", mPreference.getFacebookCredentials());
         } catch (Exception e) {
             Log.e(Constants.TAG, Log.getStackTraceString(e));
         }

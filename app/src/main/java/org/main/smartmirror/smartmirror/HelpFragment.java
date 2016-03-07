@@ -46,9 +46,56 @@ public class HelpFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mTimer = new Timer();
+        // Set-up the fade in
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator());
+        fadeIn.setDuration(fadeInTime);
+
+        // Set-up the fade out
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
+        fadeOut.setStartOffset(fadeInTime + displayLength);
+        fadeOut.setDuration(fadeOutTime);
+
+        // Create our animation
+        final AnimationSet animation = new AnimationSet(false);
+        animation.addAnimation(fadeIn);
+        animation.addAnimation(fadeOut);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                removeHelpFragment();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        // Set the runnable
+        mRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // Start the animation
+                mHelpLayout.setAnimation(animation);
+                mHelpLayout.setVisibility(View.VISIBLE);
+            }
+        };
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.help_fragment, container, false);
         mHelpLayout = (RelativeLayout) view.findViewById(R.id.help_layout);
+        mHelpLayout.setVisibility(View.INVISIBLE);
 
         String name = getArguments().getString("name");
         Resources res = getResources();
@@ -110,7 +157,14 @@ public class HelpFragment extends Fragment {
                 txtCurrentHelpContent.setVisibility(View.GONE);
                 break;
         }
-        startHelpAnimtation();
+
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(mRunnable);
+            }
+        };
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, displayLength);
         return view;
     }
 
@@ -154,7 +208,13 @@ public class HelpFragment extends Fragment {
      * The equivalent of Activity.finish()
      */
     private void removeHelpFragment() {
+        mTimerTask.cancel();
         ((MainActivity) getActivity()).removeFragment(Constants.HELP);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mTimerTask.cancel();
+    }
 }

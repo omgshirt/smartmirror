@@ -57,17 +57,23 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
     @Override
     public void onStart() {
         super.onStart();
-        // Check for any cached traffic data.
-        // If a cache exists, render it to the view.
-        // Update the cache if it has expired.
-        if (!mCacheManager.containsKey(TRAFFIC_CACHE)) {
-            startTrafficUpdate();
-        } else {
-            renderTraffic((JSONObject) mCacheManager.get(TRAFFIC_CACHE));
-            if (mCacheManager.isExpired(TRAFFIC_CACHE)) {
-                Log.i(Constants.TAG, "TrafficCache expired. Refreshing...");
+        if (mPreference.isWorkAddressSet()) {
+            showTraffic();
+            // Check for any cached traffic data.
+            // If a cache exists, render it to the view.
+            // Update the cache if it has expired.
+            if (!mCacheManager.containsKey(TRAFFIC_CACHE)) {
                 startTrafficUpdate();
+            } else {
+                renderTraffic((JSONObject) mCacheManager.get(TRAFFIC_CACHE));
+                if (mCacheManager.isExpired(TRAFFIC_CACHE)) {
+                    Log.i(Constants.TAG, "TrafficCache expired. Refreshing...");
+                    startTrafficUpdate();
+                }
             }
+        } else {
+            // traffic wasn't set so let's hide it.
+            hideTraffic();
         }
     }
 
@@ -87,21 +93,20 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
      * Prepares the JSON request to get the current traffic information
      */
     private void startTrafficUpdate() {
-        if (!mPreference.isWorkAddressSet()) {
-            // traffic wasn't set so let's hide it.
-            hideTraffic();
-        } else {
-            String distanceMatrixKey = getActivity().getResources().getString(R.string.distance_matrix_api_key);
-            String distanceMatrixUnit = "metric";
-            if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
-                distanceMatrixUnit = "imperial";
-            }
-            updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
+        String distanceMatrixKey = getActivity().getResources().getString(R.string.distance_matrix_api_key);
+        String distanceMatrixUnit = "metric";
+        if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
+            distanceMatrixUnit = "imperial";
         }
+        updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
     }
 
     private void hideTraffic() {
         mTrafficLayout.setVisibility(View.GONE);
+    }
+
+    private void showTraffic() {
+        mTrafficLayout.setVisibility(View.VISIBLE);
     }
 
     /**
