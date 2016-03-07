@@ -114,8 +114,8 @@ public class HelpFragment extends Fragment {
         return view;
     }
 
-    private void startHelpAnimtation(){
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(mHelpLayout, "alpha",  1f, 0f);
+    private void startHelpAnimtation() {
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(mHelpLayout, "alpha", 1f, 0f);
         fadeOut.setDuration(fadeOutTime);
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(mHelpLayout, "alpha", 0f, 1f);
         fadeIn.setDuration(fadeInTime);
@@ -153,8 +153,8 @@ public class HelpFragment extends Fragment {
     /**
      * The equivalent of Activity.finish()
      */
-    private void removeHelpFragment(){
-        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+    private void removeHelpFragment() {
+        ((MainActivity) getActivity()).removeFragment(Constants.HELP);
     }
 
 }

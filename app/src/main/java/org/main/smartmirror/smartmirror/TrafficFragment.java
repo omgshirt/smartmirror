@@ -87,15 +87,15 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
      * Prepares the JSON request to get the current traffic information
      */
     private void startTrafficUpdate() {
-        String distanceMatrixKey = getActivity().getResources().getString(R.string.distance_matrix_api_key);
-        String distanceMatrixUnit = "metric";
-        if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
-            distanceMatrixUnit = "imperial";
-        }
         if (!mPreference.isWorkAddressSet()) {
             // traffic wasn't set so let's hide it.
             hideTraffic();
         } else {
+            String distanceMatrixKey = getActivity().getResources().getString(R.string.distance_matrix_api_key);
+            String distanceMatrixUnit = "metric";
+            if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
+                distanceMatrixUnit = "imperial";
+            }
             updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
         }
     }
@@ -189,9 +189,10 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
 
     /**
      * Handles the update to the traffic cache
+     *
      * @param data the data to cache
      */
-    private void updateTrafficCache(JSONObject data){
+    private void updateTrafficCache(JSONObject data) {
         mCacheManager.addCache(TRAFFIC_CACHE, data, DATA_UPDATE_FREQUENCY);
     }
 

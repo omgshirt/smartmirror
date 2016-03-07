@@ -10,6 +10,9 @@ public class Constants {
 
     public static final String TAG = "SmartMirror";
 
+    //-------- Accont Activity ---------
+    public static final String KEY_STORE="AndroidKeyStore";
+
     //-------------- DISPLAY -----------
     public static final String BACK = "back";
     public static final String CLOSE_WINDOW = "close window";

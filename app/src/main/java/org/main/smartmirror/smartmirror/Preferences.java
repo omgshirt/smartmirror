@@ -58,6 +58,11 @@ public class Preferences implements LocationListener {
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
+    public static final String PREFS_FACEBOOK_LOGGED_IN = "PREFS_FACEBOOK_LOGGED_IN";
+    public static final String PREFS_TWITTER_LOGGED_IN = "PREFS_TWITTER_LOGGED_IN";
+
+    public static final String PREFS_FACEBOOK_USERNAME = "PREFS_FACEBOOK_USERNAME";
+
     // Constants for screen brightness (0-255)
     public static final int BRIGHTNESS_VLOW = 10;
     public static final int BRIGHTNESS_LOW = 40;
@@ -74,8 +79,8 @@ public class Preferences implements LocationListener {
     public static final float VOL_VHIGH = 1.0f;
 
     // default for work address
-    public static final float WORK_LAT = 0f;
-    public static final float WORK_LONG = 0f;
+    public static final float WORK_LAT = -1f;
+    public static final float WORK_LONG = -1f;
 
     public static final String CMD_LIGHT_VLOW = "light min";
     public static final String CMD_LIGHT_LOW = "light low";
@@ -139,6 +144,8 @@ public class Preferences implements LocationListener {
     private String mWeatherUnits;                   // Weather display format (English / metric)
 
     private boolean mFirstTimeRun;
+    private boolean mFacebookLoggedIn;
+    private boolean mTwitterLoggedIn;
 
     private boolean mStayAwake;                     // if true, screen will stay on until cancelled
     private double mLatitude;
@@ -146,6 +153,8 @@ public class Preferences implements LocationListener {
 
     private double mWorkLatitude;
     private double mWorkLongitude;
+
+    private String mFacebookUsername;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
@@ -314,11 +323,15 @@ public class Preferences implements LocationListener {
         // Google Account Email Preferences
         mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
 
-        mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, false);
+        mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, true);
 
         // Work address
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
+
+        // User logged in false
+        mFacebookLoggedIn = mSharedPreferences.getBoolean(PREFS_FACEBOOK_LOGGED_IN, false);
+        mTwitterLoggedIn = mSharedPreferences.getBoolean(PREFS_TWITTER_LOGGED_IN, false);
 
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
@@ -700,7 +713,7 @@ public class Preferences implements LocationListener {
     }
 
     public boolean isWorkAddressSet() {
-        if (getWorkLongitude() == 0.0 || getWorkLatitude() == 0.0) {
+        if (getWorkLongitude() < 0.0 || getWorkLatitude() < 0.0) {
             return false;
         } else {
             return true;
@@ -730,7 +743,7 @@ public class Preferences implements LocationListener {
 
     }
 
-    public void setFirstTimrRun(boolean mFirstTimeRun) {
+    public void setFirstTimeRun(boolean mFirstTimeRun) {
         this.mFirstTimeRun = mFirstTimeRun;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_FIRST_TIME_RUN, mFirstTimeRun);
@@ -748,7 +761,7 @@ public class Preferences implements LocationListener {
 
     //Set User Account if null
     public void setUserAccountName(String userAcc) {
-        mUserAccountPref = userAcc;
+        this.mUserAccountPref = userAcc;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_GMAIL, userAcc);
         edit.apply();
@@ -757,14 +770,43 @@ public class Preferences implements LocationListener {
     public void setStayAwake(boolean stayAwake) {
         if (mStayAwake && stayAwake) {
             speakText(R.string.speech_stay_awake_err);
-        } else if (stayAwake){
+        } else if (stayAwake) {
             speakText(R.string.speech_stay_awake);
         }
         mStayAwake = stayAwake;
-        ((MainActivity)mActivity).showStayAwakeIcon(mStayAwake);
+        ((MainActivity) mActivity).showStayAwakeIcon(mStayAwake);
     }
 
-    public boolean isStayingAwake(){
+    public boolean isStayingAwake() {
         return mStayAwake;
+    }
+
+    public void setTwitterLoggedIn(boolean mUserLoggedIn) {
+        this.mTwitterLoggedIn = mUserLoggedIn;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putBoolean(PREFS_TWITTER_LOGGED_IN, mUserLoggedIn);
+        edit.commit();
+    }
+
+    public void setFacebookLoggedIn(boolean mFacebookLoggedIn) {
+        this.mFacebookLoggedIn = mFacebookLoggedIn;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putBoolean(PREFS_FACEBOOK_LOGGED_IN, mFacebookLoggedIn);
+        edit.commit();
+    }
+
+    public void setFacebookUsername(String mFacebookUsername){
+        this.mFacebookUsername = mFacebookUsername;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_FACEBOOK_USERNAME, mFacebookUsername);
+        edit.commit();
+    }
+
+    public boolean getFacebookLogIn() {
+        return mFacebookLoggedIn;
+    }
+
+    public boolean getTwitterLoggedIn() {
+        return mTwitterLoggedIn;
     }
 }
