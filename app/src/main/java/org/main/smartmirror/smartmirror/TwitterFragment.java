@@ -69,7 +69,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
                     if (position < 0) position = 0;
                 }
                 VoiceScroll sl = new VoiceScroll();
-                sl.voiceListView(message,twitterFeed, position);
+                sl.scrollListView(message,twitterFeed, position);
             }
         }
     };
@@ -79,7 +79,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
         CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
         try {
             for(int i = 0; i < 10; i++){
-                CustomListViewObject co = new CustomListViewObject(mUsers.get(i),mTweets.get(i),mUri.get(i));
+                CustomListViewObject co = new CustomListViewObject(mUsers.get(i),mTweets.get(i),mUri.get(i),null);
                 objects.add(co);
                 customAdapter.notifyDataSetChanged();
             }
