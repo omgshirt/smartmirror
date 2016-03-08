@@ -1159,40 +1159,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onNextCommand(){
-        Log.i(Constants.TAG, "In onNextCommand Main Activity");
         //Here we update GmailHomeFragment
-        // The user selected the headline of an article from the HeadlinesFragment
-        // Do something here to display that article
-
-//        GmailHomeFragment gmailHomeFrag = (GmailHomeFragment)
-//                getSupportFragmentManager().findFragmentById(R.id.gmail_home_frag);
-
         GmailHomeFragment gmailHomeFrag = (GmailHomeFragment)
                 getSupportFragmentManager().findFragmentById(R.id.gmail_home);
 
         if (gmailHomeFrag != null) {
-            // If article frag is available, we're in two-pane layout...
-
-            // Call a method in the ArticleFragment to update its content
             gmailHomeFrag.updateUnreadCount();
         }
-//        else {
-//            // Otherwise, we're in the one-pane layout and must swap frags...
-//
-//            // Create fragment and give it an argument for the selected article
-//            GmailHomeFragment newFragment = new GmailHomeFragment();
-//
-//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//
-//            // Replace whatever is in the fragment_container view with this fragment,
-//            // and add the transaction to the back stack so the user can navigate back
-//            transaction.replace(R.id.gmail_home, newFragment);
-//            transaction.addToBackStack(null);
-//
-//            // Commit the transaction
-//            transaction.commit();
-//            newFragment.updateUnreadCount();
-//        }
-        Log.i(Constants.TAG, "End of onNextCommand Main aCtivity");
     }
 }

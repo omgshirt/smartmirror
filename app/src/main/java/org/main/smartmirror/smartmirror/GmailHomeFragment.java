@@ -21,7 +21,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,22 +31,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-//Gmail fragment should get messages one by one
-
 public class GmailHomeFragment extends Fragment {
 
-    public static TextView textView;
+    public TextView textView;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private static String PREF_ACCOUNT_NAME = "";
-    public static int numUnreadPrimary;
+    private String PREF_ACCOUNT_NAME = "";
+    public int numUnreadPrimary;
     private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.gmail_home_fragment, container, false);
-         textView = (TextView)view.findViewById(R.id.numUnread);
+        textView = (TextView)view.findViewById(R.id.numUnread);
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
@@ -161,22 +157,19 @@ public class GmailHomeFragment extends Fragment {
             ListMessagesResponse messageResponse =
                     mService.users().messages().list(user).setQ(query).execute();
 
-            List<Message> messages = messageResponse.getMessages();
-            numUnreadPrimary = messages.size();
-            textView.setText("Inbox: " + numUnreadPrimary);
+            if(messageResponse.size() == 1){
+                textView.setText("Inbox: 0");
+            }else {
 
+                Log.i(Constants.TAG, "Message Response: " + messageResponse.size());
+
+                List<Message> messages = messageResponse.getMessages();
+                numUnreadPrimary = messages.size();
+
+                textView.setText("Inbox: " + numUnreadPrimary);
+            }
             List<String> labels = new ArrayList<String>();
-//            ListLabelsResponse listResponse =
-//                    mService.users().labels().list(user).execute();
-//
-//            for (Label label : listResponse.getLabels()) {
-//                if(label.getName().equals("INBOX")) {
-//                    Label labelCount = mService.users().labels().get(user, label.getId()).execute();
-//                    labels.add(label.getName() + " " + labelCount.getThreadsUnread());
-//                    //textView.setText("Inbox: " + Integer.toString(labelCount.getThreadsUnread()));
-//                }
-//            }
-            return labels;
+                return labels;
         }
 
         @Override
@@ -193,17 +186,6 @@ public class GmailHomeFragment extends Fragment {
     }
 
     public void updateUnreadCount(){
-        Log.i(Constants.TAG, "In Update Unread Count");
-
-        numUnreadPrimary = numUnreadPrimary-1;
-        textView.setText("Inbox: " + Integer.toString(numUnreadPrimary));
-       // refreshResults();
-//        Fragment frg = null;
-//        frg = getActivity().getSupportFragmentManager().findFragmentByTag(getTag());
-//        final FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-//        ft.detach(frg);
-//        ft.attach(frg);
-//        ft.commit();
-        //mCallback.onNextCommand();
+        new MakeRequestTask(mCredential).execute();
     }
 }

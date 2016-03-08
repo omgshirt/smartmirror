@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,41 +37,21 @@ import java.util.List;
 
 public class GmailFragment extends Fragment {
 
-    OnNextMessageListener mCallback;
-
-    // Container Activity must implement this interface
-    public interface OnNextMessageListener {
-        public void onNextCommand();
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            Log.i(Constants.TAG, "In onAttach");
-            mCallback = (OnNextMessageListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnNextMessageListener");
-        }
-    }
-
-    public static List<String> messageList = new ArrayList<>();
-    public static TextView textViewTitle;
-    public static TextView textViewTo;
-    public static String mTo;
-    public static TextView textViewFrom;
-    public static String mFrom;
-    public static TextView textViewSubject;
-    public static String mSubject;
-    public static ListView listViewBody;
-    public static String mBody;
-
-    public static Button nextM;
+    public List<String> messageList = new ArrayList<>();
+    public TextView textViewTitle;
+    public TextView textViewTo;
+    public String mTo;
+    public TextView textViewFrom;
+    public String mFrom;
+    public TextView textViewSubject;
+    public String mSubject;
+    public ListView listViewBody;
+    public String mBody;
+    public Button nextM;
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private static String PREF_ACCOUNT_NAME = "";
+    private String PREF_ACCOUNT_NAME = "";
 
     //SCOPES - Note: When adding/deleting scopes, it is necessary to reauthorize by:
     //               1. Remove SmartMirror from Google Account by going to Connected Apps and Services
@@ -87,6 +65,24 @@ public class GmailFragment extends Fragment {
             GmailScopes.GMAIL_INSERT
     };
 
+    OnNextMessageListener mCallback;
+
+    //Interface for updating Gmail Unread Count
+    public interface OnNextMessageListener {
+        public void onNextCommand();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (OnNextMessageListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnNextMessageListener");
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -99,7 +95,6 @@ public class GmailFragment extends Fragment {
         listViewBody = (ListView) view.findViewById(R.id.messageBody);
 
         nextM = (Button)view.findViewById(R.id.nextMessage);
-
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -115,7 +110,6 @@ public class GmailFragment extends Fragment {
         nextM.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-//                mCallback.onNextCommand();
                 Fragment frg = null;
                 frg = getActivity().getSupportFragmentManager().findFragmentByTag(getTag());
                 final FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
@@ -124,7 +118,6 @@ public class GmailFragment extends Fragment {
                 ft.commit();
             }
         });
-
         return view;
     }
 
@@ -136,15 +129,15 @@ public class GmailFragment extends Fragment {
         }
     }
 
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//    }
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 
     @Override
     public void onActivityResult(
@@ -240,46 +233,49 @@ public class GmailFragment extends Fragment {
             List<String> labelsToRemove = new ArrayList<String>();
             labelsToRemove.add("UNREAD");
 
-
             ListMessagesResponse messageResponse =
                     mService.users().messages().list(user).setQ(query).setMaxResults(Long.valueOf(1)).execute();
 
-            List<Message> messages = messageResponse.getMessages();
+            if(messageResponse.size()==1){
+                mTo = "No New Messages...";
+            }else {
 
-            ModifyMessageRequest mods = new ModifyMessageRequest()
-                    .setRemoveLabelIds(labelsToRemove);
+                List<Message> messages = messageResponse.getMessages();
 
-            for(Message message : messages){
+                ModifyMessageRequest mods = new ModifyMessageRequest()
+                        .setRemoveLabelIds(labelsToRemove);
 
-                Message message2 = mService.users().messages().get(user, message.getId()).execute();
+                for (Message message : messages) {
 
-                Message message1 = mService.users().messages().modify(user, message.getId(), mods).execute();
+                    Message message2 = mService.users().messages().get(user, message.getId()).execute();
 
+                    Message message1 = mService.users().messages().modify(user, message.getId(), mods).execute();
 
-                int headerSize = message2.getPayload().getHeaders().size();
-                //Get who message is from
-                for(int i = 0; i < headerSize; i++ ) {
-                    if (message2.getPayload().getHeaders().get(i).getName().toString().equals("From")) {
-                        mFrom = new String(message2.getPayload().getHeaders().get(i).getValue().toString());
+                    int headerSize = message2.getPayload().getHeaders().size();
+
+                    //Get who message is from
+                    for (int i = 0; i < headerSize; i++) {
+                        if (message2.getPayload().getHeaders().get(i).getName().toString().equals("From")) {
+                            mFrom = new String(message2.getPayload().getHeaders().get(i).getValue().toString());
+                        }
                     }
-                }
-                //Get subject of message
-                for(int j = 0; j < headerSize; j++){
-                    if(message2.getPayload().getHeaders().get(j).getName().toString().equals("Subject")){
-                        mSubject = new String(message2.getPayload().getHeaders().get(j).getValue().toString());
+                    //Get subject of message
+                    for (int j = 0; j < headerSize; j++) {
+                        if (message2.getPayload().getHeaders().get(j).getName().toString().equals("Subject")) {
+                            mSubject = new String(message2.getPayload().getHeaders().get(j).getValue().toString());
+                        }
                     }
-                }
-                //Get who message is to
-                for(int k = 0; k < headerSize; k++){
-                    if(message2.getPayload().getHeaders().get(k).getName().toString().equals(("To"))){
-                        mTo = new String(message2.getPayload().getHeaders().get(k).getValue().toString());
+                    //Get who message is to
+                    for (int k = 0; k < headerSize; k++) {
+                        if (message2.getPayload().getHeaders().get(k).getName().toString().equals(("To"))) {
+                            mTo = new String(message2.getPayload().getHeaders().get(k).getValue().toString());
+                        }
                     }
+                    //Get the body of the message
+                    byte[] bodyBytes = Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().getData().trim().toString()); // get body
+                    mBody = new String(bodyBytes, "UTF-8");
+                    messageList.add(mBody);
                 }
-
-                //Get the body of the message
-                byte[] bodyBytes = Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().getData().trim().toString()); // get body
-                mBody = new String(bodyBytes, "UTF-8");
-                messageList.add(mBody);
             }
             return messageList;
         }
@@ -291,14 +287,18 @@ public class GmailFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<String> output) {
-            textViewTo.setText("To: " + mTo + "\n");
-            textViewFrom.setText("From: " + mFrom + "\n");
-            textViewSubject.setText("Subject: " + mSubject + "\n");
-            ArrayAdapter<String> arrayAdapter =
-                    new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
-            listViewBody.setAdapter(arrayAdapter);
 
-            mCallback.onNextCommand();
+            if(mTo=="No New Messages..."){
+                textViewTo.setText(mTo);
+            }else {
+                textViewTo.setText("To: " + mTo + "\n");
+                textViewFrom.setText("From: " + mFrom + "\n");
+                textViewSubject.setText("Subject: " + mSubject + "\n");
+                ArrayAdapter<String> arrayAdapter =
+                        new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
+                listViewBody.setAdapter(arrayAdapter);
+                mCallback.onNextCommand();
+            }
         }
     }
 }
