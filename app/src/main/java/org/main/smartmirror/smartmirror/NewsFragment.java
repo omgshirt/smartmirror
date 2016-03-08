@@ -51,6 +51,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public ArrayList<String> mSnippet = new ArrayList<String>();
     public ArrayList<Uri> mImageURI = new ArrayList<Uri>();
     public ArrayList<String> mFullArticle = new ArrayList<String>();
+    public ArrayList<String> mArticleNumber = new ArrayList<>();
 
     Handler mHandler = new Handler();
     private ArticleSelectedListener articleSelectedListener;
@@ -129,43 +130,33 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             String message = intent.getStringExtra("message");
             switch (message) {
                 case Constants.ONE:
-                case Constants.FIRST:
                     toNewsBodyFragment(0);
                     break;
                 case Constants.TWO:
-                case Constants.SECOND:
                     toNewsBodyFragment(1);
                     break;
                 case Constants.THREE:
-                case Constants.THIRD:
                     toNewsBodyFragment(2);
                     break;
                 case Constants.FOUR:
-                case Constants.FOURTH:
                     toNewsBodyFragment(3);
                     break;
                 case Constants.FIVE:
-                case Constants.FIFTH:
                     toNewsBodyFragment(4);
                     break;
                 case Constants.SIX:
-                case Constants.SIXTH:
                     toNewsBodyFragment(5);
                     break;
                 case Constants.SEVEN:
-                case Constants.SEVENTH:
                     toNewsBodyFragment(6);
                     break;
                 case Constants.EIGHT:
-                case Constants.EIGHTH:
                     toNewsBodyFragment(7);
                     break;
                 case Constants.NINE:
-                case Constants.NINTH:
                     toNewsBodyFragment(8);
                     break;
                 case Constants.TEN:
-                case Constants.TENTH:
                     toNewsBodyFragment(9);
                     break;
                 default:
@@ -181,7 +172,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     if (position < 0) position = 0;
                 }
                 VoiceScroll sl = new VoiceScroll();
-                sl.voiceListView(message,newsFeed, position);
+                sl.scrollListView(message,newsFeed, position);
             }
 
         }
@@ -196,8 +187,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // If a cache exists, render it to the view.
         // Update the cache if it has expired.
 
-        // TODO: 2/3/2016 add switch case so only current news section is checked/updated
-        // TODO: 2/3/2016 don't update when null/not prev visited
 
         if (!mCacheManager.containsKey(mNewsSection)) {
             Log.i(Constants.TAG, mNewsSection + " does not exist, creating");
@@ -309,17 +298,36 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             Log.e("NEWS ERROR", e.toString());
         }
 
+        addToArrayList(mArticleNumber);
         ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
         CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
         try {
             for(int j = 0; j < numArticles; j++){
-                CustomListViewObject co = new CustomListViewObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j));
+                CustomListViewObject co = new CustomListViewObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j), mArticleNumber.get(j));
                 objects.add(co);
                 customAdapter.notifyDataSetChanged();
             }
 
         } catch (Exception e) {Log.i("NEWS", e.toString());}
         newsFeed.setAdapter(customAdapter);
+    }
+
+    public void addToArrayList(ArrayList arrayList) {
+        arrayList.add("1");
+        arrayList.add("2");
+        arrayList.add("3");
+        arrayList.add("4");
+        arrayList.add("5");
+        arrayList.add("6");
+        arrayList.add("7");
+        arrayList.add("8");
+        arrayList.add("9");
+        arrayList.add("10");
+        arrayList.add("11");
+        arrayList.add("12");
+        arrayList.add("13");
+        arrayList.add("14");
+        arrayList.add("15");
     }
 
     /**

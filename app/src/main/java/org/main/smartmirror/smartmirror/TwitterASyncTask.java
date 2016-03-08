@@ -84,7 +84,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
         ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
         try {
             for(int i = 0; i < statuses.size(); i++){
-                CustomListViewObject co = new CustomListViewObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i));
+                CustomListViewObject co = new CustomListViewObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i), null);
                 objects.add(co);
             }
             CustomAdapter customAdapter = new CustomAdapter(MainActivity.getContextForApplication(), objects);

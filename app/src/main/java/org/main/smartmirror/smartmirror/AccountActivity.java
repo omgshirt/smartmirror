@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.twitter.sdk.android.core.Callback;
@@ -28,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.crypto.SecretKey;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -36,13 +37,14 @@ import io.fabric.sdk.android.Fabric;
  */
 public class AccountActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private long mUserID;
     private Preferences mPreference;
     private TwitterLoginButton mTwitterLoginButton;
     private TwitterSession mSession;
-    private long mUserID;
-    public static String mScreenName;
-    public static String mAuthToken;
-    public static String mAuthSecret;
+
+    public String mScreenName;
+    public String mAuthToken;
+    public String mAuthSecret;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,18 +54,52 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
         findGoogleAccounts();
+        setUpTwitterButton();
         if (mPreference.getFirstTimeRun()) {
-            if (mPreference.isWorkAddressSet()) {
-                startMain();
-            }
+            // generate the keys
+            // createNewKeys();
+        } else {
+            // we don't care if the values are empty
+            // each fragment should handle this
+            startMain();
         }
+    }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (!parent.getItemAtPosition(position).toString().equals("None")) {
+            mPreference.setUserAccountName(parent.getItemAtPosition(position).toString());
+        }
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    /**
+     * We listen here for the result from Twitter
+     * and pass it on to TwitterLoginBUtton
+     *
+     * @param requestCode the request
+     * @param resultCode  the result
+     * @param data        data that we received
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Sets up the functionality for the twitter button.
+     */
+    private void setUpTwitterButton() {
         mTwitterLoginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
-
         mTwitterLoginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
+                mPreference.setTwitterLoggedIn(true);
                 String output = "Status: " +
                         "Your login was successful " +
                         result.data.getUserName() +
@@ -90,22 +126,6 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mPreference.setUserAccountName(parent.getItemAtPosition(position).toString());
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
     /**
      * Finds the google accounts that are tied to the device
      */
@@ -120,10 +140,10 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
                 accountsList.add(account.name);
             }
         } catch (Exception e) {
-            Log.i("Exception", "Exception:" + e);
+            Log.i(Constants.TAG, "Exception:" + e);
         }
-        // add a none option for privacy reasons off for now...
-        // accountsList.add("None");
+        // add a none option for privacy reasons
+        accountsList.add("None");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, accountsList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         googleAccountsPicker.setAdapter(adapter);
@@ -136,18 +156,19 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
      * @param view current view
      */
     public void saveUserInputs(View view) {
-        // EditText facebookUsername = (EditText) findViewById(R.id.facebook_username);
-        // EditText facebookPassword = (EditText) findViewById(R.id.facebook_password);
-        // EditText twitterUsername = (EditText) findViewById(R.id.twitter_username);
-        // EditText twitterPassword = (EditText) findViewById(R.id.twitter_password);
+        /*EditText facebookUsername = (EditText) findViewById(R.id.facebook_username);
+        EditText facebookPassword = (EditText) findViewById(R.id.facebook_password);
+        if (facebookPassword.getText().toString().equals("") && facebookUsername.getText().toString().equals("")) {
+            AESHelper.encryptMsg(facebookUsername.getText().toString() + "::" + facebookPassword.getText().toString(), mPreference.getSecret());
+            facebookPassword = null;
+            facebookUsername = null;
+        }*/
         EditText workAddress = (EditText) findViewById(R.id.work_location);
+        // since by default the work lat and long is set to -1 we are OK
+        // to not have an else case here
         if (!(workAddress.getText().toString().equals(""))) {
             String strAddress = workAddress.getText().toString().replace(' ', '+');
             convertAddressToLatLong(strAddress);
-        } else {
-            // I think I need this...?
-            mPreference.setWorkLatitude(0.0);
-            mPreference.setWorkLongitude(0.0);
         }
         startMain();
     }
@@ -176,7 +197,7 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
      * Starts Main Activity
      */
     private void startMain() {
-        mPreference.setFirstTimrRun(true);
+        mPreference.setFirstTimeRun(false);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
