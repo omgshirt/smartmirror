@@ -14,11 +14,11 @@ public class Constants {
     public static final String KEY_STORE = "AndroidKeyStore";
 
     //-------------- DISPLAY -----------
-    public static final String BACK = "back";
     public static final String CLOSE_WINDOW = "close window";
     public static final String CLOSE_SCREEN = "close screen";
     public static final String FULL_SCREEN = "full screen";
     public static final String GO_BACK = "go back";
+    public static final String GO_FORWARD = "go forward";
     public static final String GO_TO_SLEEP = "go to sleep";
     public static final String HIDE_SCREEN = "hide screen";
     public static final String MAXIMIZE = "maximize";
@@ -116,11 +116,10 @@ public class Constants {
 
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {
-            BACK, BUSINESS,
-            CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
+            BUSINESS, CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
             CONDITIONS, EIGHT, EIGHTH, FACEBOOK, FIVE,
             FORECAST, FOUR, FULL_SCREEN, GALLERY,
-            GO_BACK, GO_TO_SLEEP, HELP, HIDE_TIME,
+            GO_BACK, GO_FORWARD, GO_TO_SLEEP, HELP, HIDE_TIME,
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
             MEDIA, MENU, MINIMIZE,
             MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,
@@ -138,16 +137,8 @@ public class Constants {
             "first", "second", "third", "fourth",
             "fifth", "sixth", "seventh", "eighth",
 
-            Preferences.CMD_LIGHT_HIGH, Preferences.CMD_LIGHT_LOW,
-            Preferences.CMD_LIGHT_MEDIUM, Preferences.CMD_LIGHT_VHIGH,
-            Preferences.CMD_LIGHT_VLOW,
-
             Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
             Preferences.CMD_ENABLE_REMOTE, Preferences.CMD_DISABLE_REMOTE,
-
-            Preferences.CMD_SCREEN_HIGH, Preferences.CMD_SCREEN_LOW,
-            Preferences.CMD_SCREEN_MEDIUM, Preferences.CMD_SCREEN_VHIGH,
-            Preferences.CMD_SCREEN_VLOW,
 
             Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_VLOW,
             Preferences.CMD_SPEECH_LOW, Preferences.CMD_SPEECH_MEDIUM,

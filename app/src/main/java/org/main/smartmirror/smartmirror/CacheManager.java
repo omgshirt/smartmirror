@@ -112,10 +112,7 @@ public class CacheManager {
 
 
     public boolean isExpired(String key) {
-        if (cacheMap.containsKey(key)) {
-            return cacheMap.get(key).isExpired();
-        }
-        return true;
+        return (!cacheMap.containsKey(key) || cacheMap.get(key).isExpired());
     }
 
     /**

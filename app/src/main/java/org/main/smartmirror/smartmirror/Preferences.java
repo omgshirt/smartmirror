@@ -80,12 +80,6 @@ public class Preferences implements LocationListener {
     public static final float WORK_LAT = -1f;
     public static final float WORK_LONG = -1f;
 
-    public static final String CMD_LIGHT_VLOW = "light min";
-    public static final String CMD_LIGHT_LOW = "light low";
-    public static final String CMD_LIGHT_MEDIUM = "light medium";
-    public static final String CMD_LIGHT_HIGH = "light high";
-    public static final String CMD_LIGHT_VHIGH = "light max";
-
     public static final String CMD_SPEECH_OFF = "speech off";
     public static final String CMD_SPEECH_VLOW = "speech min";
     public static final String CMD_SPEECH_LOW = "speech low";
@@ -97,12 +91,6 @@ public class Preferences implements LocationListener {
     public static final String CMD_REMOTE_OFF = "remote off";
     public static final String CMD_ENABLE_REMOTE = "enable remote";
     public static final String CMD_DISABLE_REMOTE = "disable remote";
-
-    public static final String CMD_SCREEN_VLOW = "brightness min";
-    public static final String CMD_SCREEN_LOW = "brightness low";
-    public static final String CMD_SCREEN_MEDIUM = "brightness medium";
-    public static final String CMD_SCREEN_HIGH = "brightness high";
-    public static final String CMD_SCREEN_VHIGH = "brightness max";
 
     public static final String CMD_VOICE_OFF = "stop listening";
     public static final String CMD_VOICE_ON = "start listening";
@@ -155,7 +143,7 @@ public class Preferences implements LocationListener {
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
     public static final String TIME_FORMAT_24_HR_SHORT = "H:mm";
-    public static final String TIME_FORMAT_12_HR = "h:mm";
+    public static final String TIME_FORMAT_12_HR = "h:mm a";
     public static final String TIME_FORMAT_12_HR_SHORT = "h:mm";
 
 
@@ -171,23 +159,6 @@ public class Preferences implements LocationListener {
 
     private void handleSettingsCommand(Context context, String command) {
         switch (command) {
-
-            // Light
-            case CMD_LIGHT_VLOW:
-                setLightBrightness(BRIGHTNESS_VLOW);
-                break;
-            case CMD_LIGHT_LOW:
-                setLightBrightness(BRIGHTNESS_LOW);
-                break;
-            case CMD_LIGHT_MEDIUM:
-                setLightBrightness(BRIGHTNESS_MEDIUM);
-                break;
-            case CMD_LIGHT_HIGH:
-                setLightBrightness(BRIGHTNESS_HIGH);
-                break;
-            case CMD_LIGHT_VHIGH:
-                setLightBrightness(BRIGHTNESS_VHIGH);
-                break;
 
             // Speech Volume
             case CMD_SPEECH_OFF:
@@ -217,23 +188,6 @@ public class Preferences implements LocationListener {
             case CMD_REMOTE_ON:
                 speakText(R.string.speech_remote_on);
                 setRemoteEnabled(true);
-                break;
-
-            // screen brightness
-            case CMD_SCREEN_VLOW:
-                setScreenBrightness(BRIGHTNESS_VLOW);
-                break;
-            case CMD_SCREEN_LOW:
-                setScreenBrightness(BRIGHTNESS_LOW);
-                break;
-            case CMD_SCREEN_MEDIUM:
-                setScreenBrightness(BRIGHTNESS_MEDIUM);
-                break;
-            case CMD_SCREEN_HIGH:
-                setScreenBrightness(BRIGHTNESS_HIGH);
-                break;
-            case CMD_SCREEN_VHIGH:
-                setScreenBrightness(BRIGHTNESS_VHIGH);
                 break;
 
             // Voice recognition on / off
@@ -275,12 +229,20 @@ public class Preferences implements LocationListener {
 
             // weather units
             case CMD_WEATHER_ENGLISH:
-                speakText(R.string.speech_weather_english);
-                setWeatherUnits(ENGLISH);
+                if (weatherIsEnglish()) {
+                    speakText(R.string.speech_weather_english_err);
+                } else {
+                    speakText(R.string.speech_weather_english);
+                    setWeatherUnits(ENGLISH);
+                }
                 break;
             case CMD_WEATHER_METRIC:
-                speakText(R.string.speech_weather_metric);
-                setWeatherUnits(METRIC);
+                if (!weatherIsEnglish()) {
+                    speakText(R.string.speech_weather_metric_err);
+                } else {
+                    speakText(R.string.speech_weather_metric);
+                    setWeatherUnits(METRIC);
+                }
                 break;
 
             // time display
@@ -334,7 +296,6 @@ public class Preferences implements LocationListener {
 
         setSystemVolume(mSystemVolume);
         setMusicVolume(mMusicVolume);
-        setScreenBrightness(mAppBrightness);
 
         // Find current lat and long positions.
         // This is not currently saved to the prefs file, system will re-discover location on start
@@ -557,57 +518,6 @@ public class Preferences implements LocationListener {
         setTimeFormat(TIME_FORMAT_12_HR);
     }
 
-    /**
-     * Set brightness value used by night light
-     *
-     * @param brightness int (0-255)
-     */
-    public void setLightBrightness(int brightness) {
-        if (brightness < 0 || brightness > 255) return;
-
-        mLightBrightness = brightness;
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putInt(PREFS_LIGHT_BRIGHTNESS, mLightBrightness);
-        edit.apply();
-
-    }
-
-    public int getLightBrightness() {
-        return mLightBrightness;
-    }
-
-    /**
-     * Set brightness value for the application
-     *
-     * @param brightness int (0-255)
-     */
-    public void setScreenBrightness(int brightness) {
-        if (brightness < 0 || brightness > 255) return;
-
-        try {
-            this.mAppBrightness = brightness;
-            ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
-            sbh.setScreenBrightness(mActivity, mAppBrightness);
-
-            SharedPreferences.Editor edit = mSharedPreferences.edit();
-            edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
-            edit.apply();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Resets the application's current brightness to value stored in preferences
-     */
-    public void resetScreenBrightness() {
-        setScreenBrightness(mAppBrightness);
-    }
-
-    public int getAppBrightness() {
-        return mAppBrightness;
-    }
-
     public boolean isRemoteEnabled() {
         return mRemoteEnabled;
     }
@@ -617,13 +527,14 @@ public class Preferences implements LocationListener {
      * Disabling will unregister the service and shows remote disabled icon
      * Enabling registers the service
      *
-     * @param isEnabled enable or disable the remote control
+     * @param enable enable or disable the remote control
      */
-    public void setRemoteEnabled(boolean isEnabled) {
-        if (mRemoteEnabled == isEnabled) return;
+    public void setRemoteEnabled(boolean enable) {
+        if (mRemoteEnabled == enable) return;
+        mRemoteEnabled = enable;
 
         if (mActivity instanceof MainActivity) {
-            if (isEnabled) {
+            if (enable) {
                 ((MainActivity) mActivity).registerNsdService();
             } else {
                 ((MainActivity) mActivity).unregisterNsdService();
@@ -631,7 +542,6 @@ public class Preferences implements LocationListener {
             }
         }
         try {
-            mRemoteEnabled = isEnabled;
             if (!mRemoteEnabled) {
                 // when disabling, hide remote connected icon
                 ((MainActivity) mActivity).showRemoteIcon(false);

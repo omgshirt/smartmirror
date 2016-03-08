@@ -2,9 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:weightSum="3">
-
+    android:orientation="vertical">
     <include
         android:id="@+id/daily_forecast_1"
         layout="@layout/forecast_item" />
@@ -15,5 +13,13 @@
 
     <include
         android:id="@+id/daily_forecast_3"
+        layout="@layout/forecast_item" />
+
+    <include
+        android:id="@+id/daily_forecast_4"
+        layout="@layout/forecast_item" />
+
+    <include
+        android:id="@+id/daily_forecast_5"
         layout="@layout/forecast_item" />
 </LinearLayout>
