@@ -51,13 +51,11 @@ public class LightFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.light_fragment, container, false);
-        int brightness = Preferences.getInstance(getActivity()).getLightBrightness();
 
         // get the stored color, White if no value is set
         SharedPreferences prefs = getActivity().getApplicationContext().getSharedPreferences(LIGHT_PREFS, Context.MODE_PRIVATE);
         mColor = prefs.getInt(LIGHT_COLOR, getResources().getColor(R.color.white));
         view.setBackgroundColor(mColor);
-        //setWindowBrightness(brightness);
 
         return view;
     }
@@ -73,16 +71,9 @@ public class LightFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        // return brightness to the mAppBrightness level
-        Preferences prefs = Preferences.getInstance(getActivity());
-        prefs.resetScreenBrightness();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
-    private void setWindowBrightness(int brightness) {
-        ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
-        sbh.setScreenBrightness(getActivity(), brightness);
-    }
 
     @SuppressWarnings("deprecation")
     private void handleCommand(String command) {

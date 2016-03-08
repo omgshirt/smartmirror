@@ -168,26 +168,6 @@ public class HelpFragment extends Fragment {
         return view;
     }
 
-    private void startHelpAnimtation() {
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(mHelpLayout, "alpha", 1f, 0f);
-        fadeOut.setDuration(fadeOutTime);
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(mHelpLayout, "alpha", 0f, 1f);
-        fadeIn.setDuration(fadeInTime);
-
-        final AnimatorSet mAnimationSet = new AnimatorSet();
-
-        mAnimationSet.play(fadeOut).after(fadeIn);
-
-        mAnimationSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                removeHelpFragment();
-            }
-        });
-        mAnimationSet.start();
-    }
-
     /**
      * Builds up a single string from an array to be used in a TextView
      *

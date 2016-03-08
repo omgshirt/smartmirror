@@ -8,6 +8,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.net.InetAddress;
+
 public class NsdHelper {
 
     Context mContext;
@@ -37,12 +39,6 @@ public class NsdHelper {
         // This is used to distinguish this machine from other broadcasters on the network.
         mDeviceName += "_" + Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         //initializeRegistrationListener();
-    }
-
-    public void initializeDiscoveryListener() {
-        //mResolveListener = new MyResolveListener();
-        //mDiscoveryListener = new MyDiscoveryListener();
-        //discoverServices();
     }
 
     public class MyDiscoveryListener implements NsdManager.DiscoveryListener {
@@ -116,7 +112,6 @@ public class NsdHelper {
             mServiceName = nsdServiceInfo.getServiceName();
             Log.d(TAG, "service registered as :: " + nsdServiceInfo);
             serviceRegistered = true;
-            initializeDiscoveryListener();
         }
 
         @Override
@@ -141,6 +136,7 @@ public class NsdHelper {
 
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
         serviceInfo.setPort(port);
+        //serviceInfo.setHost(host);
         serviceInfo.setServiceName(mDeviceName);
         serviceInfo.setServiceType(SERVICE_TYPE);
         Log.d(TAG, "serviceInfo :: " + serviceInfo);
@@ -152,7 +148,8 @@ public class NsdHelper {
     }
 
     public void unregisterService(){
-        if (mRegistrationListener != null && !serviceRegistered) {
+        if (mRegistrationListener != null && serviceRegistered) {
+            Log.d(TAG, "unregistering Nsd Service");
             mNsdManager.unregisterService(mRegistrationListener);
         }
     }
@@ -176,7 +173,7 @@ public class NsdHelper {
     }
 
     public void tearDown() {
-        mNsdManager.unregisterService(mRegistrationListener);
+        unregisterService();
         //mResolveListener = null;
     }
 }
