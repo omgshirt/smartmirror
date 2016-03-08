@@ -2,15 +2,11 @@ package org.main.smartmirror.smartmirror;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Build;
 import android.os.Bundle;
-import android.security.KeyPairGeneratorSpec;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,23 +23,9 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
-import javax.security.auth.x500.X500Principal;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -54,7 +36,6 @@ import io.fabric.sdk.android.Fabric;
 public class AccountActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private long mUserID;
-    private KeyStore mKeyStore;
     private Preferences mPreference;
     private TwitterLoginButton mTwitterLoginButton;
     private TwitterSession mSession;
@@ -66,18 +47,6 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        try {
-//            mKeyStore = KeyStore.getInstance(Constants.KEY_STORE);
-//            mKeyStore.load(null);
-//        } catch (KeyStoreException e) {
-//            e.printStackTrace();
-//        } catch (CertificateException e) {
-//            e.printStackTrace();
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_CONSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET);
         Fabric.with(this, new TwitterCore(authConfig));
         setContentView(R.layout.account_activity);
@@ -118,35 +87,6 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /**
-     *
-     */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public void createNewKeys() {
-        try {
-            // Create new key if needed
-            if (!mKeyStore.containsAlias(Constants.TAG)) {
-                Calendar start = Calendar.getInstance();
-                Calendar end = Calendar.getInstance();
-                end.add(Calendar.YEAR, 1);
-                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(this)
-                        .setAlias(Constants.TAG)
-                        .setSubject(new X500Principal("CN=Sample Name, O=" + Constants.TAG))
-                        .setSerialNumber(BigInteger.ONE)
-                        .setStartDate(start.getTime())
-                        .setEndDate(end.getTime())
-                        .build();
-                KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", Constants.KEY_STORE);
-                generator.initialize(spec);
-
-                KeyPair keyPair = generator.generateKeyPair();
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "Exception " + e.getMessage() + " occured", Toast.LENGTH_LONG).show();
-            Log.e(Constants.TAG, Log.getStackTraceString(e));
-        }
     }
 
     /**
@@ -229,37 +169,6 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
             convertAddressToLatLong(strAddress);
         }
         startMain();
-    }
-
-    /**
-     * Encrypts a string to the android KeyStore. This might not be the best
-     * way of doing it since make two copies of the plain text string. Further
-     * investigation needs to be made here to make a better implementation.
-     *
-     * @param plainText the string to encrypt
-     */
-    private void encryptString(String plainText) {
-        try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) mKeyStore.getEntry(Constants.TAG, null);
-            RSAPublicKey publicKey = (RSAPublicKey) privateKeyEntry.getCertificate().getPublicKey();
-
-            // Encrypt the text
-            Cipher input = Cipher.getInstance("AES/CFB8/NoPadding");
-            input.init(Cipher.ENCRYPT_MODE, publicKey);
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            CipherOutputStream cipherOutputStream = new CipherOutputStream(
-                    outputStream, input);
-            cipherOutputStream.write(plainText.getBytes("UTF-8"));
-            cipherOutputStream.close();
-
-            byte[] vals = outputStream.toByteArray();
-            // save to preferences.
-            mPreference.setFacebookCredentials(Base64.encodeToString(vals, Base64.DEFAULT));
-            Log.i("Facebook", mPreference.getFacebookCredentials());
-        } catch (Exception e) {
-            Log.e(Constants.TAG, Log.getStackTraceString(e));
-        }
     }
 
     /**
