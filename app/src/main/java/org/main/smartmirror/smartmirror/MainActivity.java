@@ -40,11 +40,9 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -775,7 +773,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.GMAIL:
                     fragment = new GmailFragment();
-                            break;
+                    break;
                 case Constants.CLOSE_SCREEN:
                 case Constants.CLOSE_WINDOW:
                 case Constants.HIDE_SCREEN:

@@ -31,13 +31,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GmailHomeFragment extends Fragment {
+public class GmailHomeFragment extends Fragment implements CacheManager.CacheListener {
+
+    public static CacheManager mCacheManager = null;
+    public static final int DATA_UPDATE_FREQUENCY = 60;
+    public static final String GMAIL_CACHE = "mail count cache";
 
     public TextView textView;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private String PREF_ACCOUNT_NAME = "";
-    public int numUnreadPrimary;
+    public static int numUnreadPrimary;
     private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
 
     @Override
@@ -47,6 +51,8 @@ public class GmailHomeFragment extends Fragment {
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
+
+        mCacheManager = CacheManager.getInstance();
 
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getActivity().getApplicationContext(), Arrays.asList(SCOPES))
@@ -59,9 +65,17 @@ public class GmailHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        mCacheManager.registerCacheListener(GMAIL_CACHE, this);
+
         if (isGooglePlayServicesAvailable()) {
             refreshResults();
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mCacheManager.unRegisterCacheListener(GMAIL_CACHE, this);
     }
 
     @Override
@@ -186,6 +200,18 @@ public class GmailHomeFragment extends Fragment {
     }
 
     public void updateUnreadCount(){
+        mCacheManager.addCache(GMAIL_CACHE, numUnreadPrimary, DATA_UPDATE_FREQUENCY);
         new MakeRequestTask(mCredential).execute();
+    }
+
+    @Override
+    public void onCacheExpired(String cacheName) {
+        if (cacheName.equals(GMAIL_CACHE)) updateUnreadCount();
+        Log.i("GMAIL CACHE", "updating expired cache" + cacheName);
+    }
+
+    @Override
+    public void onCacheChanged(String cacheName) {
+        // In this case we do nothing
     }
 }
