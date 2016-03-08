@@ -32,7 +32,7 @@ public class FacebookFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
-        mScrollView = (ScrollView) view.findViewById(R.id.fb_scrollview);
+        mScrollView = (ScrollView) view.findViewById(R.id.facebook_scrollview);
         mWebview = (WebView) view.findViewById(R.id.facebook_webview);
         mWebview.getSettings().setJavaScriptEnabled(true);
         mWebview.setWebViewClient(new webClient());

@@ -6,9 +6,9 @@
     android:padding="15dp">
 
     <ScrollView
+        android:id="@+id/facebook_scrollview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/fb_scrollview" >
+        android:layout_height="match_parent">
 
         <WebView
             android:id="@+id/facebook_webview"
