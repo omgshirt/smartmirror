@@ -13,12 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ScrollView;
 
 
 public class FacebookFragment extends Fragment {
 
     private Preferences mPreference;
-    private WebView webview;
+    private ScrollView mScrollView;
+    private WebView mWebview;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,10 +32,11 @@ public class FacebookFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
-        webview = (WebView) view.findViewById(R.id.facebook_webview);
-        webview.getSettings().setJavaScriptEnabled(true);
-        webview.setWebViewClient(new webClient());
-        webview.loadUrl(Constants.FACEBOOK_URL);
+        mScrollView = (ScrollView) view.findViewById(R.id.fb_scrollview);
+        mWebview = (WebView) view.findViewById(R.id.facebook_webview);
+        mWebview.getSettings().setJavaScriptEnabled(true);
+        mWebview.setWebViewClient(new webClient());
+        mWebview.loadUrl(Constants.FACEBOOK_URL);
         return view;
     }
 
@@ -48,10 +51,8 @@ public class FacebookFragment extends Fragment {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             Log.d("Facebook ", "Got message:\"" + message + "\"");
-            if (message.contains(Constants.SCROLL_DOWN))
-                webview.scrollBy(0, -((int) 0.3 * ((int) getResources().getDisplayMetrics().density * webview.getContentHeight()) - webview.getHeight()));
-            else if (!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                webview.scrollBy(0, (int) 0.3 * ((int) getResources().getDisplayMetrics().density * webview.getContentHeight()) - webview.getHeight());
+            VoiceScroll vs = new VoiceScroll();
+            vs.scrollScrollView(message,mScrollView);
 
         }
     };

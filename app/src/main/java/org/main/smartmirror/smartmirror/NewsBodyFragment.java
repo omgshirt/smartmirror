@@ -8,10 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
-import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.SpannedString;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,7 +63,7 @@ public class NewsBodyFragment extends Fragment {
             String message = intent.getStringExtra("message");
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
                 VoiceScroll sl = new VoiceScroll();
-                sl.voiceScrollView(message,mScrollView);
+                sl.scrollScrollView(message,mScrollView);
             }
         }
     };

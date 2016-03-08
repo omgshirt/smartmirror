@@ -1,24 +1,46 @@
 package org.main.smartmirror.smartmirror;
 
+import android.view.View;
 import android.widget.ListView;
 import android.widget.ScrollView;
 
-/**
- * Created by harout on 2/21/16.
- */
+
 public class VoiceScroll {
 
-    public void voiceListView(String message, ListView lv, int position) {
+    int position = 0;
+
+    public void scrollViewDown(View view) {
+        if (view instanceof ListView) {
+            position = position + 5;
+            scrollListView(Constants.SCROLL_DOWN, (ListView) view, position);
+        }
+        else if (view instanceof ScrollView) {
+            scrollScrollView(Constants.SCROLL_DOWN, (ScrollView) view);
+        }
+    }
+
+    public void scrollViewUp(View view) {
+        if (view instanceof ListView) {
+            position = position - 5;
+            if (position < 0) position = 0;
+            scrollListView(Constants.SCROLL_UP, (ListView) view, 3);
+        }
+        else if (view instanceof ScrollView) {
+            scrollScrollView(Constants.SCROLL_UP, (ScrollView) view);
+        }
+    }
+
+    public void scrollListView(String message, ListView lv, int position) {
         if(message.contains(Constants.SCROLL_DOWN))
             lv.smoothScrollToPosition(position);
         else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
             lv.smoothScrollToPosition(position);
     }
 
-    public void voiceScrollView(String message, ScrollView sv) {
+    public void scrollScrollView(String message, ScrollView sv) {
         if(message.contains(Constants.SCROLL_DOWN))
-            sv.scrollBy(0, -(0-sv.getHeight()));
+            sv.smoothScrollBy(0, -(0-sv.getHeight()));
         else if(!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-            sv.scrollBy(0, 0-sv.getHeight());
+            sv.smoothScrollBy(0, 0-sv.getHeight());
     }
 }

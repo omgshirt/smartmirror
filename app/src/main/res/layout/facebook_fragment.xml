@@ -5,9 +5,15 @@
     android:orientation="vertical"
     android:padding="15dp">
 
-    <WebView
-        android:id="@+id/facebook_webview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fb_scrollview" >
+
+        <WebView
+            android:id="@+id/facebook_webview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+    </ScrollView>
 
 </LinearLayout>
