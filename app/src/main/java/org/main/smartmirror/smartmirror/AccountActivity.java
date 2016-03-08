@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.crypto.SecretKey;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -154,13 +156,13 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
      * @param view current view
      */
     public void saveUserInputs(View view) {
-        EditText facebookUsername = (EditText) findViewById(R.id.facebook_username);
+        /*EditText facebookUsername = (EditText) findViewById(R.id.facebook_username);
         EditText facebookPassword = (EditText) findViewById(R.id.facebook_password);
         if (facebookPassword.getText().toString().equals("") && facebookUsername.getText().toString().equals("")) {
-//            encryptString(facebookUsername.getText().toString() + "::" + facebookPassword.getText().toString());
-//            facebookPassword = null;
-//            facebookUsername = null;
-        }
+            AESHelper.encryptMsg(facebookUsername.getText().toString() + "::" + facebookPassword.getText().toString(), mPreference.getSecret());
+            facebookPassword = null;
+            facebookUsername = null;
+        }*/
         EditText workAddress = (EditText) findViewById(R.id.work_location);
         // since by default the work lat and long is set to -1 we are OK
         // to not have an else case here

@@ -13,10 +13,9 @@
         <!-- current fragment -->
         <TextView
             android:id="@+id/fragment_help_header"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <View
@@ -33,11 +32,10 @@
         <!-- available sections -->
         <TextView
             android:id="@+id/mode_header"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/fragment_help_content"
-            android:layout_marginStart="5dp"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <View
@@ -53,11 +51,10 @@
         <!-- news sections -->
         <TextView
             android:id="@+id/news_header"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/mode_content"
-            android:layout_marginStart="9dp"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <View
@@ -73,11 +70,10 @@
         <!-- general help -->
         <TextView
             android:id="@+id/general_help_header"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/news_content"
-            android:layout_marginStart="9dp"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <View

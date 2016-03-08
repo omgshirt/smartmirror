@@ -61,8 +61,6 @@ public class Preferences implements LocationListener {
     public static final String PREFS_FACEBOOK_LOGGED_IN = "PREFS_FACEBOOK_LOGGED_IN";
     public static final String PREFS_TWITTER_LOGGED_IN = "PREFS_TWITTER_LOGGED_IN";
 
-    public static final String PREFS_FACEBOOK_CREDENTIALS = "PREFS_FACEBOOK_CREDENTIALS";
-
     // Constants for screen brightness (0-255)
     public static final int BRIGHTNESS_VLOW = 10;
     public static final int BRIGHTNESS_LOW = 40;
@@ -153,8 +151,6 @@ public class Preferences implements LocationListener {
 
     private double mWorkLatitude;
     private double mWorkLongitude;
-
-    private String mFacebookCredentials;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
@@ -322,10 +318,7 @@ public class Preferences implements LocationListener {
 
         // Google Account Email Preferences
         mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
-
         mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, true);
-
-        mFacebookCredentials = mSharedPreferences.getString(PREFS_FACEBOOK_CREDENTIALS, "");
 
         // Work address
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
@@ -795,17 +788,6 @@ public class Preferences implements LocationListener {
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_FACEBOOK_LOGGED_IN, mFacebookLoggedIn);
         edit.commit();
-    }
-
-    public void setFacebookCredentials(String mFacebookCredentials){
-        this.mFacebookCredentials = mFacebookCredentials;
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putString(PREFS_FACEBOOK_CREDENTIALS, mFacebookCredentials);
-        edit.commit();
-    }
-
-    public String getFacebookCredentials(){
-        return mFacebookCredentials;
     }
 
     public boolean getFacebookLogIn() {
