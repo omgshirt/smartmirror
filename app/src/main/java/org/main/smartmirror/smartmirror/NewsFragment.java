@@ -187,8 +187,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         // If a cache exists, render it to the view.
         // Update the cache if it has expired.
 
-        // TODO: 2/3/2016 add switch case so only current news section is checked/updated
-        // TODO: 2/3/2016 don't update when null/not prev visited
 
         if (!mCacheManager.containsKey(mNewsSection)) {
             Log.i(Constants.TAG, mNewsSection + " does not exist, creating");
@@ -300,7 +298,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             Log.e("NEWS ERROR", e.toString());
         }
 
-        addToArrayList(mArticleNumber, numArticles);
+        addToArrayList(mArticleNumber);
         ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
         CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
         try {
@@ -314,10 +312,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         newsFeed.setAdapter(customAdapter);
     }
 
-    public void addToArrayList(ArrayList arrayList, int numItems) {
-        /*for (int i = 0; i < numItems; i++) {
-            arrayList.add(i);
-        }*/
+    public void addToArrayList(ArrayList arrayList) {
         arrayList.add("1");
         arrayList.add("2");
         arrayList.add("3");

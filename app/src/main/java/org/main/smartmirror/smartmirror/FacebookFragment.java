@@ -13,12 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ScrollView;
 
 
 public class FacebookFragment extends Fragment {
 
-    private WebView webview;
+    private WebView mWebview;
     private String curURL;
+    private ScrollView mScrollView;
 
     public void init(String url) {
         curURL = url;
@@ -30,14 +32,15 @@ public class FacebookFragment extends Fragment {
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
         init("https://m.facebook.com/");
 
-        webview = (WebView) view.findViewById(R.id.facebook_webview);
+        mScrollView = (ScrollView) view.findViewById(R.id.fb_scrollview);
+        mWebview = (WebView) view.findViewById(R.id.facebook_webview);
         if (curURL != null) {
 
-            webview.getSettings().setJavaScriptEnabled(true);
+            mWebview.getSettings().setJavaScriptEnabled(true);
 
-            webview.setWebViewClient(new webClient());
+            mWebview.setWebViewClient(new webClient());
 
-            webview.loadUrl(curURL);
+            mWebview.loadUrl(curURL);
 
         }
         return view;
@@ -53,10 +56,8 @@ public class FacebookFragment extends Fragment {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             Log.d("Facebook ", "Got message:\"" + message + "\"");
-            if (message.contains(Constants.SCROLL_DOWN))
-                webview.scrollBy(0, -((int) 0.3 * ((int) getResources().getDisplayMetrics().density * webview.getContentHeight()) - webview.getHeight()));
-            else if (!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                webview.scrollBy(0, (int) 0.3 * ((int) getResources().getDisplayMetrics().density * webview.getContentHeight()) - webview.getHeight());
+            VoiceScroll vs = new VoiceScroll();
+            vs.scrollScrollView(message,mScrollView);
 
         }
     };
