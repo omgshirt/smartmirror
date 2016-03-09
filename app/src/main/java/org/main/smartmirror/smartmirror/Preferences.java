@@ -673,7 +673,7 @@ public class Preferences implements LocationListener {
     }
 
     public boolean getGmailLoggedIn() {
-        if (mUserAccountPref.equals("")) {
+        if (mUserAccountPref.equals("None")) {
             return false;
         } else {
             return false;
