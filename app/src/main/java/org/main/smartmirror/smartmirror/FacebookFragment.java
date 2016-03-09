@@ -26,6 +26,10 @@ public class FacebookFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
+        if (!mPreference.getFacebookLoggedIn()) {
+            ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
+            ((MainActivity) getActivity()).speakText("You're not logged in!");
+        }
     }
 
     @Override
@@ -52,7 +56,7 @@ public class FacebookFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("Facebook ", "Got message:\"" + message + "\"");
             VoiceScroll vs = new VoiceScroll();
-            vs.scrollScrollView(message,mScrollView);
+            vs.scrollScrollView(message, mScrollView);
 
         }
     };

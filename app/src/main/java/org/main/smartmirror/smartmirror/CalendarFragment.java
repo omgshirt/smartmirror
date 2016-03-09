@@ -15,6 +15,18 @@ import java.util.List;
 
 public class CalendarFragment extends Fragment {
 
+    private Preferences mPreference;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreference = Preferences.getInstance(getActivity());
+        if (!mPreference.getGmailLoggedIn()) {
+            ((MainActivity) getActivity()).speakText("You're not logged in!");
+            ((MainActivity) getActivity()).removeFragment(Constants.CALENDAR);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
@@ -70,7 +82,6 @@ public class CalendarFragment extends Fragment {
             // Add this event to calendarLayout
             calendarLayout.addView(eventLayout);
         }
-
         return rootView;
     }
 }

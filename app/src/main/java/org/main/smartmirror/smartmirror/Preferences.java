@@ -672,6 +672,14 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public boolean getGmailLoggedIn() {
+        if (mUserAccountPref.equals("")) {
+            return false;
+        } else {
+            return false;
+        }
+    }
+
     public void setStayAwake(boolean stayAwake) {
         if (mStayAwake && stayAwake) {
             speakText(R.string.speech_stay_awake_err);
@@ -700,7 +708,7 @@ public class Preferences implements LocationListener {
         edit.commit();
     }
 
-    public boolean getFacebookLogIn() {
+    public boolean getFacebookLoggedIn() {
         return mFacebookLoggedIn;
     }
 

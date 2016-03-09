@@ -73,6 +73,8 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
             }
         } else {
             // traffic wasn't set so let's hide it.
+            // TODO think about this more.
+            mCacheManager.deleteCache(TRAFFIC_CACHE);
             hideTraffic();
         }
     }
