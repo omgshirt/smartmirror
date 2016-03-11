@@ -561,6 +561,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Display the HelpFragment within content_frame_2
+     *
+     */
     private void displayHelpFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = HelpFragment.newInstance(getCurrentFragment().getTag());
@@ -594,7 +598,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @param tag tag to remove
      */
-    private void removeFragment(String tag) {
+    public void removeFragment(String tag) {
         Log.i(Constants.TAG, "removing fragment: " + tag);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);

@@ -164,7 +164,7 @@
             android:textColor="@color/white"
             android:text="@string/time_format_24hr"
             android:textSize="18sp" />
-        <!-- Off for now -->
+        <!-- Change Log In -->
         <Button
             android:id="@+id/change_account_button"
             android:layout_width="match_parent"

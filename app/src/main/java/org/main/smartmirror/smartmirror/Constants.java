@@ -10,6 +10,9 @@ public class Constants {
 
     public static final String TAG = "SmartMirror";
 
+    //-------- Accont Activity ---------
+    public static final String KEY_STORE = "AndroidKeyStore";
+
     //-------------- DISPLAY -----------
     public static final String CLOSE_WINDOW = "close window";
     public static final String CLOSE_SCREEN = "close screen";
@@ -28,11 +31,13 @@ public class Constants {
     public static final String SCROLL_UP = "scroll up";
     public static final String SCROLL_DOWN = "scroll down";
     public static final String SLEEP = "sleep";
-
     public static final String SMALL_SCREEN = "small screen";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
     public static final String WIDE_SCREEN = "wide screen";
+
+    //--------------FACEBOOK-------------
+    public static final String FACEBOOK_URL = "https://m.facebook.com/";
 
     //--------------FRAGMENTS------------
     public static final String CALENDAR = "calendar";
@@ -58,12 +63,9 @@ public class Constants {
     public static final String TECHNOLOGY = "technology";
     public static final String TRAVEL = "travel";
     public static final String WORLD = "world";
-
     public static final String NEWS_BODY = "news body";
-
     public static final String[] NEWS_DESKS = {BUSINESS, MEDIA, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL,
             WORLD};
-
     public static final List<String> DESK_LIST = Arrays.asList(NEWS_DESKS);
     public static final HashSet<String> DESK_HASH = new HashSet<>(DESK_LIST);
 
@@ -80,6 +82,10 @@ public class Constants {
 
     //--------------CAMERA---------------
     public static final String TAKE_PICTURE = "take a picture";
+
+    //--------------TRAFFIC--------------
+    public static final String DISTANCE_MATRIX_API =
+            "https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s,%s&destinations=%s,%s&departure_time=now&traffic_model=best_guess&units=%s&key=%s";
 
     //--------------TWITTER--------------
     public static final String TWITTER_CONSUMER_KEY = "W9cvqANm0cXASr4MyzIUKDiaK";
@@ -156,8 +162,4 @@ public class Constants {
     }
 
     public static final Set<String> COMMAND_SET = createCommandSet();
-
-    //--------------TRAFFIC--------------
-    public static final String DISTANCE_MATRIX_API =
-            "https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s,%s&destinations=%s,%s&departure_time=now&traffic_model=best_guess&units=%s&key=%s";
 }
