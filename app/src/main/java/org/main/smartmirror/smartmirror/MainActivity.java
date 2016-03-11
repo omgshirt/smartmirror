@@ -399,6 +399,7 @@ public class MainActivity extends AppCompatActivity
     protected void exitSleep() {
         if (mirrorSleepState != ASLEEP) return;
         Log.i(Constants.TAG, "exitSleep() called");
+        mira.appWaking();
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
@@ -417,6 +418,7 @@ public class MainActivity extends AppCompatActivity
         resetInteractionTimer();
         stopLightSensor();
         mirrorSleepState = AWAKE;
+        mira.appWaking();
     }
 
     protected void enterLightSleep() {
@@ -433,7 +435,7 @@ public class MainActivity extends AppCompatActivity
         setScreenOffTimeout();
         stopUITimer();
         startLightSensor();
-        mira.saySleepMessage();
+        mira.appSleeping();
 
     }
 

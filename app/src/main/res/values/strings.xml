@@ -23,6 +23,11 @@
     <string name="title_traffic">Traffic</string>
     <string name="title_twitter">Twitter</string>
     <string name="title_weather">Weather</string>
+
+    <!-- Mira -->
+    <string name="mira_greet_morning">Good morning.</string>
+    <string name="mira_greet_afternoon">Good afternoon.</string>
+    <string name="mira_greet_night">Good evening.</string>
     
     <!-- Calendar -->
     <string name="calendar_items_err">No Events Found</string>
@@ -55,8 +60,6 @@
     <string name="weather_therm_low">\uf053</string>
 
     <!-- Settings strings -->
-    <string name="settings_screen_brightness">Screen Brightness</string>
-    <string name="settings_night_light_brightness">Night Light Brightness</string>
     <string name="settings_weather_units">Weather Units</string>
     <string name="settings_system_vol">System Volume</string>
     <string name="settings_music_vol">Speech Volume</string>

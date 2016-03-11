@@ -71,7 +71,6 @@ public class TTSHelper {
 
     /**
      * Initialize a TTS engine if necessary, then speak the text.
-     * This will bypass the Preferences setting for speech frequency.
      *
      * @param text string to say
      */
