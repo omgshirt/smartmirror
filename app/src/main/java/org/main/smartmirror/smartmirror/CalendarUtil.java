@@ -90,7 +90,7 @@ public class CalendarUtil {
         if (cursor.getCount() > 0) {
             do {
                 //If calendar name is what is stored in preferences, then add event to be displayed
-                if (cursor.getString(ACCOUNT_NAME).equals(Preferences.getUserAccountName())) {
+                if (cursor.getString(ACCOUNT_NAME).equals(Preferences.getInstance((Activity)context).getUserAccountName())) {
 
                     String eventName = cursor.getString(EVENT_NAME);
                     String location = cursor.getString(EVENT_LOC);
@@ -149,7 +149,7 @@ public class CalendarUtil {
             do {
                 Log.i(Constants.TAG, "account :: " + cursor.getString(ACCOUNT_NAME));
                 //If calendar name is what is stored in preferences, then add event to be displayed
-                if (cursor.getString(ACCOUNT_NAME).equals(Preferences.getUserAccountName())) {
+                if (cursor.getString(ACCOUNT_NAME).equals(Preferences.getInstance((Activity)context).getUserAccountName())) {
 
                     String eventName = cursor.getString(EVENT_NAME);
 

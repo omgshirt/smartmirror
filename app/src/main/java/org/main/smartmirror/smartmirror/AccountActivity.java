@@ -50,12 +50,11 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
     private TwitterLoginButton mTwitterLoginButton;
     private TwitterSession mSession;
 
-    public String mScreenName;
-    public String mAuthToken;
-    public String mAuthSecret;
+    private String mScreenName;
+    private String mAuthToken;
+    private String mAuthSecret;
 
-    public static final int REQUEST_PERMISSIONS = 0;
-
+    private static final int REQUEST_PERMISSIONS = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,31 +137,28 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         }
     }
 
+    /**
+     * Gets the permission for WRITE_SETTINGS for Android M
+     */
     private void getWriteSettingsPermission() {
         // check for permission to write system settings on API 23 and greater.
         // Leaving this in case we need the WRITE_SETTINGS permission later on.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.System.canWrite(getApplicationContext())) {
-                Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                intent.setData(Uri.parse("package:" + this.getPackageName()));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-//                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-//                startActivityForResult(intent, REQUEST_PERMISSIONS);
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                startActivityForResult(intent, REQUEST_PERMISSIONS);
             }
         }
     }
 
     /**
-     * Sets up the functionality for the twitter button.
+     * Sets up the functionality for the twitter button in the view.
      */
-
     private void setUpTwitterButton() {
         mTwitterLoginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         mTwitterLoginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
-                mPreference.setTwitterLoggedIn(true);
                 String output = "Status: " +
                         "Your login was successful " +
                         result.data.getUserName() +
@@ -250,6 +246,12 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
         }
     }
 
+    /**
+     * Shows the dialog that prompts the user for the number of permissions
+     *
+     * @param message    The message we want to display
+     * @param okListener
+     */
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(AccountActivity.this)
                 .setMessage(message)
@@ -259,6 +261,15 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
                 .show();
     }
 
+    /**
+     * Receives a list of permissions and the permission
+     * wanted. It then checks to see if the permission is not
+     * granted and prompts the user to grant the permission
+     *
+     * @param permissionsList the permission list that we want
+     * @param permission the given permission we need to check against
+     * @return the boolean value
+     */
     private boolean addPermission(List<String> permissionsList, String permission) {
         if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             permissionsList.add(permission);
@@ -270,17 +281,17 @@ public class AccountActivity extends AppCompatActivity implements AdapterView.On
     }
 
     /**
-     * Handles the button press
+     * Handles the button press in the layout
      *
      * @param view current view
      */
-    public void saveUserInputs(View view) {
-        /*EditText facebookUsername = (EditText) findViewById(R.id.facebook_username);
-        EditText facebookPassword = (EditText) findViewById(R.id.facebook_password);
-        if (facebookPassword.getText().toString().equals("") && facebookUsername.getText().toString().equals("")) {
+    public void handleButtonPress(View view) {
+        /*EditText edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
+        EditText edtFacebookPassword = (EditText) findViewById(R.id.facebook_password);
+        if (edtFacebookPassword.getText().toString().equals("") && edtFacebookUsername.getText().toString().equals("")) {
             AESHelper.encryptMsg(facebookUsername.getText().toString() + "::" + facebookPassword.getText().toString(), mPreference.getSecret());
-            facebookPassword = null;
-            facebookUsername = null;
+            edFacebookPassword = null;
+            edtFacebookUsername = null;
         }*/
         EditText workAddress = (EditText) findViewById(R.id.work_location);
         // since by default the work lat and long is set to -1 we are OK

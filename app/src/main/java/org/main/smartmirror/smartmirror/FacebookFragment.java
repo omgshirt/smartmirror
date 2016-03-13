@@ -27,8 +27,9 @@ public class FacebookFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
         if (!mPreference.getFacebookLoggedIn()) {
-            ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
+//            ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
             ((MainActivity) getActivity()).speakText("You're not logged in!");
+            ((MainActivity)getActivity()).displayNotSignedInFragment(Constants.FACEBOOK, true);
         }
     }
 

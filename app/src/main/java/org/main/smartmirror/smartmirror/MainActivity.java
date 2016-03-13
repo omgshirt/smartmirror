@@ -558,6 +558,11 @@ public class MainActivity extends AppCompatActivity
         ft.commit();
     }
 
+    public void displayNotSignedInFragment(String tag, boolean addToBackStack) {
+        Fragment fragment = NotSignedInFragment.newInstance(getCurrentFragment().getTag());
+        displayFragment(fragment, tag, addToBackStack);
+    }
+
     /**
      * Display the fragment within content_frame_3
      *

@@ -34,9 +34,7 @@ public class Preferences implements LocationListener {
     private static Activity mActivity;
 
     //Google Account Email Preference
-    public static final String PREFS_GMAIL = "accountName";
-    //Google Account Email String
-    private static String mUserAccountPref = "";
+    public static final String PREFS_GMAIL = "PREFS_GMAIL";
 
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
@@ -58,8 +56,7 @@ public class Preferences implements LocationListener {
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
-    public static final String PREFS_FACEBOOK_LOGGED_IN = "PREFS_FACEBOOK_LOGGED_IN";
-    public static final String PREFS_TWITTER_LOGGED_IN = "PREFS_TWITTER_LOGGED_IN";
+    public static final String PREFS_FACEBOOK_CREDENTIALS = "PREFS_FACEBOOK_CREDENTIALS";
 
     // Constants for screen brightness (0-255)
     public static final int BRIGHTNESS_VLOW = 10;
@@ -130,8 +127,6 @@ public class Preferences implements LocationListener {
     private String mWeatherUnits;                   // Weather display format (English / metric)
 
     private boolean mFirstTimeRun;
-    private boolean mFacebookLoggedIn;
-    private boolean mTwitterLoggedIn;
 
     private boolean mStayAwake;                     // if true, screen will stay on until cancelled
     private double mLatitude;
@@ -139,6 +134,10 @@ public class Preferences implements LocationListener {
 
     private double mWorkLatitude;
     private double mWorkLongitude;
+
+    //Google Account Email String
+    private String mGmailAccount;
+    private String mFacebookCredentials;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
@@ -279,16 +278,14 @@ public class Preferences implements LocationListener {
         mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
 
         // Google Account Email Preferences
-        mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
+        mGmailAccount = mSharedPreferences.getString(PREFS_GMAIL, "");
         mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, true);
 
         // Work address
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
 
-        // User logged in false
-        mFacebookLoggedIn = mSharedPreferences.getBoolean(PREFS_FACEBOOK_LOGGED_IN, false);
-        mTwitterLoggedIn = mSharedPreferences.getBoolean(PREFS_TWITTER_LOGGED_IN, false);
+        mFacebookCredentials = mSharedPreferences.getString(PREFS_FACEBOOK_CREDENTIALS, "");
 
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
@@ -660,23 +657,23 @@ public class Preferences implements LocationListener {
     }
 
     //Get User Gmail Account to be used in other fragments
-    public static String getUserAccountName() {
-        return mUserAccountPref;
+    public String getUserAccountName() {
+        return mGmailAccount;
     }
 
     //Set User Account if null
     public void setUserAccountName(String userAcc) {
-        this.mUserAccountPref = userAcc;
+        this.mGmailAccount = userAcc;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_GMAIL, userAcc);
         edit.apply();
     }
 
     public boolean getGmailLoggedIn() {
-        if (mUserAccountPref.equals("None")) {
+        if (mGmailAccount.equals("None") || mGmailAccount.equals("")) {
             return false;
         } else {
-            return false;
+            return true;
         }
     }
 
@@ -694,25 +691,17 @@ public class Preferences implements LocationListener {
         return mStayAwake;
     }
 
-    public void setTwitterLoggedIn(boolean mUserLoggedIn) {
-        this.mTwitterLoggedIn = mUserLoggedIn;
+    public void setFacebookCredentials(String mFacebookCredentials) {
+        this.mFacebookCredentials = mFacebookCredentials;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putBoolean(PREFS_TWITTER_LOGGED_IN, mUserLoggedIn);
-        edit.commit();
-    }
-
-    public void setFacebookLoggedIn(boolean mFacebookLoggedIn) {
-        this.mFacebookLoggedIn = mFacebookLoggedIn;
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putBoolean(PREFS_FACEBOOK_LOGGED_IN, mFacebookLoggedIn);
-        edit.commit();
+        edit.putString(PREFS_FACEBOOK_CREDENTIALS, mFacebookCredentials);
+        edit.apply();
     }
 
     public boolean getFacebookLoggedIn() {
-        return mFacebookLoggedIn;
-    }
-
-    public boolean getTwitterLoggedIn() {
-        return mTwitterLoggedIn;
+        if (mFacebookCredentials.equals(""))
+            return false;
+        else
+            return true;
     }
 }

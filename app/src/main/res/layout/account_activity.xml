@@ -88,7 +88,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/work_location"
-        android:onClick="saveUserInputs"
+        android:onClick="handleButtonPress"
         android:text="Submit" />
 
 </RelativeLayout>
