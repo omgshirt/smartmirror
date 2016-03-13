@@ -27,9 +27,7 @@ public class FacebookFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
         if (!mPreference.getFacebookLoggedIn()) {
-//            ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
-            ((MainActivity) getActivity()).speakText("You're not logged in!");
-            ((MainActivity)getActivity()).displayNotSignedInFragment(Constants.FACEBOOK, true);
+            removeFacebook();
         }
     }
 
@@ -78,6 +76,15 @@ public class FacebookFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    /**
+     * Removes facebook fragment, speaks error, and displays error message
+     */
+    private void removeFacebook() {
+        ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
+        ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.FACEBOOK, true);
+        ((MainActivity) getActivity()).speakText("You're not logged in!");
     }
 
     private class webClient extends WebViewClient {

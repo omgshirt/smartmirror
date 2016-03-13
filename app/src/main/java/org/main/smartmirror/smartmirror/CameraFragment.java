@@ -31,7 +31,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.preference.PreferenceFragment;
 import android.support.annotation.NonNull;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.Fragment;
@@ -447,15 +446,17 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public void onStart() {
         super.onStart();
         if (!mPreferences.getGmailLoggedIn()) {
-            hideCameraFragment();
+            removeCamera();
         }
     }
 
-    private void hideCameraFragment() {
-        // hide me
-//        ((MainActivity)getActivity()).removeFragment(Constants.CAMERA);
-        ((MainActivity)getActivity()).displayNotSignedInFragment(Constants.CAMERA, true);
-        ((MainActivity)getActivity()).speakText("You're Not Logged In");
+    /**
+     * Removes the Camera Fragment, displays an error and speaks the error
+     */
+    private void removeCamera() {
+        ((MainActivity) getActivity()).removeFragment(Constants.CAMERA);
+        ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.CAMERA, true);
+        ((MainActivity) getActivity()).speakText("You're Not Logged In");
     }
 
     @Override
