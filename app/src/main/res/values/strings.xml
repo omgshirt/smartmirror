@@ -28,7 +28,7 @@
     <string name="calendar_items_err">No Events Found</string>
 
     <!-- Login Error -->
-    <string name="not_logged_in_err">Sorry, you are not logged into</string>
+    <string name="not_logged_in_err">Sorry, you are not logged in to</string>
 
 
     <!-- WEATHER STRINGS -->
