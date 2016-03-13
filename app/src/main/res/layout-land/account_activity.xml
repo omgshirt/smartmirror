@@ -96,7 +96,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/work_location"
         android:layout_marginEnd="20dp"
-        android:onClick="saveUserInputs"
+        android:onClick="handleButtonPress"
         android:text="Submit" />
 
 </RelativeLayout>

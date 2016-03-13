@@ -197,7 +197,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        checkMarshmallowPermissions();
         mContext = getApplicationContext();
 
         // Load any application preferences. If prefs do not exist, set them to defaults
@@ -278,17 +277,6 @@ public class MainActivity extends AppCompatActivity
         //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
         //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         decorView.setSystemUiVisibility(uiOptions);
-    }
-
-    private void checkMarshmallowPermissions() {
-        // check for permission to write system settings on API 23 and greater.
-        // Leaving this in case we need the WRITE_SETTINGS permission later on.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.System.canWrite(getApplicationContext())) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                startActivityForResult(intent, 1);
-            }
-        }
     }
 
     public static Context getContextForApplication() {
@@ -570,6 +558,11 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = HelpFragment.newInstance(getCurrentFragment().getTag());
         ft.replace(R.id.content_frame_2, fragment, Constants.HELP);
         ft.commit();
+    }
+
+    public void displayNotSignedInFragment(String tag, boolean addToBackStack) {
+        Fragment fragment = NotSignedInFragment.newInstance(getCurrentFragment().getTag());
+        displayFragment(fragment, tag, addToBackStack);
     }
 
     /**
