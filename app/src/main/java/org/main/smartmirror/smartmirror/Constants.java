@@ -131,9 +131,7 @@ public class Constants {
             SIXTH, SLEEP, SMALL_SCREEN, TAKE_PICTURE,
             THIRD, THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
-            "black", "blue", "gray", "green",
-            "magenta", "orange", "purple",
-            "red", "yellow", "white",
+
             "first", "second", "third", "fourth",
             "fifth", "sixth", "seventh", "eighth",
 

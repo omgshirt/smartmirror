@@ -8,7 +8,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +20,7 @@ import org.json.JSONObject;
  */
 public class TrafficFragment extends Fragment implements CacheManager.CacheListener {
     private Preferences mPreference;
-    private RelativeLayout mTrafficLayout;
+    private ViewGroup mTrafficLayout;
     private String mCurrentLat;
     private String mCurrentLong;
     private String mWorkLat;
@@ -48,7 +48,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.traffic_fragment, container, false);
-        mTrafficLayout = (RelativeLayout) view.findViewById(R.id.traffic_layout);
+        mTrafficLayout = (LinearLayout) view.findViewById(R.id.traffic_layout);
         txtDistance = (TextView) view.findViewById(R.id.traffic_distance);
         txtTravelTime = (TextView) view.findViewById(R.id.traffic_delay);
         return view;
@@ -145,7 +145,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
 
             String minute = " minute ";
             if (tripCost > 1) minute = " minutes ";
-            txtTravelTime.setText("Travel Time: " + tripTime + " minutes (" + tripCost + minute + trafficFlow + ".)");
+            txtTravelTime.setText("Time: " + tripTime + " minutes (" + tripCost + minute + trafficFlow + ")");
         } catch (JSONException e) {
             e.printStackTrace();
         }

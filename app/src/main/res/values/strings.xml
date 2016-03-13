@@ -25,9 +25,9 @@
     <string name="title_weather">Weather</string>
 
     <!-- Mira -->
-    <string name="mira_greet_morning">Good morning.</string>
-    <string name="mira_greet_afternoon">Good afternoon.</string>
-    <string name="mira_greet_night">Good evening.</string>
+    <string name="mira_greet_morning">Good morning, %s.</string>
+    <string name="mira_greet_afternoon">Good afternoon, %s.</string>
+    <string name="mira_greet_night">Good evening, %s.</string>
     
     <!-- Calendar -->
     <string name="calendar_items_err">No Events Found</string>

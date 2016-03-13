@@ -1,6 +1,8 @@
 package org.main.smartmirror.smartmirror;
 
+import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -10,6 +12,9 @@ public class Mira {
 
     private MainActivity mActivity;
     private static Mira mira;
+    private static Preferences mPreferences;
+    private long mLastSleepTime = 0;
+    private long mLastWakeTime = 0;
 
     private Mira(MainActivity activity) {
         mActivity = activity;
@@ -18,6 +23,7 @@ public class Mira {
     public static Mira getInstance(MainActivity activity) {
         if (mira == null) {
             mira = new Mira(activity);
+            mPreferences = Preferences.getInstance(activity);
         }
         return mira;
     }
@@ -50,13 +56,18 @@ public class Mira {
      */
     private void sayTimeGreeting() {
         int hour = GregorianCalendar.getInstance().get(GregorianCalendar.HOUR_OF_DAY);
+        String msg;
+        String userName = mPreferences.getUserFirstName();
+
         if (hour < 12 ) {
-            mActivity.speakText(mActivity.getResources().getString(R.string.mira_greet_morning));
-        } else if (hour < 7) {
-            mActivity.speakText(mActivity.getResources().getString(R.string.mira_greet_afternoon));
+            msg = mActivity.getResources().getString(R.string.mira_greet_morning);
+        } else if (hour < 19) {
+            msg = mActivity.getResources().getString(R.string.mira_greet_afternoon);
         } else {
-            mActivity.speakText(mActivity.getResources().getString(R.string.mira_greet_night));
+            msg = mActivity.getResources().getString(R.string.mira_greet_night);
         }
+
+        mActivity.speakText(String.format( msg, userName ));
      }
 
     /**
@@ -73,15 +84,21 @@ public class Mira {
      * Track the time and say a message (if appropriate)
      */
     public void appSleeping() {
+        mLastSleepTime = System.currentTimeMillis();
         saySleepMessage();
     }
 
     /**
      * Called when the mirror is moving from LIGHT_SLEEP or ASLEEP to AWAKE.
-     * Track the time and respond with appropriate message
+     * Track the time and respond with appropriate message.
      */
     public void appWaking() {
-        sayTimeGreeting();
-        sayUnreadEmails();
+        mLastWakeTime = System.currentTimeMillis();
+
+        // Say messages only if the mirror has been asleep for more than a minute
+        if (mLastWakeTime - mLastSleepTime > 60000) {
+            sayTimeGreeting();
+            sayUnreadEmails();
+        }
     }
 }

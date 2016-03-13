@@ -33,11 +33,6 @@ public class Preferences implements LocationListener {
     private SharedPreferences mSharedPreferences;
     private static Activity mActivity;
 
-    //Google Account Email Preference
-    public static final String PREFS_GMAIL = "accountName";
-    //Google Account Email String
-    private static String mUserAccountPref = "";
-
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
     public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
@@ -50,8 +45,8 @@ public class Preferences implements LocationListener {
     public static final String PREFS_DATE_FORMAT = "MIRROR_PREFS_DATE_FORMAT";
     public static final String PREFS_TIME_FORMAT = "MIRROR_PREFS_TIME_FORMAT";
 
-    public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
-    public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
+    public static final String PREFS_FIRST_NAME = "MIRROR_PREFS_FIRST_NAME";
+    public static final String PREFS_LAST_NAME = "MIRROR_PREFS_LAST_NAME";
 
     public static final String PREFS_FIRST_TIME_RUN = "MIRROR_FIRST_TIME_RUN";
 
@@ -60,13 +55,6 @@ public class Preferences implements LocationListener {
 
     public static final String PREFS_FACEBOOK_LOGGED_IN = "PREFS_FACEBOOK_LOGGED_IN";
     public static final String PREFS_TWITTER_LOGGED_IN = "PREFS_TWITTER_LOGGED_IN";
-
-    // Constants for screen brightness (0-255)
-    public static final int BRIGHTNESS_VLOW = 10;
-    public static final int BRIGHTNESS_LOW = 40;
-    public static final int BRIGHTNESS_MEDIUM = 80;
-    public static final int BRIGHTNESS_HIGH = 130;
-    public static final int BRIGHTNESS_VHIGH = 225;
 
     // constant volumes
     public static final float VOL_OFF = 0f;
@@ -113,11 +101,12 @@ public class Preferences implements LocationListener {
     public static final String ENGLISH = "english";
     public static final String METRIC = "metric";
 
-    public static final String MPH = "mph";
-    public static final String KPH = "kph";
-
-    private int mAppBrightness;                     // general screen brightness
-    private int mLightBrightness;                   // Night light brightness
+    //Google Account Email Preference
+    public static final String PREFS_GMAIL = "accountName";
+    //Google Account Email String
+    private static String mUserAccountPref = "";
+    private String mUserFirstName = "";
+    private String mUserLastName = "";
 
     private boolean mRemoteEnabled;                 // Enable / disable remote control connections
     private boolean mVoiceEnabled;                  // Enable / disable voice recognition UNTIL keyword spoken
@@ -270,8 +259,6 @@ public class Preferences implements LocationListener {
         // grab saved values from mSharedPreferences if they exist, if not use defaults
         mMusicVolume = mSharedPreferences.getFloat(PREFS_SPEECH_VOL, VOL_LOW);
         mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_LOW);
-        mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
-        mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
         mWeatherUnits = mSharedPreferences.getString(PREFS_WEATHER_UNIT, ENGLISH);
 
         mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);
@@ -293,6 +280,10 @@ public class Preferences implements LocationListener {
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
         mMusicVolumeHolder = getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        // User name
+        mUserFirstName = mSharedPreferences.getString(PREFS_FIRST_NAME, "Defaultfirstname");
+        mUserLastName = mSharedPreferences.getString(PREFS_LAST_NAME, "Defaultlastname");
 
         setSystemVolume(mSystemVolume);
         setMusicVolume(mMusicVolume);
@@ -524,8 +515,8 @@ public class Preferences implements LocationListener {
 
     /**
      * Set enable / disabled status for remote control.
-     * Disabling will unregister the service and shows remote disabled icon
-     * Enabling registers the service
+     * Disabling will unregister the service and display the remote disabled icon.
+     * Enabling registers the service on the network and hides remote disabled icon.
      *
      * @param enable enable or disable the remote control
      */
@@ -669,6 +660,28 @@ public class Preferences implements LocationListener {
         this.mUserAccountPref = userAcc;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_GMAIL, userAcc);
+        edit.apply();
+    }
+
+    public String getUserFirstName() {
+        return mUserFirstName;
+    }
+
+    public void setUserFirstName(String mUserFirstName) {
+        this.mUserFirstName = mUserFirstName;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_FIRST_NAME, mUserFirstName);
+        edit.apply();
+    }
+
+    public String getUserLastName() {
+        return mUserLastName;
+    }
+
+    public void setUserLastName(String mUserLastName) {
+        this.mUserLastName = mUserLastName;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_LAST_NAME, mUserLastName);
         edit.apply();
     }
 
