@@ -816,7 +816,7 @@ public class MainActivity extends AppCompatActivity
                     showViewIfHidden(contentFrame3);
                     break;
                 case Constants.PHOTOS:
-                    // create photos fragment
+                    fragment = new PhotosFragment();
                     break;
                 case Constants.QUOTES:
                     fragment = new QuoteFragment();
