@@ -43,8 +43,8 @@ refresh/1e-4/
 remote on/1e-10/
 remote off/1e-7/
 settings/1e-4/
-scroll up/1e4/
-scroll down/1e4/
+scroll up/1e8/
+scroll down/1e1/
 speech off/1e5/
 speech min/1e-5/
 speech low/1e5/
@@ -82,7 +82,6 @@ science/1e3/
 sports/1e8/
 technology/1e3/
 travel/1e4/
-world/1e8/
 article one/1e8/
 article two/1e10/
 article three/1e6/

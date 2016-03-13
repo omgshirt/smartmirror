@@ -86,26 +86,25 @@ public class Constants {
     public static final String TWITTER_CONSUMER_SECRET = "WP9HyhszNP2x4Y9WGPtF5DfXT23v55O515PrukTCpkewuuNngT";
 
     //--------------NEWS--------------
-    public static final String ONE = "one";
+    public static final String ONE = "article one";
     public static final String FIRST = "first";
-    public static final String TWO = "two";
+    public static final String TWO = "article two";
     public static final String SECOND = "second";
-    public static final String THREE = "three";
+    public static final String THREE = "article three";
     public static final String THIRD = "third";
-    public static final String FOUR = "four";
+    public static final String FOUR = "article four";
     public static final String FOURTH = "fourth";
-    public static final String FIVE = "five";
+    public static final String FIVE = "article five";
     public static final String FIFTH = "fifth";
-    public static final String SIX = "six";
+    public static final String SIX = "article six";
     public static final String SIXTH = "sixth";
-    public static final String SEVEN = "seven";
+    public static final String SEVEN = "article seven";
     public static final String SEVENTH = "seventh";
-    public static final String EIGHT = "eight";
+    public static final String EIGHT = "article eight";
     public static final String EIGHTH = "eighth";
-    public static final String NINE = "nine";
+    public static final String NINE = "article nine";
     public static final String NINTH = "ninth";
-    public static final String TEN = "ten";
-    public static final String TENTH = "tenth";
+    public static final String TEN = "article ten";
 
 
     // used to initialize COMMAND_SET
