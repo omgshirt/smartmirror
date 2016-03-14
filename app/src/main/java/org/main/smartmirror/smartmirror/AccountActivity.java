@@ -196,11 +196,11 @@ public class AccountActivity extends AppCompatActivity implements
      * Handles the signing out of Google
      */
     private void signOutOfGoogle() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        Log.i(Constants.TAG, "Logged out with code: " + status);
+                        Log.i(Constants.TAG, "Revoked: " + status);
                     }
                 });
     }
