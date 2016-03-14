@@ -171,6 +171,7 @@ public class SettingsFragment extends Fragment {
         changeAccountbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(getActivity(), AccountActivity.class);
                 mPreferences.setFirstTimeRun(true);
                 startActivity(intent);
