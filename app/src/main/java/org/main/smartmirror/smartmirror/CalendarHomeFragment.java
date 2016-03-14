@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.List;
@@ -35,7 +34,8 @@ public class CalendarHomeFragment extends Fragment {
         List<CalendarEvent> events = CalendarUtil.getCalendarEvents(getContext(), CalendarUtil.ONE_DAY);
         if (events.size() == 0) {
             hideCalendarHome();
-            return mRootView;
+            // I don't need this I think
+            // return mRootView;
         }
 
         Calendar calendar = Calendar.getInstance();
@@ -46,7 +46,7 @@ public class CalendarHomeFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (!mPreferences.getGmailLoggedIn()) {
+        if (!mPreferences.getGmailLoginStatus()) {
             hideCalendarHome();
         } else {
             showCalendarHome();

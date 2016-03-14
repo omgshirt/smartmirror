@@ -21,7 +21,7 @@ public class CalendarFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
-        if (!mPreference.getGmailLoggedIn()) {
+        if (!mPreference.getGmailLoginStatus()) {
             removeCalendar();
         }
     }

@@ -657,19 +657,19 @@ public class Preferences implements LocationListener {
     }
 
     //Get User Gmail Account to be used in other fragments
-    public String getUserAccountName() {
+    public String getGmailAccount() {
         return mGmailAccount;
     }
 
     //Set User Account if null
-    public void setUserAccountName(String userAcc) {
+    public void setGmailAccount(String userAcc) {
         this.mGmailAccount = userAcc;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_GMAIL, userAcc);
         edit.apply();
     }
 
-    public boolean getGmailLoggedIn() {
+    public boolean getGmailLoginStatus() {
         if (mGmailAccount.equals("None") || mGmailAccount.equals("")) {
             return false;
         } else {
@@ -698,7 +698,7 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
-    public boolean getFacebookLoggedIn() {
+    public boolean getFacebookLoginStatus() {
         if (mFacebookCredentials.equals(""))
             return false;
         else

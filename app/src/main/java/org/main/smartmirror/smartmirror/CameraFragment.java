@@ -436,7 +436,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
         //String accountName = ("smartmirrortesting@gmail.com");
         //String accountName = Preferences.mUserAccountPref;
-        String accountName = mPreferences.getUserAccountName();
+        String accountName = mPreferences.getGmailAccount();
         credential.setSelectedAccountName(accountName);
         service = getDriveService(credential);
         return view;
@@ -445,7 +445,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     @Override
     public void onStart() {
         super.onStart();
-        if (!mPreferences.getGmailLoggedIn()) {
+        if (!mPreferences.getGmailLoginStatus()) {
             removeCamera();
         }
     }

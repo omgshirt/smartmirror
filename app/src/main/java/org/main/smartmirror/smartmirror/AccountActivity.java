@@ -23,7 +23,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -75,7 +74,7 @@ public class AccountActivity extends AppCompatActivity implements
         setUpTwitterButton();
         setUpGoogleButton();
         if (mPreference.getFirstTimeRun()) {
-            if (mPreference.getGmailLoggedIn()) {
+            if (mPreference.getGmailLoginStatus()) {
                 signOutOfGoogle();
             }
             // generate the keys
@@ -343,7 +342,7 @@ public class AccountActivity extends AppCompatActivity implements
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             Log.i(Constants.TAG, acct.getDisplayName().toString());
-            mPreference.setUserAccountName(acct.getEmail().toString());
+            mPreference.setGmailAccount(acct.getEmail().toString());
 //            mPreference.setUserName(acct.getDisplayName());
         } else {
             // not logged in!

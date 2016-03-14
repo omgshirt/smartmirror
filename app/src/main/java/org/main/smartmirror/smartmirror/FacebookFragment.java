@@ -26,7 +26,7 @@ public class FacebookFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
-        if (!mPreference.getFacebookLoggedIn()) {
+        if (!mPreference.getFacebookLoginStatus()) {
             removeFacebook();
         }
     }
