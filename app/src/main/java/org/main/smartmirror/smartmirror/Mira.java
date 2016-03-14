@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import java.util.GregorianCalendar;
 import java.util.Random;
 
 /**
@@ -24,22 +25,63 @@ public class Mira {
     /**
      * Speak a random message about sleeping
      */
-    public void saySleepMessage() {
+    private void saySleepMessage() {
         Random random = new Random();
         String voice;
         float rand = random.nextFloat();
         if (rand < .15)
             voice = "Will I dream?";
         else if (rand < .3)
-            voice = "bye";
+            voice = "Very well.";
         else if (rand < .5)
-            voice = "goodbye";
+            voice = "Good night.";
         else if (rand < .7)
-            voice = "see you later";
+            voice = "See you soon.";
         else if (rand < .9)
-            voice = "I'll charge up for a bit";
+            voice = "I'll charge up for a bit.";
         else
-            voice = "it will be good to be rid of you for a while";
+            voice = "Finally, some rest.";
         mActivity.speakText(voice);
+    }
+
+
+    /**
+     * Speak a greeting message based on the current time of day
+     */
+    private void sayTimeGreeting() {
+        int hour = GregorianCalendar.getInstance().get(GregorianCalendar.HOUR_OF_DAY);
+        if (hour < 12 ) {
+            mActivity.speakText(mActivity.getResources().getString(R.string.mira_greet_morning));
+        } else if (hour < 7) {
+            mActivity.speakText(mActivity.getResources().getString(R.string.mira_greet_afternoon));
+        } else {
+            mActivity.speakText(mActivity.getResources().getString(R.string.mira_greet_night));
+        }
+     }
+
+    /**
+     * Mira tells the user how many unread emails are in their inbox
+     */
+    private void sayUnreadEmails() {
+        // TODO: get the # of unread mails from gmailHomeFragment
+        //String msg = "You have " + mActivity.getUnreadEmailCount() + " unread emails.";
+        //mActivity.speakText(msg);
+    }
+
+    /**
+     * Called when the mirror is transitioning to sleep.
+     * Track the time and say a message (if appropriate)
+     */
+    public void appSleeping() {
+        saySleepMessage();
+    }
+
+    /**
+     * Called when the mirror is moving from LIGHT_SLEEP or ASLEEP to AWAKE.
+     * Track the time and respond with appropriate message
+     */
+    public void appWaking() {
+        sayTimeGreeting();
+        sayUnreadEmails();
     }
 }

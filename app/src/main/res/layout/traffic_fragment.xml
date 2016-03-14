@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,24 +7,30 @@
     android:padding="15dp"
     tools:context="org.main.smartmirror.smartmirror.TrafficFragment">
 
-    <ImageView
-        android:id="@+id/traffic_icon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="5dp"
-        android:src="@drawable/ic_traffic_display" />
+    <RelativeLayout
+        android:id="@+id/traffic_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/traffic_distance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/traffic_icon" />
+        <ImageView
+            android:id="@+id/traffic_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="5dp"
+            android:src="@drawable/car_front" />
 
-    <TextView
-        android:id="@+id/traffic_delay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/traffic_distance"
-        android:layout_toRightOf="@id/traffic_icon" />
+        <TextView
+            android:id="@+id/traffic_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/traffic_icon" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/traffic_delay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/traffic_distance"
+            android:layout_toEndOf="@id/traffic_icon" />
+    </RelativeLayout>
+
+</LinearLayout>

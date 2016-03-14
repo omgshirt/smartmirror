@@ -34,9 +34,7 @@ public class Preferences implements LocationListener {
     private static Activity mActivity;
 
     //Google Account Email Preference
-    public static final String PREFS_GMAIL = "accountName";
-    //Google Account Email String
-    private static String mUserAccountPref = "";
+    public static final String PREFS_GMAIL = "PREFS_GMAIL";
 
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
@@ -58,6 +56,8 @@ public class Preferences implements LocationListener {
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
+    public static final String PREFS_FACEBOOK_CREDENTIALS = "PREFS_FACEBOOK_CREDENTIALS";
+
     // Constants for screen brightness (0-255)
     public static final int BRIGHTNESS_VLOW = 10;
     public static final int BRIGHTNESS_LOW = 40;
@@ -74,14 +74,8 @@ public class Preferences implements LocationListener {
     public static final float VOL_VHIGH = 1.0f;
 
     // default for work address
-    public static final float WORK_LAT = 0f;
-    public static final float WORK_LONG = 0f;
-
-    public static final String CMD_LIGHT_VLOW = "light min";
-    public static final String CMD_LIGHT_LOW = "light low";
-    public static final String CMD_LIGHT_MEDIUM = "light medium";
-    public static final String CMD_LIGHT_HIGH = "light high";
-    public static final String CMD_LIGHT_VHIGH = "light max";
+    public static final float WORK_LAT = -1f;
+    public static final float WORK_LONG = -1f;
 
     public static final String CMD_SPEECH_OFF = "speech off";
     public static final String CMD_SPEECH_VLOW = "speech min";
@@ -94,12 +88,6 @@ public class Preferences implements LocationListener {
     public static final String CMD_REMOTE_OFF = "remote off";
     public static final String CMD_ENABLE_REMOTE = "enable remote";
     public static final String CMD_DISABLE_REMOTE = "disable remote";
-
-    public static final String CMD_SCREEN_VLOW = "brightness min";
-    public static final String CMD_SCREEN_LOW = "brightness low";
-    public static final String CMD_SCREEN_MEDIUM = "brightness medium";
-    public static final String CMD_SCREEN_HIGH = "brightness high";
-    public static final String CMD_SCREEN_VHIGH = "brightness max";
 
     public static final String CMD_VOICE_OFF = "stop listening";
     public static final String CMD_VOICE_ON = "start listening";
@@ -147,10 +135,14 @@ public class Preferences implements LocationListener {
     private double mWorkLatitude;
     private double mWorkLongitude;
 
+    //Google Account Email String
+    private String mGmailAccount;
+    private String mFacebookCredentials;
+
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
     public static final String TIME_FORMAT_24_HR_SHORT = "H:mm";
-    public static final String TIME_FORMAT_12_HR = "h:mm";
+    public static final String TIME_FORMAT_12_HR = "h:mm a";
     public static final String TIME_FORMAT_12_HR_SHORT = "h:mm";
 
 
@@ -166,23 +158,6 @@ public class Preferences implements LocationListener {
 
     private void handleSettingsCommand(Context context, String command) {
         switch (command) {
-
-            // Light
-            case CMD_LIGHT_VLOW:
-                setLightBrightness(BRIGHTNESS_VLOW);
-                break;
-            case CMD_LIGHT_LOW:
-                setLightBrightness(BRIGHTNESS_LOW);
-                break;
-            case CMD_LIGHT_MEDIUM:
-                setLightBrightness(BRIGHTNESS_MEDIUM);
-                break;
-            case CMD_LIGHT_HIGH:
-                setLightBrightness(BRIGHTNESS_HIGH);
-                break;
-            case CMD_LIGHT_VHIGH:
-                setLightBrightness(BRIGHTNESS_VHIGH);
-                break;
 
             // Speech Volume
             case CMD_SPEECH_OFF:
@@ -212,23 +187,6 @@ public class Preferences implements LocationListener {
             case CMD_REMOTE_ON:
                 speakText(R.string.speech_remote_on);
                 setRemoteEnabled(true);
-                break;
-
-            // screen brightness
-            case CMD_SCREEN_VLOW:
-                setScreenBrightness(BRIGHTNESS_VLOW);
-                break;
-            case CMD_SCREEN_LOW:
-                setScreenBrightness(BRIGHTNESS_LOW);
-                break;
-            case CMD_SCREEN_MEDIUM:
-                setScreenBrightness(BRIGHTNESS_MEDIUM);
-                break;
-            case CMD_SCREEN_HIGH:
-                setScreenBrightness(BRIGHTNESS_HIGH);
-                break;
-            case CMD_SCREEN_VHIGH:
-                setScreenBrightness(BRIGHTNESS_VHIGH);
                 break;
 
             // Voice recognition on / off
@@ -270,12 +228,20 @@ public class Preferences implements LocationListener {
 
             // weather units
             case CMD_WEATHER_ENGLISH:
-                speakText(R.string.speech_weather_english);
-                setWeatherUnits(ENGLISH);
+                if (weatherIsEnglish()) {
+                    speakText(R.string.speech_weather_english_err);
+                } else {
+                    speakText(R.string.speech_weather_english);
+                    setWeatherUnits(ENGLISH);
+                }
                 break;
             case CMD_WEATHER_METRIC:
-                speakText(R.string.speech_weather_metric);
-                setWeatherUnits(METRIC);
+                if (!weatherIsEnglish()) {
+                    speakText(R.string.speech_weather_metric_err);
+                } else {
+                    speakText(R.string.speech_weather_metric);
+                    setWeatherUnits(METRIC);
+                }
                 break;
 
             // time display
@@ -312,13 +278,14 @@ public class Preferences implements LocationListener {
         mTimeFormat = mSharedPreferences.getString(PREFS_TIME_FORMAT, TIME_FORMAT_12_HR);
 
         // Google Account Email Preferences
-        mUserAccountPref = mSharedPreferences.getString(PREFS_GMAIL, "");
-
-        mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, false);
+        mGmailAccount = mSharedPreferences.getString(PREFS_GMAIL, "");
+        mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, true);
 
         // Work address
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
+
+        mFacebookCredentials = mSharedPreferences.getString(PREFS_FACEBOOK_CREDENTIALS, "");
 
         // set brightness and volume to stored values
         mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
@@ -326,7 +293,6 @@ public class Preferences implements LocationListener {
 
         setSystemVolume(mSystemVolume);
         setMusicVolume(mMusicVolume);
-        setScreenBrightness(mAppBrightness);
 
         // Find current lat and long positions.
         // This is not currently saved to the prefs file, system will re-discover location on start
@@ -549,57 +515,6 @@ public class Preferences implements LocationListener {
         setTimeFormat(TIME_FORMAT_12_HR);
     }
 
-    /**
-     * Set brightness value used by night light
-     *
-     * @param brightness int (0-255)
-     */
-    public void setLightBrightness(int brightness) {
-        if (brightness < 0 || brightness > 255) return;
-
-        mLightBrightness = brightness;
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putInt(PREFS_LIGHT_BRIGHTNESS, mLightBrightness);
-        edit.apply();
-
-    }
-
-    public int getLightBrightness() {
-        return mLightBrightness;
-    }
-
-    /**
-     * Set brightness value for the application
-     *
-     * @param brightness int (0-255)
-     */
-    public void setScreenBrightness(int brightness) {
-        if (brightness < 0 || brightness > 255) return;
-
-        try {
-            this.mAppBrightness = brightness;
-            ScreenBrightnessHelper sbh = new ScreenBrightnessHelper();
-            sbh.setScreenBrightness(mActivity, mAppBrightness);
-
-            SharedPreferences.Editor edit = mSharedPreferences.edit();
-            edit.putInt(PREFS_APP_BRIGHTNESS, mAppBrightness);
-            edit.apply();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Resets the application's current brightness to value stored in preferences
-     */
-    public void resetScreenBrightness() {
-        setScreenBrightness(mAppBrightness);
-    }
-
-    public int getAppBrightness() {
-        return mAppBrightness;
-    }
-
     public boolean isRemoteEnabled() {
         return mRemoteEnabled;
     }
@@ -609,13 +524,14 @@ public class Preferences implements LocationListener {
      * Disabling will unregister the service and shows remote disabled icon
      * Enabling registers the service
      *
-     * @param isEnabled enable or disable the remote control
+     * @param enable enable or disable the remote control
      */
-    public void setRemoteEnabled(boolean isEnabled) {
-        if (mRemoteEnabled == isEnabled) return;
+    public void setRemoteEnabled(boolean enable) {
+        if (mRemoteEnabled == enable) return;
+        mRemoteEnabled = enable;
 
         if (mActivity instanceof MainActivity) {
-            if (isEnabled) {
+            if (enable) {
                 ((MainActivity) mActivity).registerNsdService();
             } else {
                 ((MainActivity) mActivity).unregisterNsdService();
@@ -623,7 +539,6 @@ public class Preferences implements LocationListener {
             }
         }
         try {
-            mRemoteEnabled = isEnabled;
             if (!mRemoteEnabled) {
                 // when disabling, hide remote connected icon
                 ((MainActivity) mActivity).showRemoteIcon(false);
@@ -700,7 +615,7 @@ public class Preferences implements LocationListener {
     }
 
     public boolean isWorkAddressSet() {
-        if (getWorkLongitude() == 0.0 || getWorkLatitude() == 0.0) {
+        if (getWorkLongitude() <= 0.0 && getWorkLatitude() <= 0.0) {
             return false;
         } else {
             return true;
@@ -730,7 +645,7 @@ public class Preferences implements LocationListener {
 
     }
 
-    public void setFirstTimrRun(boolean mFirstTimeRun) {
+    public void setFirstTimeRun(boolean mFirstTimeRun) {
         this.mFirstTimeRun = mFirstTimeRun;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_FIRST_TIME_RUN, mFirstTimeRun);
@@ -742,29 +657,51 @@ public class Preferences implements LocationListener {
     }
 
     //Get User Gmail Account to be used in other fragments
-    public static String getUserAccountName() {
-        return mUserAccountPref;
+    public String getGmailAccount() {
+        return mGmailAccount;
     }
 
     //Set User Account if null
-    public void setUserAccountName(String userAcc) {
-        mUserAccountPref = userAcc;
+    public void setGmailAccount(String userAcc) {
+        this.mGmailAccount = userAcc;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_GMAIL, userAcc);
         edit.apply();
     }
 
+    public boolean getGmailLoginStatus() {
+        if (mGmailAccount.equals("None") || mGmailAccount.equals("")) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public void setStayAwake(boolean stayAwake) {
         if (mStayAwake && stayAwake) {
             speakText(R.string.speech_stay_awake_err);
-        } else if (stayAwake){
+        } else if (stayAwake) {
             speakText(R.string.speech_stay_awake);
         }
         mStayAwake = stayAwake;
-        ((MainActivity)mActivity).showStayAwakeIcon(mStayAwake);
+        ((MainActivity) mActivity).showStayAwakeIcon(mStayAwake);
     }
 
-    public boolean isStayingAwake(){
+    public boolean isStayingAwake() {
         return mStayAwake;
+    }
+
+    public void setFacebookCredentials(String mFacebookCredentials) {
+        this.mFacebookCredentials = mFacebookCredentials;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_FACEBOOK_CREDENTIALS, mFacebookCredentials);
+        edit.apply();
+    }
+
+    public boolean getFacebookLoginStatus() {
+        if (mFacebookCredentials.equals(""))
+            return false;
+        else
+            return true;
     }
 }

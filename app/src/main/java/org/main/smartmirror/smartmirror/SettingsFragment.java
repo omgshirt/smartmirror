@@ -21,8 +21,6 @@ import android.widget.Switch;
 public class SettingsFragment extends Fragment {
 
     private Preferences mPreferences;
-    private RadioGroup grpAppBrightness;
-    private RadioGroup grpLightBrightness;
     private RadioGroup grpSysVolume;
     private RadioGroup grpSpeechVolume;
     private Switch swtVoiceEnabled;
@@ -43,8 +41,6 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
         mPreferences = Preferences.getInstance(getActivity());
     }
 
@@ -111,60 +107,6 @@ public class SettingsFragment extends Fragment {
 
         setMusicVolume(mPreferences.getMusicVolume());
 
-        // App Brightness radio group
-        grpAppBrightness = (RadioGroup) view.findViewById(R.id.brightness_group);
-        grpAppBrightness.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.brightness_vlow:
-                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_VLOW);
-                        break;
-                    case R.id.brightness_low:
-                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_LOW);
-                        break;
-                    case R.id.brightness_medium:
-                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_MEDIUM);
-                        break;
-                    case R.id.brightness_high:
-                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_HIGH);
-                        break;
-                    case R.id.brightness_vhigh:
-                        mPreferences.setScreenBrightness(Preferences.BRIGHTNESS_VHIGH);
-                        break;
-                }
-            }
-        });
-
-        setScreenBrightness(mPreferences.getAppBrightness());
-
-        // Handle LightBrightness settings
-        grpLightBrightness = (RadioGroup) view.findViewById(R.id.light_group);
-        grpLightBrightness.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.light_vlow:
-                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_VLOW);
-                        break;
-                    case R.id.light_low:
-                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_LOW);
-                        break;
-                    case R.id.light_medium:
-                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_MEDIUM);
-                        break;
-                    case R.id.light_high:
-                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_HIGH);
-                        break;
-                    case R.id.light_vhigh:
-                        mPreferences.setLightBrightness(Preferences.BRIGHTNESS_VHIGH);
-                        break;
-                }
-            }
-        });
-        setLightBrightness(mPreferences.getLightBrightness());
-
-
         // Voice Enabled Switch
         swtVoiceEnabled = (Switch) view.findViewById(R.id.switch_voice_enabled);
         swtVoiceEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -229,8 +171,9 @@ public class SettingsFragment extends Fragment {
         changeAccountbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(getActivity(), AccountActivity.class);
-                mPreferences.setFirstTimrRun(false);
+                mPreferences.setFirstTimeRun(true);
                 startActivity(intent);
             }
         });
@@ -250,40 +193,6 @@ public class SettingsFragment extends Fragment {
             Log.d("SettingsFragment", "Got message:\"" + message + "\"");
             Boolean checked = false;
             switch (message) {
-
-                // screen brightness
-                case Preferences.CMD_SCREEN_VLOW:
-                    setScreenBrightness(Preferences.BRIGHTNESS_VLOW);
-                    break;
-                case Preferences.CMD_SCREEN_LOW:
-                    setScreenBrightness(Preferences.BRIGHTNESS_LOW);
-                    break;
-                case Preferences.CMD_SCREEN_MEDIUM:
-                    setScreenBrightness(Preferences.BRIGHTNESS_MEDIUM);
-                    break;
-                case Preferences.CMD_SCREEN_HIGH:
-                    setScreenBrightness(Preferences.BRIGHTNESS_HIGH);
-                    break;
-                case Preferences.CMD_SCREEN_VHIGH:
-                    setScreenBrightness(Preferences.BRIGHTNESS_VHIGH);
-                    break;
-
-                // Light
-                case Preferences.CMD_LIGHT_VLOW:
-                    setLightBrightness(Preferences.BRIGHTNESS_VLOW);
-                    break;
-                case Preferences.CMD_LIGHT_LOW:
-                    setLightBrightness(Preferences.BRIGHTNESS_LOW);
-                    break;
-                case Preferences.CMD_LIGHT_MEDIUM:
-                    setLightBrightness(Preferences.BRIGHTNESS_MEDIUM);
-                    break;
-                case Preferences.CMD_LIGHT_HIGH:
-                    setLightBrightness(Preferences.BRIGHTNESS_HIGH);
-                    break;
-                case Preferences.CMD_LIGHT_VHIGH:
-                    setLightBrightness(Preferences.BRIGHTNESS_VHIGH);
-                    break;
 
                 // system volume
                 case Preferences.CMD_VOLUME_OFF:
@@ -399,46 +308,6 @@ public class SettingsFragment extends Fragment {
             grpSpeechVolume.check(R.id.mus_vol_high);
         } else if (vol == Preferences.VOL_VHIGH) {
             grpSpeechVolume.check(R.id.mus_vol_vhigh);
-        }
-    }
-
-    public void setScreenBrightness(int brightness) {
-        switch (brightness) {
-            case Preferences.BRIGHTNESS_VLOW:
-                grpAppBrightness.check(R.id.brightness_vlow);
-                break;
-            case Preferences.BRIGHTNESS_LOW:
-                grpAppBrightness.check(R.id.brightness_low);
-                break;
-            case Preferences.BRIGHTNESS_MEDIUM:
-                grpAppBrightness.check(R.id.brightness_medium);
-                break;
-            case Preferences.BRIGHTNESS_HIGH:
-                grpAppBrightness.check(R.id.brightness_high);
-                break;
-            case Preferences.BRIGHTNESS_VHIGH:
-                grpAppBrightness.check(R.id.brightness_vhigh);
-                break;
-        }
-    }
-
-    public void setLightBrightness(int brightness) {
-        switch (brightness) {
-            case Preferences.BRIGHTNESS_VLOW:
-                grpLightBrightness.check(R.id.light_vlow);
-                break;
-            case Preferences.BRIGHTNESS_LOW:
-                grpLightBrightness.check(R.id.light_low);
-                break;
-            case Preferences.BRIGHTNESS_MEDIUM:
-                grpLightBrightness.check(R.id.light_medium);
-                break;
-            case Preferences.BRIGHTNESS_HIGH:
-                grpLightBrightness.check(R.id.light_high);
-                break;
-            case Preferences.BRIGHTNESS_VHIGH:
-                grpLightBrightness.check(R.id.light_vhigh);
-                break;
         }
     }
 }

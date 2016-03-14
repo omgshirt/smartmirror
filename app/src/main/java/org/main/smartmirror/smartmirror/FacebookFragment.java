@@ -18,33 +18,31 @@ import android.widget.ScrollView;
 
 public class FacebookFragment extends Fragment {
 
-    private WebView mWebview;
-    private String curURL;
+    private Preferences mPreference;
     private ScrollView mScrollView;
+    private WebView mWebview;
 
-    public void init(String url) {
-        curURL = url;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreference = Preferences.getInstance(getActivity());
+        if (!mPreference.getFacebookLoginStatus()) {
+            removeFacebook();
+        }
     }
 
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
-        init("https://m.facebook.com/");
-
-        mScrollView = (ScrollView) view.findViewById(R.id.fb_scrollview);
+        mScrollView = (ScrollView) view.findViewById(R.id.facebook_scrollview);
         mWebview = (WebView) view.findViewById(R.id.facebook_webview);
-        if (curURL != null) {
-
-            mWebview.getSettings().setJavaScriptEnabled(true);
-
-            mWebview.setWebViewClient(new webClient());
-
-            mWebview.loadUrl(curURL);
-
-        }
+        mWebview.getSettings().setJavaScriptEnabled(true);
+        mWebview.setWebViewClient(new webClient());
+        mWebview.loadUrl(Constants.FACEBOOK_URL);
         return view;
     }
+
 
     // ----------------------- Local Broadcast Receiver -----------------------
 
@@ -57,7 +55,7 @@ public class FacebookFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("Facebook ", "Got message:\"" + message + "\"");
             VoiceScroll vs = new VoiceScroll();
-            vs.scrollScrollView(message,mScrollView);
+            vs.scrollScrollView(message, mScrollView);
 
         }
     };
@@ -78,6 +76,15 @@ public class FacebookFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    /**
+     * Removes facebook fragment, speaks error, and displays error message
+     */
+    private void removeFacebook() {
+        ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
+        ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.FACEBOOK, true);
+        ((MainActivity) getActivity()).speakText("You're not logged in!");
     }
 
     private class webClient extends WebViewClient {
