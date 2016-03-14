@@ -84,7 +84,7 @@
 
             <fragment
                 android:id="@+id/calendar_fragment"
-                android:name="org.main.smartmirror.smartmirror.TrafficFragment"
+                android:name="org.main.smartmirror.smartmirror.CalendarHomeFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/calendar_home_fragment" />

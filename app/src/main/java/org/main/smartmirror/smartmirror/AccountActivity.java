@@ -75,7 +75,8 @@ public class AccountActivity extends AppCompatActivity implements
         setUpGoogleButton();
         if (mPreference.getFirstTimeRun()) {
             if (mPreference.getGmailLoginStatus()) {
-                signOutOfGoogle();
+                // sign out of google
+                // signOutOfGoogle();
             }
             // generate the keys
             // createNewKeys();
