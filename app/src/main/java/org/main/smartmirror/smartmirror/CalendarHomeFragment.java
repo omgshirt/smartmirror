@@ -5,6 +5,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Fragment that handles all the events for today
@@ -13,6 +18,7 @@ import android.view.ViewGroup;
 public class CalendarHomeFragment extends Fragment {
 
     private Preferences mPreferences;
+    private View mRootView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -22,7 +28,19 @@ public class CalendarHomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        mRootView = inflater.inflate(R.layout.calendar_home_fragment, container, false);
+
+        LinearLayout homeCalendarLayout = (LinearLayout) mRootView.findViewById(R.id.calendar_home_layout);
+        // read events for the next five days
+        List<CalendarEvent> events = CalendarUtil.getCalendarEvents(getContext(), CalendarUtil.ONE_DAY);
+        if (events.size() == 0) {
+            hideCalendarHome();
+            return mRootView;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+
+        return mRootView;
     }
 
     @Override
@@ -37,9 +55,11 @@ public class CalendarHomeFragment extends Fragment {
 
     private void hideCalendarHome() {
         // set view gone
+        mRootView.setVisibility(View.GONE);
     }
 
     private void showCalendarHome() {
         // set view visible
+        mRootView.setVisibility(View.VISIBLE);
     }
 }
