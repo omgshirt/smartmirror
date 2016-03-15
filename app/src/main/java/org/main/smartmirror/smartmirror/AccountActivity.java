@@ -97,7 +97,8 @@ public class AccountActivity extends AppCompatActivity implements
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(new Scope(Constants.PICASA), new Scope(Scopes.PLUS_LOGIN))
+                .requestEmail()
+                .requestScopes(new Scope(Constants.PICASA))
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -195,7 +196,8 @@ public class AccountActivity extends AppCompatActivity implements
     /**
      * Handles the signing out of Google
      */
-    private void signOutOffGoogle() {
+    private void signOutOfGoogle() {
+        mGoogleApiClient.connect();
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
@@ -212,7 +214,6 @@ public class AccountActivity extends AppCompatActivity implements
         mPreference.setFirstTimeRun(false);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-        finish();
     }
 
     // --------------------------------Helpers------------------------------------------------- //
