@@ -844,7 +844,7 @@ public class MainActivity extends AppCompatActivity
             // put this fragment into contentFrame3. Frame 1 is added via XML. Frame 2 (help) is added via handleHelp() method
             displayFragment(fragment, command, true);
 
-            // ensure that contentFrame3, if hidden, is made visible
+            // ensure that contentFrame3 is visible
             if (viewHidden(contentFrame3)) {
                 setContentFrameValues(null, null, View.VISIBLE);
             }
