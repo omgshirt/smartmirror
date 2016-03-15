@@ -47,11 +47,10 @@ public class CacheManager {
             @Override
             public void run() {
                 checkCacheExpiration();
-                //Log.i(Constants.TAG, "CacheManager: checking for expired caches");
             }
         };
 
-        // set a thread to check for expired caches.
+        // Schedule checks for any expired caches.
         if (cacheScheduler == null)
             cacheScheduler = scheduler.scheduleAtFixedRate(expirationChecker, 31, 31, TimeUnit.SECONDS);
     }
@@ -73,7 +72,7 @@ public class CacheManager {
     /**
      * Add a cache object to the CacheManager. This will overwrite any object with the same name.
      *
-     * @param key  name of the item
+     * @param key  item name
      * @param data data to store.
      * @param time time (in seconds) until the cache is considered expired
      */
@@ -99,7 +98,7 @@ public class CacheManager {
     /**
      * Delete the cache object given by 'key'
      *
-     * @param key key to delete
+     * @param key key of cache to delete
      * @return returns TRUE if cache was deleted, FALSE on failure or key not found
      */
     public boolean deleteCache(String key) {
@@ -163,21 +162,21 @@ public class CacheManager {
     }
 
     /**
-     * Checks all caches for expiration & notifies attached listeners
+     * Checks all caches for expiration & notifies all attached listeners via onCacheExpired method.
      */
     public void checkCacheExpiration() {
         if (mListenersMap.isEmpty()) return;
-        for (String s : mListenersMap.keySet()) {
-            if (cacheMap.get(s).isExpired()) {
-                for (CacheListener cl : mListenersMap.get(s)) {
-                    cl.onCacheExpired(s);
+        for (String key : mListenersMap.keySet()) {
+            if (cacheMap.get(key).isExpired()) {
+                for (CacheListener cl : mListenersMap.get(key)) {
+                    cl.onCacheExpired(key);
                 }
             }
         }
     }
 
     /**
-     * Notify all attached listeners that the cache has been updated.
+     * Notify all attached listeners that the cache has been updated via onCacheChanged method.
      * Note: this is not called when a cache object is deleted.
      *
      * @param cacheName name of the updated cache.

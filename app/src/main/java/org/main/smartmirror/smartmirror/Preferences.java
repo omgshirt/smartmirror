@@ -327,12 +327,20 @@ public class Preferences implements LocationListener {
         mActivity = null;
     }
 
-    // returns the instance of the Preferences class, or creates one if it does not exist
+    /** Returns the instance of the Preferences class, or creates one if it does not exist.
+     * On start, this will first be called by AccountActivity during the setup phase.
+     * It will then be called by MainActivity, which is essential due to the close binding between
+     * methods in this class and MainActivity.
+     *
+     * @param activity creating activity
+     * @return singleton of the Preferences class
+     */
     public static Preferences getInstance(Activity activity) {
         if (mPreferences == null) {
             Log.d("Preferences", "Creating new prefs instance...");
             mPreferences = new Preferences(activity);
         } else {
+            // Changing the context is important ensure casts to MainActivity.
             mActivity = activity;
         }
         return mPreferences;
@@ -532,6 +540,7 @@ public class Preferences implements LocationListener {
                 ((MainActivity) mActivity).disconnectRemote();
             }
         }
+
         try {
             if (!mRemoteEnabled) {
                 // when disabling, hide remote connected icon
@@ -658,6 +667,7 @@ public class Preferences implements LocationListener {
     //Set User Account if null
     public void setGmailAccount(String userAcc) {
         this.mGmailAccount = userAcc;
+        Log.i(Constants.TAG, "setting email :: " + userAcc);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_GMAIL, userAcc);
         edit.apply();

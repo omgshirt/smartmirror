@@ -97,7 +97,8 @@ public class AccountActivity extends AppCompatActivity implements
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(new Scope(Constants.PICASA), new Scope(Scopes.PLUS_LOGIN))
+                .requestEmail()
+                .requestScopes(new Scope(Constants.PICASA))
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -265,8 +266,9 @@ public class AccountActivity extends AppCompatActivity implements
         if (requestCode == GOOGLE_REQUEST) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
+        } else if (requestCode == TWITTER_REQUEST) {
+            mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
         }
-        mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
@@ -347,8 +349,11 @@ public class AccountActivity extends AppCompatActivity implements
             if(acct != null) {
                 mPreference.setGmailAccount(acct.getEmail().toString());
                 // mPreference.setUserName(acct.getDisplayName());
+            } else {
+                Toast.makeText(this, "No account found!!", Toast.LENGTH_LONG).show();
             }
         } else {
+
             // not logged in!
         }
     }
