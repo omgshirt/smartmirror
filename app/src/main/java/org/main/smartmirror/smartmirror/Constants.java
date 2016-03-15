@@ -108,6 +108,9 @@ public class Constants {
     public static final String TEN = "ten";
     public static final String TENTH = "tenth";
 
+    //--------------GMAIL-----------------
+    public static final String NEXT = "next";
+
 
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {
@@ -119,7 +122,7 @@ public class Constants {
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
             MEDIA, MENU, MINIMIZE,
             MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,
-            NEWS, NINE, NINTH, ONE,
+            NEWS, NEXT, NINE, NINTH, ONE,
             OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
             SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
             SETTINGS, SEVEN, SEVENTH, SHOW_LIGHT, SHOW_HELP,

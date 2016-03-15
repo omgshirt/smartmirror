@@ -772,7 +772,7 @@ public class MainActivity extends AppCompatActivity
                     fragment = new CameraFragment();
                     break;
                 case Constants.GMAIL:
-                    fragment = new GmailFragment();
+                        fragment = new GmailFragment();
                     break;
                 case Constants.CLOSE_SCREEN:
                 case Constants.CLOSE_WINDOW:

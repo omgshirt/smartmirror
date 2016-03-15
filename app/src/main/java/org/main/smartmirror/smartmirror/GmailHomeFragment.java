@@ -25,48 +25,70 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-public class GmailHomeFragment extends Fragment implements CacheManager.CacheListener {
-
-    public static CacheManager mCacheManager = null;
-    public static final int DATA_UPDATE_FREQUENCY = 60;
-    public static final String GMAIL_CACHE = "mail count cache";
+public class GmailHomeFragment extends Fragment {
 
     public TextView textView;
+    public ImageView mailIcon;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private String PREF_ACCOUNT_NAME = "";
-    public static int numUnreadPrimary;
+    public int numUnreadPrimary;
     private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
+
+    private static ScheduledFuture<?> unreadCountScheduler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.gmail_home_fragment, container, false);
-        textView = (TextView)view.findViewById(R.id.numUnread);
+        textView = (TextView)view.findViewById(R.id.num_unread);
+        mailIcon = (ImageView) view.findViewById(R.id.mail_icon);
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
-
-        mCacheManager = CacheManager.getInstance();
 
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getActivity().getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff())
                 .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
         mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
+
+        ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
+                Executors.newScheduledThreadPool(1);
+
+        final Runnable messageCountUpdater = new Runnable() {
+            @Override
+            public void run() {
+                int numUnreadPrevious = numUnreadPrimary;
+                new MakeRequestTask(mCredential).execute();
+                if(numUnreadPrevious<numUnreadPrimary) {
+                    //Here is where Mira says,"You have new mail"
+                    Log.i(Constants.TAG, "UnreadCount: updating");
+                }
+            }
+        };
+
+        // set a thread to check update in gmailUnreadCount.
+        if (unreadCountScheduler == null) {
+            unreadCountScheduler = scheduler.scheduleAtFixedRate(messageCountUpdater, 10, 10, TimeUnit.SECONDS);
+        }
+
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mCacheManager.registerCacheListener(GMAIL_CACHE, this);
-
         if (isGooglePlayServicesAvailable()) {
             refreshResults();
         }
@@ -75,7 +97,6 @@ public class GmailHomeFragment extends Fragment implements CacheManager.CacheLis
     @Override
     public void onPause() {
         super.onPause();
-        mCacheManager.unRegisterCacheListener(GMAIL_CACHE, this);
     }
 
     @Override
@@ -172,18 +193,17 @@ public class GmailHomeFragment extends Fragment implements CacheManager.CacheLis
                     mService.users().messages().list(user).setQ(query).execute();
 
             if(messageResponse.size() == 1){
-                textView.setText("Inbox: 0");
+                numUnreadPrimary = 0;
             }else {
 
                 Log.i(Constants.TAG, "Message Response: " + messageResponse.size());
 
                 List<Message> messages = messageResponse.getMessages();
                 numUnreadPrimary = messages.size();
-
-                textView.setText("Inbox: " + numUnreadPrimary);
+                Log.i(Constants.TAG, "Messages: " + messages.toString());
             }
             List<String> labels = new ArrayList<String>();
-                return labels;
+            return labels;
         }
 
         @Override
@@ -192,26 +212,27 @@ public class GmailHomeFragment extends Fragment implements CacheManager.CacheLis
 
         @Override
         protected void onPostExecute(List<String> output) {
-            if (output == null || output.size() == 0) {
-            } else {
-                output.add(0, "Data retrieved using the Gmail API:");
-            }
+            displayEmailCount();
         }
     }
 
     public void updateUnreadCount(){
-        mCacheManager.addCache(GMAIL_CACHE, numUnreadPrimary, DATA_UPDATE_FREQUENCY);
-        new MakeRequestTask(mCredential).execute();
+        numUnreadPrimary--;
+        displayEmailCount();
     }
 
-    @Override
-    public void onCacheExpired(String cacheName) {
-        if (cacheName.equals(GMAIL_CACHE)) updateUnreadCount();
-        Log.i("GMAIL CACHE", "updating expired cache" + cacheName);
+    public void displayEmailCount() {
+        if (numUnreadPrimary > 0) {
+            mailIcon.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
+            textView.setText(" " +  numUnreadPrimary);
+        } else {
+            mailIcon.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
+        }
     }
 
-    @Override
-    public void onCacheChanged(String cacheName) {
-        // In this case we do nothing
+    public int getUnreadCount() {
+        return numUnreadPrimary;
     }
 }

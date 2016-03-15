@@ -1,9 +1,11 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +50,8 @@ public class GmailFragment extends Fragment {
     public String mSubject;
     public ListView listViewBody;
     public String mBody;
-    public Button nextM;
+
+    public Button nextMessage;
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
@@ -73,7 +77,7 @@ public class GmailFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
         try {
             mCallback = (OnNextMessageListener) activity;
@@ -94,7 +98,16 @@ public class GmailFragment extends Fragment {
         textViewSubject = (TextView)view.findViewById(R.id.messageSubject);
         listViewBody = (ListView) view.findViewById(R.id.messageBody);
 
-        nextM = (Button)view.findViewById(R.id.nextMessage);
+        nextMessage = (Button) view.findViewById(R.id.next);
+
+        nextMessage.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Log.i(Constants.TAG, "Before task");
+                displayNextMessage();
+                Log.i(Constants.TAG, "After task");
+            }
+        });
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -107,23 +120,42 @@ public class GmailFragment extends Fragment {
 
         mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
 
-        nextM.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Fragment frg = null;
-                frg = getActivity().getSupportFragmentManager().findFragmentByTag(getTag());
-                final FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.detach(frg);
-                ft.attach(frg);
-                ft.commit();
-            }
-        });
         return view;
     }
+
+    // ----------------------- Local Broadcast Receiver -----------------------
+
+    // Create a handler for received Intents. This will be called whenever an Intent
+    // with an action named "inputAction" is broadcast.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+            Log.d("GmailArrayList ", "Got message:\"" + message +"\"");
+            if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
+                int position = 0;
+                if (message.contains(Constants.SCROLL_DOWN)) {
+                    position = position + 5;
+                } else if (message.contains(Constants.SCROLL_UP)) {
+                    position = position - 5;
+                    if (position < 0) position = 0;
+                }
+                VoiceScroll sl = new VoiceScroll();
+                sl.voiceListView(message,listViewBody, position);
+            }
+            else if(message.contains(Constants.NEXT)){
+                Log.i(Constants.TAG, "In Broadcast Listener");
+                displayNextMessage();
+            }
+        }
+    };
 
     @Override
     public void onResume() {
         super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("inputAction"));
         if (isGooglePlayServicesAvailable()) {
             refreshResults();
         }
@@ -132,6 +164,7 @@ public class GmailFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
@@ -155,6 +188,8 @@ public class GmailFragment extends Fragment {
     private void refreshResults() {
         if (isDeviceOnline()) {
             new MakeRequestTask(mCredential).execute();
+        }else{
+            Log.i(Constants.TAG, "SOMETHING WRONG HERE");
         }
     }
 
@@ -210,11 +245,14 @@ public class GmailFragment extends Fragment {
          */
         @Override
         protected List<String> doInBackground(Void... params) {
-            try {
+            try { Log.i(Constants.TAG, " GET DATA TEST");
                  return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
+                Log.i(Constants.TAG, "CATCHING EXCEPTION E");
                 cancel(true);
+                Log.i(Constants.TAG, mLastError.toString());
+               // Log.i(Constants.TAG, isCancelled() + "ISCANCELLED TEST");
                 return null;
             }
         }
@@ -229,7 +267,7 @@ public class GmailFragment extends Fragment {
             // Get the labels in the user's account.
             String user = "me";
             String query = "in:inbox is:unread category:primary";
-            textViewTitle.setText("Inbox");
+
             List<String> labelsToRemove = new ArrayList<String>();
             labelsToRemove.add("UNREAD");
 
@@ -277,6 +315,7 @@ public class GmailFragment extends Fragment {
                     messageList.add(mBody);
                 }
             }
+            Log.i(Constants.TAG, "TEST CHECK WHEN NEW TASK CREATED");
             return messageList;
         }
 
@@ -288,9 +327,15 @@ public class GmailFragment extends Fragment {
         @Override
         protected void onPostExecute(List<String> output) {
 
+            textViewTitle.setText("Inbox");
+
             if(mTo=="No New Messages..."){
                 textViewTo.setText(mTo);
+                textViewFrom.setVisibility(View.GONE);
+                textViewSubject.setVisibility(View.GONE);
             }else {
+                textViewFrom.setVisibility(View.VISIBLE);
+                textViewSubject.setVisibility(View.VISIBLE);
                 textViewTo.setText("To: " + mTo + "\n");
                 textViewFrom.setText("From: " + mFrom + "\n");
                 textViewSubject.setText("Subject: " + mSubject + "\n");
@@ -300,5 +345,11 @@ public class GmailFragment extends Fragment {
                 mCallback.onNextCommand();
             }
         }
+    }
+
+    public void displayNextMessage(){
+        Log.i(Constants.TAG, "In displayNextMEssage Before");
+        new MakeRequestTask(mCredential).execute();
+        Log.i(Constants.TAG, "In displayNextMEssage After");
     }
 }

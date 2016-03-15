@@ -430,7 +430,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
         mCountDownText = (TextView) view.findViewById(R.id.count_down);
         credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
+       // credential = GoogleAccountCredential.usingAudience(getActivity(), "151636454113-9prv66cvop4fqqgj75gkk8k17d78h0p5.apps.googleusercontent.com");
         String accountName = Preferences.getUserAccountName();
+        Log.i(Constants.TAG, "onCreateView Camera: " + accountName);
         credential.setSelectedAccountName(accountName);
         service = getDriveService(credential);
         return view;
@@ -520,7 +522,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
                 // We don't use a front facing camera in this sample.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-                if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     continue;
                 }
 
@@ -925,6 +927,26 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             try {
                 FileOutputStream output = new FileOutputStream(mFile);
                 output.write(bytes);
+
+//                    List<com.google.api.services.drive.model.File> result = new ArrayList<com.google.api.services.drive.model.File>();
+//                    Drive.Files.List request = service.files().list();
+                   // Log.i(Constants.TAG, "TEST CAM " + request);
+
+//                    do {
+//                        try {
+//                            FileList files = request.execute();
+//
+//                            result.addAll(files.getItems());
+//                            String x = files.getItems().get(0).getDownloadUrl();
+//                            Log.i(Constants.TAG, "DLURL: " + x);
+//                            request.setPageToken(files.getNextPageToken());
+//                        } catch (IOException e) {
+//                            System.out.println("An error occurred: " + e);
+//                            request.setPageToken(null);
+//                        }
+//                    } while (request.getPageToken() != null &&
+//                            request.getPageToken().length() > 0);
+
                 saveFileToDrive();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -970,7 +992,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     body.setMimeType("image/jpeg");
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-                    showCameraFeedback("Upload to Drive Successful!");
+
+                    retrieveAllFiles(service);
+                    //showCameraFeedback("Upload to Drive Successful!");
                     //showToast("Upload to Drive Successful!");
                     //DONT DELETE BELOW CODE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //                    boolean folderExists =false;
@@ -1046,6 +1070,27 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
     public static void setCurrentDateTime(String dateTimeString) {
         dateTimeStr = dateTimeString;
+    }
+
+    public static List<com.google.api.services.drive.model.File> retrieveAllFiles(Drive service) throws IOException {
+        List<com.google.api.services.drive.model.File> result = new ArrayList<com.google.api.services.drive.model.File>();
+        Drive.Files.List request = service.files().list();
+
+        do {
+            try {
+                FileList files = request.execute();
+
+                result.addAll(files.getItems());
+                request.setPageToken(files.getNextPageToken());
+            } catch (IOException e) {
+                System.out.println("An error occurred: " + e);
+                request.setPageToken(null);
+            }
+        } while (request.getPageToken() != null &&
+                request.getPageToken().length() > 0);
+
+        Log.i("DRIVE ID", result.toString());
+        return result;
     }
 
 }
