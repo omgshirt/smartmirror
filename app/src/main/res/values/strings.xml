@@ -15,6 +15,7 @@
     <string name="title_facebook">Facebook</string>
     <string name="title_forecast">Forecast</string>
     <string name="title_gallery">Gallery</string>
+    <string name="title_photos">Photos</string>
     <string name="title_help">Help</string>
     <string name="title_light">Light</string>
     <string name="title_news">News</string>
@@ -112,14 +113,17 @@
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
     <string name="distance_matrix_api_key">AIzaSyBumZObXEyI5_7Ie0u8ZnrRKAXzojKpDw8</string>
     <string name="guardian_api_key">c6ed3edf-b0c6-4669-8e5c-ba32ba96a65f</string>
-    <string name="news_err">Unable to retrieve news &#8212; check your internet connection</string>
-
+   
     <string name="twitter_api_key">mQ51h9ZbAz9Xk2AZtsUBJAGlx</string>
     <string name="twitter_secret">uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt</string>
     <string name="twitter_access_token">4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG</string>
-    <string name="twitter_error">Error with Twitter Data</string>
 
     <string name="facebook_app_id">913606198722814</string>
     <string name="facebook_app_secret">7ab77882cb36c0e7f942ebee16117444</string>
+
+    <!-- Error messages -->
+    <string name="twitter_error">Unable to retrieve twitter data &#8212; check your internet connection</string>
+    <string name="news_err">Unable to retrieve news &#8212; check your internet connection</string>
+    <string name="photos_err">Unable to retrieve photos &#8212; check your internet connection</string>
 
 </resources>

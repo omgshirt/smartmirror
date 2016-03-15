@@ -53,6 +53,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public ArrayList<String> mFullArticle = new ArrayList<String>();
     public ArrayList<String> mArticleNumber = new ArrayList<>();
 
+    public int newsFeedPosition = 0;
+
     Handler mHandler = new Handler();
     private ArticleSelectedListener articleSelectedListener;
 
@@ -163,16 +165,19 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     txtNewsDesk.setText(mNewsSection.toUpperCase());
 
             }
+
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
-                int position = 0;
-                if (message.contains(Constants.SCROLL_DOWN)) {
-                    position = position + 5;
-                } else if (message.contains(Constants.SCROLL_UP)) {
-                    position = position - 5;
-                    if (position < 0) position = 0;
-                }
                 VoiceScroll sl = new VoiceScroll();
-                sl.scrollListView(message,newsFeed, position);
+                if (message.contains(Constants.SCROLL_DOWN)) {
+                    newsFeedPosition = newsFeedPosition + 5;
+
+                } else if (message.contains(Constants.SCROLL_UP)) {
+                    newsFeedPosition = newsFeedPosition - 5;
+                    if (newsFeedPosition < 0) newsFeedPosition = 0;
+                }
+
+                sl.scrollListView(message,newsFeed, newsFeedPosition);
+
             }
 
         }

@@ -23,7 +23,7 @@ public class VoiceScroll {
         if (view instanceof ListView) {
             position = position - 5;
             if (position < 0) position = 0;
-            scrollListView(Constants.SCROLL_UP, (ListView) view, 3);
+            scrollListView(Constants.SCROLL_UP, (ListView) view, position);
         }
         else if (view instanceof ScrollView) {
             scrollScrollView(Constants.SCROLL_UP, (ScrollView) view);

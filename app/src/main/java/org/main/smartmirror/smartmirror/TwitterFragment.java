@@ -29,6 +29,8 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
     public static ArrayList<String> mUsersAt = new ArrayList<String>();
     public static ArrayList<Uri> mUri = new ArrayList<Uri>();
 
+    public int position = 0;
+
     public static CacheManager mCacheManager = null;
 
     // time in seconds before twitter data is considered old and is discarded
@@ -61,7 +63,6 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
             String message = intent.getStringExtra("message");
             Log.d("TwitterArrayList ", "Got message:\"" + message +"\"");
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
-                int position = 0;
                 if (message.contains(Constants.SCROLL_DOWN)) {
                     position = position + 5;
                 } else if (message.contains(Constants.SCROLL_UP)) {
