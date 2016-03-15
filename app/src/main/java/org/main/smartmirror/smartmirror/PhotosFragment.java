@@ -10,21 +10,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URLConnection;
 
-import com.google.gdata.client.*;
 import com.google.gdata.client.photos.*;
-import com.google.gdata.data.*;
-import com.google.gdata.data.media.*;
-import com.google.gdata.data.photos.*;
-import com.google.gdata.util.ServiceException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 public class PhotosFragment extends Fragment {
@@ -33,6 +30,13 @@ public class PhotosFragment extends Fragment {
     URL albumPostUrl;
     private PicasawebService service;
     Handler mHandler;
+    String userID;
+    String albumID;
+    int numPhotos;
+
+    String getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + userID;
+    String getPhotosInAlbum = "https://picasaweb.google.com/data/feed/api/user/"+userID+"albumid/"+albumID;
+    String getLatestPhotos = "https://picasaweb.google.com/data/feed/api/user/"+userID+"?kind=photo&max-results="+numPhotos;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,6 +47,8 @@ public class PhotosFragment extends Fragment {
         //new PhotosASyncTask(service,"smartmirrortesting@gmail.com", "smartmirrort").execute();
 
 
+
+
         return view;
     }
 
@@ -50,7 +56,7 @@ public class PhotosFragment extends Fragment {
 
     }
 
-    // Get picasa
+    // Get picasa json
     private void updatePicasa(final String query) {
         new Thread() {
             public void run() {
@@ -77,5 +83,31 @@ public class PhotosFragment extends Fragment {
         }.start();
     }
 
+
+    private void getXmlFromUrl(final String query) {
+        new Thread() {
+            public void run() {
+                try {
+                    URL url = new URL(query);
+                    URLConnection conn = url.openConnection();
+
+                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder builder = factory.newDocumentBuilder();
+                    Document doc = builder.parse(conn.getInputStream());
+
+                    /*NodeList nodes = doc.getElementsByTagName(*//*tag from xml file*//*);
+                    for (int i = 0; i < nodes.getLength(); i++) {
+                        Element element = (Element) nodes.item(i);
+                        NodeList title = element.getElementsByTagName(*//*item within the tag*//*);
+                        Element line = (Element) title.item(0);
+                        phoneNumberList.add(line.getTextContent());
+                    }*/
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
 
 }
