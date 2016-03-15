@@ -46,7 +46,15 @@ public class GmailHomeFragment extends Fragment {
     public int numUnreadPrimary;
     private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
 
+    private Preferences mPreference;
     private static ScheduledFuture<?> unreadCountScheduler;
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreference = Preferences.getInstance(getActivity());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,7 +63,7 @@ public class GmailHomeFragment extends Fragment {
         mailIcon = (ImageView) view.findViewById(R.id.mail_icon);
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
+        PREF_ACCOUNT_NAME = mPreference.getGmailAccount();
 
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getActivity().getApplicationContext(), Arrays.asList(SCOPES))

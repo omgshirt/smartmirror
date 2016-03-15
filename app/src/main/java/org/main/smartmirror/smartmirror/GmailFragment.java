@@ -51,6 +51,7 @@ public class GmailFragment extends Fragment {
     public ListView listViewBody;
     public String mBody;
 
+    private Preferences mPreference;
     public Button nextMessage;
 
     GoogleAccountCredential mCredential;
@@ -74,6 +75,12 @@ public class GmailFragment extends Fragment {
     //Interface for updating Gmail Unread Count
     public interface OnNextMessageListener {
         public void onNextCommand();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreference = Preferences.getInstance(getActivity());
     }
 
     @Override
@@ -111,7 +118,7 @@ public class GmailFragment extends Fragment {
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
+        PREF_ACCOUNT_NAME = mPreference.getGmailAccount();
 
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getActivity().getApplicationContext(), Arrays.asList(SCOPES))
@@ -142,7 +149,7 @@ public class GmailFragment extends Fragment {
                     if (position < 0) position = 0;
                 }
                 VoiceScroll sl = new VoiceScroll();
-                sl.voiceListView(message,listViewBody, position);
+                sl.scrollListView(message,listViewBody, position);
             }
             else if(message.contains(Constants.NEXT)){
                 Log.i(Constants.TAG, "In Broadcast Listener");
