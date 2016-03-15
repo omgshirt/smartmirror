@@ -35,6 +35,7 @@ public class Preferences implements LocationListener {
 
     //Google Account Email Preference
     public static final String PREFS_GMAIL = "PREFS_GMAIL";
+    public static final String PREFS_TOKENID = "PREFS_TOKENID";
 
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
@@ -138,6 +139,8 @@ public class Preferences implements LocationListener {
     //Google Account Email String
     private String mGmailAccount;
     private String mFacebookCredentials;
+
+    private String mTokenId;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
@@ -280,6 +283,7 @@ public class Preferences implements LocationListener {
         // Google Account Email Preferences
         mGmailAccount = mSharedPreferences.getString(PREFS_GMAIL, "");
         mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, true);
+        mTokenId = mSharedPreferences.getString(PREFS_TOKENID, "");
 
         // Work address
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
@@ -675,6 +679,17 @@ public class Preferences implements LocationListener {
         } else {
             return true;
         }
+    }
+
+    public void setTokenId(String mTokenId){
+        this.mTokenId = mTokenId;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_TOKENID, mTokenId);
+        edit.apply();
+    }
+
+    public String getTokenId(){
+        return mTokenId;
     }
 
     public void setStayAwake(boolean stayAwake) {

@@ -30,6 +30,8 @@
     <!-- Login Error -->
     <string name="not_logged_in_err">Sorry, you are not logged in to</string>
 
+    <string name="login_successful">Successfully logged in as</string>
+    <string name="login_err">Oh no! Something went wrong!</string>
 
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
