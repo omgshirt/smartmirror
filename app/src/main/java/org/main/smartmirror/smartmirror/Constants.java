@@ -46,6 +46,7 @@ public class Constants {
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
     public static final String GALLERY = "gallery";
+    public static final String GMAIL = "gmail";
     public static final String LIGHT = "light";
     public static final String NEWS = "news";
     public static final String NIGHT_LIGHT = "night light";
@@ -56,6 +57,7 @@ public class Constants {
     public static final String SHOW_HELP = "show help";
     public static final String TIME = "current time";
     public static final String TWITTER = "twitter";
+    
 
     // ------------- NEWS ------------
     public static final String BUSINESS = "business";
@@ -115,17 +117,19 @@ public class Constants {
     public static final String TEN = "ten";
     public static final String TENTH = "tenth";
 
+    //--------------GMAIL-----------------
+    public static final String NEXT = "next";
 
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {
             BUSINESS, CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
             CONDITIONS, EIGHT, EIGHTH, FACEBOOK, FIVE,
-            FORECAST, FOUR, FULL_SCREEN, GALLERY,
+            FORECAST, FOUR, FULL_SCREEN, GALLERY, GMAIL,
             GO_BACK, GO_FORWARD, GO_TO_SLEEP, HELP, HIDE_TIME,
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
             MEDIA, MENU, MINIMIZE,
             MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,
-            NEWS, NINE, NINTH, ONE,
+            NEWS, NEXT, NINE, NINTH, ONE,
             OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
             SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
             SETTINGS, SEVEN, SEVENTH, SHOW_LIGHT, SHOW_HELP,

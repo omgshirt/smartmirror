@@ -59,7 +59,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:layout="@layout/weather_fragment" />
-    </LinearLayout>
+        <fragment
+            android:id="@+id/gmail_home"
+            android:name="org.main.smartmirror.smartmirror.GmailHomeFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        </LinearLayout>
 
     <FrameLayout
         android:id="@+id/content_frame_2"

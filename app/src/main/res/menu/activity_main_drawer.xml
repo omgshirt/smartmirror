@@ -24,5 +24,7 @@
             android:title="@string/title_twitter"/>
         <item android:id="@+id/nav_weather" android:icon="@android:drawable/ic_menu_gallery"
             android:title="@string/title_weather"/>
+        <item android:id="@+id/nav_gmail" android:icon="@android:drawable/ic_menu_gallery"
+            android:title="@string/title_gmail"/>
     </group>
 </menu>

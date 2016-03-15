@@ -81,7 +81,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/traffic_fragment" />
-
+            <fragment
+                android:id="@+id/gmail_home"
+                android:name="org.main.smartmirror.smartmirror.GmailHomeFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
             <fragment
                 android:id="@+id/calendar_fragment"
                 android:name="org.main.smartmirror.smartmirror.CalendarHomeFragment"

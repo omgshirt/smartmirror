@@ -53,6 +53,8 @@ import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.ParentReference;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -222,7 +224,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 activity.finish();
             }
         }
-
     };
 
     /**
@@ -543,7 +544,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
                 // We don't use a front facing camera in this sample.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-                if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     continue;
                 }
 
@@ -990,7 +991,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     body.setMimeType("image/jpeg");
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-                    showCameraFeedback("Upload to Drive Successful!");
+                    retrieveAllFiles(service);
+//                    showCameraFeedback("Upload to Drive Successful!");
                 } catch (UserRecoverableAuthIOException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -1014,6 +1016,27 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
     public static void setCurrentDateTime(String dateTimeString) {
         dateTimeStr = dateTimeString;
+    }
+
+    public static List<com.google.api.services.drive.model.File> retrieveAllFiles(Drive service) throws IOException {
+        List<com.google.api.services.drive.model.File> result = new ArrayList<com.google.api.services.drive.model.File>();
+        Drive.Files.List request = service.files().list();
+
+        do {
+            try {
+                FileList files = request.execute();
+
+                result.addAll(files.getItems());
+                request.setPageToken(files.getNextPageToken());
+            } catch (IOException e) {
+                System.out.println("An error occurred: " + e);
+                request.setPageToken(null);
+            }
+        } while (request.getPageToken() != null &&
+                request.getPageToken().length() > 0);
+
+        Log.i("DRIVE ID", result.toString());
+        return result;
     }
 
 }
