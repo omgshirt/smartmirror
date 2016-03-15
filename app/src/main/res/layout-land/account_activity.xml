@@ -58,13 +58,12 @@
         android:text="Google Account"
         android:textAppearance="?android:textAppearanceLarge" />
 
-    <Spinner
-        android:id="@+id/google_account_picker"
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/google_account"
-        android:layout_marginBottom="15dp"
         android:layout_marginEnd="20dp" />
 
     <TextView
@@ -72,7 +71,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/google_account_picker"
+        android:layout_below="@id/google_sign_in_button"
         android:layout_marginBottom="15dp"
         android:layout_marginEnd="20dp"
         android:text="Work Location"
@@ -96,7 +95,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/work_location"
         android:layout_marginEnd="20dp"
-        android:onClick="saveUserInputs"
+        android:onClick="handleButtonPress"
         android:text="Submit" />
 
 </RelativeLayout>

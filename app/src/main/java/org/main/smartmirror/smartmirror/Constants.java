@@ -12,6 +12,7 @@ public class Constants {
 
     //-------- Accont Activity ---------
     public static final String KEY_STORE = "AndroidKeyStore";
+    public static final String PICASA = "https://picasaweb.google.com/data/";
 
     //-------------- DISPLAY -----------
     public static final String CLOSE_WINDOW = "close window";

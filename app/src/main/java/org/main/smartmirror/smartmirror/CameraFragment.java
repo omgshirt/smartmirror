@@ -78,6 +78,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private TextView mCountDownText;
     private static Drive service;
     private GoogleAccountCredential credential;
+    private Preferences mPreferences;
 
     //Gets current date and time to name pictures
     public static String dateTimeStr;
@@ -423,16 +424,39 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreferences = Preferences.getInstance(getActivity());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
         mCountDownText = (TextView) view.findViewById(R.id.count_down);
         credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
         //String accountName = ("smartmirrortesting@gmail.com");
         //String accountName = Preferences.mUserAccountPref;
-        String accountName = Preferences.getUserAccountName();
+        String accountName = mPreferences.getGmailAccount();
         credential.setSelectedAccountName(accountName);
         service = getDriveService(credential);
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!mPreferences.getGmailLoginStatus()) {
+            removeCamera();
+        }
+    }
+
+    /**
+     * Removes the Camera Fragment, displays an error and speaks the error
+     */
+    private void removeCamera() {
+        ((MainActivity) getActivity()).removeFragment(Constants.CAMERA);
+        ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.CAMERA, true);
+        ((MainActivity) getActivity()).speakText("You're Not Logged In");
     }
 
     @Override
