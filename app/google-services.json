@@ -1,0 +1,52 @@
+{
+  "project_info": {
+    "project_id": "smartmirror-1113",
+    "project_number": "151636454113",
+    "name": "SmartMirror"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:151636454113:android:f3cdc1a377c545b0",
+        "client_id": "android:org.main.smartmirror.smartmirror",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "org.main.smartmirror.smartmirror",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "151636454113-9prv66cvop4fqqgj75gkk8k17d78h0p5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.main.smartmirror.smartmirror",
+            "certificate_hash": "2E6720CB7E7861A7F571CEEF11E97ED9732B2D4F"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
