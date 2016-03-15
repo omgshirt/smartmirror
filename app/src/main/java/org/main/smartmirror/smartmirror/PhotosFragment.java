@@ -14,19 +14,25 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gdata.client.*;
 import com.google.gdata.client.photos.*;
 import com.google.gdata.data.*;
 import com.google.gdata.data.media.*;
 import com.google.gdata.data.photos.*;
+import com.google.gdata.util.ServiceException;
 
 
 public class PhotosFragment extends Fragment {
 
     ImageView mPhotoFromPicasa;
     URL albumPostUrl;
+    private PicasawebService service;
+    Handler mHandler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,7 +40,8 @@ public class PhotosFragment extends Fragment {
         View view = inflater.inflate(R.layout.photos_fragment, container, false);
         mPhotoFromPicasa = (ImageView) view.findViewById(R.id.photo_from_picasa);
 
-        new PhotosASyncTask().execute();
+        //new PhotosASyncTask(service,"smartmirrortesting@gmail.com", "smartmirrort").execute();
+
 
         return view;
     }
@@ -43,36 +50,32 @@ public class PhotosFragment extends Fragment {
 
     }
 
-    /*public void uploadPhoto() {
-        try {
-            albumPostUrl = new URL("https://picasaweb.google.com/data/feed/api/user/" + userName + "/albumid/SmartMirror");
-            PhotoEntry myPhoto = new PhotoEntry();
-            myPhoto.setTitle(new PlainTextConstruct("Puppies FTW"));
-            myPhoto.setDescription(new PlainTextConstruct("Puppies are the greatest."));
-            myPhoto.setClient("myClientName");
+    // Get picasa
+    private void updatePicasa(final String query) {
+        new Thread() {
+            public void run() {
+                final JSONObject json = FetchURL.getJSON(query);
+                if (json == null) {
+                    mHandler.post(new Runnable() {
+                        public void run() {
+                            ((MainActivity) getActivity()).showToast(getString(R.string.photos_err),
+                                    Gravity.CENTER, Toast.LENGTH_LONG);
+                        }
+                    });
+                } else {
+                    mHandler.post(new Runnable() {
+                        public void run() {
+                            try {;
+                                Log.i("PICASA ", json.toString());
+                                //renderNews(json);
+                            } catch (Exception e) {Log.i("picasa ", e.toString());}
 
-            MediaFileSource myMedia = new MediaFileSource(new File("/home/liz/puppies.jpg"), "image/jpeg");
-            myPhoto.setMediaSource(myMedia);
-
-            PhotoEntry returnedPhoto = myService.insert(albumPostUrl, myPhoto);
-        } catch (Exception e) {
-            Log.i("PHOTOS", e.toString());
-        }
-
-    }
-
-    public void listOfAlbums() {
-        try {
-            URL feedUrl = new URL("https://picasaweb.google.com/data/feed/api/user/"+userName+"?kind=album");
-
-            UserFeed myUserFeed = myService.getFeed(feedUrl, UserFeed.class);
-
-            for (AlbumEntry myAlbum : myUserFeed.getAlbumEntries()) {
-                System.out.println("PHOTOS " + myAlbum.getTitle().getPlainText());
+                        }
+                    });
+                }
             }
-        } catch (Exception e ) {Log.i("PHOTOS", e.toString());}
-
-    }*/
+        }.start();
+    }
 
 
 }
