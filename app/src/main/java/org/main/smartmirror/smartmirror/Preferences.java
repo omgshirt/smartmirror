@@ -656,7 +656,7 @@ public class Preferences implements LocationListener {
         edit.commit();
     }
 
-    public boolean getFirstTimeRun() {
+    public boolean isFirstTimeRun() {
         return mFirstTimeRun;
     }
 
@@ -673,8 +673,8 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
-    public boolean getGmailLoginStatus() {
-        if (mGmailAccount.equals("None") || mGmailAccount.equals("")) {
+    public boolean isLoggedInToGmail() {
+        if (mGmailAccount.equals("")) {
             return false;
         } else {
             return true;
@@ -713,7 +713,7 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
-    public boolean getFacebookLoginStatus() {
+    public boolean isLoggedInToFacebook() {
         if (mFacebookCredentials.equals(""))
             return false;
         else

@@ -54,7 +54,6 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.ParentReference;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -446,7 +445,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     @Override
     public void onStart() {
         super.onStart();
-        if (!mPreferences.getGmailLoginStatus()) {
+        if (!mPreferences.isLoggedInToGmail()) {
             removeCamera();
         }
     }

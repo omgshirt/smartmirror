@@ -46,7 +46,7 @@ public class CalendarHomeFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (!mPreferences.getGmailLoginStatus()) {
+        if (!mPreferences.isLoggedInToGmail()) {
             hideCalendarHome();
         } else {
             showCalendarHome();

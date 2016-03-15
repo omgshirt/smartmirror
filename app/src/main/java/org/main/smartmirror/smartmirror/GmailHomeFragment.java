@@ -42,10 +42,7 @@ public class GmailHomeFragment extends Fragment {
     public ImageView mailIcon;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private String PREF_ACCOUNT_NAME = "";
     public int numUnreadPrimary;
-    private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
-
     private Preferences mPreference;
     private static ScheduledFuture<?> unreadCountScheduler;
 
@@ -54,6 +51,7 @@ public class GmailHomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
+        mCredential.setSelectedAccountName(mPreference.getGmailAccount());
     }
 
     @Override
@@ -61,15 +59,8 @@ public class GmailHomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.gmail_home_fragment, container, false);
         textView = (TextView)view.findViewById(R.id.num_unread);
         mailIcon = (ImageView) view.findViewById(R.id.mail_icon);
-        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        PREF_ACCOUNT_NAME = mPreference.getGmailAccount();
-
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                getActivity().getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
-        mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
+        mCredential.setSelectedAccountName(mPreference.getGmailAccount());
 
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
                 Executors.newScheduledThreadPool(1);

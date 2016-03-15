@@ -31,6 +31,7 @@
     <!-- Login Error -->
     <string name="not_logged_in_err">Sorry, you are not logged in to</string>
 
+
     <string name="login_successful">Successfully logged in as</string>
     <string name="login_err">Oh no! Something went wrong!</string>
 
@@ -107,6 +108,7 @@
     <string name="speech_weather_metric_err">Weather display is already set to metric</string>
 
     <string name="speech_remote_off_err">The remote is disabled.</string>
+    <string name="speech_not_logged_in_err">You\'re not logged in!</string>
 
     <!-- api keys -->
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>

@@ -30,6 +30,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
+import com.google.api.services.gmail.GmailScopes;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -80,8 +81,8 @@ public class AccountActivity extends AppCompatActivity implements
         askForPermissions();
         setUpTwitterButton();
         setUpGoogleButton();
-        if (mPreference.getFirstTimeRun()) {
-            if (mPreference.getGmailLoginStatus()) {
+        if (mPreference.isFirstTimeRun()) {
+            if (mPreference.isLoggedInToGmail()) {
                 // sign out of google
 //                signOutOfGoogle();
             }
@@ -101,7 +102,11 @@ public class AccountActivity extends AppCompatActivity implements
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
-                .requestScopes(new Scope(Constants.PICASA))
+                .requestScopes(new Scope(Constants.PICASA), new Scope(GmailScopes.GMAIL_LABELS),
+                new Scope(GmailScopes.GMAIL_READONLY),
+                new Scope(GmailScopes.MAIL_GOOGLE_COM),
+                new Scope(GmailScopes.GMAIL_MODIFY),
+                new Scope(GmailScopes.GMAIL_INSERT))
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)

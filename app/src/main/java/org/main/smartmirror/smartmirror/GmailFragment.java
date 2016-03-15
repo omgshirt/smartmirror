@@ -56,19 +56,6 @@ public class GmailFragment extends Fragment {
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private String PREF_ACCOUNT_NAME = "";
-
-    //SCOPES - Note: When adding/deleting scopes, it is necessary to reauthorize by:
-    //               1. Remove SmartMirror from Google Account by going to Connected Apps and Services
-    //               2. Run Google Account Picker (Navin uses the OldCalendarFragment code)
-    //Otherwise, changes won't take place.
-    private static final String[] SCOPES = {
-            GmailScopes.GMAIL_LABELS,
-            GmailScopes.GMAIL_READONLY,
-            GmailScopes.MAIL_GOOGLE_COM,
-            GmailScopes.GMAIL_MODIFY,
-            GmailScopes.GMAIL_INSERT
-    };
 
     OnNextMessageListener mCallback;
 
@@ -115,17 +102,7 @@ public class GmailFragment extends Fragment {
                 Log.i(Constants.TAG, "After task");
             }
         });
-
-        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-
-        PREF_ACCOUNT_NAME = mPreference.getGmailAccount();
-
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                getActivity().getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
-
-        mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
+        mCredential.setSelectedAccountName(mPreference.getGmailAccount());
 
         return view;
     }
