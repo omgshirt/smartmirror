@@ -294,7 +294,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 try {
                     thumbnail = fields.getString("thumbnail");
                     mImageURI.add(Uri.parse(thumbnail));
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 i++;
             }
 
@@ -317,7 +319,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         newsFeed.setAdapter(customAdapter);
     }
 
-    public void addToArrayList(ArrayList arrayList) {
+    public void addToArrayList(ArrayList<String> arrayList) {
         arrayList.add("1");
         arrayList.add("2");
         arrayList.add("3");

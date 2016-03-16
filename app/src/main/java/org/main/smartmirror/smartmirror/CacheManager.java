@@ -12,11 +12,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * CacheManager holds a hashMap of DataCache objects. Periodically a thread will check all registered
- * objects and notify listeners when the data has expired.
+ * CacheManager class maintains a map of data objects for the life of the application.
+ *
+ * Periodically a thread will check all caches. Any expired caches will trigger callbacks to
+ * onCacheExpired. Changing the contents of a cache will callback to onCacheChanged.
  *
  * To receive notifications when a cache has changed or expired, use the CacheListener interface.
  */
+
 public class CacheManager {
 
     private static CacheManager mCacheManager;

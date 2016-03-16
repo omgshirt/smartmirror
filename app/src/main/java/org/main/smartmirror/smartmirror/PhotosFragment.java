@@ -20,7 +20,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import com.google.gdata.client.photos.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +29,7 @@ public class PhotosFragment extends Fragment {
 
     ImageView mPhotoFromPicasa;
     URL albumPostUrl;
-    private PicasawebService service;
+    //private PicasawebService service;
     Handler mHandler;
     String userID = "smartmirrortesting";
     String albumID;
