@@ -12,9 +12,4 @@
         android:layout_gravity="center_horizontal|top"
         android:src="@color/colorAccent" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/list_photos"
-        android:layout_gravity="center_horizontal" />
 </FrameLayout>
