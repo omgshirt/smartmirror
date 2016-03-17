@@ -305,7 +305,6 @@ public class MainActivity extends AppCompatActivity
 
         addScreenOnFlag();
         resetInteractionTimer();
-        mPreferences.setVolumesToPrefValues();
         stopLightSensor();
         startSpeechRecognition();
 
@@ -328,7 +327,6 @@ public class MainActivity extends AppCompatActivity
         // This is (mostly) for debugging purposes as the finished program should always be in foreground.
         if (mPowerManager.isScreenOn()) {
             stopSpeechRecognition();
-            mPreferences.setVolumesToSystemValues();
             setDefaultScreenOffTimeout();
         } else {
             // Otherwise the screen is turning off: start Light Sensor
@@ -978,6 +976,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // --------------------------------- GMail ---------------------------------------------
+
+    public int getUnreadCount() {
+        // TODO: enable this when gmailhomefragment is added
+        int count = 2;
+        /*
+        GmailHomeFragment gmhf = (GmailHomeFragment)getSupportFragmentManager().findFragmentById(R.id.);
+        if (gmhf != null)
+            count = gmhf.getUnreadCount();
+        */
+        return count;
+    }
+
     // --------------------------------- Sound Effects Playback -----------------------------
 
     /**
@@ -1013,17 +1024,10 @@ public class MainActivity extends AppCompatActivity
      * @param phrase to speak
      */
     public void speakText(final String phrase) {
-        Thread mSpeechThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mTTSHelper.start(phrase);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        mSpeechThread.start();
+        Log.i(Constants.TAG, "speakText :: " + phrase);
+        if (mPreferences.isSpeechEnabled()) {
+            mTTSHelper.start(phrase);
+        }
     }
 
     /**

@@ -71,12 +71,20 @@ public class Mira {
      }
 
     /**
-     * Mira tells the user how many unread emails are in their inbox
+     * If logged in to a gmail account, Mira says the number of unread messages.
      */
     private void sayUnreadEmails() {
-        // TODO: get the # of unread mails from gmailHomeFragment
-        //String msg = "You have " + mActivity.getUnreadEmailCount() + " unread emails.";
-        //mActivity.speakText(msg);
+
+        if (mPreferences.getGmailLoginStatus()) {
+            int unreadCount = mActivity.getUnreadCount();
+
+            if (unreadCount > 0) {
+                String plural = "";
+                if (unreadCount > 1) plural = "s";
+                String msg = String.format(Locale.US, "You have %d unread email%s.", unreadCount, plural);
+                mActivity.speakText(msg);
+            }
+        }
     }
 
     /**
@@ -96,7 +104,7 @@ public class Mira {
         mLastWakeTime = System.currentTimeMillis();
 
         // Say messages only if the mirror has been asleep for more than a minute
-        if (mLastWakeTime - mLastSleepTime > 60000) {
+        if (mLastWakeTime - mLastSleepTime > 6) {
             sayTimeGreeting();
             sayUnreadEmails();
         }

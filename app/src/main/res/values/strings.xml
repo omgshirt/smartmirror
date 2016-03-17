@@ -69,26 +69,29 @@
     <string name="settings_system_vol">System Volume</string>
     <string name="settings_music_vol">Speech Volume</string>
 
-    <string name="settings_off">Off</string>
-    <string name="settings_vlow">Min</string>
-    <string name="settings_low">Low</string>
-    <string name="settings_medium">Medium</string>
-    <string name="settings_high">High</string>
-    <string name="settings_vhigh">Max</string>
+    <string name="lbl_speech_on">Speech: On</string>
+    <string name="lbl_speech_off">Speech: Off</string>
 
-    <string name="voice_on">Voice Recognition: On</string>
-    <string name="voice_off">Voice Recognition: Off</string>
+    <string name="lbl_voice_on">Voice Recognition: On</string>
+    <string name="lbl_voice_off">Voice Recognition: Off</string>
 
-    <string name="remote_on">Remote: On</string>
-    <string name="remote_off">Remote: Off</string>
+    <string name="lbl_remote_on">Remote: On</string>
+    <string name="lbl_remote_off">Remote: Off</string>
 
-    <string name="weather_english">Weather: English</string>
-    <string name="weather_metric">Weather: Metric</string>
+    <string name="lbl_weather_english">Weather: English</string>
+    <string name="lbl_weather_metric">Weather: Metric</string>
 
-    <string name="time_format_12hr">Time: 12-hour</string>
-    <string name="time_format_24hr">Time: 24-hour</string>
+    <string name="lbl_time_format_12hr">Time: 12-hour</string>
+    <string name="lbl_time_format_24hr">Time: 24-hour</string>
 
     <!-- Text to Speech phrases -->
+    <string name="speech_on">Speech on.</string>
+    <string name="speech_on_err">Speech is on.</string>
+
+    <string name="speech_off">I\'ll be quiet. Say \'speech on\' to cancel.</string>
+    <string name="speech_off_err">Speech is already off. Oops I shouldn\'t be talking.</string>
+
+
     <string name="speech_voice_on">I\'m listening</string>
     <string name="speech_voice_on_err">I\'m already listening</string>
 

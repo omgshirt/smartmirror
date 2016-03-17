@@ -17,7 +17,7 @@
 
     <TextView
         android:id="@+id/daily_forecast_icon"
-        android:gravity="start|center_vertical"
+        android:gravity="end"
         android:layout_gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
 
     <TextView
         android:id="@+id/daily_forecast_temp"
-        android:gravity="start|center_vertical"
+        android:gravity="end"
         android:layout_gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

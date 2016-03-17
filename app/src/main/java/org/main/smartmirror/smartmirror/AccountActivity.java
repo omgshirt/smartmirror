@@ -38,7 +38,6 @@ import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -197,6 +196,7 @@ public class AccountActivity extends AppCompatActivity implements
      * Handles the signing out of Google
      */
     private void signOutOfGoogle() {
+        mGoogleApiClient.connect();
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
@@ -213,7 +213,6 @@ public class AccountActivity extends AppCompatActivity implements
         mPreference.setFirstTimeRun(false);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-        finish();
     }
 
     // --------------------------------Helpers------------------------------------------------- //
@@ -353,7 +352,6 @@ public class AccountActivity extends AppCompatActivity implements
                 Toast.makeText(this, "No account found!!", Toast.LENGTH_LONG).show();
             }
         } else {
-
             // not logged in!
         }
     }

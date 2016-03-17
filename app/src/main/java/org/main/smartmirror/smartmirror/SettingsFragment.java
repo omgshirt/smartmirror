@@ -21,8 +21,7 @@ import android.widget.Switch;
 public class SettingsFragment extends Fragment {
 
     private Preferences mPreferences;
-    private RadioGroup grpSysVolume;
-    private RadioGroup grpSpeechVolume;
+    private Switch swtSpeechEnabled;
     private Switch swtVoiceEnabled;
     private Switch swtRemoteEnabled;
     private Switch swtWeatherEnglish;
@@ -49,63 +48,20 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings_fragment, container, false);
 
-        grpSysVolume = (RadioGroup) view.findViewById(R.id.sys_vol_group);
-        grpSysVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        // Speech Enabled Switch
+        swtSpeechEnabled = (Switch) view.findViewById(R.id.switch_speech_enabled);
+        swtSpeechEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.sys_vol_off:
-                        mPreferences.setSystemVolume(Preferences.VOL_OFF);
-                        break;
-                    case R.id.sys_vol_vlow:
-                        mPreferences.setSystemVolume(Preferences.VOL_VLOW);
-                        break;
-                    case R.id.sys_vol_low:
-                        mPreferences.setSystemVolume(Preferences.VOL_LOW);
-                        break;
-                    case R.id.sys_vol_medium:
-                        mPreferences.setSystemVolume(Preferences.VOL_MEDIUM);
-                        break;
-                    case R.id.sys_vol_high:
-                        mPreferences.setSystemVolume(Preferences.VOL_HIGH);
-                        break;
-                    case R.id.sys_vol_vhigh:
-                        mPreferences.setSystemVolume(Preferences.VOL_VHIGH);
-                        break;
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPreferences.setSpeechEnabled(isChecked);
+                if (isChecked) {
+                    swtSpeechEnabled.setText(getResources().getString(R.string.lbl_speech_on));
+                } else {
+                    swtSpeechEnabled.setText(getResources().getString(R.string.lbl_speech_off));
                 }
             }
         });
-
-        setSystemVolume(mPreferences.getSystemVolume());
-
-        grpSpeechVolume = (RadioGroup) view.findViewById(R.id.mus_vol_group);
-        grpSpeechVolume.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.mus_vol_off:
-                        mPreferences.setMusicVolume(Preferences.VOL_OFF);
-                        break;
-                    case R.id.mus_vol_vlow:
-                        mPreferences.setMusicVolume(Preferences.VOL_VLOW);
-                        break;
-                    case R.id.mus_vol_low:
-                        mPreferences.setMusicVolume(Preferences.VOL_LOW);
-                        break;
-                    case R.id.mus_vol_medium:
-                        mPreferences.setMusicVolume(Preferences.VOL_MEDIUM);
-                        break;
-                    case R.id.mus_vol_high:
-                        mPreferences.setMusicVolume(Preferences.VOL_HIGH);
-                        break;
-                    case R.id.mus_vol_vhigh:
-                        mPreferences.setMusicVolume(Preferences.VOL_VHIGH);
-                        break;
-                }
-            }
-        });
-
-        setMusicVolume(mPreferences.getMusicVolume());
+        swtSpeechEnabled.setChecked(mPreferences.isSpeechEnabled());
 
         // Voice Enabled Switch
         swtVoiceEnabled = (Switch) view.findViewById(R.id.switch_voice_enabled);
@@ -114,9 +70,9 @@ public class SettingsFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPreferences.setVoiceEnabled(isChecked);
                 if (isChecked) {
-                    swtVoiceEnabled.setText(getResources().getString(R.string.voice_on));
+                    swtVoiceEnabled.setText(getResources().getString(R.string.lbl_voice_on));
                 } else {
-                    swtVoiceEnabled.setText(getResources().getString(R.string.voice_off));
+                    swtVoiceEnabled.setText(getResources().getString(R.string.lbl_voice_off));
                 }
             }
         });
@@ -129,9 +85,9 @@ public class SettingsFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPreferences.setRemoteEnabled(isChecked);
                 if (isChecked) {
-                    swtRemoteEnabled.setText(getResources().getString(R.string.remote_on));
+                    swtRemoteEnabled.setText(getResources().getString(R.string.lbl_remote_on));
                 } else {
-                    swtRemoteEnabled.setText(getResources().getString(R.string.remote_off));
+                    swtRemoteEnabled.setText(getResources().getString(R.string.lbl_remote_off));
                 }
             }
         });
@@ -143,10 +99,10 @@ public class SettingsFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     mPreferences.setWeatherUnits(Preferences.ENGLISH);
-                    swtWeatherEnglish.setText(getResources().getString(R.string.weather_english));
+                    swtWeatherEnglish.setText(getResources().getString(R.string.lbl_weather_english));
                 } else {
                     mPreferences.setWeatherUnits(Preferences.METRIC);
-                    swtWeatherEnglish.setText(getResources().getString(R.string.weather_metric));
+                    swtWeatherEnglish.setText(getResources().getString(R.string.lbl_weather_metric));
                 }
             }
         });
@@ -158,10 +114,10 @@ public class SettingsFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     mPreferences.setTimeFormat12hr();
-                    swtTimeFormat.setText(getResources().getString(R.string.time_format_12hr));
+                    swtTimeFormat.setText(getResources().getString(R.string.lbl_time_format_12hr));
                 } else {
                     mPreferences.setTimeFormat24hr();
-                    swtTimeFormat.setText(getResources().getString(R.string.time_format_24hr));
+                    swtTimeFormat.setText(getResources().getString(R.string.lbl_time_format_24hr));
                 }
             }
         });
@@ -194,44 +150,10 @@ public class SettingsFragment extends Fragment {
             Boolean checked = false;
             switch (message) {
 
-                // system volume
-                case Preferences.CMD_VOLUME_OFF:
-                    setSystemVolume(Preferences.VOL_OFF);
-                    break;
-                case Preferences.CMD_VOLUME_VLOW:
-                    setSystemVolume(Preferences.VOL_VLOW);
-                    break;
-                case Preferences.CMD_VOLUME_LOW:
-                    setSystemVolume(Preferences.VOL_LOW);
-                    break;
-                case Preferences.CMD_VOLUME_MEDIUM:
-                    setSystemVolume(Preferences.VOL_MEDIUM);
-                    break;
-                case Preferences.CMD_VOLUME_HIGH:
-                    setSystemVolume(Preferences.VOL_HIGH);
-                    break;
-                case Preferences.CMD_VOLUME_VHIGH:
-                    setSystemVolume(Preferences.VOL_VHIGH);
-                    break;
-
-                // Speech Volume
+                case Preferences.CMD_SPEECH_ON:
+                    checked = true;
                 case Preferences.CMD_SPEECH_OFF:
-                    setMusicVolume(Preferences.VOL_OFF);
-                    break;
-                case Preferences.CMD_SPEECH_VLOW:
-                    setMusicVolume(Preferences.VOL_VLOW);
-                    break;
-                case Preferences.CMD_SPEECH_LOW:
-                    setMusicVolume(Preferences.VOL_LOW);
-                    break;
-                case Preferences.CMD_SPEECH_MEDIUM:
-                    setMusicVolume(Preferences.VOL_MEDIUM);
-                    break;
-                case Preferences.CMD_SPEECH_HIGH:
-                    setMusicVolume(Preferences.VOL_HIGH);
-                    break;
-                case Preferences.CMD_SPEECH_VHIGH:
-                    setMusicVolume(Preferences.VOL_VHIGH);
+                    swtSpeechEnabled.setChecked(checked);
                     break;
 
                 // remote on / off
@@ -275,39 +197,5 @@ public class SettingsFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-    }
-
-    // Methods to update UI elements
-
-    public void setSystemVolume(float vol) {
-        if (vol == Preferences.VOL_OFF) {
-            grpSysVolume.check(R.id.sys_vol_off);
-        } else if (vol == Preferences.VOL_VLOW) {
-            grpSysVolume.check(R.id.sys_vol_vlow);
-        } else if (vol == Preferences.VOL_LOW) {
-            grpSysVolume.check(R.id.sys_vol_low);
-        } else if (vol == Preferences.VOL_MEDIUM) {
-            grpSysVolume.check(R.id.sys_vol_medium);
-        } else if (vol == Preferences.VOL_HIGH) {
-            grpSysVolume.check(R.id.sys_vol_high);
-        } else if (vol == Preferences.VOL_VHIGH) {
-            grpSysVolume.check(R.id.sys_vol_vhigh);
-        }
-    }
-
-    public void setMusicVolume(float vol) {
-        if (vol == Preferences.VOL_OFF) {
-            grpSpeechVolume.check(R.id.mus_vol_off);
-        } else if (vol == Preferences.VOL_VLOW) {
-            grpSpeechVolume.check(R.id.mus_vol_vlow);
-        } else if (vol == Preferences.VOL_LOW) {
-            grpSpeechVolume.check(R.id.mus_vol_low);
-        } else if (vol == Preferences.VOL_MEDIUM) {
-            grpSpeechVolume.check(R.id.mus_vol_medium);
-        } else if (vol == Preferences.VOL_HIGH) {
-            grpSpeechVolume.check(R.id.mus_vol_high);
-        } else if (vol == Preferences.VOL_VHIGH) {
-            grpSpeechVolume.check(R.id.mus_vol_vhigh);
-        }
     }
 }
