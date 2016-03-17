@@ -769,9 +769,6 @@ public class MainActivity extends AppCompatActivity
                 case Constants.CAMERA:
                     fragment = new CameraFragment();
                     break;
-                case Constants.GMAIL:
-                        fragment = new GmailFragment();
-                    break;
                 case Constants.CLOSE_SCREEN:
                 case Constants.CLOSE_WINDOW:
                 case Constants.HIDE_SCREEN:
@@ -785,6 +782,9 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.GALLERY:
                     fragment = new GalleryFragment();
+                    break;
+                case Constants.GMAIL:
+                    fragment = new GmailFragment();
                     break;
                 case Constants.HELP:
                 case Constants.SHOW_HELP:
@@ -1162,7 +1162,7 @@ public class MainActivity extends AppCompatActivity
     public void onNextCommand(){
         //Here we update GmailHomeFragment
         GmailHomeFragment gmailHomeFrag = (GmailHomeFragment)
-                getSupportFragmentManager().findFragmentById(R.id.gmail_home);
+                getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
 
         if (gmailHomeFrag != null) {
             gmailHomeFrag.updateUnreadCount();

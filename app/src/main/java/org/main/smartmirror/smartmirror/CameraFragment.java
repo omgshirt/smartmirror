@@ -438,7 +438,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         //String accountName = Preferences.mUserAccountPref;
         String accountName = mPreferences.getGmailAccount();
         credential.setSelectedAccountName(accountName);
-        service = getDriveService(credential);
+        // service = getDriveService(credential);
         return view;
     }
 
@@ -541,9 +541,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 CameraCharacteristics characteristics
                         = manager.getCameraCharacteristics(cameraId);
 
-                // We don't use a front facing camera in this sample.
+                // We don't use the rear facing camera.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
 
@@ -948,7 +948,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             try {
                 FileOutputStream output = new FileOutputStream(mFile);
                 output.write(bytes);
-                saveFileToDrive();
+                // saveFileToDrive();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -991,7 +991,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
                     retrieveAllFiles(service);
-//                    showCameraFeedback("Upload to Drive Successful!");
+                    // showCameraFeedback("Upload to Drive Successful!");
                 } catch (UserRecoverableAuthIOException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

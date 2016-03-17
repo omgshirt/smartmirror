@@ -3,6 +3,22 @@ package org.main.smartmirror.smartmirror;
 /**
  * Created by Master N on 2/10/2016.
  */
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -12,21 +28,9 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.gmail.GmailScopes;
-import com.google.api.services.gmail.model.*;
-import android.support.v4.app.Fragment;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import com.google.api.services.gmail.model.ListMessagesResponse;
+import com.google.api.services.gmail.model.Message;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,16 +46,17 @@ public class GmailHomeFragment extends Fragment {
     public ImageView mailIcon;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    private String PREF_ACCOUNT_NAME = "";
     public int numUnreadPrimary;
     private Preferences mPreference;
-    private static ScheduledFuture<?> unreadCountScheduler;
+    private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
 
+    private static ScheduledFuture<?> unreadCountScheduler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
-        mCredential.setSelectedAccountName(mPreference.getGmailAccount());
     }
 
     @Override
@@ -60,6 +65,10 @@ public class GmailHomeFragment extends Fragment {
         textView = (TextView)view.findViewById(R.id.num_unread);
         mailIcon = (ImageView) view.findViewById(R.id.mail_icon);
 
+        mCredential = GoogleAccountCredential.usingOAuth2(
+                getActivity().getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff())
+                .setSelectedAccountName(mPreference.getGmailAccount());
         mCredential.setSelectedAccountName(mPreference.getGmailAccount());
 
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
@@ -112,9 +121,9 @@ public class GmailHomeFragment extends Fragment {
     }
 
     private void refreshResults() {
-            if (isDeviceOnline()) {
-                new MakeRequestTask(mCredential).execute();
-            }
+        if (isDeviceOnline()) {
+            new MakeRequestTask(mCredential).execute();
+        }
     }
 
     /**

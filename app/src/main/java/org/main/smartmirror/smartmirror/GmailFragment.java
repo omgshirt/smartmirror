@@ -51,11 +51,25 @@ public class GmailFragment extends Fragment {
     public ListView listViewBody;
     public String mBody;
 
-    private Preferences mPreference;
     public Button nextMessage;
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    private String PREF_ACCOUNT_NAME = "";
+
+    //SCOPES - Note: When adding/deleting scopes, it is necessary to reauthorize by:
+    //               1. Remove SmartMirror from Google Account by going to Connected Apps and Services
+    //               2. Run Google Account Picker (Navin uses the OldCalendarFragment code)
+    //Otherwise, changes won't take place.
+    private static final String[] SCOPES = {
+            GmailScopes.GMAIL_LABELS,
+            GmailScopes.GMAIL_READONLY,
+            GmailScopes.MAIL_GOOGLE_COM,
+            GmailScopes.GMAIL_MODIFY,
+            GmailScopes.GMAIL_INSERT
+    };
+
+    private Preferences mPreference;
 
     OnNextMessageListener mCallback;
 
@@ -63,6 +77,7 @@ public class GmailFragment extends Fragment {
     public interface OnNextMessageListener {
         public void onNextCommand();
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,6 +117,14 @@ public class GmailFragment extends Fragment {
                 Log.i(Constants.TAG, "After task");
             }
         });
+
+        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        mCredential = GoogleAccountCredential.usingOAuth2(
+                getActivity().getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff())
+                .setSelectedAccountName(settings.getString(mPreference.getGmailAccount(), null));
+
         mCredential.setSelectedAccountName(mPreference.getGmailAccount());
 
         return view;
@@ -126,7 +149,7 @@ public class GmailFragment extends Fragment {
                     if (position < 0) position = 0;
                 }
                 VoiceScroll sl = new VoiceScroll();
-                sl.scrollListView(message,listViewBody, position);
+                sl.scrollListView(message, listViewBody, position);
             }
             else if(message.contains(Constants.NEXT)){
                 Log.i(Constants.TAG, "In Broadcast Listener");
@@ -230,13 +253,13 @@ public class GmailFragment extends Fragment {
         @Override
         protected List<String> doInBackground(Void... params) {
             try { Log.i(Constants.TAG, " GET DATA TEST");
-                 return getDataFromApi();
+                return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
                 Log.i(Constants.TAG, "CATCHING EXCEPTION E");
                 cancel(true);
                 Log.i(Constants.TAG, mLastError.toString());
-               // Log.i(Constants.TAG, isCancelled() + "ISCANCELLED TEST");
+                // Log.i(Constants.TAG, isCancelled() + "ISCANCELLED TEST");
                 return null;
             }
         }

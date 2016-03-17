@@ -12,16 +12,16 @@
 
     <!-- status icons -->
     <LinearLayout
-        android:gravity="end"
         android:layout_width="match_parent"
-        android:layout_height="25dp">
+        android:layout_height="25dp"
+        android:gravity="end">
 
         <ImageView
             android:id="@+id/speech_icon"
             android:layout_width="25sp"
             android:layout_height="25sp"
-            android:layout_marginEnd="2dp"
             android:layout_gravity="end"
+            android:layout_marginEnd="2dp"
             android:background="@android:color/transparent"
             android:contentDescription="speech icon"
             android:src="@drawable/ic_action_microphone"
@@ -36,6 +36,7 @@
             android:contentDescription="remote control icon"
             android:src="@drawable/remote_128"
             android:visibility="gone" />
+
         <ImageView
             android:id="@+id/remote_dc_icon"
             android:layout_width="25sp"
@@ -59,12 +60,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:layout="@layout/weather_fragment" />
+
         <fragment
-            android:id="@+id/gmail_home"
-            android:name="org.main.smartmirror.smartmirror.GmailHomeFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        </LinearLayout>
+            android:id="@+id/calendar_home_fragment"
+            android:name="org.main.smartmirror.smartmirror.CalendarHomeFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout="@layout/calendar_home_fragment" />
+
+        <fragment
+            android:id="@+id/gmail_home_fragment"
+            android:name="org.main.smartmirror.smartmirror.CalendarHomeFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout="@layout/gmail_home_fragment" />
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/content_frame_2"

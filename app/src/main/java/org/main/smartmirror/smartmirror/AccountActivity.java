@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -22,6 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gm.contentprovider.GmailContract;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -124,6 +126,8 @@ public class AccountActivity extends AppCompatActivity implements
         List<String> permissionsNeeded = new ArrayList<>();
         final List<String> permissionsList = new ArrayList<>();
         // Here, this is the current activity
+        if (!addPermission(permissionsList, GmailContract.PERMISSION))
+            permissionsNeeded.add("Content Provider");
         if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION))
             permissionsNeeded.add("Access Coarse Location");
         if (!addPermission(permissionsList, Manifest.permission.CAMERA))
@@ -310,7 +314,8 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
-     * Handles the button press in the layout
+     * Handles the Submit button in account_activity
+     * layout
      *
      * @param view current view
      */
@@ -405,6 +410,7 @@ public class AccountActivity extends AppCompatActivity implements
             case REQUEST_PERMISSIONS:
                 Map<String, Integer> perms = new HashMap<String, Integer>();
                 // Initial
+                perms.put(GmailContract.PERMISSION, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.ACCESS_COARSE_LOCATION, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.GET_ACCOUNTS, PackageManager.PERMISSION_GRANTED);
@@ -415,7 +421,8 @@ public class AccountActivity extends AppCompatActivity implements
                 for (int i = 0; i < permissions.length; i++)
                     perms.put(permissions[i], grantResults[i]);
                 // Check for permissions
-                if (perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                if (perms.get(GmailContract.PERMISSION) == PackageManager.PERMISSION_GRANTED
+                        && perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
