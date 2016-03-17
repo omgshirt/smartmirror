@@ -55,7 +55,6 @@ dependencies {
     compile('com.twitter.sdk.android:twitter:1.10.0@aar') {
         transitive = true;
     }
-
     compile project(':pocketsphinx-android-5prealpha-nolib')
     compile('com.google.api-client:google-api-client-android:1.20.0') {
         exclude group: 'org.apache.httpcomponents'
@@ -63,7 +62,6 @@ dependencies {
     compile('com.google.apis:google-api-services-drive:v2-rev170-1.20.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
@@ -73,7 +71,6 @@ dependencies {
     compile 'com.android.support:support-v13:23.1.1'
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.google.gdata:core:1.47.1'
     compile 'com.google.android.gms:play-services-appindexing:8.3.0'
     compile 'com.google.android.gms:play-services-auth:8.3.0'
 }
