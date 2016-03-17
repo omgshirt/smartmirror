@@ -2,7 +2,6 @@ package org.main.smartmirror.smartmirror;
 
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-//android.os.AsyncTask<Params, Progress, Result>
 public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
     String userID = "smartmirrortesting";
@@ -63,21 +61,10 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             URL url = new URL(query);
             URLConnection conn = url.openConnection();
 
-            // get xml from api
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(conn.getInputStream());
             traverse(doc.getDocumentElement());
-
-                    /*NodeList nodes = doc.getElementsByTagName("author");
-                    //Log.i("Node ", nodes.toString());
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        Element element = (Element) nodes.item(i);
-                        NodeList title = element.getElementsByTagName("name");
-                        Element line = (Element) title.item(0);
-                        //names.add(line.getTextContent());
-                        //Log.i("Node ", names.toString());
-                    }*/
         }
         catch (Exception e) {
             e.printStackTrace();

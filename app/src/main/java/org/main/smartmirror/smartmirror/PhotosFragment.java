@@ -1,50 +1,16 @@
 package org.main.smartmirror.smartmirror;
 
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.util.Xml;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
-
-import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 
 public class PhotosFragment extends Fragment {
 
     public static ImageView mPhotoFromPicasa;
-
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
