@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,39 +42,18 @@ import javax.xml.transform.stream.StreamResult;
 public class PhotosFragment extends Fragment {
 
     public static ImageView mPhotoFromPicasa;
-    URL albumPostUrl;
-    Handler mHandler;
-    String userID = "smartmirrortesting";
-    String albumID = "SmartMirror";
-    int numPhotos = 1;
-    ArrayList<Uri> mImageUrlList = new ArrayList<Uri>();
-    String[] imageList = new String[10];
-    String imageUrl;
 
-    String samplePhoto = "https://lh3.googleusercontent.com/-c7yXykzq6uw/VuXZevOmjhE/AAAAAAAAALw/HdMLGlY50d8//SmartMirror";
 
-    String getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + userID;
-    String getPhotosInAlbum = "https://picasaweb.google.com/data/feed/api/user/"+userID+"/albumid/"+albumID;
-    String getLatestPhotos = "https://picasaweb.google.com/data/feed/api/user/"+userID+"?kind=photo&max-results="+numPhotos;
-    String getUserPhotos = "https://picasaweb.google.com/data/feed/api/user/"+userID;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.photos_fragment, container, false);
         mPhotoFromPicasa = (ImageView) view.findViewById(R.id.photo_from_picasa);
-
-        renderPhoto();
-
+        new PhotosASyncTask().execute();
         return view;
     }
-
-    public void renderPhoto() {
-        Picasso.with(getActivity()).load(samplePhoto).fit().centerInside().into(mPhotoFromPicasa);
-        //new PhotosASyncTask().execute();
-    }
-
-
 
 
 }
