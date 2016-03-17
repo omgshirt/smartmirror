@@ -80,6 +80,7 @@ public class CacheManager {
      * @param time time (in seconds) until the cache is considered expired
      */
     public void addCache(String key, Object data, int time) {
+        Log.i(Constants.TAG, "CacheManager addCache :: " + key);
         cacheMap.put(key, new DataCache<>(data, time));
         notifyCacheChanged(key);
     }
@@ -130,7 +131,7 @@ public class CacheManager {
         }
         // ensure one listener can't sign up twice for the same cache.
         if (!listeners.contains(newListener)) {
-            Log.i(Constants.TAG, "CacheManager adding :: " + newListener);
+            //Log.i(Constants.TAG, "CacheManager adding listener :: " + newListener);
             listeners.add(newListener);
             mListenersMap.put(cacheName, listeners);
         }
@@ -144,7 +145,7 @@ public class CacheManager {
      */
     public void unRegisterCacheListener(String key, CacheListener listener) {
         if (mListenersMap.containsKey(key)) {
-            Log.i(Constants.TAG, "CacheManager unregistering :: " + listener);
+            //Log.i(Constants.TAG, "CacheManager unregistering :: " + listener);
             mListenersMap.get(key).remove(listener);
         }
     }

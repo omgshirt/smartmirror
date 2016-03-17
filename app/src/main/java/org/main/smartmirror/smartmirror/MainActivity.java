@@ -947,7 +947,6 @@ public class MainActivity extends AppCompatActivity
      * Start the speech recognizer
      */
     public void startSpeechRecognition() {
-        Log.i(Constants.TAG, "startSpeechRecognition()");
         if (mTTSHelper.isSpeaking() || mService == null) return;
         try {
             //Log.i("VR", "startSpeechRecognition()");
@@ -964,7 +963,6 @@ public class MainActivity extends AppCompatActivity
      * Stops the current speech recognition object
      */
     public void stopSpeechRecognition() {
-        Log.i(Constants.TAG, "stopSpeechRecognition()");
         if (mService == null) return;
         try {
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);

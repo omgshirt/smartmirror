@@ -87,7 +87,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
 
         txtNewsDesk.setText(mNewsSection.toUpperCase());
-        startNewsUpdate();
 
         return view;
     }
