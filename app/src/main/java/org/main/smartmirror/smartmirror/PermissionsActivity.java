@@ -58,6 +58,8 @@ public class PermissionsActivity extends AppCompatActivity {
         List<String> permissionsNeeded = new ArrayList<>();
         final List<String> permissionsList = new ArrayList<>();
         // Here, this is the current activity
+        if (!addPermission(permissionsList, Constants.GMAIL_PROVIDER_PERMISSION))
+            permissionsNeeded.add("Gmail Provider");
         if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION))
             permissionsNeeded.add("Access Coarse Location");
         if (!addPermission(permissionsList, Manifest.permission.CAMERA))
@@ -133,6 +135,7 @@ public class PermissionsActivity extends AppCompatActivity {
             case REQUEST_PERMISSIONS:
                 Map<String, Integer> perms = new HashMap<>();
                 // Initial
+                perms.put(Constants.GMAIL_PROVIDER_PERMISSION, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.ACCESS_COARSE_LOCATION, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.GET_ACCOUNTS, PackageManager.PERMISSION_GRANTED);
@@ -143,7 +146,8 @@ public class PermissionsActivity extends AppCompatActivity {
                 for (int i = 0; i < permissions.length; i++)
                     perms.put(permissions[i], grantResults[i]);
                 // Check for permissions
-                if (perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                if (perms.get(Constants.GMAIL_PROVIDER_PERMISSION) == PackageManager.PERMISSION_GRANTED
+                        && perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED

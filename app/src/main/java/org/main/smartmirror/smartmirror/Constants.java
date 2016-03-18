@@ -14,6 +14,7 @@ public class Constants {
     public static final String KEY_STORE = "AndroidKeyStore";
     public static final String PICASA = "https://picasaweb.google.com/data/";
     public static final String REVOKE_ACCOUNT = "https://accounts.google.com/o/oauth2/revoke?token=";
+    public static final String GMAIL_PROVIDER_PERMISSION = "com.google.android.gm.permission.READ_CONTENT_PROVIDER";
 
     //-------------- DISPLAY -----------
     public static final String CLOSE_WINDOW = "close window";
@@ -118,9 +119,9 @@ public class Constants {
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
             MEDIA, MENU, MINIMIZE,
             MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,
-            NEWS, NEXT, NINE, NINTH, ONE,
+            NEWS, NEXT, NINE, ONE,
             OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
-            SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
+            SCROLL_DOWN, SCROLL_UP, SPORTS,
             SETTINGS, SEVEN, SHOW_LIGHT, SHOW_HELP,
             SHOW_TIME, SHOW_WEATHER, SIX,
             SLEEP, SMALL_SCREEN, TAKE_PICTURE,

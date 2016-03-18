@@ -75,7 +75,7 @@ public class Mira {
      */
     private void sayUnreadEmails() {
 
-        if (mPreferences.getGmailLoginStatus()) {
+        if (mPreferences.isLoggedInToGmail()) {
             int unreadCount = mActivity.getUnreadCount();
 
             if (unreadCount > 0) {

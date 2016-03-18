@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
-        if (mPreferences.getFirstTimeRun()) {
+        if (mPreferences.isFirstTimeRun()) {
             startActivity( new Intent(this, AccountActivity.class));
         }
 

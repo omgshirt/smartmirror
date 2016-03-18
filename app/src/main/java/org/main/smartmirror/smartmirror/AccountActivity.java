@@ -25,6 +25,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.api.Status;
 import com.google.api.services.gmail.GmailScopes;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
