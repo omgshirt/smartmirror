@@ -52,6 +52,7 @@ public class Preferences implements LocationListener {
 
     public static final String PREFS_FIRST_TIME_RUN = "MIRROR_FIRST_TIME_RUN";
 
+    public static final String PREFS_WORK_LOC = "PREFS_WORK_LOC";
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
@@ -102,6 +103,7 @@ public class Preferences implements LocationListener {
     private double mLatitude;
     private double mLongitude;
 
+    private String mWorkLocation;
     private double mWorkLatitude;
     private double mWorkLongitude;
 
@@ -228,6 +230,7 @@ public class Preferences implements LocationListener {
         mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, true);
 
         // Work address
+        mWorkLocation = mSharedPreferences.getString(PREFS_WORK_LOC, "");
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
 
@@ -287,9 +290,6 @@ public class Preferences implements LocationListener {
         if (mPreferences == null) {
             Log.d("Preferences", "Creating new prefs instance...");
             mPreferences = new Preferences(activity);
-        } else {
-            // Changing the context is important ensure casts to MainActivity.
-            mActivity = activity;
         }
         return mPreferences;
     }
@@ -516,12 +516,20 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public void setWorkLocation(String location) {
+        Log.i(Constants.TAG, "settings location :: " + location);
+        mWorkLocation = location;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_WORK_LOC, mWorkLocation);
+        edit.apply();
+    }
+
+    public String getWorkLocation(){
+        return mWorkLocation;
+    }
+
     public boolean isWorkAddressSet() {
-        if (getWorkLongitude() <= 0.0 && getWorkLatitude() <= 0.0) {
-            return false;
-        } else {
-            return true;
-        }
+        return (!mWorkLocation.isEmpty());
     }
 
     // Location Listener Implementation

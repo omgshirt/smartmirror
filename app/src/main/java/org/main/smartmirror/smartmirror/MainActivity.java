@@ -203,6 +203,10 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
+        if (mPreferences.getFirstTimeRun()) {
+            startActivity( new Intent(this, AccountActivity.class));
+        }
+
         setContentView(R.layout.activity_main);
         mira = Mira.getInstance(this);
 
