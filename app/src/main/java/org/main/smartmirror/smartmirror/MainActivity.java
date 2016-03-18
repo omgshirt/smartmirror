@@ -785,6 +785,9 @@ public class MainActivity extends AppCompatActivity
                 case Constants.GALLERY:
                     fragment = new GalleryFragment();
                     break;
+                case Constants.GMAIL:
+                    fragment = new GmailFragment();
+                    break;
                 case Constants.HELP:
                 case Constants.SHOW_HELP:
                     break;
@@ -1155,6 +1158,16 @@ public class MainActivity extends AppCompatActivity
                 sum += v;
             }
             return sum / recentValues.length;
+        }
+    }
+
+    public void onNextCommand(){
+        //Here we update GmailHomeFragment
+        GmailHomeFragment gmailHomeFrag = (GmailHomeFragment)
+                getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
+
+        if (gmailHomeFrag != null) {
+            gmailHomeFrag.updateUnreadCount();
         }
     }
 }

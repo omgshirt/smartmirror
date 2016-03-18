@@ -44,6 +44,7 @@
         <item>quotes</item>
         <item>twitter</item>
         <item>traffic</item>
+        <item>gmail</item>
     </string-array>
 
     <string-array name="weather_help">

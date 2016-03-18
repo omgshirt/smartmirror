@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -14,21 +15,24 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gm.contentprovider.GmailContract;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.common.api.Status;
+import com.google.api.services.gmail.GmailScopes;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -38,11 +42,14 @@ import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -76,13 +83,12 @@ public class AccountActivity extends AppCompatActivity implements
         askForPermissions();
         setUpTwitterButton();
         setUpGoogleButton();
-        if (mPreference.getFirstTimeRun()) {
-            if (mPreference.getGmailLoginStatus()) {
+        if (mPreference.isFirstTimeRun()) {
+            if (mPreference.isLoggedInToGmail()) {
                 // sign out of google
-                // signOutOfGoogle();
+//                signOutOfGoogle();
             }
-            // generate the keys
-            // createNewKeys();
+            // encryption stuff should go here
         } else {
             // we don't care if the values are empty
             // each fragment should handle this
@@ -98,7 +104,11 @@ public class AccountActivity extends AppCompatActivity implements
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
-                .requestScopes(new Scope(Constants.PICASA))
+                .requestScopes(new Scope(Constants.PICASA), new Scope(GmailScopes.GMAIL_LABELS),
+                new Scope(GmailScopes.GMAIL_READONLY),
+                new Scope(GmailScopes.MAIL_GOOGLE_COM),
+                new Scope(GmailScopes.GMAIL_MODIFY),
+                new Scope(GmailScopes.GMAIL_INSERT))
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -116,6 +126,8 @@ public class AccountActivity extends AppCompatActivity implements
         List<String> permissionsNeeded = new ArrayList<>();
         final List<String> permissionsList = new ArrayList<>();
         // Here, this is the current activity
+        if (!addPermission(permissionsList, GmailContract.PERMISSION))
+            permissionsNeeded.add("Content Provider");
         if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION))
             permissionsNeeded.add("Access Coarse Location");
         if (!addPermission(permissionsList, Manifest.permission.CAMERA))
@@ -197,14 +209,23 @@ public class AccountActivity extends AppCompatActivity implements
      * Handles the signing out of Google
      */
     private void signOutOfGoogle() {
-        mGoogleApiClient.connect();
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        Log.i(Constants.TAG, "Revoked: " + status);
-                    }
-                });
+        HttpsURLConnection connection = null;
+        URL url = null;
+        try {
+            url = new URL("https://accounts.google.com/o/oauth2/revoke?token=" + mPreference.getTokenId());
+            connection = (HttpsURLConnection) url.openConnection();
+            connection.connect();
+            if(connection.getResponseCode() == 200){
+                Log.i(Constants.TAG, "Successfully Logged Out");
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            connection.disconnect();
+        }
+
     }
 
     /**
@@ -293,7 +314,8 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
-     * Handles the button press in the layout
+     * Handles the Submit button in account_activity
+     * layout
      *
      * @param view current view
      */
@@ -345,13 +367,38 @@ public class AccountActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            if(acct != null) {
-                mPreference.setGmailAccount(acct.getEmail().toString());
-                // mPreference.setUserName(acct.getDisplayName());
+            if (acct.getEmail() != null) {
+                mPreference.setGmailAccount(acct.getEmail());
+                mPreference.setTokenId(acct.getIdToken());
+                String message = getResources().getString(R.string.login_successful) + " " + acct.getEmail();
+                showToast(message, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, Toast.LENGTH_LONG);
             }
         } else {
-            // not logged in!
+            showToast(getResources().getString(R.string.login_err), Gravity.CENTER_HORIZONTAL, Toast.LENGTH_LONG);
         }
+    }
+
+    /**
+     * Show a toast with given gravity for duration
+     *
+     * @param text     text to show
+     * @param gravity  View.Gravity
+     * @param duration Toast.Duration
+     */
+    @SuppressWarnings("deprecation")
+    private void showToast(String text, int gravity, int duration) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_layout,
+                (ViewGroup) findViewById(R.id.toast_layout_root));
+
+        TextView txtLayout = (TextView) layout.findViewById(R.id.text);
+        txtLayout.setText(text);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setGravity(gravity, 0, 0);
+        toast.setDuration(duration);
+        toast.setView(layout);
+        toast.show();
     }
 
     // -------------------------------Callbacks------------------------------------------------- //
@@ -363,6 +410,7 @@ public class AccountActivity extends AppCompatActivity implements
             case REQUEST_PERMISSIONS:
                 Map<String, Integer> perms = new HashMap<String, Integer>();
                 // Initial
+                perms.put(GmailContract.PERMISSION, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.ACCESS_COARSE_LOCATION, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.GET_ACCOUNTS, PackageManager.PERMISSION_GRANTED);
@@ -373,7 +421,8 @@ public class AccountActivity extends AppCompatActivity implements
                 for (int i = 0; i < permissions.length; i++)
                     perms.put(permissions[i], grantResults[i]);
                 // Check for permissions
-                if (perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                if (perms.get(GmailContract.PERMISSION) == PackageManager.PERMISSION_GRANTED
+                        && perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED

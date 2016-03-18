@@ -21,7 +21,7 @@ public class CalendarFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
-        if (!mPreference.getGmailLoginStatus()) {
+        if (!mPreference.isLoggedInToGmail()) {
             removeCalendar();
         }
     }
@@ -90,6 +90,6 @@ public class CalendarFragment extends Fragment {
     private void removeCalendar() {
         ((MainActivity) getActivity()).removeFragment(Constants.CALENDAR);
         ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.CALENDAR, true);
-        ((MainActivity) getActivity()).speakText("You're not logged in!");
+        ((MainActivity) getActivity()).speakText(getResources().getString(R.string.speech_not_logged_in_err));
     }
 }
