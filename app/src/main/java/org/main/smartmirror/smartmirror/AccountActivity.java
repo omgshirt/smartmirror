@@ -41,6 +41,8 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -80,6 +82,12 @@ public class AccountActivity extends AppCompatActivity implements
         initializeApis();
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
+        TextView txtGoogleAccount = (TextView) findViewById(R.id.current_google_account);
+        if(!mPreference.getGmailAccount().equals("")) {
+            txtGoogleAccount.setText("Logged in as: " + mPreference.getGmailAccount());
+        } else {
+            txtGoogleAccount.setText("Not logged in");
+        }
         askForPermissions();
         setUpTwitterButton();
         setUpGoogleButton();
