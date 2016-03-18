@@ -64,8 +64,8 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
         JSONObject json = (JSONObject) CacheManager.getInstance().get(WeatherFragment.WEATHER_CACHE);
 
         // If cache is empty, return
-        if (json == null || json.length() == 0) {
-            Log.e(Constants.TAG, "forecast: json is null or 0");
+        if (json.length() == 0) {
+            Log.e(Constants.TAG, "forecast: json length 0");
             return;
         }
 

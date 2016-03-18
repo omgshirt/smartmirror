@@ -5,37 +5,24 @@
         <item>take a picture</item>
     </array>
 
-    <array name="color_names">
-        <item>black</item>
-        <item>blue</item>
-        <item>gray</item>
-        <item>green</item>
-        <item>magenta</item>
-        <item>orange</item>
-        <item>purple</item>
-        <item>red</item>
-        <item>yellow</item>
-        <item>white</item>
-    </array>
-
     <string-array name="facebook_help">
         <item>scroll up</item>
         <item>scroll down</item>
     </string-array>
 
     <string-array name="general_help">
-        <item>back / Go Back</item>
-        <item>help</item>
-        <item>conditions</item>
-        <item>settings</item>
-        <item>sleep</item>
-        <item>wake</item>
-        <item>show / Hide Time</item>
-        <item>show / Hide Weather</item>
-        <item>start / Stop Listening</item>
-        <item>enable / Disable Camera</item>
-        <item>enable / Disable Remote</item>
-        <item>weather English / Metric</item>
+        <item>Back | Go Back</item>
+        <item>Help</item>
+        <item>Conditions</item>
+        <item>Settings</item>
+        <item>Sleep | Mira Sleep</item>
+        <item>Wake</item>
+        <item>Show | Hide Time</item>
+        <item>Show | Hide Weather</item>
+        <item>Start | Stop Listening</item>
+        <item>Enable | Disable Camera</item>
+        <item>Enable | Disable Remote</item>
+        <item>Weather English | Metric</item>
     </string-array>
 
     <string-array name="guardian_sections">

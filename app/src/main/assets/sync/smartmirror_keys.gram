@@ -36,14 +36,10 @@ refresh/1e-4/
 remote on/1e-13/
 remote off/1e-10/
 settings/1e-4/
-scroll up/1e3/
-scroll down/1e2/
-speech off/1e5/
-speech min/1e-5/
-speech low/1e5/
-speech medium/1e-20/
-speech high/1e1/
-speech max/1e-15/
+scroll up/1e4/
+scroll down/1e-12/
+speech off/1e-10/
+speech on/1e-10/
 show help/1e-4/
 show time/1e-1/
 show weather/1e1/
@@ -57,12 +53,6 @@ take a picture/1e-15/
 time twelve hour/1e-10/
 time twenty-four hour/1e-20/
 twitter/1e1/
-volume off/1e1/
-volume min/1e-2/
-volume low/1e5/
-volume medium/1e-2/
-volume high/1e5/
-volume max/1e-2/
 wake/1e10/
 wake up/1e-8/
 weather english/1e-8/
@@ -74,14 +64,14 @@ science/1e3/
 sports/1e8/
 technology/1e3/
 travel/1e4/
-world/1e14/
-article one/1e8/
-article two/1e10/
-article three/1e6/
-article four/1e20/
-article five/1e8/
-article six/1e4/
-article seven/1e5/
-article eight/1e4/
-article nine/1e8/
-article ten/1e10/
+world/1e25/
+article one/1e-5/
+article two/1e-5/
+article three/1e-6/
+article four/1e-5/
+article five/1e-5/
+article six/1e-5/
+article seven/1e-5/
+article eight/1e-4/
+article nine/1e-8/
+article ten/1e-5/

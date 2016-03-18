@@ -53,6 +53,8 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public ArrayList<String> mFullArticle = new ArrayList<String>();
     public ArrayList<String> mArticleNumber = new ArrayList<>();
 
+    public int newsFeedPosition = 0;
+
     Handler mHandler = new Handler();
     private ArticleSelectedListener articleSelectedListener;
 
@@ -85,7 +87,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
 
         txtNewsDesk.setText(mNewsSection.toUpperCase());
-        startNewsUpdate();
 
         return view;
     }
@@ -163,16 +164,19 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     txtNewsDesk.setText(mNewsSection.toUpperCase());
 
             }
+
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
-                int position = 0;
-                if (message.contains(Constants.SCROLL_DOWN)) {
-                    position = position + 5;
-                } else if (message.contains(Constants.SCROLL_UP)) {
-                    position = position - 5;
-                    if (position < 0) position = 0;
-                }
                 VoiceScroll sl = new VoiceScroll();
-                sl.scrollListView(message,newsFeed, position);
+                if (message.contains(Constants.SCROLL_DOWN)) {
+                    newsFeedPosition = newsFeedPosition + 5;
+
+                } else if (message.contains(Constants.SCROLL_UP)) {
+                    newsFeedPosition = newsFeedPosition - 5;
+                    if (newsFeedPosition < 0) newsFeedPosition = 0;
+                }
+
+                sl.scrollListView(message,newsFeed, newsFeedPosition);
+
             }
 
         }
@@ -289,7 +293,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 try {
                     thumbnail = fields.getString("thumbnail");
                     mImageURI.add(Uri.parse(thumbnail));
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 i++;
             }
 
@@ -312,7 +318,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         newsFeed.setAdapter(customAdapter);
     }
 
-    public void addToArrayList(ArrayList arrayList) {
+    public void addToArrayList(ArrayList<String> arrayList) {
         arrayList.add("1");
         arrayList.add("2");
         arrayList.add("3");

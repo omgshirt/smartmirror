@@ -1,5 +1,8 @@
 package org.main.smartmirror.smartmirror;
 
+import java.util.Formatter;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -9,6 +12,9 @@ public class Mira {
 
     private MainActivity mActivity;
     private static Mira mira;
+    private static Preferences mPreferences;
+    private long mLastSleepTime = 0;
+    private long mLastWakeTime = 0;
 
     private Mira(MainActivity activity) {
         mActivity = activity;
@@ -17,6 +23,7 @@ public class Mira {
     public static Mira getInstance(MainActivity activity) {
         if (mira == null) {
             mira = new Mira(activity);
+            mPreferences = Preferences.getInstance(activity);
         }
         return mira;
     }
@@ -24,7 +31,7 @@ public class Mira {
     /**
      * Speak a random message about sleeping
      */
-    public void saySleepMessage() {
+    private void saySleepMessage() {
         Random random = new Random();
         String voice;
         float rand = random.nextFloat();
@@ -41,5 +48,65 @@ public class Mira {
         else
             voice = "Finally, some rest.";
         mActivity.speakText(voice);
+    }
+
+
+    /**
+     * Speak a greeting message based on the current time of day
+     */
+    private void sayTimeGreeting() {
+        int hour = GregorianCalendar.getInstance().get(GregorianCalendar.HOUR_OF_DAY);
+        String msg;
+        String userName = mPreferences.getUserFirstName();
+
+        if (hour < 12 ) {
+            msg = mActivity.getResources().getString(R.string.mira_greet_morning);
+        } else if (hour < 19) {
+            msg = mActivity.getResources().getString(R.string.mira_greet_afternoon);
+        } else {
+            msg = mActivity.getResources().getString(R.string.mira_greet_night);
+        }
+
+        mActivity.speakText(String.format( msg, userName ));
+     }
+
+    /**
+     * If logged in to a gmail account, Mira says the number of unread messages.
+     */
+    private void sayUnreadEmails() {
+
+        if (mPreferences.getGmailLoginStatus()) {
+            int unreadCount = mActivity.getUnreadCount();
+
+            if (unreadCount > 0) {
+                String plural = "";
+                if (unreadCount > 1) plural = "s";
+                String msg = String.format(Locale.US, "You have %d unread email%s.", unreadCount, plural);
+                mActivity.speakText(msg);
+            }
+        }
+    }
+
+    /**
+     * Called when the mirror is transitioning to sleep.
+     * Track the time and say a message (if appropriate)
+     */
+    public void appSleeping() {
+        mLastSleepTime = System.currentTimeMillis();
+        saySleepMessage();
+    }
+
+    /**
+     * Called when the mirror is moving from LIGHT_SLEEP or ASLEEP to AWAKE.
+     * Track the time and respond with appropriate message.
+     */
+    public void appWaking() {
+        mLastWakeTime = System.currentTimeMillis();
+
+        // Say messages only if the mirror has been asleep for more than a minute
+        if (mLastWakeTime - mLastSleepTime > 6) {
+            sayTimeGreeting();
+            sayUnreadEmails();
+        }
     }
 }

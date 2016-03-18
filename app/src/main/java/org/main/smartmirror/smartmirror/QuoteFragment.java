@@ -73,8 +73,6 @@ public class QuoteFragment extends Fragment {
         animation.addAnimation(fadeIn);
         animation.addAnimation(fadeOut);
 
-        // Get the quotes as an array list
-        // mQuoteList = new ArrayList<>(Arrays.asList(getQuotes()));
         setUpQuotes();
         refreshAvailableQuotes();
 
