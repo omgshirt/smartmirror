@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -36,13 +37,15 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     String albumID = "6261649979025559057"; // smart mirror album
     //String albumID = "6263091469173478818"; // profile pics
     int numPhotos = 4;
-    public static ArrayList<Uri> mImageUrlList = new ArrayList<Uri>();
     String imageUrl;
-    //public NodeList nodeList;
+    int currentPhoto = 0;
 
+    public static ArrayList<Uri> mImageUrlList = new ArrayList<Uri>();
 
-    Handler mTimerHandler = new Handler();
-    int mDelay = 5000; //milliseconds
+    private TimerTask mTimerTask;
+    private Timer mTimer;
+    private Runnable mRunnable;
+    private Activity activity;
 
     String getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + uID;
     String getPhotosInAlbum = "https://picasaweb.google.com/data/feed/api/user/"+userID+"/albumid/"+albumID;
@@ -67,22 +70,40 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String message) {
-        try {
-                /*Timer timer = new Timer();
-                TimerTask myTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        Picasso.with(MainActivity.getContextForApplication()).load(mImageUrlList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
-                        //currentPhoto++;
-                        //if (currentPhoto > 2) currentPhoto = 0;
 
-                    }
-                };
-                timer.schedule(myTask, 1000, 3000);*/
+        try {
+
+            mTimer = new Timer();
+
+            // initialize the runnable that will handle the task
+            mRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    Picasso.with(MainActivity.getContextForApplication()).load(mImageUrlList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                    currentPhoto++;
+                    if (currentPhoto > mImageUrlList.size()-1) currentPhoto = 0;
+                }
+            };
+
+            // initialize the timer task that will run on the UI
+            mTimerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    //getActivity().runOnUiThread(mRunnable);
+                    activity.runOnUiThread(mRunnable);
+
+                }
+            };
+            mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
 
 
         } catch (Exception e) {e.printStackTrace();}
 
+    }
+
+    public PhotosASyncTask(Activity activity) {
+
+        this.activity = activity;
     }
 
     private String nodeToString(Node node) {
