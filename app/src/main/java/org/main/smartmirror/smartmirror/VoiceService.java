@@ -84,7 +84,7 @@ public class VoiceService extends Service implements RecognitionListener {
     public void startVoice() {
         if (mSpeechInitialized) {
             // issue a short delay
-            Log.i("VR", "startVoice()");
+            //Log.i("VR", "startVoice()");
             mSpeechRecognizer.startListening(KEYWORD_SEARCH);
         }
     }
@@ -173,7 +173,6 @@ public class VoiceService extends Service implements RecognitionListener {
 
     public void cancelAndSendResult(String text) {
         //Log.i("VR", "cancelling voice. Result: \"" + text + "\"");
-        //Log.i(Constants.TAG, "cancelling voice. Result: \"" + text + "\"");
         mSpeechRecognizer.cancel();
         speechResults(text, RESULT_SPEECH);
         startVoice();
@@ -203,7 +202,7 @@ public class VoiceService extends Service implements RecognitionListener {
      */
     @Override
     public void onBeginningOfSpeech() {
-        Log.i("VR", "onBeginningOfSpeech");
+        //Log.i("VR", "onBeginningOfSpeech");
     }
 
     /**
@@ -211,7 +210,7 @@ public class VoiceService extends Service implements RecognitionListener {
      */
     @Override
     public void onEndOfSpeech() {
-        Log.i("VR", "onEndOfSpeech()");
+        //Log.i("VR", "onEndOfSpeech()");
         stopVoice();
     }
 

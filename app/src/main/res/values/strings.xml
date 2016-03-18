@@ -16,6 +16,7 @@
     <string name="title_forecast">Forecast</string>
     <string name="title_gallery">Gallery</string>
     <string name="title_gmail">Gmail</string>
+    <string name="title_photos">Photos</string>
     <string name="title_help">Help</string>
     <string name="title_light">Light</string>
     <string name="title_news">News</string>
@@ -26,17 +27,15 @@
     <string name="title_weather">Weather</string>
 
     <!-- Mira -->
-    <string name="mira_greet_morning">Good morning.</string>
-    <string name="mira_greet_afternoon">Good afternoon.</string>
-    <string name="mira_greet_night">Good evening.</string>
+    <string name="mira_greet_morning">Good morning, %s.</string>
+    <string name="mira_greet_afternoon">Good afternoon, %s.</string>
+    <string name="mira_greet_night">Good evening, %s.</string>
     
     <!-- Calendar -->
     <string name="calendar_items_err">No Events Found</string>
 
-    <!-- Login Error -->
+    <!-- Login -->
     <string name="not_logged_in_err">Sorry, you are not logged in to</string>
-
-
     <string name="login_successful">Successfully logged in as</string>
     <string name="login_err">Oh no! Something went wrong!</string>
 
@@ -72,26 +71,29 @@
     <string name="settings_system_vol">System Volume</string>
     <string name="settings_music_vol">Speech Volume</string>
 
-    <string name="settings_off">Off</string>
-    <string name="settings_vlow">Min</string>
-    <string name="settings_low">Low</string>
-    <string name="settings_medium">Medium</string>
-    <string name="settings_high">High</string>
-    <string name="settings_vhigh">Max</string>
+    <string name="lbl_speech_on">Speech: On</string>
+    <string name="lbl_speech_off">Speech: Off</string>
 
-    <string name="voice_on">Voice Recognition: On</string>
-    <string name="voice_off">Voice Recognition: Off</string>
+    <string name="lbl_voice_on">Voice Recognition: On</string>
+    <string name="lbl_voice_off">Voice Recognition: Off</string>
 
-    <string name="remote_on">Remote: On</string>
-    <string name="remote_off">Remote: Off</string>
+    <string name="lbl_remote_on">Remote: On</string>
+    <string name="lbl_remote_off">Remote: Off</string>
 
-    <string name="weather_english">Weather: English</string>
-    <string name="weather_metric">Weather: Metric</string>
+    <string name="lbl_weather_english">Weather: English</string>
+    <string name="lbl_weather_metric">Weather: Metric</string>
 
-    <string name="time_format_12hr">Time: 12-hour</string>
-    <string name="time_format_24hr">Time: 24-hour</string>
+    <string name="lbl_time_format_12hr">Time: 12-hour</string>
+    <string name="lbl_time_format_24hr">Time: 24-hour</string>
 
     <!-- Text to Speech phrases -->
+    <string name="speech_on">Speech on.</string>
+    <string name="speech_on_err">Speech is on.</string>
+
+    <string name="speech_off">I\'ll be quiet. Say \'speech on\' to cancel.</string>
+    <string name="speech_off_err">Speech is already off. Oops I shouldn\'t be talking.</string>
+
+
     <string name="speech_voice_on">I\'m listening</string>
     <string name="speech_voice_on_err">I\'m already listening</string>
 
@@ -117,14 +119,17 @@
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
     <string name="distance_matrix_api_key">AIzaSyBumZObXEyI5_7Ie0u8ZnrRKAXzojKpDw8</string>
     <string name="guardian_api_key">c6ed3edf-b0c6-4669-8e5c-ba32ba96a65f</string>
-    <string name="news_err">Unable to retrieve news &#8212; check your internet connection</string>
-
+   
     <string name="twitter_api_key">mQ51h9ZbAz9Xk2AZtsUBJAGlx</string>
     <string name="twitter_secret">uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt</string>
     <string name="twitter_access_token">4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG</string>
-    <string name="twitter_error">Error with Twitter Data</string>
 
     <string name="facebook_app_id">913606198722814</string>
     <string name="facebook_app_secret">7ab77882cb36c0e7f942ebee16117444</string>
+
+    <!-- Error messages -->
+    <string name="twitter_error">Unable to retrieve twitter data &#8212; check your internet connection</string>
+    <string name="news_err">Unable to retrieve news &#8212; check your internet connection</string>
+    <string name="photos_err">Unable to retrieve photos &#8212; check your internet connection</string>
 
 </resources>

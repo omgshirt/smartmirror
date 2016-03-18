@@ -3,27 +3,19 @@ package org.main.smartmirror.smartmirror;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gm.contentprovider.GmailContract;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,7 +23,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.api.Status;
 import com.google.api.services.gmail.GmailScopes;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -41,17 +35,9 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -71,10 +57,12 @@ public class AccountActivity extends AppCompatActivity implements
     private String mAuthToken;
     private String mAuthSecret;
 
-    private static final int GOOGLE_REQUEST = 1;
-    private static final int REQUEST_PERMISSIONS = 2;
-    private static final int TWITTER_REQUEST = 3;
+    private TextView txtGoogleAccountName;
+    private EditText edtWorkAddress;
 
+    public static final int GOOGLE_REQUEST = 1;
+    public static final int REQUEST_PERMISSIONS = 2;
+    public static final int TWITTER_REQUEST = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,26 +70,16 @@ public class AccountActivity extends AppCompatActivity implements
         initializeApis();
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
-        TextView txtGoogleAccount = (TextView) findViewById(R.id.current_google_account);
-        if(!mPreference.getGmailAccount().equals("")) {
-            txtGoogleAccount.setText("Logged in as: " + mPreference.getGmailAccount());
-        } else {
-            txtGoogleAccount.setText("Not logged in");
-        }
-        askForPermissions();
+
+        txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
+        edtWorkAddress = (EditText) findViewById(R.id.work_location);
+
+        txtGoogleAccountName.setText(mPreference.getGmailAccount());
+        edtWorkAddress.setText(mPreference.getWorkLocation());
+
         setUpTwitterButton();
         setUpGoogleButton();
-        if (mPreference.isFirstTimeRun()) {
-            if (mPreference.isLoggedInToGmail()) {
-                // sign out of google
-//                signOutOfGoogle();
-            }
-            // encryption stuff should go here
-        } else {
-            // we don't care if the values are empty
-            // each fragment should handle this
-            startMain();
-        }
+
     }
 
     /**
@@ -126,45 +104,6 @@ public class AccountActivity extends AppCompatActivity implements
         Fabric.with(this, new TwitterCore(authConfig));
     }
 
-    /**
-     * Checks all the permissions!
-     */
-    private void askForPermissions() {
-        getWriteSettingsPermission();
-        List<String> permissionsNeeded = new ArrayList<>();
-        final List<String> permissionsList = new ArrayList<>();
-        // Here, this is the current activity
-        if (!addPermission(permissionsList, GmailContract.PERMISSION))
-            permissionsNeeded.add("Content Provider");
-        if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION))
-            permissionsNeeded.add("Access Coarse Location");
-        if (!addPermission(permissionsList, Manifest.permission.CAMERA))
-            permissionsNeeded.add("Camera");
-        if (!addPermission(permissionsList, Manifest.permission.GET_ACCOUNTS))
-            permissionsNeeded.add("Get Accounts");
-        if (!addPermission(permissionsList, Manifest.permission.READ_CALENDAR))
-            permissionsNeeded.add("Read Calendar");
-        if (!addPermission(permissionsList, Manifest.permission.RECORD_AUDIO))
-            permissionsNeeded.add("Record Audio");
-        if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE))
-            permissionsNeeded.add("Write External Storage");
-        if (permissionsList.size() > 0) {
-            if (permissionsNeeded.size() > 0) {
-                // Need Rationale
-                String message = "You need to grant access to " + permissionsNeeded.get(0);
-                for (int i = 1; i < permissionsNeeded.size(); i++)
-                    message = message + ", " + permissionsNeeded.get(i);
-                showMessageOKCancel(message,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(AccountActivity.this, permissionsList.toArray(new String[permissionsList.size()]),
-                                        REQUEST_PERMISSIONS);
-                            }
-                        });
-            }
-        }
-    }
 
     /**
      * Sets up the functionality for the twitter button in the view.
@@ -217,32 +156,30 @@ public class AccountActivity extends AppCompatActivity implements
      * Handles the signing out of Google
      */
     private void signOutOfGoogle() {
-        HttpsURLConnection connection = null;
-        URL url = null;
-        try {
-            url = new URL("https://accounts.google.com/o/oauth2/revoke?token=" + mPreference.getTokenId());
-            connection = (HttpsURLConnection) url.openConnection();
-            connection.connect();
-            if(connection.getResponseCode() == 200){
-                Log.i(Constants.TAG, "Successfully Logged Out");
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            connection.disconnect();
-        }
-
-    }
-
-    /**
-     * Starts Main Activity
-     */
-    private void startMain() {
-        mPreference.setFirstTimeRun(false);
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        mGoogleApiClient.connect();
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Log.i(Constants.TAG, "Revoked: " + status);
+                    }
+                });
+//        HttpsURLConnection connection = null;
+//        URL url = null;
+//        try {
+//            url = new URL("https://accounts.google.com/o/oauth2/revoke?token=" + mPreference.getTokenId());
+//            connection = (HttpsURLConnection) url.openConnection();
+//            connection.connect();
+//            if(connection.getResponseCode() == 200){
+//                Log.i(Constants.TAG, "Successfully Logged Out");
+//            }
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            connection.disconnect();
+//        }
     }
 
     // --------------------------------Helpers------------------------------------------------- //
@@ -263,25 +200,6 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
-     * Receives a list of permissions and the permission
-     * wanted. It then checks to see if the permission is not
-     * granted and prompts the user to grant the permission
-     *
-     * @param permissionsList the permission list that we want
-     * @param permission      the given permission we need to check against
-     * @return the boolean value
-     */
-    private boolean addPermission(List<String> permissionsList, String permission) {
-        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-            permissionsList.add(permission);
-            // Check for Rationale Option
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permission))
-                return false;
-        }
-        return true;
-    }
-
-    /**
      * We listen here for the result from Twitter
      * and pass it on to TwitterLoginBUtton
      *
@@ -295,21 +213,8 @@ public class AccountActivity extends AppCompatActivity implements
         if (requestCode == GOOGLE_REQUEST) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
-        }
-        mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /**
-     * Gets the permission for WRITE_SETTINGS for Android M
-     */
-    private void getWriteSettingsPermission() {
-        // check for permission to write system settings on API 23 and greater.
-        // Leaving this in case we need the WRITE_SETTINGS permission later on.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.System.canWrite(getApplicationContext())) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                startActivityForResult(intent, REQUEST_PERMISSIONS);
-            }
+        } else if (requestCode == TWITTER_REQUEST) {
+            mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -336,14 +241,17 @@ public class AccountActivity extends AppCompatActivity implements
             edFacebookPassword = null;
             edtFacebookUsername = null;
         }*/
-        EditText workAddress = (EditText) findViewById(R.id.work_location);
         // since by default the work lat and long is set to -1 we are OK
         // to not have an else case here
-        if (!(workAddress.getText().toString().equals(""))) {
-            String strAddress = workAddress.getText().toString().replace(' ', '+');
+        if ( !(edtWorkAddress.getText().toString().isEmpty()) ) {
+            mPreference.setWorkLocation(edtWorkAddress.getText().toString());
+
+            String strAddress = edtWorkAddress.getText().toString().replace(' ', '+');
             convertAddressToLatLong(strAddress);
         }
-        startMain();
+        mPreference.setFirstTimeRun(false);
+        finish();
+        //Activity();
     }
 
     /**
@@ -375,77 +283,23 @@ public class AccountActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            if (acct.getEmail() != null) {
+            if(acct != null) {
                 mPreference.setGmailAccount(acct.getEmail());
-                mPreference.setTokenId(acct.getIdToken());
-                String message = getResources().getString(R.string.login_successful) + " " + acct.getEmail();
-                showToast(message, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, Toast.LENGTH_LONG);
+                txtGoogleAccountName.setText(acct.getEmail());
+                String[] names = acct.getDisplayName().split("\\s");
+                if (names.length > 0) {
+                    mPreference.setUserFirstName(names[0]);
+                    mPreference.setUserLastName(names[names.length - 1]);
+                }
+            } else {
+                Toast.makeText(this, "No account found!!", Toast.LENGTH_LONG).show();
             }
         } else {
-            showToast(getResources().getString(R.string.login_err), Gravity.CENTER_HORIZONTAL, Toast.LENGTH_LONG);
+            // not logged in!
         }
-    }
-
-    /**
-     * Show a toast with given gravity for duration
-     *
-     * @param text     text to show
-     * @param gravity  View.Gravity
-     * @param duration Toast.Duration
-     */
-    @SuppressWarnings("deprecation")
-    private void showToast(String text, int gravity, int duration) {
-        LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.toast_layout,
-                (ViewGroup) findViewById(R.id.toast_layout_root));
-
-        TextView txtLayout = (TextView) layout.findViewById(R.id.text);
-        txtLayout.setText(text);
-
-        Toast toast = new Toast(getApplicationContext());
-        toast.setGravity(gravity, 0, 0);
-        toast.setDuration(duration);
-        toast.setView(layout);
-        toast.show();
     }
 
     // -------------------------------Callbacks------------------------------------------------- //
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMISSIONS:
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(GmailContract.PERMISSION, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.ACCESS_COARSE_LOCATION, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.GET_ACCOUNTS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CALENDAR, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.RECORD_AUDIO, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for permissions
-                if (perms.get(GmailContract.PERMISSION) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    // All Permissions Granted
-                } else {
-                    // Permission Denied
-                    Toast.makeText(AccountActivity.this, "Some Permission is Denied", Toast.LENGTH_LONG).show();
-                }
-
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {

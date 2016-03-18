@@ -16,7 +16,6 @@ public class TTSHelper {
     private static boolean mIsSpeaking = false;
     private static boolean mTtsInitialized = false;
     private static TextToSpeech.OnInitListener mTextToSpeechListener;
-    private static String mTextToSpeak;
     private int messageId = 0;
 
 
@@ -60,7 +59,6 @@ public class TTSHelper {
                         }
                     });
                     mTtsInitialized = true;
-                    speak();
                 }
             }
         };
@@ -75,30 +73,16 @@ public class TTSHelper {
      * @param text string to say
      */
     public void start(final String text) {
-        mTextToSpeak = text;
-        if (!mTtsInitialized) {
-            Log.i("TextToSpeech", "not initialized");
-            return;
-        }
 
-        if (mTextToSpeech == null) {
-            Log.i("TextToSpeech", "not initialized");
-            try {
-                mTextToSpeech = new TextToSpeech(mActivity, mTextToSpeechListener);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else
-            speak();
-    }
+        if (mTtsInitialized) {
+            // Map passes in the UtteranceProgressListener so we can handle callbacks from the TTS.speak event
+            HashMap<String, String> map = new HashMap<>();
+            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, Integer.toString(messageId++));
 
-    private void speak() {
-        // Map passes in the UtteranceProgressListener so we can handle callbacks from the TTS.speak event
-        HashMap<String, String> map = new HashMap<>();
-        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, Integer.toString(messageId++));
-        // String.valueOf(AudioManager.STREAM_NOTIFICATION); // param to set TTS to use NOTIFICATION stream
-        if (mTextToSpeak != null) {
-            mTextToSpeech.speak(mTextToSpeak, TextToSpeech.QUEUE_ADD, map);
+            mTextToSpeech.speak(text, TextToSpeech.QUEUE_ADD, map);
+            pauseSpeech(500);
+        } else {
+            Log.i("TextToSpeech", "not initialized");
         }
     }
 
@@ -132,7 +116,7 @@ public class TTSHelper {
      *
      * @param duration duration in MS
      */
-    public void pause(int duration) {
+    public void pauseSpeech(int duration) {
         mTextToSpeech.playSilence(duration, TextToSpeech.QUEUE_ADD, null);
     }
 }

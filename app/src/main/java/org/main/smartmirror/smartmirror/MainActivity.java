@@ -203,6 +203,10 @@ public class MainActivity extends AppCompatActivity
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
+        if (mPreferences.isFirstTimeRun()) {
+            startActivity( new Intent(this, AccountActivity.class));
+        }
+
         setContentView(R.layout.activity_main);
         mira = Mira.getInstance(this);
 
@@ -305,7 +309,6 @@ public class MainActivity extends AppCompatActivity
 
         addScreenOnFlag();
         resetInteractionTimer();
-        mPreferences.setVolumesToPrefValues();
         stopLightSensor();
         startSpeechRecognition();
 
@@ -328,7 +331,6 @@ public class MainActivity extends AppCompatActivity
         // This is (mostly) for debugging purposes as the finished program should always be in foreground.
         if (mPowerManager.isScreenOn()) {
             stopSpeechRecognition();
-            mPreferences.setVolumesToSystemValues();
             setDefaultScreenOffTimeout();
         } else {
             // Otherwise the screen is turning off: start Light Sensor
@@ -815,7 +817,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     break;
                 case Constants.PHOTOS:
-                    // create photos fragment
+                    fragment = new PhotosFragment();
                     break;
                 case Constants.QUOTES:
                     fragment = new QuoteFragment();
@@ -847,7 +849,7 @@ public class MainActivity extends AppCompatActivity
             // put this fragment into contentFrame3. Frame 1 is added via XML. Frame 2 (help) is added via handleHelp() method
             displayFragment(fragment, command, true);
 
-            // ensure that contentFrame3, if hidden, is made visible
+            // ensure that contentFrame3 is visible
             if (viewHidden(contentFrame3)) {
                 setContentFrameValues(null, null, View.VISIBLE);
             }
@@ -952,7 +954,6 @@ public class MainActivity extends AppCompatActivity
      * Start the speech recognizer
      */
     public void startSpeechRecognition() {
-        Log.i(Constants.TAG, "startSpeechRecognition()");
         if (mTTSHelper.isSpeaking() || mService == null) return;
         try {
             //Log.i("VR", "startSpeechRecognition()");
@@ -969,7 +970,6 @@ public class MainActivity extends AppCompatActivity
      * Stops the current speech recognition object
      */
     public void stopSpeechRecognition() {
-        Log.i(Constants.TAG, "stopSpeechRecognition()");
         if (mService == null) return;
         try {
             Message msg = Message.obtain(null, VoiceService.STOP_SPEECH);
@@ -979,6 +979,19 @@ public class MainActivity extends AppCompatActivity
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    // --------------------------------- GMail ---------------------------------------------
+
+    public int getUnreadCount() {
+        // TODO: enable this when gmailhomefragment is added
+        int count = 2;
+        /*
+        GmailHomeFragment gmhf = (GmailHomeFragment)getSupportFragmentManager().findFragmentById(R.id.);
+        if (gmhf != null)
+            count = gmhf.getUnreadCount();
+        */
+        return count;
     }
 
     // --------------------------------- Sound Effects Playback -----------------------------
@@ -1016,17 +1029,10 @@ public class MainActivity extends AppCompatActivity
      * @param phrase to speak
      */
     public void speakText(final String phrase) {
-        Thread mSpeechThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mTTSHelper.start(phrase);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        mSpeechThread.start();
+        Log.i(Constants.TAG, "speakText :: " + phrase);
+        if (mPreferences.isSpeechEnabled()) {
+            mTTSHelper.start(phrase);
+        }
     }
 
     /**

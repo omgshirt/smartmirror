@@ -28,7 +28,7 @@ import android.util.Log;
  * Access is by getters and setters, which also handle file storage:
  */
 public class Preferences implements LocationListener {
-    private final String TAG = "Preferences";
+
     private static Preferences mPreferences = null;
     private SharedPreferences mSharedPreferences;
     private static Activity mActivity;
@@ -39,8 +39,7 @@ public class Preferences implements LocationListener {
 
     // constants define the names of the values to be savked to the storage file
     public static final String PREFS_NAME = "MIRROR_PREFS";
-    public static final String PREFS_SYSTEM_VOL = "MIRROR_PREFS_VOL";
-    public static final String PREFS_SPEECH_VOL = "MIRROR_PREFS_SPEECH_VOL";
+    public static final String PREFS_SPEECH_ENABLED = "MIRROR_SPEECH_ENABLED";
 
     public static final String PREFS_VOICE_ENABLED = "MIRROR_PREFS_VOICE_ENABLED";
     public static final String PREFS_REMOTE_ENABLED = "MIRROR_PREFS_REMOTE_ENABLED";
@@ -49,41 +48,23 @@ public class Preferences implements LocationListener {
     public static final String PREFS_DATE_FORMAT = "MIRROR_PREFS_DATE_FORMAT";
     public static final String PREFS_TIME_FORMAT = "MIRROR_PREFS_TIME_FORMAT";
 
-    public static final String PREFS_LIGHT_BRIGHTNESS = "MIRROR_PREFS_LIGHT_BRIGHTNESS";
-    public static final String PREFS_APP_BRIGHTNESS = "MIRROR_PREFS_APP_BRIGHTNESS";
+    public static final String PREFS_FIRST_NAME = "MIRROR_PREFS_FIRST_NAME";
+    public static final String PREFS_LAST_NAME = "MIRROR_PREFS_LAST_NAME";
 
     public static final String PREFS_FIRST_TIME_RUN = "MIRROR_FIRST_TIME_RUN";
 
+    public static final String PREFS_WORK_LOC = "PREFS_WORK_LOC";
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
     public static final String PREFS_FACEBOOK_CREDENTIALS = "PREFS_FACEBOOK_CREDENTIALS";
-
-    // Constants for screen brightness (0-255)
-    public static final int BRIGHTNESS_VLOW = 10;
-    public static final int BRIGHTNESS_LOW = 40;
-    public static final int BRIGHTNESS_MEDIUM = 80;
-    public static final int BRIGHTNESS_HIGH = 130;
-    public static final int BRIGHTNESS_VHIGH = 225;
-
-    // constant volumes
-    public static final float VOL_OFF = 0f;
-    public static final float VOL_VLOW = .2f;
-    public static final float VOL_LOW = .4f;
-    public static final float VOL_MEDIUM = .6f;
-    public static final float VOL_HIGH = .8f;
-    public static final float VOL_VHIGH = 1.0f;
 
     // default for work address
     public static final float WORK_LAT = -1f;
     public static final float WORK_LONG = -1f;
 
     public static final String CMD_SPEECH_OFF = "speech off";
-    public static final String CMD_SPEECH_VLOW = "speech min";
-    public static final String CMD_SPEECH_LOW = "speech low";
-    public static final String CMD_SPEECH_MEDIUM = "speech medium";
-    public static final String CMD_SPEECH_HIGH = "speech high";
-    public static final String CMD_SPEECH_VHIGH = "speech max";
+    public static final String CMD_SPEECH_ON = "speech on";
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
@@ -92,13 +73,6 @@ public class Preferences implements LocationListener {
 
     public static final String CMD_VOICE_OFF = "stop listening";
     public static final String CMD_VOICE_ON = "start listening";
-
-    public static final String CMD_VOLUME_OFF = "volume off";
-    public static final String CMD_VOLUME_VLOW = "volume min";
-    public static final String CMD_VOLUME_LOW = "volume low";
-    public static final String CMD_VOLUME_MEDIUM = "volume medium";
-    public static final String CMD_VOLUME_HIGH = "volume high";
-    public static final String CMD_VOLUME_VHIGH = "volume max";
 
     public static final String CMD_WEATHER_ENGLISH = "weather english";
     public static final String CMD_WEATHER_METRIC = "weather metric";
@@ -111,19 +85,16 @@ public class Preferences implements LocationListener {
     public static final String ENGLISH = "english";
     public static final String METRIC = "metric";
 
-    public static final String MPH = "mph";
-    public static final String KPH = "kph";
-
-    private int mAppBrightness;                     // general screen brightness
-    private int mLightBrightness;                   // Night light brightness
+    //Google Account Email String
+    private static String mUserAccountPref = "";
+    private String mUserFirstName = "";
+    private String mUserLastName = "";
 
     private boolean mRemoteEnabled;                 // Enable / disable remote control connections
     private boolean mVoiceEnabled;                  // Enable / disable voice recognition UNTIL keyword spoken
 
-    private float mSystemVolume;                    // control general system volume
-    private float mMusicVolume;                     // music stream volume
-    private int mMusicVolumeHolder;
-    private int mSystemVolumeHolder;
+    private boolean mSpeechEnabled;
+
     private String mTimeFormat;
     private String mWeatherUnits;                   // Weather display format (English / metric)
 
@@ -133,13 +104,13 @@ public class Preferences implements LocationListener {
     private double mLatitude;
     private double mLongitude;
 
+    private String mWorkLocation;
     private double mWorkLatitude;
     private double mWorkLongitude;
 
     //Google Account Email String
     private String mGmailAccount;
     private String mFacebookCredentials;
-
     private String mTokenId;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
@@ -162,24 +133,22 @@ public class Preferences implements LocationListener {
     private void handleSettingsCommand(Context context, String command) {
         switch (command) {
 
-            // Speech Volume
+            // Speech on / off
             case CMD_SPEECH_OFF:
-                setMusicVolume(VOL_OFF);
+                if (isSpeechEnabled()) {
+                    speakText(R.string.speech_off);
+                    setSpeechEnabled(false);
+                } else {
+                    speakText(R.string.speech_off_err);
+                }
                 break;
-            case CMD_SPEECH_VLOW:
-                setMusicVolume(VOL_VLOW);
-                break;
-            case CMD_SPEECH_LOW:
-                setMusicVolume(VOL_LOW);
-                break;
-            case CMD_SPEECH_MEDIUM:
-                setMusicVolume(VOL_MEDIUM);
-                break;
-            case CMD_SPEECH_HIGH:
-                setMusicVolume(VOL_HIGH);
-                break;
-            case CMD_SPEECH_VHIGH:
-                setMusicVolume(VOL_VHIGH);
+            case CMD_SPEECH_ON:
+                if (isSpeechEnabled()) {
+                    speakText(R.string.speech_on_err);
+                } else {
+                    speakText(R.string.speech_on);
+                    setSpeechEnabled(true);
+                }
                 break;
 
             // Remote
@@ -207,26 +176,6 @@ public class Preferences implements LocationListener {
                 else
                     speakText(R.string.speech_voice_on);
                 setVoiceEnabled(true);
-                break;
-
-            // system volume
-            case CMD_VOLUME_OFF:
-                setSystemVolume(VOL_OFF);
-                break;
-            case CMD_VOLUME_VLOW:
-                setSystemVolume(VOL_VLOW);
-                break;
-            case CMD_VOLUME_LOW:
-                setSystemVolume(VOL_LOW);
-                break;
-            case CMD_VOLUME_MEDIUM:
-                setSystemVolume(VOL_MEDIUM);
-                break;
-            case CMD_VOLUME_HIGH:
-                setSystemVolume(VOL_HIGH);
-                break;
-            case CMD_VOLUME_VHIGH:
-                setSystemVolume(VOL_VHIGH);
                 break;
 
             // weather units
@@ -269,11 +218,9 @@ public class Preferences implements LocationListener {
         mActivity = activity;
         mSharedPreferences = mActivity.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
+        mSpeechEnabled = mSharedPreferences.getBoolean(PREFS_SPEECH_ENABLED, true);
+
         // grab saved values from mSharedPreferences if they exist, if not use defaults
-        mMusicVolume = mSharedPreferences.getFloat(PREFS_SPEECH_VOL, VOL_LOW);
-        mSystemVolume = mSharedPreferences.getFloat(PREFS_SYSTEM_VOL, VOL_LOW);
-        mAppBrightness = mSharedPreferences.getInt(PREFS_APP_BRIGHTNESS, BRIGHTNESS_MEDIUM);
-        mLightBrightness = mSharedPreferences.getInt(PREFS_LIGHT_BRIGHTNESS, BRIGHTNESS_LOW);
         mWeatherUnits = mSharedPreferences.getString(PREFS_WEATHER_UNIT, ENGLISH);
 
         mRemoteEnabled = mSharedPreferences.getBoolean(PREFS_REMOTE_ENABLED, true);
@@ -286,17 +233,15 @@ public class Preferences implements LocationListener {
         mTokenId = mSharedPreferences.getString(PREFS_TOKENID, "");
 
         // Work address
+        mWorkLocation = mSharedPreferences.getString(PREFS_WORK_LOC, "");
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
 
         mFacebookCredentials = mSharedPreferences.getString(PREFS_FACEBOOK_CREDENTIALS, "");
 
-        // set brightness and volume to stored values
-        mSystemVolumeHolder = getStreamVolume(AudioManager.STREAM_SYSTEM);
-        mMusicVolumeHolder = getStreamVolume(AudioManager.STREAM_MUSIC);
-
-        setSystemVolume(mSystemVolume);
-        setMusicVolume(mMusicVolume);
+        // User name
+        mUserFirstName = mSharedPreferences.getString(PREFS_FIRST_NAME, "Defaultfirstname");
+        mUserLastName = mSharedPreferences.getString(PREFS_LAST_NAME, "Defaultlastname");
 
         // Find current lat and long positions.
         // This is not currently saved to the prefs file, system will re-discover location on start
@@ -331,80 +276,25 @@ public class Preferences implements LocationListener {
     public void destroy() {
         Context appContext = MainActivity.getContextForApplication();
         LocalBroadcastManager.getInstance(appContext).unregisterReceiver(mMessageReceiver);
-        setVolumesToSystemValues();
         mPreferences = null;
         mSharedPreferences = null;
         mActivity = null;
     }
 
-    // returns the instance of the Preferences class, or creates one if it does not exist
+    /** Returns the instance of the Preferences class, or creates one if it does not exist.
+     * On start, this will first be called by AccountActivity during the setup phase.
+     * It will then be called by MainActivity, which is essential due to the close binding between
+     * methods in this class and MainActivity.
+     *
+     * @param activity creating activity
+     * @return singleton of the Preferences class
+     */
     public static Preferences getInstance(Activity activity) {
         if (mPreferences == null) {
             Log.d("Preferences", "Creating new prefs instance...");
             mPreferences = new Preferences(activity);
-        } else {
-            mActivity = activity;
         }
         return mPreferences;
-    }
-
-    public float getSystemVolume() {
-        return mSystemVolume;
-    }
-
-    /**
-     * @param vol set system volume (0-1)
-     */
-    public void setSystemVolume(float vol) {
-        if (vol < 0 || vol > 1) return;
-        mSystemVolume = vol;
-        setStreamVolume(vol, AudioManager.STREAM_SYSTEM);
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putFloat(PREFS_SYSTEM_VOL, mSystemVolume);
-        edit.apply();
-    }
-
-    public float getMusicVolume() {
-        return mMusicVolume;
-    }
-
-    /**
-     * Sets the volume for music stream
-     *
-     * @param vol value to set (0-1)
-     */
-    public void setMusicVolume(float vol) {
-        if (vol < 0 || vol > 1) return;
-        mMusicVolume = vol;
-        setStreamVolume(vol, AudioManager.STREAM_MUSIC);
-        SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putFloat(PREFS_SPEECH_VOL, mMusicVolume);
-        edit.apply();
-    }
-
-    public void setVolumesToPrefValues() {
-        setStreamVolume(mSystemVolume, AudioManager.STREAM_SYSTEM);
-        setStreamVolume(mMusicVolume, AudioManager.STREAM_MUSIC);
-    }
-
-    public void setVolumesToSystemValues() {
-        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, mMusicVolumeHolder, 0);
-        am.setStreamVolume(AudioManager.STREAM_SYSTEM, mSystemVolumeHolder, 0);
-    }
-
-    // private helper sets vol for given stream
-    // Gets the max volume allowed for this stream, then sets the volume
-    private void setStreamVolume(float vol, int stream) {
-        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
-        int max = am.getStreamMaxVolume(stream);
-        int setVol = (int) (vol * max);
-        am.setStreamVolume(stream, setVol, 0);
-    }
-
-    private int getStreamVolume(int stream) {
-        AudioManager am = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
-        return am.getStreamVolume(stream);
     }
 
     /**
@@ -525,8 +415,8 @@ public class Preferences implements LocationListener {
 
     /**
      * Set enable / disabled status for remote control.
-     * Disabling will unregister the service and shows remote disabled icon
-     * Enabling registers the service
+     * Disabling will unregister the service and display the remote disabled icon.
+     * Enabling registers the service on the network and hides remote disabled icon.
      *
      * @param enable enable or disable the remote control
      */
@@ -542,6 +432,7 @@ public class Preferences implements LocationListener {
                 ((MainActivity) mActivity).disconnectRemote();
             }
         }
+
         try {
             if (!mRemoteEnabled) {
                 // when disabling, hide remote connected icon
@@ -573,6 +464,16 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public void setSpeechEnabled(boolean enable) {
+        this.mSpeechEnabled = enable;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putBoolean(PREFS_SPEECH_ENABLED, mSpeechEnabled);
+        edit.apply();
+    }
+
+    public boolean isSpeechEnabled() {
+        return mSpeechEnabled;
+    }
 
     // helper sends a string to MainActivity to be spoken
     private void speakText(int stringId) {
@@ -618,12 +519,20 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public void setWorkLocation(String location) {
+        Log.i(Constants.TAG, "settings location :: " + location);
+        mWorkLocation = location;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_WORK_LOC, mWorkLocation);
+        edit.apply();
+    }
+
+    public String getWorkLocation(){
+        return mWorkLocation;
+    }
+
     public boolean isWorkAddressSet() {
-        if (getWorkLongitude() <= 0.0 && getWorkLatitude() <= 0.0) {
-            return false;
-        } else {
-            return true;
-        }
+        return (!mWorkLocation.isEmpty());
     }
 
     // Location Listener Implementation
@@ -668,8 +577,31 @@ public class Preferences implements LocationListener {
     //Set User Account if null
     public void setGmailAccount(String userAcc) {
         this.mGmailAccount = userAcc;
+        Log.i(Constants.TAG, "setting email :: " + userAcc);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_GMAIL, userAcc);
+        edit.apply();
+    }
+
+    public String getUserFirstName() {
+        return mUserFirstName;
+    }
+
+    public void setUserFirstName(String mUserFirstName) {
+        this.mUserFirstName = mUserFirstName;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_FIRST_NAME, mUserFirstName);
+        edit.apply();
+    }
+
+    public String getUserLastName() {
+        return mUserLastName;
+    }
+
+    public void setUserLastName(String mUserLastName) {
+        this.mUserLastName = mUserLastName;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_LAST_NAME, mUserLastName);
         edit.apply();
     }
 

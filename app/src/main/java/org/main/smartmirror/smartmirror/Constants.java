@@ -14,6 +14,7 @@ public class Constants {
     public static final String KEY_STORE = "AndroidKeyStore";
     public static final String PICASA = "https://picasaweb.google.com/data/";
     public static final String REVOKE_ACCOUNT = "https://accounts.google.com/o/oauth2/revoke?token=";
+    public static final String GMAIL_PROVIDER_PERMISSION = "com.google.android.gm.permission.READ_CONTENT_PROVIDER";
 
     //-------------- DISPLAY -----------
     public static final String CLOSE_WINDOW = "close window";
@@ -57,7 +58,6 @@ public class Constants {
     public static final String SHOW_HELP = "show help";
     public static final String TIME = "current time";
     public static final String TWITTER = "twitter";
-    
 
     // ------------- NEWS ------------
     public static final String BUSINESS = "business";
@@ -96,26 +96,16 @@ public class Constants {
     public static final String TWITTER_CONSUMER_SECRET = "WP9HyhszNP2x4Y9WGPtF5DfXT23v55O515PrukTCpkewuuNngT";
 
     //--------------NEWS--------------
-    public static final String ONE = "one";
-    public static final String FIRST = "first";
-    public static final String TWO = "two";
-    public static final String SECOND = "second";
-    public static final String THREE = "three";
-    public static final String THIRD = "third";
-    public static final String FOUR = "four";
-    public static final String FOURTH = "fourth";
-    public static final String FIVE = "five";
-    public static final String FIFTH = "fifth";
-    public static final String SIX = "six";
-    public static final String SIXTH = "sixth";
-    public static final String SEVEN = "seven";
-    public static final String SEVENTH = "seventh";
-    public static final String EIGHT = "eight";
-    public static final String EIGHTH = "eighth";
-    public static final String NINE = "nine";
-    public static final String NINTH = "ninth";
-    public static final String TEN = "ten";
-    public static final String TENTH = "tenth";
+    public static final String ONE = "article one";
+    public static final String TWO = "article two";
+    public static final String THREE = "article three";
+    public static final String FOUR = "article four";
+    public static final String FIVE = "article five";
+    public static final String SIX = "article six";
+    public static final String SEVEN = "article seven";
+    public static final String EIGHT = "article eight";
+    public static final String NINE = "article nine";
+    public static final String TEN = "article ten";
 
     //--------------GMAIL-----------------
     public static final String NEXT = "next";
@@ -123,36 +113,24 @@ public class Constants {
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {
             BUSINESS, CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
-            CONDITIONS, EIGHT, EIGHTH, FACEBOOK, FIVE,
+            CONDITIONS, EIGHT, FACEBOOK, FIVE,
             FORECAST, FOUR, FULL_SCREEN, GALLERY, GMAIL,
             GO_BACK, GO_FORWARD, GO_TO_SLEEP, HELP, HIDE_TIME,
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
             MEDIA, MENU, MINIMIZE,
             MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,
-            NEWS, NEXT, NINE, NINTH, ONE,
+            NEWS, NEXT, NINE, ONE,
             OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
-            SCROLL_DOWN, SCROLL_UP, SPORTS, SECOND,
-            SETTINGS, SEVEN, SEVENTH, SHOW_LIGHT, SHOW_HELP,
+            SCROLL_DOWN, SCROLL_UP, SPORTS,
+            SETTINGS, SEVEN, SHOW_LIGHT, SHOW_HELP,
             SHOW_TIME, SHOW_WEATHER, SIX,
-            SIXTH, SLEEP, SMALL_SCREEN, TAKE_PICTURE,
-            THIRD, THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
+            SLEEP, SMALL_SCREEN, TAKE_PICTURE,
+            THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
-            "black", "blue", "gray", "green",
-            "magenta", "orange", "purple",
-            "red", "yellow", "white",
-            "first", "second", "third", "fourth",
-            "fifth", "sixth", "seventh", "eighth",
 
             Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
             Preferences.CMD_ENABLE_REMOTE, Preferences.CMD_DISABLE_REMOTE,
-
-            Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_VLOW,
-            Preferences.CMD_SPEECH_LOW, Preferences.CMD_SPEECH_MEDIUM,
-            Preferences.CMD_SPEECH_HIGH, Preferences.CMD_SPEECH_VHIGH,
-
-            Preferences.CMD_VOLUME_OFF, Preferences.CMD_VOLUME_VLOW,
-            Preferences.CMD_VOLUME_LOW, Preferences.CMD_VOLUME_MEDIUM,
-            Preferences.CMD_VOLUME_HIGH, Preferences.CMD_VOLUME_VHIGH,
+            Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_ON,
 
             Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
             Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,

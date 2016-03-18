@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginStart="20dp"
+    android:layout_margin="20dp"
     android:orientation="horizontal">
 
     <TextView
@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/facebook_title"
         android:layout_marginBottom="15dp"
+        android:padding="3dp"
         android:hint="Email"
         android:inputType="textEmailAddress" />
 
@@ -28,6 +29,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/facebook_username"
+        android:padding="3dp"
         android:hint="Password"
         android:inputType="textPassword" />
 
@@ -52,36 +54,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="15dp"
-        android:layout_marginEnd="20dp"
         android:layout_marginTop="15dp"
         android:text="Google Account"
         android:textAppearance="?android:textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/google_account_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="15dp"
+        android:text="no account selected"
+        android:layout_below="@+id/google_account"
+        android:textAppearance="?android:textAppearanceMedium" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/google_sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/google_account"
-        android:layout_marginEnd="20dp" />
-
-    <TextView
-        android:id="@+id/current_google_account"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/google_sign_in_button"
-        android:layout_marginEnd="20dp" />
+        android:layout_below="@+id/google_account_name" />
 
     <TextView
         android:id="@+id/work_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/current_google_account"
+        android:layout_below="@id/google_sign_in_button"
         android:layout_marginBottom="15dp"
-        android:layout_marginEnd="20dp"
         android:text="Work Location"
         android:textAppearance="?android:textAppearanceLarge" />
 
@@ -92,7 +92,7 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@id/work_title"
         android:layout_marginBottom="15dp"
-        android:layout_marginEnd="20dp"
+        android:padding="3dp"
         android:hint="Address"
         android:inputType="text" />
 
@@ -102,8 +102,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/work_location"
-        android:layout_marginEnd="20dp"
         android:onClick="handleButtonPress"
+        android:padding="6dp"
         android:text="Submit" />
 
 </RelativeLayout>
