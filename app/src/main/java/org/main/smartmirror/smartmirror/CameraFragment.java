@@ -543,7 +543,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
                 // We don't use the rear facing camera.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-                if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     continue;
                 }
 
