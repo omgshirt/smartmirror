@@ -26,7 +26,7 @@ public class FacebookFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
-        if (!mPreference.getFacebookLoginStatus()) {
+        if (!mPreference.isLoggedInToFacebook()) {
             removeFacebook();
         }
     }
@@ -84,7 +84,7 @@ public class FacebookFragment extends Fragment {
     private void removeFacebook() {
         ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
         ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.FACEBOOK, true);
-        ((MainActivity) getActivity()).speakText("You're not logged in!");
+        ((MainActivity) getActivity()).speakText(getResources().getString(R.string.speech_not_logged_in_err));
     }
 
     private class webClient extends WebViewClient {
