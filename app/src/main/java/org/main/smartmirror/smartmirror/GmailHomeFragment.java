@@ -4,6 +4,7 @@ package org.main.smartmirror.smartmirror;
  * Created by Master N on 2/10/2016.
  */
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -113,7 +114,7 @@ public class GmailHomeFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
-                if (resultCode != getActivity().RESULT_OK) {
+                if (resultCode != Activity.RESULT_OK) {
                     isGooglePlayServicesAvailable();
                 }
                 break;
