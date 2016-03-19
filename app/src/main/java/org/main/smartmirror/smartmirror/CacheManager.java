@@ -60,7 +60,6 @@ public class CacheManager {
 
     public static CacheManager getInstance() {
         if (mCacheManager == null) {
-            Log.i(Constants.TAG, "Creating cache manager");
             mCacheManager = new CacheManager();
         }
         return mCacheManager;

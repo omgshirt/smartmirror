@@ -8,6 +8,8 @@
     <string name="action_settings">Settings</string>
     <string name="remote_connected">Remote Connected</string>
     <string name="remote_disconnected">Remote Disconnected</string>
+    <string name="no_google_account">No Account Selected</string>
+    <string name="google_account">Google Account</string>
 
     <!-- Module names (used to create Navigation Bar menu) -->
     <string name="title_calendar">Calendar</string>
@@ -16,10 +18,10 @@
     <string name="title_forecast">Forecast</string>
     <string name="title_gallery">Gallery</string>
     <string name="title_gmail">Gmail</string>
-    <string name="title_photos">Photos</string>
     <string name="title_help">Help</string>
     <string name="title_light">Light</string>
     <string name="title_news">News</string>
+    <string name="title_photos">Photos</string>
     <string name="title_quotes">Quotes</string>
     <string name="title_settings">Settings</string>
     <string name="title_traffic">Traffic</string>
@@ -43,6 +45,7 @@
     <string name="place_not_found">Cannot Find Location</string>
     <string name="weather_data_err">Failed to retrieve weather data &#8212; check your internet connection</string>
 
+    <!-- Weather Icons -->
     <string name="weather_sunny">\uf00d</string>
     <string name="weather_cloudy_day">\uf002</string>
     <string name="weather_clear_night">\uf02e</string>
@@ -73,45 +76,32 @@
 
     <string name="lbl_speech_on">Speech: On</string>
     <string name="lbl_speech_off">Speech: Off</string>
-
     <string name="lbl_voice_on">Voice Recognition: On</string>
     <string name="lbl_voice_off">Voice Recognition: Off</string>
-
     <string name="lbl_remote_on">Remote: On</string>
     <string name="lbl_remote_off">Remote: Off</string>
-
     <string name="lbl_weather_english">Weather: English</string>
     <string name="lbl_weather_metric">Weather: Metric</string>
-
     <string name="lbl_time_format_12hr">Time: 12-hour</string>
     <string name="lbl_time_format_24hr">Time: 24-hour</string>
 
     <!-- Text to Speech phrases -->
     <string name="speech_on">Speech on.</string>
     <string name="speech_on_err">Speech is on.</string>
-
     <string name="speech_off">I\'ll be quiet. Say \'speech on\' to cancel.</string>
     <string name="speech_off_err">Speech is already off. Oops I shouldn\'t be talking.</string>
-
-
     <string name="speech_voice_on">I\'m listening</string>
     <string name="speech_voice_on_err">I\'m already listening</string>
-
     <string name="speech_voice_off">I\'ll ignore you</string>
     <string name="speech_voice_off_err">I\'m still ignoring you</string>
-
     <string name="speech_stay_awake">I\'ll stay awake. Say \'sleep\' to cancel.</string>
     <string name="speech_stay_awake_err">I\'m staying awake until you say \'sleep\'.</string>
-
     <string name="speech_remote_on">Remote control on</string>
     <string name="speech_remote_off">Remote control off</string>
-
     <string name="speech_weather_english">Weather display English</string>
     <string name="speech_weather_english_err">Weather display is currently set to English units</string>
-
     <string name="speech_weather_metric">Weather display metric</string>
     <string name="speech_weather_metric_err">Weather display is already set to metric</string>
-
     <string name="speech_remote_off_err">The remote is disabled.</string>
     <string name="speech_not_logged_in_err">You\'re not logged in!</string>
 

@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -86,7 +85,6 @@ public class Preferences implements LocationListener {
     public static final String METRIC = "metric";
 
     //Google Account Email String
-    private static String mUserAccountPref = "";
     private String mUserFirstName = "";
     private String mUserLastName = "";
 
@@ -126,11 +124,11 @@ public class Preferences implements LocationListener {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            handleSettingsCommand(context, message);
+            handleSettingsCommand(message);
         }
     };
 
-    private void handleSettingsCommand(Context context, String command) {
+    private void handleSettingsCommand(String command) {
         switch (command) {
 
             // Speech on / off

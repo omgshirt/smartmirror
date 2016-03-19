@@ -58,7 +58,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
     public void onStart() {
         super.onStart();
         if (mPreference.isWorkAddressSet()) {
-            showTraffic();
+            mTrafficLayout.setVisibility(View.VISIBLE);
             // Check for any cached traffic data.
             // If a cache exists, render it to the view.
             // Update the cache if it has expired.

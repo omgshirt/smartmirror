@@ -70,7 +70,7 @@
 
         <fragment
             android:id="@+id/gmail_home_fragment"
-            android:name="org.main.smartmirror.smartmirror.CalendarHomeFragment"
+            android:name="org.main.smartmirror.smartmirror.GmailHomeFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:layout="@layout/gmail_home_fragment" />

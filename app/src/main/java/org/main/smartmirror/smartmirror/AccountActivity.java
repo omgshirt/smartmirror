@@ -57,6 +57,9 @@ public class AccountActivity extends AppCompatActivity implements
     private String mAuthToken;
     private String mAuthSecret;
 
+    private TextView edtFacebookUsername;
+    private TextView edtFacebookPassword;
+
     private TextView txtGoogleAccountName;
     private EditText edtWorkAddress;
 
@@ -71,10 +74,19 @@ public class AccountActivity extends AppCompatActivity implements
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
 
+        edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
+        edtFacebookPassword  = (EditText) findViewById(R.id.facebook_password);
+
+        if (mPreference.isLoggedInToFacebook()) {
+            // TODO: get values from preferences and set edtFacebookUsername / edtFacebookPassword
+        }
+
         txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
         edtWorkAddress = (EditText) findViewById(R.id.work_location);
 
-        txtGoogleAccountName.setText(mPreference.getGmailAccount());
+        if (mPreference.isLoggedInToGmail()) {
+            txtGoogleAccountName.setText(mPreference.getGmailAccount());
+        }
         edtWorkAddress.setText(mPreference.getWorkLocation());
 
         setUpTwitterButton();
@@ -162,6 +174,8 @@ public class AccountActivity extends AppCompatActivity implements
                     @Override
                     public void onResult(Status status) {
                         Log.i(Constants.TAG, "Revoked: " + status);
+                        mPreference.setGmailAccount("");
+                        txtGoogleAccountName.setText(getResources().getString(R.string.no_google_account));
                     }
                 });
 //        HttpsURLConnection connection = null;
@@ -188,7 +202,7 @@ public class AccountActivity extends AppCompatActivity implements
      * Shows the dialog that prompts the user for the number of permissions
      *
      * @param message    The message we want to display
-     * @param okListener
+     * @param okListener OnClickListener instance
      */
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(AccountActivity.this)
@@ -251,7 +265,6 @@ public class AccountActivity extends AppCompatActivity implements
         }
         mPreference.setFirstTimeRun(false);
         finish();
-        //Activity();
     }
 
     /**
@@ -295,7 +308,7 @@ public class AccountActivity extends AppCompatActivity implements
                 Toast.makeText(this, "No account found!!", Toast.LENGTH_LONG).show();
             }
         } else {
-            // not logged in!
+            Log.i(Constants.TAG, "Google sign in failed");
         }
     }
 
