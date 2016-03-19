@@ -13,6 +13,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.*;
+
+import android.preference.Preference;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -45,7 +47,7 @@ public class GmailHomeFragment extends Fragment {
     private String PREF_ACCOUNT_NAME = "";
     public int numUnreadPrimary;
     private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
-
+    //private Preference mPreference;
     private static ScheduledFuture<?> unreadCountScheduler;
 
     @Override
@@ -54,13 +56,14 @@ public class GmailHomeFragment extends Fragment {
         textView = (TextView)view.findViewById(R.id.num_unread);
         mailIcon = (ImageView) view.findViewById(R.id.mail_icon);
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-
+        //mPreference = new Preference();
         PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
 
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getActivity().getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff())
                 .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+        mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
         mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
 
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)

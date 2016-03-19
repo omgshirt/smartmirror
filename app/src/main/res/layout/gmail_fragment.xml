@@ -34,7 +34,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/messageSubject"
         android:textSize="14dp"/>
-
+<ScrollView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/scroll_view_body">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/message_body"
+        android:textSize="14dp" />
+</ScrollView>
         <ListView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

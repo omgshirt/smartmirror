@@ -48,8 +48,10 @@ public class GmailFragment extends Fragment {
     public String mFrom;
     public TextView textViewSubject;
     public String mSubject;
-    public ListView listViewBody;
+    public TextView textViewBody;
+    //public ListView listViewBody;
     public String mBody;
+    public ScrollView scrollViewBody;
 
     public Button nextMessage;
 
@@ -96,7 +98,9 @@ public class GmailFragment extends Fragment {
         textViewTo = (TextView)view.findViewById(R.id.messageTo);
         textViewFrom = (TextView)view.findViewById(R.id.messageFrom);
         textViewSubject = (TextView)view.findViewById(R.id.messageSubject);
-        listViewBody = (ListView) view.findViewById(R.id.messageBody);
+        textViewBody = (TextView) view.findViewById(R.id.message_body);
+        scrollViewBody = (ScrollView) view.findViewById(R.id.scroll_view_body);
+        //listViewBody = (ListView) view.findViewById(R.id.messageBody);
 
         nextMessage = (Button) view.findViewById(R.id.next);
 
@@ -113,9 +117,9 @@ public class GmailFragment extends Fragment {
 
         PREF_ACCOUNT_NAME = Preferences.getUserAccountName();
 
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                getActivity().getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff())
+        mCredential = GoogleAccountCredential.usingOAuth2(//
+                getActivity().getApplicationContext(), Arrays.asList(SCOPES))//
+                .setBackOff(new ExponentialBackOff())//
                 .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
 
         mCredential.setSelectedAccountName(PREF_ACCOUNT_NAME);
@@ -132,17 +136,9 @@ public class GmailFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("GmailArrayList ", "Got message:\"" + message +"\"");
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
-                int position = 0;
-                if (message.contains(Constants.SCROLL_DOWN)) {
-                    position = position + 5;
-                } else if (message.contains(Constants.SCROLL_UP)) {
-                    position = position - 5;
-                    if (position < 0) position = 0;
-                }
                 VoiceScroll sl = new VoiceScroll();
-                sl.voiceListView(message,listViewBody, position);
+                sl.voiceScrollView(message,scrollViewBody);
             }
             else if(message.contains(Constants.NEXT)){
                 Log.i(Constants.TAG, "In Broadcast Listener");
@@ -339,9 +335,10 @@ public class GmailFragment extends Fragment {
                 textViewTo.setText("To: " + mTo + "\n");
                 textViewFrom.setText("From: " + mFrom + "\n");
                 textViewSubject.setText("Subject: " + mSubject + "\n");
-                ArrayAdapter<String> arrayAdapter =
-                        new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
-                listViewBody.setAdapter(arrayAdapter);
+                textViewBody.setText(mBody);
+//                ArrayAdapter<String> arrayAdapter =
+//                        new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
+//                listViewBody.setAdapter(arrayAdapter);
                 mCallback.onNextCommand();
             }
         }
