@@ -12,7 +12,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.net.nsd.NsdServiceInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -78,6 +77,8 @@ public class MainActivity extends AppCompatActivity
     private int frame1Visibility = View.VISIBLE;
     private int frame2Visibility = View.VISIBLE;
     private int frame3Visibility = View.VISIBLE;
+
+    private enum FrameSize { CLOSE_SCREEN, SMALL_SCREEN, WIDE_SCREEN, FULL_SCREEN }
 
     // Light Sensor
     private SensorManager mSensorManager;
@@ -435,9 +436,25 @@ public class MainActivity extends AppCompatActivity
         return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
     }
 
+    protected void setContentFrameValues(FrameSize fs) {
+        if (fs == FrameSize.CLOSE_SCREEN) {
+            setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+        } else if (fs == FrameSize.SMALL_SCREEN) {
+            setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+        } else if (fs == FrameSize.WIDE_SCREEN) {
+            setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
+        } else if (fs == FrameSize.FULL_SCREEN) {
+            setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
+        }
+    }
+
     /**
      * Set the visibility of the 3 content frames and stores those values for future reference.
      * Passing a null for any parameter will keep that frame in its current state.
+     *
+     * @param frameOne View.VISIBILITY
+     * @param frameTwo View.VISIBILITY
+     * @param frameThree View.VISIBILITY
      */
     protected void setContentFrameValues(@Nullable Integer frameOne, @Nullable Integer frameTwo, @Nullable Integer frameThree) {
         frame1Visibility = (frameOne == null) ? frame1Visibility : frameOne;
@@ -688,7 +705,7 @@ public class MainActivity extends AppCompatActivity
         if (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP)) {
             // If frame3 is in any visible state, return it to 'small screen' proportion
             if (frame3Visibility == View.VISIBLE) {
-                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                setContentFrameValues(FrameSize.SMALL_SCREEN);
             }
             displayHelpFragment();
         }
@@ -776,7 +793,7 @@ public class MainActivity extends AppCompatActivity
                 case Constants.CLOSE_SCREEN:
                 case Constants.CLOSE_WINDOW:
                 case Constants.HIDE_SCREEN:
-                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+                    setContentFrameValues(FrameSize.CLOSE_SCREEN);
                     break;
                 case Constants.FACEBOOK:
                     fragment = new FacebookFragment();
@@ -795,11 +812,11 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.MAXIMIZE:
                 case Constants.FULL_SCREEN:
-                    setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
+                    setContentFrameValues(FrameSize.FULL_SCREEN);
                     break;
                 case Constants.MINIMIZE:
                 case Constants.SMALL_SCREEN:
-                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                    setContentFrameValues(FrameSize.SMALL_SCREEN);
                     break;
                 case Constants.NIGHT_LIGHT:
                 case Constants.SHOW_LIGHT:
@@ -837,7 +854,7 @@ public class MainActivity extends AppCompatActivity
                 case Constants.WAKE:
                     break;
                 case Constants.WIDE_SCREEN:
-                    setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
+                    setContentFrameValues(FrameSize.WIDE_SCREEN);
                     break;
                 default:
                     broadcastMessage("inputAction", command);
@@ -1074,15 +1091,35 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Callback from RemoteServerAsyncTask when a command is received from the remote control.
+     * Callback from RemoteServerAsyncTask when a command is issued by the remote control.
+     * Several commands are generic toggles and will perform different
+     * operations depending on the mirror's current state.
      *
      * @param command String: received command
      */
     public void handleRemoteCommand(String command) {
         Log.i(Constants.TAG, "remote msg :: " + command);
 
-        if (command.equals(Constants.LIGHT)) {
-            command = Constants.NIGHT_LIGHT;
+        switch (command) {
+            case Constants.REMOTE_INCREASE_SCREEN:
+                command = increaseScreenSize();
+                break;
+            case Constants.REMOTE_TOGGLE_LISTENING:
+                command = ( mPreferences.isVoiceEnabled() ) ? Preferences.CMD_VOICE_OFF : Preferences.CMD_VOICE_ON;
+                break;
+            case Constants.REMOTE_TOGGLE_SLEEPS_STATE:
+                command = (mirrorSleepState == AWAKE) ? Constants.SLEEP : Constants.WAKE;
+                break;
+            case Constants.REMOTE_TOGGLE_SPEECH:
+                command = (mPreferences.isSpeechEnabled()) ? Preferences.CMD_SPEECH_OFF : Preferences.CMD_SPEECH_ON;
+                break;
+            case Constants.REMOTE_TOGGLE_TIME_FORMAT:
+                command = (mPreferences.isTimeFormat12hr()) ? Preferences.CMD_TIME_24HR : Preferences.CMD_TIME_24HR;
+                break;
+            case Constants.REMOTE_TOGGLE_WEATHER_FORMAT:
+                command = (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) ? Preferences.CMD_WEATHER_METRIC :
+                        Preferences.CMD_WEATHER_ENGLISH;
+                break;
         }
 
         if (mPreferences.isRemoteEnabled())
@@ -1090,6 +1127,29 @@ public class MainActivity extends AppCompatActivity
         else {
             Log.i(Constants.TAG, "Remote Disabled. Command ignored: \"" + command + "\"");
         }
+    }
+
+    /**
+     * Based on the current configuration of the 3 content frames, increase the size of contentFrame3
+     * by one step in this order: SMALL_SCREEN -> WIDE_SCREEN -> FULL_SCREEN -> CLOSE_SCREEN
+     * @return command corresponding to new screen sizes
+     */
+    private String increaseScreenSize(){
+        if (mirrorSleepState != AWAKE) return "";
+
+        String command = Constants.SMALL_SCREEN;
+
+        if (contentFrame3.getVisibility() == View.INVISIBLE) {
+            command = Constants.SMALL_SCREEN;
+        } else if (contentFrame1.getVisibility() == View.VISIBLE &&
+                    contentFrame2.getVisibility() == View.VISIBLE) {
+            command = Constants.WIDE_SCREEN;
+        } else if (contentFrame1.getVisibility() == View.GONE) {
+            command = Constants.CLOSE_SCREEN;
+        } else if (contentFrame2.getVisibility() == View.GONE) {
+            command = Constants.FULL_SCREEN;
+        }
+        return command;
     }
 
     // --------------------------- LIGHT SENSOR --------------------------------------

@@ -32,7 +32,7 @@ public class CalendarFragment extends Fragment {
         LinearLayout calendarLayout = (LinearLayout) rootView.findViewById(R.id.calendar_layout);
 
         // read events for the next five days
-        List<CalendarEvent> events = CalendarUtil.getCalendarEvents(getContext(), CalendarUtil.FIVE_DAYS);
+        List<CalendarEvent> events = CalendarUtil.getCalendarEvents(getContext(), CalendarUtil.LOOK_AHEAD);
 
         // Display error if no events found
         if (events.size() == 0) {
@@ -46,7 +46,8 @@ public class CalendarFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         int prevEventDay = -1;
 
-        for (CalendarEvent event : events) {
+        for (int i = 0; i < events.size() && i < 7; i++) {
+            CalendarEvent event = events.get(i);
             // create a copy of calendar_item xml.
             View eventLayout = inflater.inflate(R.layout.calendar_item, null);
 

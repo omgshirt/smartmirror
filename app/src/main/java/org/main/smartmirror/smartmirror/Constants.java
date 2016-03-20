@@ -110,6 +110,14 @@ public class Constants {
     //--------------GMAIL-----------------
     public static final String NEXT = "next";
 
+    //--------------- Remote Control Specific Commands --------------------
+    public static final String REMOTE_INCREASE_SCREEN ="increase screen size";
+    public static final String REMOTE_TOGGLE_SLEEPS_STATE = "toggle wake";
+    public static final String REMOTE_TOGGLE_LISTENING = "toggle listening";
+    public static final String REMOTE_TOGGLE_SPEECH = "toggle speech";
+    public static final String REMOTE_TOGGLE_TIME_FORMAT = "toggle time format";
+    public static final String REMOTE_TOGGLE_WEATHER_FORMAT = "toggle weather format";
+
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {
             BUSINESS, CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
