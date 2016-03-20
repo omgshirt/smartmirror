@@ -62,9 +62,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     private final String TIME_VISIBLE_PREF = "time visible";
     private final String WEATHER_VISIBLE_PREF = "weather visible";
 
-    private int mWeatherVisible = View.VISIBLE;
-    private int mTimeVisible = View.VISIBLE;
-
     // default weather values
     private int mCurrentTemp = 0;
     private int mCurrentHumidity = 0;
@@ -127,7 +124,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             hideWeather();
         }
 
-
         clkTextClock = (TextClock) view.findViewById(R.id.time_clock);
         clkDateClock = (TextClock) view.findViewById(R.id.date_clock);
         updateTimeDisplay();
@@ -184,7 +180,23 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     showWeather();
                     break;
                 case Constants.TIME:
-                    speakTime();
+                    // TODO: move this broadcast receiver into Mira?
+                    Mira mira = Mira.getInstance((MainActivity)getActivity());
+                    mira.sayCurrentTime();
+                    break;
+                case Constants.REMOTE_TOGGLE_TIME_VISIBLE:
+                    if (layTimeLayout.getVisibility() == View.VISIBLE) {
+                        hideTime();
+                    } else {
+                        showTime();
+                    }
+                    break;
+                case Constants.REMOTE_TOGGLE_WEATHER_VISIBLE:
+                    if (layWeatherLayout.getVisibility() == View.VISIBLE) {
+                        hideWeather();
+                    } else {
+                        showWeather();
+                    }
                     break;
                 default:
                     break;
@@ -240,27 +252,23 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     }
 
     public void hideTime() {
-        mTimeVisible = View.GONE;
-        layTimeLayout.setVisibility(mTimeVisible);
-        saveVisibilityPreference(TIME_VISIBLE_PREF, mTimeVisible);
+        layTimeLayout.setVisibility(View.GONE);
+        saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
     public void showTime() {
-        mTimeVisible = View.VISIBLE;
-        layTimeLayout.setVisibility(mTimeVisible);
-        saveVisibilityPreference(TIME_VISIBLE_PREF, mTimeVisible);
+        layTimeLayout.setVisibility(View.VISIBLE);
+        saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
     public void hideWeather() {
-        mWeatherVisible = View.GONE;
-        layWeatherLayout.setVisibility(mWeatherVisible);
-        saveVisibilityPreference(WEATHER_VISIBLE_PREF, mWeatherVisible);
+        layWeatherLayout.setVisibility(View.GONE);
+        saveVisibilityPreference(WEATHER_VISIBLE_PREF, layWeatherLayout.getVisibility());
     }
 
     public void showWeather() {
-        mWeatherVisible = View.VISIBLE;
-        layWeatherLayout.setVisibility(mWeatherVisible);
-        saveVisibilityPreference(WEATHER_VISIBLE_PREF, mWeatherVisible);
+        layWeatherLayout.setVisibility(View.VISIBLE);
+        saveVisibilityPreference(WEATHER_VISIBLE_PREF, layWeatherLayout.getVisibility());
     }
 
     private void saveVisibilityPreference(String prefName, int value) {
@@ -272,42 +280,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     // ----------------------- TTS Feedback -------------------------
 
-    // TODO: move this into Mira?
-    private void speakTime() {
-        GregorianCalendar calendar = new GregorianCalendar();
-        String strMinute, strHour;
 
-        int hourMode = Calendar.HOUR_OF_DAY;
-        if (mPreferences.isTimeFormat12hr()) {
-            hourMode = Calendar.HOUR;
-        }
-        strHour = Integer.toString(calendar.get(hourMode));
-
-        int minute = calendar.get(Calendar.MINUTE);
-        strMinute = Integer.toString(minute);
-
-        // handle times > :00 and < :10
-        if (minute > 0 && minute < 10) {
-            strMinute = ":0" + strMinute;
-        } else if (minute == 0) {
-            strMinute = " ";
-        } else {
-            strMinute = ":" + strMinute;
-        }
-
-        // add AM / PM as necessary
-        if (mPreferences.isTimeFormat12hr()) {
-            String AM_PM = " A M";
-            if (calendar.get(Calendar.AM_PM) == 1) {
-                AM_PM = " P M";
-            }
-            strMinute = strMinute + AM_PM;
-        }
-
-        String result = "the time is " + strHour + strMinute;
-        Log.i(Constants.TAG, "time: " + result);
-        speakText(result);
-    }
 
     private void speakCurrentConditions() {
 

@@ -10,7 +10,7 @@ public class Constants {
 
     public static final String TAG = "SmartMirror";
 
-    //-------- Accont Activity ---------
+    //-------- Account Activity ---------
     public static final String KEY_STORE = "AndroidKeyStore";
     public static final String PICASA = "https://picasaweb.google.com/data/";
     public static final String REVOKE_ACCOUNT = "https://accounts.google.com/o/oauth2/revoke?token=";
@@ -46,6 +46,7 @@ public class Constants {
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
+    public static final String FORECAST = "forecast";
     public static final String GALLERY = "gallery";
     public static final String GMAIL = "gmail";
     public static final String LIGHT = "light";
@@ -78,7 +79,6 @@ public class Constants {
 
     //--------------WEATHER--------------
     public static final String CONDITIONS = "conditions";
-    public static final String FORECAST = "forecast";
     public static final String SHOW_WEATHER = "show weather";
     public static final String HIDE_WEATHER = "hide weather";
     public static final String SHOW_TIME = "show time";
@@ -107,6 +107,17 @@ public class Constants {
     public static final String NINE = "article nine";
     public static final String TEN = "article ten";
 
+    public static final String ARTICLE_1 = "article 1";
+    public static final String ARTICLE_2 = "article 2";
+    public static final String ARTICLE_3 = "article 3";
+    public static final String ARTICLE_4 = "article 4";
+    public static final String ARTICLE_5 = "article 5";
+    public static final String ARTICLE_6 = "article 6";
+    public static final String ARTICLE_7 = "article 7";
+    public static final String ARTICLE_8 = "article 8";
+    public static final String ARTICLE_9 = "article 9";
+    public static final String ARTICLE_10 = "article 10";
+
     //--------------GMAIL-----------------
     public static final String NEXT = "next";
 
@@ -115,8 +126,11 @@ public class Constants {
     public static final String REMOTE_TOGGLE_SLEEPS_STATE = "toggle wake";
     public static final String REMOTE_TOGGLE_LISTENING = "toggle listening";
     public static final String REMOTE_TOGGLE_SPEECH = "toggle speech";
+    public static final String REMOTE_TOGGLE_TIME_VISIBLE = "time visible";
+    public static final String REMOTE_TOGGLE_WEATHER_VISIBLE = "weather visible";
     public static final String REMOTE_TOGGLE_TIME_FORMAT = "toggle time format";
     public static final String REMOTE_TOGGLE_WEATHER_FORMAT = "toggle weather format";
+
 
     // used to initialize COMMAND_SET
     public static final String[] COMMANDS = {

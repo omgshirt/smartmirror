@@ -1114,11 +1114,41 @@ public class MainActivity extends AppCompatActivity
                 command = (mPreferences.isSpeechEnabled()) ? Preferences.CMD_SPEECH_OFF : Preferences.CMD_SPEECH_ON;
                 break;
             case Constants.REMOTE_TOGGLE_TIME_FORMAT:
-                command = (mPreferences.isTimeFormat12hr()) ? Preferences.CMD_TIME_24HR : Preferences.CMD_TIME_24HR;
+                command = (mPreferences.isTimeFormat12hr()) ? Preferences.CMD_TIME_24HR : Preferences.CMD_TIME_12HR;
                 break;
             case Constants.REMOTE_TOGGLE_WEATHER_FORMAT:
                 command = (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) ? Preferences.CMD_WEATHER_METRIC :
                         Preferences.CMD_WEATHER_ENGLISH;
+                break;
+            case Constants.ARTICLE_1:
+                command = Constants.ONE;
+                break;
+            case Constants.ARTICLE_2:
+                command = Constants.TWO;
+                break;
+            case Constants.ARTICLE_3:
+                command = Constants.THREE;
+                break;
+            case Constants.ARTICLE_4:
+                command = Constants.FOUR;
+                break;
+            case Constants.ARTICLE_5:
+                command = Constants.FIVE;
+                break;
+            case Constants.ARTICLE_6:
+                command = Constants.SIX;
+                break;
+            case Constants.ARTICLE_7:
+                command = Constants.SEVEN;
+                break;
+            case Constants.ARTICLE_8:
+                command = Constants.EIGHT;
+                break;
+            case Constants.ARTICLE_9:
+                command = Constants.NINE;
+                break;
+            case Constants.ARTICLE_10:
+                command = Constants.TEN;
                 break;
         }
 
