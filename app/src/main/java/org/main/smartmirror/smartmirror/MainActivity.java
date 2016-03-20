@@ -1050,6 +1050,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /** speak text even if speech is disabled in the preferences
+     *
+     */
+    public void forceSpeakText(final String phrase) {
+            mTTSHelper.start(phrase);
+    }
+
     /**
      * Stop Text to Speech
      */

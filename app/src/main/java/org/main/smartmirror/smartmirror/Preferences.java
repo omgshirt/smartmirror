@@ -137,15 +137,15 @@ public class Preferences implements LocationListener {
                     speakText(R.string.speech_off);
                     setSpeechEnabled(false);
                 } else {
-                    speakText(R.string.speech_off_err);
+                    ((MainActivity)mActivity).forceSpeakText(mActivity.getResources().getString(R.string.speech_off_err));
                 }
                 break;
             case CMD_SPEECH_ON:
                 if (isSpeechEnabled()) {
                     speakText(R.string.speech_on_err);
                 } else {
-                    speakText(R.string.speech_on);
                     setSpeechEnabled(true);
+                    speakText(R.string.speech_on);
                 }
                 break;
 
@@ -202,8 +202,13 @@ public class Preferences implements LocationListener {
                 setTimeFormat24hr();
                 break;
 
+            /** CMD_STAY_AWAKE is a toggle */
             case CMD_STAY_AWAKE:
-                setStayAwake(true);
+                if (mPreferences.isStayingAwake()) {
+                    setStayAwake(false);
+                } else {
+                    setStayAwake(true);
+                }
                 break;
 
             default:
@@ -627,6 +632,8 @@ public class Preferences implements LocationListener {
             speakText(R.string.speech_stay_awake_err);
         } else if (stayAwake) {
             speakText(R.string.speech_stay_awake);
+        } else if (!stayAwake) {
+            speakText(R.string.speech_stay_awake_cancel);
         }
         mStayAwake = stayAwake;
         ((MainActivity) mActivity).showStayAwakeIcon(mStayAwake);
