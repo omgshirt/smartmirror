@@ -3,7 +3,6 @@ package org.main.smartmirror.smartmirror;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
@@ -19,7 +18,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.RunnableFuture;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,30 +34,48 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     String uID = "118328364730024898386"; // user ID??
     String albumID = "6261649979025559057"; // smart mirror album
     //String albumID = "6263091469173478818"; // profile pics
+
     int numPhotos = 4;
-    String imageUrl;
     int currentPhoto = 0;
 
-    public static ArrayList<Uri> mImageUrlList = new ArrayList<Uri>();
+
+    String mUserID;
+    String mUID;
+
+    String getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + userID;
+    String getPhotosInAlbum = "https://picasaweb.google.com/data/feed/api/user/"+userID+"/albumid/"+albumID;
+    String getLatestPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID+"?kind=photo&max-results="+numPhotos;
+    String getUserPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID;
+    //String getAlbums = "https://picasaweb.google.com/data/feed/api/user/"+userID+"?kind=album";
+
+    private String xmlMediaContent = "media:content";
+    private String xmlPhotoUrl = "url";
+    private String xmlUserID;
+    private String xmlAlbumID;
+
+    String imageUrl;
 
     private TimerTask mTimerTask;
     private Timer mTimer;
     private Runnable mRunnable;
     private Activity activity;
 
-    String getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + uID;
-    String getPhotosInAlbum = "https://picasaweb.google.com/data/feed/api/user/"+userID+"/albumid/"+albumID;
-    String getLatestPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID+"?kind=photo&max-results="+numPhotos;
-    String getUserPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID;
-    //String getAlbums = "https://picasaweb.google.com/data/feed/api/user/"+userID+"?kind=album";
-
-
-
     @Override
     protected String doInBackground(String[] params) {
 
         try {
-            getXmlFromUrl(getPhotosInAlbum);
+            if (PhotosFragment.mAlbumIdList.isEmpty()) {
+                Log.i("PHOTOS ", "getting albums");
+                traverseforAlbums(getXmlFromUrl(getAlbums));
+                Log.i("PHOTOS ", "getting photos");
+                traverseForPhotos(getXmlFromUrl(getPhotosInAlbum));
+            }
+            else {
+                Log.i("PHOTOS ", "getting photos else");
+                getXmlFromUrl(getPhotosInAlbum);
+            }
+
+
 
         }catch (Exception e) {
             Log.i("ERR ", e.toString());
@@ -79,9 +95,11 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    Picasso.with(MainActivity.getContextForApplication()).load(mImageUrlList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                    try {
+                        Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                    } catch (Exception e) {e.printStackTrace();}
                     currentPhoto++;
-                    if (currentPhoto > mImageUrlList.size()-1) currentPhoto = 0;
+                    if (currentPhoto > PhotosFragment.mImageUrlList.size()-1) currentPhoto = 0;
                 }
             };
 
@@ -120,40 +138,57 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
 
 
-    private void getXmlFromUrl(final String query) {
+    private Document getXmlFromUrl(final String query) {
+        Document doc = null;
         try {
             URL url = new URL(query);
             URLConnection conn = url.openConnection();
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(conn.getInputStream());
+            doc = builder.parse(conn.getInputStream());
             String xmlString = nodeToString(doc.getDocumentElement());
             Log.i("FULL XML", xmlString);
-            traverse(doc.getDocumentElement());
+            //traverseforAlbums(doc.getDocumentElement());
+            //traverseForPhotos(doc.getDocumentElement());
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+        return doc;
     }
 
-    public void traverse(Node node) {
+    public void traverseForPhotos(Node node) {
         NodeList nodeList = node.getChildNodes();
-
 
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node currentNode = nodeList.item(i);
-            traverse(currentNode);
+            traverseForPhotos(currentNode);
         }
-
 
         if (node.getNodeName().equals("media:content")) {
             Element durationElement = (Element) node;
-            //System.out.println(durationElement.getAttribute("url"));
             imageUrl = durationElement.getAttribute("url");
             Log.i("PHOTO URL", imageUrl);
-            mImageUrlList.add(Uri.parse(imageUrl));
-            //Log.i("PHOTO", mImageUrlList.toString());
+            PhotosFragment.mImageUrlList.add(Uri.parse(imageUrl));
+        }
+    }
+
+    public void traverseforAlbums(Node node) {
+        NodeList nodeList = node.getChildNodes();
+        String albumID;
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node currentNode = nodeList.item(i);
+            traverseforAlbums(currentNode);
+        }
+
+        if (node.getNodeName().equals("gphoto:id")) {
+            albumID = node.getTextContent();
+            Log.i("ALBUM ID node", albumID);
+            PhotosFragment.mAlbumIdList.add(albumID);
+            Log.i("ALBUM IDs", PhotosFragment.mAlbumIdList.toString());
+
         }
     }
 
