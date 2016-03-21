@@ -43,8 +43,7 @@ public class NewsBodyFragment extends Fragment {
         mScrollView = (ScrollView)view.findViewById(R.id.scrollView);
 
         try {
-            Spanned body = Html.fromHtml(getArguments().getString("body"));
-            mTxtBody.setText(body);
+            mTxtBody.setText(getArguments().getString("body"));
             mTxtHeadline.setText(getArguments().getString("headline"));
         } catch (Exception e) {((MainActivity) getActivity()).showToast(getString(R.string.news_err),
                 Gravity.CENTER, Toast.LENGTH_LONG);}

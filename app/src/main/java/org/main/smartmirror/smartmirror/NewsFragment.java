@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -126,7 +127,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            txtNewsDesk.setText("");
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             switch (message) {
@@ -287,7 +287,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 mHeadline.add(webTitle);
                 fields = results.getJSONObject("fields");
                 body = fields.getString("body");
-                mFullArticle.add(body);
+                mFullArticle.add(Html.fromHtml(body).toString());
                 trailText = fields.getString("trailText");
                 mSnippet.add(trailText);
                 try {
