@@ -30,12 +30,11 @@ public class CalendarHomeFragment extends Fragment {
         mRootView = inflater.inflate(R.layout.calendar_home_fragment, container, false);
 
         LinearLayout homeCalendarLayout = (LinearLayout) mRootView.findViewById(R.id.calendar_home_layout);
-        // read events for the next five days
+        // read events for the current day
         List<CalendarEvent> events = CalendarUtil.getCalendarEvents(getContext(), CalendarUtil.ONE_DAY);
         if (events.size() == 0) {
             hideCalendarHome();
-            // I don't need this I think
-            // return mRootView;
+            return mRootView;
         }
 
         Calendar calendar = Calendar.getInstance();

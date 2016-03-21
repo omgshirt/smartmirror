@@ -1,17 +1,17 @@
 package org.main.smartmirror.smartmirror;
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +49,7 @@ public class AccountActivity extends AppCompatActivity implements
 
     private long mUserID;
     private GoogleApiClient mGoogleApiClient;
+    private SignInButton sbtnGoogleSignInButton;
     private Preferences mPreference;
     private TwitterLoginButton mTwitterLoginButton;
     private TwitterSession mSession;
@@ -59,6 +60,7 @@ public class AccountActivity extends AppCompatActivity implements
 
     private TextView txtGoogleAccountName;
     private EditText edtWorkAddress;
+    private ViewGroup btnSignOutButton;
 
     public static final int GOOGLE_REQUEST = 1;
     public static final int REQUEST_PERMISSIONS = 2;
@@ -71,15 +73,22 @@ public class AccountActivity extends AppCompatActivity implements
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
 
-        txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
+        btnSignOutButton = (ViewGroup) findViewById(R.id.google_sign_out_button);
         edtWorkAddress = (EditText) findViewById(R.id.work_location);
+        sbtnGoogleSignInButton = (SignInButton) findViewById(R.id.google_sign_in_button);
+        txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
 
         txtGoogleAccountName.setText(mPreference.getGmailAccount());
         edtWorkAddress.setText(mPreference.getWorkLocation());
 
         setUpTwitterButton();
-        setUpGoogleButton();
-
+        if(mPreference.getGmailAccount().isEmpty()){
+            setUpGoogleButton();
+        } else {
+            sbtnGoogleSignInButton.setVisibility(View.GONE);
+            btnSignOutButton.setVisibility(View.VISIBLE);
+            setUpSignOutButton();
+        }
     }
 
     /**
@@ -91,10 +100,10 @@ public class AccountActivity extends AppCompatActivity implements
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestScopes(new Scope(Constants.PICASA), new Scope(GmailScopes.GMAIL_LABELS),
-                new Scope(GmailScopes.GMAIL_READONLY),
-                new Scope(GmailScopes.MAIL_GOOGLE_COM),
-                new Scope(GmailScopes.GMAIL_MODIFY),
-                new Scope(GmailScopes.GMAIL_INSERT))
+                        new Scope(GmailScopes.GMAIL_READONLY),
+                        new Scope(GmailScopes.MAIL_GOOGLE_COM),
+                        new Scope(GmailScopes.GMAIL_MODIFY),
+                        new Scope(GmailScopes.GMAIL_INSERT))
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -140,11 +149,10 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
-     * Handles the Google Button necessities
+     * Sets up the Google Button with its listener
      */
     private void setUpGoogleButton() {
-        SignInButton googleSignInBtn = (SignInButton) findViewById(R.id.google_sign_in_button);
-        googleSignInBtn.setOnClickListener(new View.OnClickListener() {
+        sbtnGoogleSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signInToGoogle();
@@ -153,10 +161,21 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
+     * Sets up the Sign Out button with its listener
+     */
+    private void setUpSignOutButton() {
+        btnSignOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOutOfGoogle();
+            }
+        });
+    }
+
+    /**
      * Handles the signing out of Google
      */
     private void signOutOfGoogle() {
-        mGoogleApiClient.connect();
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
@@ -183,21 +202,6 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     // --------------------------------Helpers------------------------------------------------- //
-
-    /**
-     * Shows the dialog that prompts the user for the number of permissions
-     *
-     * @param message    The message we want to display
-     * @param okListener
-     */
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(AccountActivity.this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
 
     /**
      * We listen here for the result from Twitter
@@ -227,12 +231,12 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
-     * Handles the Submit button in account_activity
+     * Handles the Submit button press in account_activity
      * layout
      *
      * @param view current view
      */
-    public void handleButtonPress(View view) {
+    public void submitButtonPress(View view) {
         Log.i(Constants.TAG, "Submit Button");
         /*EditText edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
         EditText edtFacebookPassword = (EditText) findViewById(R.id.facebook_password);
@@ -243,7 +247,7 @@ public class AccountActivity extends AppCompatActivity implements
         }*/
         // since by default the work lat and long is set to -1 we are OK
         // to not have an else case here
-        if ( !(edtWorkAddress.getText().toString().isEmpty()) ) {
+        if (!(edtWorkAddress.getText().toString().isEmpty())) {
             mPreference.setWorkLocation(edtWorkAddress.getText().toString());
 
             String strAddress = edtWorkAddress.getText().toString().replace(' ', '+');
@@ -281,10 +285,10 @@ public class AccountActivity extends AppCompatActivity implements
      */
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            if(acct != null) {
+            if (acct != null) {
                 mPreference.setGmailAccount(acct.getEmail());
+                mPreference.setTokenId(acct.getIdToken());
                 txtGoogleAccountName.setText(acct.getEmail());
                 String[] names = acct.getDisplayName().split("\\s");
                 if (names.length > 0) {
@@ -303,6 +307,13 @@ public class AccountActivity extends AppCompatActivity implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+        if(connectionResult.hasResolution()){
+            try{
+                connectionResult.startResolutionForResult(this, GOOGLE_REQUEST);
+            } catch (IntentSender.SendIntentException e) {
+                mGoogleApiClient.connect();
+            }
+        }
         Log.i(Constants.TAG, connectionResult.toString());
     }
 }

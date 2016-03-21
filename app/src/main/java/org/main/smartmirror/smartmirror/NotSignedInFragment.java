@@ -29,7 +29,8 @@ public class NotSignedInFragment extends Fragment {
         String fragmentName = getArguments().getString("fragment");
         View view = inflater.inflate(R.layout.notsignedin_fragment, container, false);
         TextView txtErrorMessage = (TextView) view.findViewById(R.id.error_message);
-        txtErrorMessage.setText(getResources().getText(R.string.not_logged_in_err) + " " + fragmentName );
+        txtErrorMessage.setText(getResources().getText(R.string.not_logged_in_err) + " "
+                + fragmentName.substring(0,1).toUpperCase() + fragmentName.substring(1));
         return view;
     }
 }
