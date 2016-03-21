@@ -9,7 +9,6 @@
         android:layout_width="400dp"
         android:layout_height="400dp"
         android:id="@+id/photo_from_picasa"
-        android:layout_gravity="center_horizontal|top"
-        android:src="@color/colorAccent" />
+        android:layout_gravity="center_horizontal|top" />
 
 </FrameLayout>

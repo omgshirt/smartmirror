@@ -20,18 +20,18 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/facebook_title"
         android:layout_marginBottom="15dp"
-        android:padding="3dp"
         android:hint="Email"
-        android:inputType="textEmailAddress" />
+        android:inputType="textEmailAddress"
+        android:padding="3dp" />
 
     <EditText
         android:id="@+id/facebook_password"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/facebook_username"
-        android:padding="3dp"
         android:hint="Password"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:padding="3dp" />
 
     <TextView
         android:id="@+id/twitter_title"
@@ -63,9 +63,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
+        android:layout_below="@+id/google_account"
         android:layout_marginBottom="15dp"
         android:text="no account selected"
-        android:layout_below="@+id/google_account"
         android:textAppearance="?android:textAppearanceMedium" />
 
     <com.google.android.gms.common.SignInButton
@@ -92,9 +92,9 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@id/work_title"
         android:layout_marginBottom="15dp"
-        android:padding="3dp"
         android:hint="Address"
-        android:inputType="text" />
+        android:inputType="text"
+        android:padding="3dp" />
 
     <Button
         android:id="@+id/submit_btn"

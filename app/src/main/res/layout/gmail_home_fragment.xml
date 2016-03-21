@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:id="@+id/gmail_home_frag"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/gmail_home_frag">
+    android:orientation="vertical">
 
     <ImageView
-        android:layout_gravity="left"
+        android:id="@+id/mail_icon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/mail_icon"
-        android:src="@drawable/ic_mail_notification"/>
+        android:layout_gravity="left"
+        android:src="@drawable/ic_mail_notification" />
 
     <TextView
         android:id="@+id/num_unread"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/mail_icon"/>
+        android:layout_toRightOf="@id/mail_icon" />
 
 </FrameLayout>
