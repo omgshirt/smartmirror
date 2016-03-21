@@ -415,6 +415,7 @@ public class MainActivity extends AppCompatActivity
     protected void enterLightSleep() {
         if (mirrorSleepState != AWAKE) return;
         mPreferences.setStayAwake(false);
+
         mirrorSleepState = LIGHT_SLEEP;
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
         resetInteractionTimer();
@@ -426,8 +427,10 @@ public class MainActivity extends AppCompatActivity
         setScreenOffTimeout();
         stopUITimer();
         startLightSensor();
-        mira.appSleeping();
 
+        // Stop any ongoing speech. This may cause sleep messages to fail...
+        mTTSHelper.stop();
+        mira.appSleeping();
     }
 
     // ------------------------ UI Visibility / Content Frames ---------------------------
@@ -437,14 +440,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void setContentFrameValues(FrameSize fs) {
-        if (fs == FrameSize.CLOSE_SCREEN) {
-            setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
-        } else if (fs == FrameSize.SMALL_SCREEN) {
-            setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
-        } else if (fs == FrameSize.WIDE_SCREEN) {
-            setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
-        } else if (fs == FrameSize.FULL_SCREEN) {
-            setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
+
+        switch (fs) {
+            case CLOSE_SCREEN:
+                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+                break;
+            case SMALL_SCREEN:
+                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                break;
+            case WIDE_SCREEN:
+                setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
+                break;
+            case FULL_SCREEN:
+                setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
+                break;
         }
     }
 
@@ -470,7 +479,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Temporarily set content frame visibility to given values
+     * Temporarily sets content frame visibility to given values.
+     * This can be undone by calling restoreContentFrameVisibility()
      */
     private void setContentFrameVisibility(int frameOne, int frameTwo, int frameThree) {
         contentFrame1.setVisibility(frameOne);
@@ -478,7 +488,7 @@ public class MainActivity extends AppCompatActivity
         contentFrame3.setVisibility(frameThree);
     }
 
-    // Restores the screen off to the duration set when the application first ran.
+    // Restore screen off timer to the value captured when the application launched.
     protected void setDefaultScreenOffTimeout() {
         // sanity check to prevent screen lockout from super-short screen timeout settings.
         if (defaultScreenTimeout < 1000) defaultScreenTimeout = 10000;
@@ -490,13 +500,13 @@ public class MainActivity extends AppCompatActivity
         Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SLEEP_DELAY);
     }
 
-    // Flags the system to keep the screen on indefinitely.
+    // Keep the screen on indefinitely.
     protected void addScreenOnFlag() {
         Log.i(Constants.TAG, "Adding FLAG_KEEP_SCREEN_ON");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    // Removes the KEEP_SCREEN_ON flag, allowing the screen to timeout normally.
+    // Clear the KEEP_SCREEN_ON flag, allowing the screen to timeout normally.
     protected void clearScreenOnFlag() {
         Log.i(Constants.TAG, "clearing FLAG_KEEP_SCREEN_ON");
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -663,8 +673,8 @@ public class MainActivity extends AppCompatActivity
      * If command would wake the application, trigger proper state change and handle the command.
      * <p/>
      * Actions related to commands are processed in this order: Wake the screen, hide the help fragment,
-     * close menu drawer, set content frame visibility, then change fragments and / or broadcast command to
-     * command listeners.
+     * close menu drawer, set content frame visibility, then change fragments or broadcast the command to
+     * any command listeners.
      *
      * @param command input command
      */
@@ -674,12 +684,13 @@ public class MainActivity extends AppCompatActivity
             handleHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP) {
+                // NIGHT_LIGHT will change to that fragment on wake
                 if (command.equals(Constants.NIGHT_LIGHT)) nightLightOnWake = true;
                 exitSleep();
             } else {
                 exitLightSleep();
                 if (command.equals(Constants.NIGHT_LIGHT)) {
-                    // if the command is light (a special case) wake and directly show LightFragment
+                    //wake and directly show LightFragment
                     handleHelpFragment(command);
                 }
             }
@@ -702,7 +713,7 @@ public class MainActivity extends AppCompatActivity
 
         boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
 
-        if (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP)) {
+        if (!helpIsVisible && (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP)) ) {
             // If frame3 is in any visible state, return it to 'small screen' proportion
             if (frame3Visibility == View.VISIBLE) {
                 setContentFrameValues(FrameSize.SMALL_SCREEN);

@@ -204,9 +204,11 @@ public class Preferences implements LocationListener {
 
             /** CMD_STAY_AWAKE is a toggle */
             case CMD_STAY_AWAKE:
-                if (mPreferences.isStayingAwake()) {
+                if (mStayAwake) {
+                    speakText(R.string.speech_stay_awake_cancel);
                     setStayAwake(false);
-                } else {
+                } else  {
+                    speakText(R.string.speech_stay_awake);
                     setStayAwake(true);
                 }
                 break;
@@ -306,10 +308,12 @@ public class Preferences implements LocationListener {
      * @param unit Units to display
      */
     public void setWeatherUnits(String unit) {
+        if (mWeatherUnits.equals(unit)) return;
+
         if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
             mWeatherUnits = unit;
-            // Invalidate the WEATHER_CACHE
-            CacheManager.getInstance().deleteCache(WeatherFragment.WEATHER_CACHE);
+
+            CacheManager.getInstance().invalidateCache(WeatherFragment.WEATHER_CACHE);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putString(PREFS_WEATHER_UNIT, mWeatherUnits);
             edit.apply();
@@ -628,13 +632,8 @@ public class Preferences implements LocationListener {
     }
 
     public void setStayAwake(boolean stayAwake) {
-        if (mStayAwake && stayAwake) {
-            speakText(R.string.speech_stay_awake_err);
-        } else if (stayAwake) {
-            speakText(R.string.speech_stay_awake);
-        } else if (!stayAwake) {
-            speakText(R.string.speech_stay_awake_cancel);
-        }
+        if (mStayAwake == stayAwake) return;
+
         mStayAwake = stayAwake;
         ((MainActivity) mActivity).showStayAwakeIcon(mStayAwake);
     }

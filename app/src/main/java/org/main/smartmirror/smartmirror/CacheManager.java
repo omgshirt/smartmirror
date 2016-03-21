@@ -55,7 +55,7 @@ public class CacheManager {
 
         // Schedule checks for any expired caches.
         if (cacheScheduler == null)
-            cacheScheduler = scheduler.scheduleAtFixedRate(expirationChecker, 31, 31, TimeUnit.SECONDS);
+            cacheScheduler = scheduler.scheduleAtFixedRate(expirationChecker, 30, 30, TimeUnit.SECONDS);
     }
 
     public static CacheManager getInstance() {
@@ -91,6 +91,8 @@ public class CacheManager {
         if (cacheMap.containsKey(key)) {
             return cacheMap.get(key).getData();
         }
+
+        Log.i(Constants.TAG, "Cache null :: " + key);
         return null;
     }
 
@@ -107,11 +109,21 @@ public class CacheManager {
     public boolean deleteCache(String key) {
         if (cacheMap.containsKey(key)) {
             cacheMap.remove(key);
+            Log.i(Constants.TAG, "CacheManager deleteCache :: " + key);
             return true;
         }
         return false;
     }
 
+    /** Invalidate the cache given by key. Invalid caches still exist, but are marked for update the
+     *  next time the CacheManager thread checks them.
+     *
+     * @param key cache to invalidate
+     * @return boolean true if cache exists and was invalidated.
+     */
+    public boolean invalidateCache(String key) {
+        return (cacheMap.containsKey(key) && cacheMap.get(key).invalidate() );
+    }
 
     public boolean isExpired(String key) {
         return (!cacheMap.containsKey(key) || cacheMap.get(key).isExpired());
@@ -243,10 +255,11 @@ public class CacheManager {
         /**
          * Invalidate resets the data
          */
-        public void invalidate() {
+        public boolean invalidate() {
             this.data = null;
             this.creationTime = new Date(0);
             this.expirationTime = new Date(0);
+            return true;
         }
 
         public Date getCreationTime() {
