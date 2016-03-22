@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,7 +15,7 @@ import org.w3c.dom.NodeList;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,11 +47,6 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     String getUserPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID;
     //String getAlbums = "https://picasaweb.google.com/data/feed/api/user/"+userID+"?kind=album";
 
-    private String xmlMediaContent = "media:content";
-    private String xmlPhotoUrl = "url";
-    private String xmlUserID;
-    private String xmlAlbumID;
-
     String imageUrl;
 
     private TimerTask mTimerTask;
@@ -60,18 +54,29 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     private Runnable mRunnable;
     private Activity activity;
 
+    List<Uri> mImageUriList;
+    List<String> mAlbumList;
+    PhotosFragment photosFragment;
+
+
+    public PhotosASyncTask(Activity activity) {
+        photosFragment = new PhotosFragment();
+        mImageUriList = photosFragment.getImageList();
+        mAlbumList = photosFragment.getAlbumList();
+        this.activity = activity;
+    }
+
+
     @Override
     protected String doInBackground(String[] params) {
-
         try {
-
             Log.i("PHOTOS ", "getting albums");
             traverseforAlbums(getXmlFromUrl(getAlbums));
-            for(int i = 0; i < PhotosFragment.mAlbumIdList.size(); i++) {
-                String newPhotosUrl = getPhotosInAlbumPreUrl + PhotosFragment.mAlbumIdList.get(i);
+            for(int i = 0; i < mAlbumList.size(); i++) {
+                String newPhotosUrl = getPhotosInAlbumPreUrl + mAlbumList.get(i);
                 traverseForPhotos(getXmlFromUrl(newPhotosUrl));
             }
-            updatePhotosCache(PhotosFragment.mImageUrlList);
+            updatePhotosCache(mImageUriList);
 
             /*if (PhotosFragment.mAlbumIdList.isEmpty()) {
                 Log.i("PHOTOS ", "getting albums");
@@ -100,11 +105,6 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
         renderPhotos();
     }
 
-    public PhotosASyncTask(Activity activity) {
-
-        this.activity = activity;
-    }
-
     private String nodeToString(Node node) {
         StringWriter sw = new StringWriter();
         try {
@@ -117,8 +117,6 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
         return sw.toString();
     }
 
-
-
     private Document getXmlFromUrl(final String query) {
         Document doc = null;
         try {
@@ -129,7 +127,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.parse(conn.getInputStream());
             String xmlString = nodeToString(doc.getDocumentElement());
-            Log.i("FULL XML", xmlString);
+            //Log.i("FULL XML", xmlString);
             //traverseforAlbums(doc.getDocumentElement());
             //traverseForPhotos(doc.getDocumentElement());
         }
@@ -151,7 +149,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             Element durationElement = (Element) node;
             imageUrl = durationElement.getAttribute("url");
             Log.i("PHOTO URL", imageUrl);
-            PhotosFragment.mImageUrlList.add(Uri.parse(imageUrl));
+            mImageUriList.add(Uri.parse(imageUrl));
         }
     }
 
@@ -167,8 +165,8 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
         if (node.getNodeName().equals("gphoto:id")) {
             albumID = node.getTextContent();
             Log.i("ALBUM ID node", albumID);
-            PhotosFragment.mAlbumIdList.add(albumID);
-            Log.i("ALBUM IDs", PhotosFragment.mAlbumIdList.toString());
+            mAlbumList.add(albumID);
+            Log.i("ALBUM IDs", mAlbumList.toString());
 
         }
     }
@@ -177,16 +175,15 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
         try {
 
             mTimer = new Timer();
-
             // initialize the runnable that will handle the task
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                        Picasso.with(MainActivity.getContextForApplication()).load(mImageUriList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
                     } catch (Exception e) {e.printStackTrace();}
                     currentPhoto++;
-                    if (currentPhoto > PhotosFragment.mImageUrlList.size()-1) currentPhoto = 0;
+                    if (currentPhoto > mImageUriList.size()-1) currentPhoto = 0;
                 }
             };
 
@@ -194,21 +191,16 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             mTimerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    //getActivity().runOnUiThread(mRunnable);
                     activity.runOnUiThread(mRunnable);
-
                 }
             };
             mTimer.scheduleAtFixedRate(mTimerTask, 0, 20000);
-
-
         } catch (Exception e) {e.printStackTrace();}
     }
 
-    private void updatePhotosCache(ArrayList<Uri> data) {
+    private void updatePhotosCache(List<Uri> data) {
         PhotosFragment.mCacheManager.addCache(PhotosFragment.PHOTO_CACHE, data, PhotosFragment.DATA_UPDATE_FREQUENCY);
         Log.i("PHOTOS CACHE", "updating " + PhotosFragment.PHOTO_CACHE);
-
     }
 
 }

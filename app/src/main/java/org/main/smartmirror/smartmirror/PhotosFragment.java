@@ -14,22 +14,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class PhotosFragment extends Fragment implements CacheManager.CacheListener{
 
     public static ImageView mPhotoFromPicasa;
-    public static ArrayList<Uri> mImageUrlList = new ArrayList<Uri>();
-    public static ArrayList<String> mAlbumIdList = new ArrayList<String>();
+    private List<Uri> mImageUrlList;
+    private List<String> mAlbumIdList;
 
     public static CacheManager mCacheManager = null;
     public static final String PHOTO_CACHE = "photo cache";
     public static final int DATA_UPDATE_FREQUENCY = 86400000;
 
-    PhotosASyncTask newASync = new PhotosASyncTask(getActivity());
+
+
+    public PhotosFragment() {
+        mImageUrlList = new ArrayList<Uri>();
+        mAlbumIdList = new ArrayList<String>();
+    }
+
+    public List<Uri> getImageList() {
+        return mImageUrlList;
+    }
+
+    public List<String> getAlbumList() {
+        return mAlbumIdList;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,7 +79,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
             Log.i(Constants.TAG, PHOTO_CACHE + " does not exist, creating");
             startPhotosUpdate();
         } else {
-            newASync.renderPhotos();
+            new PhotosASyncTask(getActivity()).renderPhotos();
             if (mCacheManager.isExpired(PHOTO_CACHE)) {
                 Log.i(Constants.TAG, PHOTO_CACHE + " expired. Refreshing...");
                 startPhotosUpdate();
@@ -99,14 +111,16 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
 
     @Override
     public void onCacheExpired(String cacheName) {
-        if (cacheName.equals(PHOTO_CACHE)) startPhotosUpdate();
+        if (cacheName.equals(PHOTO_CACHE)) {
+            startPhotosUpdate();
+        }
         Log.i("PHOTO CACHE", "updating expired cache" + cacheName);
 
     }
 
     @Override
     public void onCacheChanged(String cacheName) {
-        // In this case we do nothing, as calling startTwitterUpdate() will refresh the views.
+        // In this case we do nothing, as calling startPhotosUpdate() will refresh the views.
     }
 
 }
