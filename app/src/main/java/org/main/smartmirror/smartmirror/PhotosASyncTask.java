@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,7 +39,6 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     int numPhotos = 4;
     int currentPhoto = 0;
 
-
     String mUserID;
     String mUID;
 
@@ -64,7 +64,16 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String[] params) {
 
         try {
-            if (PhotosFragment.mAlbumIdList.isEmpty()) {
+
+            Log.i("PHOTOS ", "getting albums");
+            traverseforAlbums(getXmlFromUrl(getAlbums));
+            for(int i = 0; i < PhotosFragment.mAlbumIdList.size(); i++) {
+                String newPhotosUrl = getPhotosInAlbumPreUrl + PhotosFragment.mAlbumIdList.get(i);
+                traverseForPhotos(getXmlFromUrl(newPhotosUrl));
+            }
+            updatePhotosCache(PhotosFragment.mImageUrlList);
+
+            /*if (PhotosFragment.mAlbumIdList.isEmpty()) {
                 Log.i("PHOTOS ", "getting albums");
                 traverseforAlbums(getXmlFromUrl(getAlbums));
 
@@ -73,12 +82,11 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
                     String newPhotosUrl = getPhotosInAlbumPreUrl + PhotosFragment.mAlbumIdList.get(i);
                     traverseForPhotos(getXmlFromUrl(newPhotosUrl));
                 }
+                updatePhotosCache(PhotosFragment.mImageUrlList);
             }
             else {
                 Log.i("PHOTOS ", "getting photos else");
-            }
-
-
+            }*/
 
         }catch (Exception e) {
             Log.i("ERR ", e.toString());
@@ -191,10 +199,16 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
                 }
             };
-            mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
+            mTimer.scheduleAtFixedRate(mTimerTask, 0, 20000);
 
 
         } catch (Exception e) {e.printStackTrace();}
+    }
+
+    private void updatePhotosCache(ArrayList<Uri> data) {
+        PhotosFragment.mCacheManager.addCache(PhotosFragment.PHOTO_CACHE, data, PhotosFragment.DATA_UPDATE_FREQUENCY);
+        Log.i("PHOTOS CACHE", "updating " + PhotosFragment.PHOTO_CACHE);
+
     }
 
 }
