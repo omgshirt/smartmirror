@@ -43,7 +43,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     String mUID;
 
     String getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + userID;
-    String getPhotosInAlbum = "https://picasaweb.google.com/data/feed/api/user/"+userID+"/albumid/"+albumID;
+    String getPhotosInAlbumPreUrl = "https://picasaweb.google.com/data/feed/api/user/"+userID+"/albumid/";
     String getLatestPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID+"?kind=photo&max-results="+numPhotos;
     String getUserPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID;
     //String getAlbums = "https://picasaweb.google.com/data/feed/api/user/"+userID+"?kind=album";
@@ -67,12 +67,15 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             if (PhotosFragment.mAlbumIdList.isEmpty()) {
                 Log.i("PHOTOS ", "getting albums");
                 traverseforAlbums(getXmlFromUrl(getAlbums));
+
                 Log.i("PHOTOS ", "getting photos");
-                traverseForPhotos(getXmlFromUrl(getPhotosInAlbum));
+                for(int i = 0; i < PhotosFragment.mAlbumIdList.size(); i++) {
+                    String newPhotosUrl = getPhotosInAlbumPreUrl + PhotosFragment.mAlbumIdList.get(i);
+                    traverseForPhotos(getXmlFromUrl(newPhotosUrl));
+                }
             }
             else {
                 Log.i("PHOTOS ", "getting photos else");
-                getXmlFromUrl(getPhotosInAlbum);
             }
 
 
@@ -86,37 +89,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String message) {
-
-        try {
-
-            mTimer = new Timer();
-
-            // initialize the runnable that will handle the task
-            mRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
-                    } catch (Exception e) {e.printStackTrace();}
-                    currentPhoto++;
-                    if (currentPhoto > PhotosFragment.mImageUrlList.size()-1) currentPhoto = 0;
-                }
-            };
-
-            // initialize the timer task that will run on the UI
-            mTimerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    //getActivity().runOnUiThread(mRunnable);
-                    activity.runOnUiThread(mRunnable);
-
-                }
-            };
-            mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
-
-
-        } catch (Exception e) {e.printStackTrace();}
-
+        renderPhotos();
     }
 
     public PhotosASyncTask(Activity activity) {
@@ -190,6 +163,38 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             Log.i("ALBUM IDs", PhotosFragment.mAlbumIdList.toString());
 
         }
+    }
+
+    public void renderPhotos() {
+        try {
+
+            mTimer = new Timer();
+
+            // initialize the runnable that will handle the task
+            mRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                    } catch (Exception e) {e.printStackTrace();}
+                    currentPhoto++;
+                    if (currentPhoto > PhotosFragment.mImageUrlList.size()-1) currentPhoto = 0;
+                }
+            };
+
+            // initialize the timer task that will run on the UI
+            mTimerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    //getActivity().runOnUiThread(mRunnable);
+                    activity.runOnUiThread(mRunnable);
+
+                }
+            };
+            mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
+
+
+        } catch (Exception e) {e.printStackTrace();}
     }
 
 }
