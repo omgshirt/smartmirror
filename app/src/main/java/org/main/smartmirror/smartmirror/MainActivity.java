@@ -12,7 +12,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.net.nsd.NsdServiceInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -154,7 +153,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onArticleSelected(String articleTitle, String articleBody) {
-        Fragment fragment = NewsBodyFragment.NewInstance(articleTitle, articleBody);
+        Fragment fragment = NewsBodyFragment.newInstance(articleTitle, articleBody);
         displayFragment(fragment, Constants.NEWS_BODY, true);
     }
 
