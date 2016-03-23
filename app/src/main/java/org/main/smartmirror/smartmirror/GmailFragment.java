@@ -51,8 +51,6 @@ public class GmailFragment extends Fragment {
     public ListView listViewBody;
     public String mBody;
 
-    public Button nextMessage;
-
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private String PREF_ACCOUNT_NAME = "";
@@ -106,17 +104,6 @@ public class GmailFragment extends Fragment {
         textViewFrom = (TextView)view.findViewById(R.id.messageFrom);
         textViewSubject = (TextView)view.findViewById(R.id.messageSubject);
         listViewBody = (ListView) view.findViewById(R.id.messageBody);
-
-        nextMessage = (Button) view.findViewById(R.id.next);
-
-        nextMessage.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Log.i(Constants.TAG, "Before task");
-                displayNextMessage();
-                Log.i(Constants.TAG, "After task");
-            }
-        });
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -252,14 +239,13 @@ public class GmailFragment extends Fragment {
          */
         @Override
         protected List<String> doInBackground(Void... params) {
-            try { Log.i(Constants.TAG, " GET DATA TEST");
+            try {
                 return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
                 Log.i(Constants.TAG, "CATCHING EXCEPTION E");
                 cancel(true);
                 Log.i(Constants.TAG, mLastError.toString());
-                // Log.i(Constants.TAG, isCancelled() + "ISCANCELLED TEST");
                 return null;
             }
         }
@@ -270,7 +256,6 @@ public class GmailFragment extends Fragment {
          * @throws IOException
          */
         private List<String> getDataFromApi() throws IOException {
-
             // Get the labels in the user's account.
             String user = "me";
             String query = "in:inbox is:unread category:primary";
@@ -322,7 +307,6 @@ public class GmailFragment extends Fragment {
                     messageList.add(mBody);
                 }
             }
-            Log.i(Constants.TAG, "TEST CHECK WHEN NEW TASK CREATED");
             return messageList;
         }
 
@@ -355,8 +339,6 @@ public class GmailFragment extends Fragment {
     }
 
     public void displayNextMessage(){
-        Log.i(Constants.TAG, "In displayNextMEssage Before");
         new MakeRequestTask(mCredential).execute();
-        Log.i(Constants.TAG, "In displayNextMEssage After");
     }
 }
