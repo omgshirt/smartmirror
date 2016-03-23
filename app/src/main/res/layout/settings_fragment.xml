@@ -1,244 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="org.main.smartmirror.smartmirror.SettingsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="15dp">
-        <!-- Application Brightness -->
-        <TextView
+        android:padding="10dp">
+
+        <Switch
+            android:id="@+id/switch_speech_enabled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_screen_brightness"
+            android:layout_margin="6dp"
+            android:textColor="@color/white"
+            android:text="@string/lbl_speech_off"
             android:textSize="18sp" />
-
-        <RadioGroup
-            android:id="@+id/brightness_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/brightness_vlow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_vlow" />
-
-            <RadioButton
-                android:id="@+id/brightness_low"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_low" />
-
-            <RadioButton
-                android:id="@+id/brightness_medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_medium" />
-
-            <RadioButton
-                android:id="@+id/brightness_high"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_high" />
-
-            <RadioButton
-                android:id="@+id/brightness_vhigh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_vhigh" />
-        </RadioGroup>
-
-        <!-- night light brightness -->
-        <TextView
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_night_light_brightness"
-            android:textSize="18sp" />
-
-        <RadioGroup
-            android:id="@+id/light_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/light_vlow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_vlow" />
-
-            <RadioButton
-                android:id="@+id/light_low"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_low" />
-
-            <RadioButton
-                android:id="@+id/light_medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_medium" />
-
-            <RadioButton
-                android:id="@+id/light_high"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_high" />
-
-            <RadioButton
-                android:id="@+id/light_vhigh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_vhigh" />
-        </RadioGroup>
-
-        <!-- system volume setting -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_system_vol"
-            android:textSize="18sp" />
-
-        <RadioGroup
-            android:id="@+id/sys_vol_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/sys_vol_off"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_off" />
-
-            <RadioButton
-                android:id="@+id/sys_vol_vlow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_vlow" />
-
-            <RadioButton
-                android:id="@+id/sys_vol_low"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_low" />
-
-            <RadioButton
-                android:id="@+id/sys_vol_medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_medium" />
-
-            <RadioButton
-                android:id="@+id/sys_vol_high"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_high" />
-
-            <RadioButton
-                android:id="@+id/sys_vol_vhigh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_vhigh" />
-        </RadioGroup>
-
-        <!-- music volume -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_music_vol"
-            android:textSize="18sp" />
-
-        <RadioGroup
-            android:id="@+id/mus_vol_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/mus_vol_off"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_off" />
-
-            <RadioButton
-                android:id="@+id/mus_vol_vlow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_vlow" />
-
-            <RadioButton
-                android:id="@+id/mus_vol_low"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_low" />
-
-            <RadioButton
-                android:id="@+id/mus_vol_medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_medium" />
-
-            <RadioButton
-                android:id="@+id/mus_vol_high"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_high" />
-
-            <RadioButton
-                android:id="@+id/mus_vol_vhigh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/settings_vhigh" />
-        </RadioGroup>
-
-        <!-- on / off toggles -->
 
         <Switch
             android:id="@+id/switch_voice_enabled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="6dp"
             android:textColor="@color/white"
-            android:text="@string/voice_off"
+            android:text="@string/lbl_voice_off"
             android:textSize="18sp" />
 
         <Switch
             android:id="@+id/switch_remote_enabled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="6dp"
             android:textColor="@color/white"
-            android:text="@string/remote_off"
+            android:text="@string/lbl_remote_off"
+            android:textSize="18sp" />
+
+
+        <!-- time format toggle 12/24 hour -->
+        <Switch
+            android:id="@+id/switch_time_format"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:switchTextAppearance="@color/white"
+            android:textColor="@color/white"
+            android:text="@string/lbl_time_format_24hr"
             android:textSize="18sp" />
 
         <!-- weather display units -->
@@ -246,28 +55,19 @@
             android:id="@+id/switch_weather_units"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="6dp"
             android:switchTextAppearance="@color/white"
             android:textColor="@color/white"
-            android:text="@string/weather_metric"
+            android:text="@string/lbl_weather_metric"
             android:textSize="18sp" />
 
-        <!-- time format toggle 12/24 hour -->
-        <Switch
-            android:id="@+id/switch_time_format"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:switchTextAppearance="@color/white"
-            android:textColor="@color/white"
-            android:text="@string/time_format_24hr"
-            android:textSize="18sp" />
-        <!-- Off for now -->
+        <!-- Change Log In -->
         <Button
             android:id="@+id/change_account_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Change Login Information" />
+            android:layout_margin="6dp"
+            android:padding="3dp"
+            android:text="Account Setup" />
     </LinearLayout>
 </ScrollView>

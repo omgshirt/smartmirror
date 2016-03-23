@@ -12,11 +12,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * CacheManager holds a hashMap of DataCache objects. Periodically a thread will check all registered
- * objects and notify listeners when the data has expired.
+ * CacheManager class maintains a map of data objects for the life of the application.
+ *
+ * Periodically a thread will check all caches. Any expired caches will trigger callbacks to
+ * onCacheExpired. Changing the contents of a cache will callback to onCacheChanged.
  *
  * To receive notifications when a cache has changed or expired, use the CacheListener interface.
  */
+
 public class CacheManager {
 
     private static CacheManager mCacheManager;
@@ -47,18 +50,16 @@ public class CacheManager {
             @Override
             public void run() {
                 checkCacheExpiration();
-                //Log.i(Constants.TAG, "CacheManager: checking for expired caches");
             }
         };
 
-        // set a thread to check for expired caches.
+        // Schedule checks for any expired caches.
         if (cacheScheduler == null)
             cacheScheduler = scheduler.scheduleAtFixedRate(expirationChecker, 31, 31, TimeUnit.SECONDS);
     }
 
     public static CacheManager getInstance() {
         if (mCacheManager == null) {
-            Log.i(Constants.TAG, "Creating cache manager");
             mCacheManager = new CacheManager();
         }
         return mCacheManager;
@@ -73,11 +74,12 @@ public class CacheManager {
     /**
      * Add a cache object to the CacheManager. This will overwrite any object with the same name.
      *
-     * @param key  name of the item
+     * @param key  item name
      * @param data data to store.
      * @param time time (in seconds) until the cache is considered expired
      */
     public void addCache(String key, Object data, int time) {
+        Log.i(Constants.TAG, "CacheManager addCache :: " + key);
         cacheMap.put(key, new DataCache<>(data, time));
         notifyCacheChanged(key);
     }
@@ -99,7 +101,7 @@ public class CacheManager {
     /**
      * Delete the cache object given by 'key'
      *
-     * @param key key to delete
+     * @param key key of cache to delete
      * @return returns TRUE if cache was deleted, FALSE on failure or key not found
      */
     public boolean deleteCache(String key) {
@@ -112,10 +114,7 @@ public class CacheManager {
 
 
     public boolean isExpired(String key) {
-        if (cacheMap.containsKey(key)) {
-            return cacheMap.get(key).isExpired();
-        }
-        return true;
+        return (!cacheMap.containsKey(key) || cacheMap.get(key).isExpired());
     }
 
     /**
@@ -131,7 +130,7 @@ public class CacheManager {
         }
         // ensure one listener can't sign up twice for the same cache.
         if (!listeners.contains(newListener)) {
-            Log.i(Constants.TAG, "CacheManager adding :: " + newListener);
+            //Log.i(Constants.TAG, "CacheManager adding listener :: " + newListener);
             listeners.add(newListener);
             mListenersMap.put(cacheName, listeners);
         }
@@ -145,7 +144,7 @@ public class CacheManager {
      */
     public void unRegisterCacheListener(String key, CacheListener listener) {
         if (mListenersMap.containsKey(key)) {
-            Log.i(Constants.TAG, "CacheManager unregistering :: " + listener);
+            //Log.i(Constants.TAG, "CacheManager unregistering :: " + listener);
             mListenersMap.get(key).remove(listener);
         }
     }
@@ -166,21 +165,21 @@ public class CacheManager {
     }
 
     /**
-     * Checks all caches for expiration & notifies attached listeners
+     * Checks all caches for expiration & notifies all attached listeners via onCacheExpired method.
      */
     public void checkCacheExpiration() {
         if (mListenersMap.isEmpty()) return;
-        for (String s : mListenersMap.keySet()) {
-            if (cacheMap.get(s).isExpired()) {
-                for (CacheListener cl : mListenersMap.get(s)) {
-                    cl.onCacheExpired(s);
+        for (String key : mListenersMap.keySet()) {
+            if (cacheMap.get(key).isExpired()) {
+                for (CacheListener cl : mListenersMap.get(key)) {
+                    cl.onCacheExpired(key);
                 }
             }
         }
     }
 
     /**
-     * Notify all attached listeners that the cache has been updated.
+     * Notify all attached listeners that the cache has been updated via onCacheChanged method.
      * Note: this is not called when a cache object is deleted.
      *
      * @param cacheName name of the updated cache.

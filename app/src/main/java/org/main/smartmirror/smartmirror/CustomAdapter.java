@@ -9,11 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
-/**
- * Created by harout on 2/17/16.
- */
+
 public class CustomAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
@@ -24,6 +24,7 @@ public class CustomAdapter extends BaseAdapter {
         TextView header;
         TextView snippet;
         ImageView thumbnail;
+        TextView articleNumber;
     }
 
     public CustomAdapter(Context context, ArrayList<CustomListViewObject> objects) {
@@ -51,6 +52,7 @@ public class CustomAdapter extends BaseAdapter {
             holder.header = (TextView) convertView.findViewById(R.id.header);
             holder.snippet = (TextView) convertView.findViewById(R.id.snippet);
             holder.thumbnail = (ImageView) convertView.findViewById(R.id.thumbnail);
+            holder.articleNumber = (TextView) convertView.findViewById(R.id.article_number);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -59,6 +61,7 @@ public class CustomAdapter extends BaseAdapter {
             holder.header.setText(objects.get(position).getProp1());
             holder.snippet.setText(objects.get(position).getProp2());
             Picasso.with(MainActivity.getContextForApplication()).load(objects.get(position).getProp3()).fit().centerInside().into(holder.thumbnail);
+            holder.articleNumber.setText(objects.get(position).getProp4());
         } catch (Exception e) {}
 
 

@@ -73,8 +73,6 @@ public class QuoteFragment extends Fragment {
         animation.addAnimation(fadeIn);
         animation.addAnimation(fadeOut);
 
-        // Get the quotes as an array list
-        // mQuoteList = new ArrayList<>(Arrays.asList(getQuotes()));
         setUpQuotes();
         refreshAvailableQuotes();
 
@@ -183,7 +181,7 @@ public class QuoteFragment extends Fragment {
             String message = intent.getStringExtra("message");
             Log.d("Quotes", "Got message:\"" + message + "\"");
             switch (message) {
-                case Constants.BACK:
+                case Constants.GO_BACK:
                     getFragmentManager().popBackStack();
                     break;
             }

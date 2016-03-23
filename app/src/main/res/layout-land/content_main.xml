@@ -12,18 +12,18 @@
 
     <!-- status icons -->
     <LinearLayout
-        android:gravity="end"
         android:layout_width="match_parent"
-        android:layout_height="25dp">
+        android:layout_height="25dp"
+        android:gravity="end">
 
         <ImageView
             android:id="@+id/speech_icon"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginEnd="2dp"
             android:layout_gravity="end"
-            android:contentDescription="speech enabled icon"
+            android:layout_marginEnd="2dp"
             android:background="@android:color/transparent"
+            android:contentDescription="speech enabled icon"
             android:src="@drawable/ic_action_microphone"
             android:visibility="gone" />
 
@@ -32,10 +32,11 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_gravity="end"
-            android:contentDescription="remote enabled icon"
             android:background="@android:color/transparent"
+            android:contentDescription="remote enabled icon"
             android:src="@drawable/remote_128"
             android:visibility="gone" />
+
         <ImageView
             android:id="@+id/remote_dc_icon"
             android:layout_width="25sp"
@@ -45,6 +46,7 @@
             android:contentDescription="remote control disconnected icon"
             android:src="@drawable/remote_dc_128"
             android:visibility="gone" />
+
         <ImageView
             android:id="@+id/stay_awake_icon"
             android:layout_width="25sp"
@@ -64,9 +66,9 @@
         <!-- Weather Frame -->
         <LinearLayout
             android:id="@+id/content_frame_1"
-            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="3"
             android:orientation="vertical">
 
             <fragment
@@ -75,17 +77,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/weather_fragment" />
+
             <fragment
                 android:id="@+id/traffic_fragment"
                 android:name="org.main.smartmirror.smartmirror.TrafficFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/traffic_fragment" />
+
             <fragment
-                android:id="@+id/gmail_home"
+                android:id="@+id/calendar_home_fragment"
+                android:name="org.main.smartmirror.smartmirror.CalendarHomeFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:layout="@layout/calendar_home_fragment" />
+
+            <fragment
+                android:id="@+id/gmail_home_fragment"
                 android:name="org.main.smartmirror.smartmirror.GmailHomeFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="wrap_content"
+                tools:layout="@layout/gmail_home_fragment" />
         </LinearLayout>
 
         <LinearLayout

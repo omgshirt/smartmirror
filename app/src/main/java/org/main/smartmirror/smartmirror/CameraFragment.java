@@ -38,14 +38,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -56,7 +54,6 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.ParentReference;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -82,6 +79,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private TextView mCountDownText;
     private static Drive service;
     private GoogleAccountCredential credential;
+    private Preferences mPreferences;
 
     //Gets current date and time to name pictures
     public static String dateTimeStr;
@@ -426,16 +424,39 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreferences = Preferences.getInstance(getActivity());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
         mCountDownText = (TextView) view.findViewById(R.id.count_down);
         credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
-       // credential = GoogleAccountCredential.usingAudience(getActivity(), "151636454113-9prv66cvop4fqqgj75gkk8k17d78h0p5.apps.googleusercontent.com");
-        String accountName = Preferences.getUserAccountName();
-        Log.i(Constants.TAG, "onCreateView Camera: " + accountName);
+        //String accountName = ("smartmirrortesting@gmail.com");
+        //String accountName = Preferences.mUserAccountPref;
+        String accountName = mPreferences.getGmailAccount();
         credential.setSelectedAccountName(accountName);
-        service = getDriveService(credential);
+        // service = getDriveService(credential);
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!mPreferences.isLoggedInToGmail()) {
+            removeCamera();
+        }
+    }
+
+    /**
+     * Removes the Camera Fragment, displays an error and speaks the error
+     */
+    private void removeCamera() {
+        ((MainActivity) getActivity()).removeFragment(Constants.CAMERA);
+        ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.CAMERA, true);
+        ((MainActivity) getActivity()).speakText("You're Not Logged In");
     }
 
     @Override
@@ -520,7 +541,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 CameraCharacteristics characteristics
                         = manager.getCameraCharacteristics(cameraId);
 
-                // We don't use a front facing camera in this sample.
+                // We don't use the rear facing camera.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     continue;
@@ -927,27 +948,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             try {
                 FileOutputStream output = new FileOutputStream(mFile);
                 output.write(bytes);
-
-//                    List<com.google.api.services.drive.model.File> result = new ArrayList<com.google.api.services.drive.model.File>();
-//                    Drive.Files.List request = service.files().list();
-                   // Log.i(Constants.TAG, "TEST CAM " + request);
-
-//                    do {
-//                        try {
-//                            FileList files = request.execute();
-//
-//                            result.addAll(files.getItems());
-//                            String x = files.getItems().get(0).getDownloadUrl();
-//                            Log.i(Constants.TAG, "DLURL: " + x);
-//                            request.setPageToken(files.getNextPageToken());
-//                        } catch (IOException e) {
-//                            System.out.println("An error occurred: " + e);
-//                            request.setPageToken(null);
-//                        }
-//                    } while (request.getPageToken() != null &&
-//                            request.getPageToken().length() > 0);
-
-                saveFileToDrive();
+                // saveFileToDrive();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -974,9 +975,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 .build();
     }
 
-        private static final String MIME_FOLDER = "application/vnd.google-apps.folder";
-        private static final String FOLDER_NAME = "SmartMirrorPics";
-
     private void saveFileToDrive() {
         Thread t = new Thread(new Runnable() {
             @Override
@@ -992,61 +990,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     body.setMimeType("image/jpeg");
 
                     com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-
                     retrieveAllFiles(service);
-                    //showCameraFeedback("Upload to Drive Successful!");
-                    //showToast("Upload to Drive Successful!");
-                    //DONT DELETE BELOW CODE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-//                    boolean folderExists =false;
-//                    //String query = "mimeType='application/vnd/google-apps.folder' and trashed=false and title='" + FOLDER_NAME + "'";
-//
-//                    Drive.Files.List request = service.files().list().setQ(
-//                            "mimeType='application/vnd.google-apps.folder' and trashed=false");
-//                    FileList files = request.execute();
-//                    for(int i = 0; i < files.size(); i++){
-//                        if(files.getItems().get(i).getOriginalFilename() == "SmartMirrorPics"){
-//                            folderExists = true;
-//                        }
-//                        else if(files.getItems().get(i).getOriginalFilename()==null){
-//                            folderExists = false;
-//                        }
-//                    }
-//                    if(folderExists = true){
-//                        // File's binary content
-//                        java.io.File fileContent = new java.io.File(mFile.getPath());
-//                        FileContent mediaContent = new FileContent("image/jpeg", fileContent);
-//
-//                        // File's metadata.
-//                        com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-//                        body.setTitle(fileContent.getName());
-//                        body.setMimeType("image/jpeg");
-//                        body.setParents(Arrays.asList(new ParentReference()
-//                            .setId(body.getId())));
-//
-//                        com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-//                        showToast("Upload to Drive Successful!");
-//                    }
-//                    else if(folderExists = false) {
-//                        com.google.api.services.drive.model.File mBody = new com.google.api.services.drive.model.File();
-//                        mBody.setTitle(FOLDER_NAME);
-//                        mBody.setMimeType(MIME_FOLDER);
-//
-//                        com.google.api.services.drive.model.File mmFile = service.files().insert(mBody).execute();
-//
-//                    // File's binary content
-//                    java.io.File fileContent = new java.io.File(mFile.getPath());
-//                    FileContent mediaContent = new FileContent("image/jpeg", fileContent);
-//
-//                    // File's metadata.
-//                    com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-//                    body.setTitle(fileContent.getName());
-//                    body.setMimeType("image/jpeg");
-//                    body.setParents(Arrays.asList(new ParentReference()
-//                            .setId(mmFile.getId())));
-//
-//                    com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-//                    showToast("Upload to Drive Successful!");
-//                    }
+                    // showCameraFeedback("Upload to Drive Successful!");
                 } catch (UserRecoverableAuthIOException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

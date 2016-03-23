@@ -18,7 +18,7 @@
             android:id="@+id/time_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30sp" />
+            android:textSize="45sp" />
 
         <TextClock
             android:id="@+id/date_clock"
@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="-6dp"
-        android:layout_marginBottom="-6dp"
+        android:layout_marginBottom="0dp"
         android:orientation="vertical">
 
         <!-- Current weather, temp and humidity-->

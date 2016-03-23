@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -22,6 +23,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/*
+    Handles retrieval of calendar items and formats them to CalendarEvents
+ */
 public class CalendarUtil {
 
     public static String dateToStr;
@@ -41,73 +45,76 @@ public class CalendarUtil {
         dateToStr = dateToString;
     }
 
-    public static String getCalendarHeader() {
-        Date curDate = new Date();
-        SimpleDateFormat format = new SimpleDateFormat();
-        dateToStr = format.format(curDate);
-
-        format = new SimpleDateFormat("E, dd MMM yyyy", Locale.US);
-        dateToStr = format.format(curDate);
+    /**
+     * Format the given date object
+     * @param curDate date object to format
+     * @return String
+     */
+    public static String getCalendarHeader(Date curDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("E MMMM d", Locale.US);
+        dateToStr = formatter.format(curDate);
         setCalendarHeader(dateToStr);
         return dateToStr;
     }
 
-    public static List<String> readCalendarEvent(Context context, ListView listView) {
+    /**
+     * Return all CalendarEvents between now and endTimeMillis
+     * @param context context
+     * @param endTimeMillis how long into the future to look for events
+     * @return List of CalendarEvents between now and endTimeMillis. Returns empty if no items found.
+     */
+    public static List<CalendarEvent> getCalendarEvents(Context context, long endTimeMillis) {
 
-        long startMillis = Calendar.getInstance().getTimeInMillis();
-        long endMillis = startMillis + FIVE_DAYS;
+        List<CalendarEvent> results = new ArrayList<>();
+
+        long startTimeMillis = Calendar.getInstance().getTimeInMillis();
+        endTimeMillis += startTimeMillis;
+        if (endTimeMillis <= startTimeMillis) return results;               // sanity check for time
+
+        Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
+        ContentUris.appendId(builder, startTimeMillis);
+        ContentUris.appendId(builder, endTimeMillis);
 
         ContentResolver cr = context.getContentResolver();
-
-        //For event information
-        Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
-        ContentUris.appendId(builder, startMillis);
-        ContentUris.appendId(builder, endMillis);
         Cursor cursor = cr.query(builder.build(),
                 new String[]{"calendar_id", "title", "description",
                         "dtstart", "dtend", "eventLocation", "calendar_displayName"}, null,
                 null, "dtstart ASC");
-
         assert cursor != null;
         cursor.moveToFirst();
 
-        List<String> eventList = new ArrayList<>();
-        ArrayAdapter<String> arrayAdapter =
-                new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, eventList);
-        listView.setAdapter(arrayAdapter);
+        // get the time format from preferences - this will follow 12 or 24 hour setting.
+        DateFormat formatter = new SimpleDateFormat(Preferences.getInstance((Activity)context)
+                .getTimeFormat(), Locale.US);
 
-        if (cursor.getCount() == 0) {
-            eventList.add("No Events Found");
-        } else {
-            // populate the adapter
+        if (cursor.getCount() > 0) {
             do {
-                Log.i(Constants.TAG, "account :: " + cursor.getString(ACCOUNT_NAME));
                 //If calendar name is what is stored in preferences, then add event to be displayed
-                if (cursor.getString(ACCOUNT_NAME).equals(Preferences.getUserAccountName())) {
+                if (cursor.getString(ACCOUNT_NAME).equals(Preferences.getInstance((Activity)context).getGmailAccount())) {
 
                     String eventName = cursor.getString(EVENT_NAME);
+                    String location = cursor.getString(EVENT_LOC);
 
-                    // Start and end times
                     Date startT = new Date(cursor.getLong(EVENT_START));
-                    DateFormat formatter = new SimpleDateFormat("h:mm a");
                     String startTime = formatter.format(startT);
 
                     Date endT = new Date(cursor.getLong(EVENT_END));
-                    DateFormat formatterEnd = new SimpleDateFormat("h:mm a");
-                    String endTime = formatterEnd.format(endT);
+                    String endTime = formatter.format(endT);
 
-                    // Set times to bold
-                    SpannableString eventTime = new SpannableString(startTime + " - " + endTime);
-                    eventTime.setSpan(new StyleSpan(Typeface.BOLD), 0, eventTime.length(), 0);
-
-                    eventList.add("\n" + eventTime + "\n" + eventName + "\n");
-
-                    Log.i(Constants.TAG, Arrays.toString(cursor.getColumnNames()));
+                    CalendarEvent event = new CalendarEvent();
+                    event.start = new Date(cursor.getLong(EVENT_START));
+                    event.end = new Date(cursor.getLong(EVENT_END));
+                    event.startString = startTime;
+                    event.endString = endTime;
+                    event.description = eventName;
+                    event.location = location;
+                    event.account = cursor.getString(ACCOUNT_NAME);
+                    event.calendarId = cursor.getInt(CALENDAR_ID);
+                    results.add(event);
                 }
             } while (cursor.moveToNext());
         }
-
         cursor.close();
-        return eventList;
+        return results;
     }
 }

@@ -29,6 +29,8 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
     public static ArrayList<String> mUsersAt = new ArrayList<String>();
     public static ArrayList<Uri> mUri = new ArrayList<Uri>();
 
+    public int position = 0;
+
     public static CacheManager mCacheManager = null;
 
     // time in seconds before twitter data is considered old and is discarded
@@ -61,7 +63,6 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
             String message = intent.getStringExtra("message");
             Log.d("TwitterArrayList ", "Got message:\"" + message +"\"");
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
-                int position = 0;
                 if (message.contains(Constants.SCROLL_DOWN)) {
                     position = position + 5;
                 } else if (message.contains(Constants.SCROLL_UP)) {
@@ -69,7 +70,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
                     if (position < 0) position = 0;
                 }
                 VoiceScroll sl = new VoiceScroll();
-                sl.voiceListView(message,twitterFeed, position);
+                sl.scrollListView(message,twitterFeed, position);
             }
         }
     };
@@ -79,7 +80,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
         CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
         try {
             for(int i = 0; i < 10; i++){
-                CustomListViewObject co = new CustomListViewObject(mUsers.get(i),mTweets.get(i),mUri.get(i));
+                CustomListViewObject co = new CustomListViewObject(mUsers.get(i),mTweets.get(i),mUri.get(i),null);
                 objects.add(co);
                 customAdapter.notifyDataSetChanged();
             }

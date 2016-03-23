@@ -13,35 +13,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ScrollView;
 
 
 public class FacebookFragment extends Fragment {
 
-    private WebView webview;
-    private String curURL;
+    private Preferences mPreference;
+    private ScrollView mScrollView;
+    private WebView mWebview;
 
-    public void init(String url) {
-        curURL = url;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreference = Preferences.getInstance(getActivity());
+        if (!mPreference.isLoggedInToFacebook()) {
+            removeFacebook();
+        }
     }
 
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.facebook_fragment, container, false);
-        init("https://m.facebook.com/");
-
-        webview = (WebView) view.findViewById(R.id.facebook_webview);
-        if (curURL != null) {
-
-            webview.getSettings().setJavaScriptEnabled(true);
-
-            webview.setWebViewClient(new webClient());
-
-            webview.loadUrl(curURL);
-
-        }
+        mScrollView = (ScrollView) view.findViewById(R.id.facebook_scrollview);
+        mWebview = (WebView) view.findViewById(R.id.facebook_webview);
+        mWebview.getSettings().setJavaScriptEnabled(true);
+        mWebview.setWebViewClient(new webClient());
+        mWebview.loadUrl(Constants.FACEBOOK_URL);
         return view;
     }
+
 
     // ----------------------- Local Broadcast Receiver -----------------------
 
@@ -53,10 +54,8 @@ public class FacebookFragment extends Fragment {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             Log.d("Facebook ", "Got message:\"" + message + "\"");
-            if (message.contains(Constants.SCROLL_DOWN))
-                webview.scrollBy(0, -((int) 0.3 * ((int) getResources().getDisplayMetrics().density * webview.getContentHeight()) - webview.getHeight()));
-            else if (!message.contains(Constants.SCROLL_DOWN) && message.contains(Constants.SCROLL_UP))
-                webview.scrollBy(0, (int) 0.3 * ((int) getResources().getDisplayMetrics().density * webview.getContentHeight()) - webview.getHeight());
+            VoiceScroll vs = new VoiceScroll();
+            vs.scrollScrollView(message, mScrollView);
 
         }
     };
@@ -77,6 +76,15 @@ public class FacebookFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    /**
+     * Removes facebook fragment, speaks error, and displays error message
+     */
+    private void removeFacebook() {
+        ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
+        ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.FACEBOOK, true);
+        ((MainActivity) getActivity()).speakText(getResources().getString(R.string.speech_not_logged_in_err));
     }
 
     private class webClient extends WebViewClient {

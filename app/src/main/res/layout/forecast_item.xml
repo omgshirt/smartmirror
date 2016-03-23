@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_weight="1"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:weightSum="1">
 
     <TextView
         android:id="@+id/daily_forecast_day"
-        android:layout_gravity="center_horizontal"
+        android:gravity="start|center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:textSize="20sp" />
+        android:layout_weight=".6"
+        tools:text="Monday"
+        android:textSize="23sp" />
 
     <TextView
         android:id="@+id/daily_forecast_icon"
-        android:layout_gravity="center_horizontal"
+        android:gravity="end|center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="60sp" />
+        android:layout_weight=".2"
+        tools:text="SS"
+        android:textSize="40sp" />
 
     <TextView
         android:id="@+id/daily_forecast_temp"
-        android:layout_gravity="center_horizontal"
+        android:gravity="end|center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="50sp" />
+        android:layout_weight=".2"
+        tools:text="75"
+        android:textSize="40sp" />
 </LinearLayout>
