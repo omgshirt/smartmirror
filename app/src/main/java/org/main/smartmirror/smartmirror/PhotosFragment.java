@@ -28,6 +28,16 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
     public static final int DATA_UPDATE_FREQUENCY = 86400000;
 
     PhotosASyncTask mAsyncTask;
+    private Preferences mPreference;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreference = Preferences.getInstance(getActivity());
+        if (!mPreference.isLoggedInToGmail()) {
+            removePhotos();
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -114,6 +124,15 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
     @Override
     public void onCacheChanged(String cacheName) {
         // In this case we do nothing, as calling startPhotosUpdate() will refresh the views.
+    }
+
+    /**
+     * Removes photos fragment, speaks error, and displays error message
+     */
+    private void removePhotos() {
+        ((MainActivity) getActivity()).removeFragment(Constants.PHOTOS);
+        ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.PHOTOS, true);
+        ((MainActivity) getActivity()).speakText(getResources().getString(R.string.speech_not_logged_in_err));
     }
 
 }
