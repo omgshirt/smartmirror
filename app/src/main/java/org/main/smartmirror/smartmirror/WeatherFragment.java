@@ -26,9 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 
@@ -47,8 +45,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     private LinearLayout layTimeLayout;
     private LinearLayout layWeatherLayout;
     private TextView txtWeatherIcon;
-    private TextClock clkTextClock;
-    private TextClock clkDateClock;
+    private TextClock clkTime;
+    private TextClock clkDate;
     private TextView txtCurrentTemp;
     private TextView txtCurrentWind;
     private TextView txtCurrentHumidity;
@@ -124,8 +122,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             hideWeather();
         }
 
-        clkTextClock = (TextClock) view.findViewById(R.id.time_clock);
-        clkDateClock = (TextClock) view.findViewById(R.id.date_clock);
+        clkTime = (TextClock) view.findViewById(R.id.time_clock);
+        clkDate = (TextClock) view.findViewById(R.id.date_clock);
         updateTimeDisplay();
 
         return view;
@@ -245,10 +243,10 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     // Refresh time and date displays to current preference setting
     public void updateTimeDisplay() {
-        clkTextClock.setFormat12Hour(mPreferences.getTimeFormat());
-        clkTextClock.setFormat24Hour(mPreferences.getTimeFormat());
-        clkDateClock.setFormat12Hour(mPreferences.getDateFormat());
-        clkDateClock.setFormat24Hour(mPreferences.getDateFormat());
+        clkTime.setFormat12Hour(mPreferences.getTimeFormat());
+        clkTime.setFormat24Hour(mPreferences.getTimeFormat());
+        clkDate.setFormat12Hour(mPreferences.getDateFormat());
+        clkDate.setFormat24Hour(mPreferences.getDateFormat());
     }
 
     public void hideTime() {

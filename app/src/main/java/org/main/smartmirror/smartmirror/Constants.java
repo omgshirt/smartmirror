@@ -50,6 +50,7 @@ public class Constants {
     public static final String GALLERY = "gallery";
     public static final String GMAIL = "gmail";
     public static final String LIGHT = "light";
+    public static final String MUSIC = "music";
     public static final String NEWS = "news";
     public static final String NIGHT_LIGHT = "night light";
     public static final String PHOTOS = "photos";
@@ -132,7 +133,10 @@ public class Constants {
     public static final String REMOTE_TOGGLE_WEATHER_FORMAT = "toggle weather format";
 
 
-    // used to initialize COMMAND_SET
+    /** Initialize COMMAND_SET. These are the words the voice recognition will
+     *  actively look for when analyzing user speech. Words or phrases not in this list will not
+     *  be detected.
+     */
     public static final String[] COMMANDS = {
             BUSINESS, CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
             CONDITIONS, EIGHT, FACEBOOK, FIVE,
@@ -140,7 +144,7 @@ public class Constants {
             GO_BACK, GO_FORWARD, GO_TO_SLEEP, HELP, HIDE_TIME,
             HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
             MEDIA, MENU, MINIMIZE,
-            MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,
+            MIRA_SLEEP, MIRA_WAKE, MUSIC, NIGHT_LIGHT,
             NEWS, NEXT, NINE, ONE,
             OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
             SCROLL_DOWN, SCROLL_UP, SPORTS,

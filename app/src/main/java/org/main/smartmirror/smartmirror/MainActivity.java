@@ -125,10 +125,10 @@ public class MainActivity extends AppCompatActivity
     private Runnable uiTimerRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!mPreferences.isStayingAwake()) {
-                clearScreenOnFlag();
-            } else {
+            if (mPreferences.isStayingAwake()) {
                 Log.i(Constants.TAG, "Screen set to stay awake");
+            } else {
+                clearScreenOnFlag();
             }
         }
     };
@@ -828,6 +828,9 @@ public class MainActivity extends AppCompatActivity
                 case Constants.MINIMIZE:
                 case Constants.SMALL_SCREEN:
                     setContentFrameValues(FrameSize.SMALL_SCREEN);
+                    break;
+                case Constants.MUSIC:
+                    fragment = MusicStreamFragment.NewInstance("");
                     break;
                 case Constants.NIGHT_LIGHT:
                 case Constants.SHOW_LIGHT:
