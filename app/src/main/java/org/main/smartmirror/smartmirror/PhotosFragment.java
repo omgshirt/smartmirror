@@ -15,33 +15,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class PhotosFragment extends Fragment implements CacheManager.CacheListener{
 
     public static ImageView mPhotoFromPicasa;
-    private List<Uri> mImageUrlList;
-    private List<String> mAlbumIdList;
+    public static ArrayList<Uri> mImageUrlList = new ArrayList<Uri>();
+    public static ArrayList<String> mAlbumIdList = new ArrayList<String>();
 
     public static CacheManager mCacheManager = null;
     public static final String PHOTO_CACHE = "photo cache";
-    public static final int DATA_UPDATE_FREQUENCY = 86400000;
+    public static final int DATA_UPDATE_FREQUENCY = 10;
 
-
-
-    public PhotosFragment() {
-        mImageUrlList = new ArrayList<Uri>();
-        mAlbumIdList = new ArrayList<String>();
-    }
-
-    public List<Uri> getImageList() {
-        return mImageUrlList;
-    }
-
-    public List<String> getAlbumList() {
-        return mAlbumIdList;
-    }
+    PhotosASyncTask mAsyncTask;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,13 +36,13 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
         mCacheManager = CacheManager.getInstance();
         mPhotoFromPicasa = (ImageView) view.findViewById(R.id.photo_from_picasa);
 
-        //new PhotosASyncTask(getActivity()).execute();
         return view;
     }
 
     public void startPhotosUpdate() {
         Log.i(Constants.TAG, "starting photos update");
-        new PhotosASyncTask(getActivity()).execute();
+        mAsyncTask = new PhotosASyncTask(getActivity());
+        mAsyncTask.execute();
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -102,6 +88,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
 
     // when this goes out of view, halt listening
     public void onPause() {
+        mAsyncTask.cancel(true);
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         mCacheManager.unRegisterCacheListener(PHOTO_CACHE, this);
@@ -112,7 +99,13 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
     @Override
     public void onCacheExpired(String cacheName) {
         if (cacheName.equals(PHOTO_CACHE)) {
-            startPhotosUpdate();
+            try {
+                mAsyncTask.cancel(true);
+                mImageUrlList.clear();
+                mAlbumIdList.clear();
+                startPhotosUpdate();
+            } catch (Exception e) {e.printStackTrace();}
+
         }
         Log.i("PHOTO CACHE", "updating expired cache" + cacheName);
 

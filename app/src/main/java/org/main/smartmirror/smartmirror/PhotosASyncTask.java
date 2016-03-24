@@ -38,9 +38,6 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     int numPhotos = 4;
     int currentPhoto = 0;
 
-    String mUserID;
-    String mUID;
-
     String getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + userID;
     String getPhotosInAlbumPreUrl = "https://picasaweb.google.com/data/feed/api/user/"+userID+"/albumid/";
     String getLatestPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID+"?kind=photo&max-results="+numPhotos;
@@ -53,16 +50,9 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     private Timer mTimer;
     private Runnable mRunnable;
     private Activity activity;
-
-    List<Uri> mImageUriList;
-    List<String> mAlbumList;
-    PhotosFragment photosFragment;
-
+    Boolean isTaskCancelled = false;
 
     public PhotosASyncTask(Activity activity) {
-        photosFragment = new PhotosFragment();
-        mImageUriList = photosFragment.getImageList();
-        mAlbumList = photosFragment.getAlbumList();
         this.activity = activity;
     }
 
@@ -70,28 +60,15 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String[] params) {
         try {
-            Log.i("PHOTOS ", "getting albums");
-            traverseforAlbums(getXmlFromUrl(getAlbums));
-            for(int i = 0; i < mAlbumList.size(); i++) {
-                String newPhotosUrl = getPhotosInAlbumPreUrl + mAlbumList.get(i);
-                traverseForPhotos(getXmlFromUrl(newPhotosUrl));
-            }
-            updatePhotosCache(mImageUriList);
-
-            /*if (PhotosFragment.mAlbumIdList.isEmpty()) {
+            if (!isCancelled()) {
                 Log.i("PHOTOS ", "getting albums");
-                traverseforAlbums(getXmlFromUrl(getAlbums));
-
-                Log.i("PHOTOS ", "getting photos");
+                traverseForAlbums(getXmlFromUrl(getAlbums));
                 for(int i = 0; i < PhotosFragment.mAlbumIdList.size(); i++) {
                     String newPhotosUrl = getPhotosInAlbumPreUrl + PhotosFragment.mAlbumIdList.get(i);
                     traverseForPhotos(getXmlFromUrl(newPhotosUrl));
                 }
                 updatePhotosCache(PhotosFragment.mImageUrlList);
             }
-            else {
-                Log.i("PHOTOS ", "getting photos else");
-            }*/
 
         }catch (Exception e) {
             Log.i("ERR ", e.toString());
@@ -102,6 +79,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String message) {
+        if (isCancelled()) cancel(true);
         renderPhotos();
     }
 
@@ -126,10 +104,8 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.parse(conn.getInputStream());
-            String xmlString = nodeToString(doc.getDocumentElement());
+            //String xmlString = nodeToString(doc.getDocumentElement());
             //Log.i("FULL XML", xmlString);
-            //traverseforAlbums(doc.getDocumentElement());
-            //traverseForPhotos(doc.getDocumentElement());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -149,24 +125,24 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             Element durationElement = (Element) node;
             imageUrl = durationElement.getAttribute("url");
             Log.i("PHOTO URL", imageUrl);
-            mImageUriList.add(Uri.parse(imageUrl));
+            PhotosFragment.mImageUrlList.add(Uri.parse(imageUrl));
         }
     }
 
-    public void traverseforAlbums(Node node) {
+    public void traverseForAlbums(Node node) {
         NodeList nodeList = node.getChildNodes();
         String albumID;
 
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node currentNode = nodeList.item(i);
-            traverseforAlbums(currentNode);
+            traverseForAlbums(currentNode);
         }
 
         if (node.getNodeName().equals("gphoto:id")) {
             albumID = node.getTextContent();
             Log.i("ALBUM ID node", albumID);
-            mAlbumList.add(albumID);
-            Log.i("ALBUM IDs", mAlbumList.toString());
+            PhotosFragment.mAlbumIdList.add(albumID);
+            Log.i("ALBUM IDs", PhotosFragment.mAlbumIdList.toString());
 
         }
     }
@@ -180,10 +156,22 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
                 @Override
                 public void run() {
                     try {
-                        Picasso.with(MainActivity.getContextForApplication()).load(mImageUriList.get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                        if (!isCancelled()) {
+                            Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.
+                                    get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                        }
+                        else if (isCancelled()) isTaskCancelled = true;
                     } catch (Exception e) {e.printStackTrace();}
                     currentPhoto++;
-                    if (currentPhoto > mImageUriList.size()-1) currentPhoto = 0;
+                    if (currentPhoto > PhotosFragment.mImageUrlList.size()-1) {
+                        if (!isCancelled()) {
+                            currentPhoto = 0;
+                        }
+                        else if (isCancelled()){
+                            Log.i("Cancelled?", isTaskCancelled.toString());
+                            mTimerTask.cancel();
+                        }
+                    }
                 }
             };
 
@@ -194,7 +182,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
                     activity.runOnUiThread(mRunnable);
                 }
             };
-            mTimer.scheduleAtFixedRate(mTimerTask, 0, 20000);
+            mTimer.scheduleAtFixedRate(mTimerTask, 0, 10000);
         } catch (Exception e) {e.printStackTrace();}
     }
 
