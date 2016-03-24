@@ -10,9 +10,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.zip.Inflater;
 
 
 /**
@@ -24,8 +30,12 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
 
     private static final String GENRE = "genre";
     private static final String TAG = "music streaming";
+
+    private LinearLayout layMusicStream;
+    private List<TextView> txtStationList;
     private MediaPlayer mMediaPlayer;
     private String mGenre;
+    private HashMap<String, String> mUrlMap;
     private AudioManager audioManager;
 
     public MusicStreamFragment() {
@@ -43,8 +53,8 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_music_stream, container, false);
-        mGenre = getArguments().getString(GENRE);
+        View view = inflater.inflate(R.layout.music_stream_fragment, container, false);
+        layMusicStream = (LinearLayout) view;
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
@@ -54,7 +64,26 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
             Log.i(TAG, "failed to get audio focus");
         }
 
-        initMediaPlayer();
+        // Create the mapping of genre -> URL from data in arrays.xml
+        String[] names = getResources().getStringArray(R.array.station_names);
+        String[] urls = getResources().getStringArray(R.array.station_urls);
+        txtStationList = new ArrayList<>();
+
+        // set up the station list using R.layout.station_name
+        mUrlMap = new HashMap<>(10);
+        for(int i =0; i < names.length; i++){
+            mUrlMap.put(names[i], urls[i]);
+            TextView stationName = (TextView) View.inflate(getActivity(), R.layout.station_name, null);
+            stationName.setText(names[i]);
+            txtStationList.add(stationName);
+            layMusicStream.addView(stationName);
+        }
+
+        // play a station if one has been selected
+        mGenre = getArguments().getString(GENRE);
+        if (!mGenre.isEmpty()) {
+            initMediaPlayer();
+        }
 
         return view;
     }
@@ -87,13 +116,14 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
         mMediaPlayer = null;
     }
 
+    /**
+     * Initialize media player and start playback when initialized.
+     */
     public void initMediaPlayer() {
-        // open a test stream
         try {
-            String url = "http://dw2.hopto.org:8080/dance.mp3";
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.setDataSource(getUrlFromGenre());
             mMediaPlayer.setOnErrorListener(this);
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.prepareAsync();
@@ -115,7 +145,6 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
         Log.i(TAG, "media player error code: " + what + " extra: " +extra);
-        initMediaPlayer();
         return true;
     }
 
@@ -158,5 +187,9 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
                 if (mMediaPlayer.isPlaying()) mMediaPlayer.setVolume(0.1f, 0.1f);
                 break;
         }
+    }
+
+    public String getUrlFromGenre() {
+        return mUrlMap.get(mGenre);
     }
 }
