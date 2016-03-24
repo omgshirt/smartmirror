@@ -775,7 +775,12 @@ public class MainActivity extends AppCompatActivity
 
         // look for news desk
         if (Constants.DESK_HASH.contains(command)) {
-            fragment = NewsFragment.newInstance(command);
+            fragment = NewsFragment.NewInstance(command);
+        }
+
+        // look for music streams
+        if (Constants.MUSIC_HASH.contains(command)) {
+            fragment = MusicStreamFragment.NewInstance(command);
         }
 
         // Create a new fragment based on the command. If the input string is not a fragment,
@@ -840,7 +845,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.NEWS:
                     //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
-                    fragment = NewsFragment.newInstance("world");
+                    fragment = NewsFragment.NewInstance("world");
                     break;
                 case Constants.OPEN_WINDOW:
                     if (viewHidden(contentFrame3)) {

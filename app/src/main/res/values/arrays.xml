@@ -58,7 +58,6 @@
         <item>Alternative: KCRW</item>
         <item>Ambient: Ambient Sleeping Pill</item>
         <item>Classical: KUSC</item>
-        <item>Country: Classic Country Radio</item>
         <item>Dance: Best Club Dance</item>
         <item>Jazz: ABC Jazz</item>
         <item>Rap: HOT 108 JAMZ</item>
@@ -69,7 +68,6 @@
         <item name="KCRW">http://www.kcrw.com/music/shows/eclectic24</item>
         <item name="ambient">http://50.7.96.138:8115/stream</item>
         <item name="KUSC">http://playerservices.streamtheworld.com/pls/KUSCMP128.pls</item>
-        <item name="country">http://185.33.22.22:7808</item>
         <item name="dance">http://listen.radionomy.com:80/BestClubDance</item>
         <item name="jazz">http://listen.radionomy.com/ABC-Jazz</item>
         <item name="rap">http://108.61.30.179:4040</item>

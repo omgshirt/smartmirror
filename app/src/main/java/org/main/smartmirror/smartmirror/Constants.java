@@ -79,11 +79,13 @@ public class Constants {
     public static final String ALTERNATIVE = "play alternative";
     public static final String AMBIENT = "play ambient";
     public static final String CLASSICAL = "play classical";
-    public static final String COUNTRY = "play country";
     public static final String DANCE = "play dance";
     public static final String JAZZ = "play jazz";
     public static final String RAP = "play rap";
     public static final String ROCK = "play rock";
+    public static final String[] MUSIC_STATIONS = { ALTERNATIVE, AMBIENT, CLASSICAL, DANCE, JAZZ, RAP, ROCK };
+    public static final HashSet<String> MUSIC_HASH = new HashSet<>(Arrays.asList(MUSIC_STATIONS));
+
 
     //--------------HELP-----------------
     public static final String HELP = "help";
@@ -164,7 +166,7 @@ public class Constants {
             THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
 
-            ALTERNATIVE, AMBIENT, CLASSICAL, COUNTRY, DANCE, JAZZ, RAP, ROCK,
+            ALTERNATIVE, AMBIENT, CLASSICAL, DANCE, JAZZ, RAP, ROCK,
 
             Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
             Preferences.CMD_ENABLE_REMOTE, Preferences.CMD_DISABLE_REMOTE,

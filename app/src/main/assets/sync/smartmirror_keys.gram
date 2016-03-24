@@ -25,7 +25,7 @@ maximize/1e-5/
 minimize/1e-5/
 mira sleep/1e-20/
 mira wake/1e-20/
-music/1e5/
+music/1e2/
 news/1e12/
 next/1e2/
 night light/1e-9/
@@ -76,3 +76,10 @@ article seven/1e-5/
 article eight/1e-4/
 article nine/1e-8/
 article ten/1e-5/
+play alternative/1e-10/
+play ambient/1e-10/
+play classical/1e-10/
+play dance/1e-5/
+play jazz/1e-5/
+play rock/1e-5/
+play rap/1e-5/

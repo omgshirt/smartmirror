@@ -65,7 +65,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     public NewsFragment() {
     }
 
-    public static NewsFragment newInstance(String section) {
+    public static NewsFragment NewInstance(String section) {
         Bundle args = new Bundle();
         args.putString("newsSection", section);
         NewsFragment fragment = new NewsFragment();

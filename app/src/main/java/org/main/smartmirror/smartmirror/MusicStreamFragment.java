@@ -41,9 +41,13 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
     public MusicStreamFragment() {
     }
 
-    public static MusicStreamFragment NewInstance(String genre) {
+    public static MusicStreamFragment NewInstance(String command) {
         Bundle args = new Bundle();
-        args.putString(GENRE, genre);
+
+        int index = command.lastIndexOf(" ");
+        command = command.substring( index+1, command.length() );
+
+        args.putString(GENRE, command);
         MusicStreamFragment msf = new MusicStreamFragment();
         msf.setArguments(args);
         return msf;
@@ -65,16 +69,17 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
         }
 
         // Create the mapping of genre -> URL from data in arrays.xml
-        String[] names = getResources().getStringArray(R.array.station_names);
-        String[] urls = getResources().getStringArray(R.array.station_urls);
+        String[] stationNames = getResources().getStringArray(R.array.station_names);
+        String[] stationUrls = getResources().getStringArray(R.array.station_urls);
         txtStationList = new ArrayList<>();
 
         // set up the station list using R.layout.station_name
         mUrlMap = new HashMap<>(10);
-        for(int i =0; i < names.length; i++){
-            mUrlMap.put(names[i], urls[i]);
+        for(int i =0; i < stationNames.length; i++){
+            String genre = convertStationNameToGenre(stationNames[i]);
+            mUrlMap.put(genre, stationUrls[i]);
             TextView stationName = (TextView) View.inflate(getActivity(), R.layout.station_name, null);
-            stationName.setText(names[i]);
+            stationName.setText(stationNames[i]);
             txtStationList.add(stationName);
             layMusicStream.addView(stationName);
         }
@@ -88,6 +93,10 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
         return view;
     }
 
+    public String convertStationNameToGenre(String stationName) {
+        int index = stationName.indexOf(":");
+        return stationName.substring(0, index).toLowerCase();
+    }
 
     @Override
     public void onResume() {
@@ -108,6 +117,8 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
     }
 
     public void tearDownMediaPlayer(){
+        if (mMediaPlayer == null) return;
+
         if (mMediaPlayer.isPlaying()) {
             Log.i(TAG, "stopping music");
             mMediaPlayer.stop();
@@ -120,6 +131,7 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
      * Initialize media player and start playback when initialized.
      */
     public void initMediaPlayer() {
+        Log.i(TAG, "opening stream for: " + mGenre);
         try {
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
