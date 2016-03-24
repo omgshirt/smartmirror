@@ -2,6 +2,7 @@ package org.main.smartmirror.smartmirror;
 
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -18,12 +19,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.zip.Inflater;
 
 
 /**
  * Fragment displays several music streaming stations, the currently selected station and its
- * status (play / pause / stop)
+ * status (drwPlay / drwPause / stop)
  */
 public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
             AudioManager.OnAudioFocusChangeListener {
@@ -73,8 +73,11 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
         String[] stationUrls = getResources().getStringArray(R.array.station_urls);
         txtStationList = new ArrayList<>();
 
+        mGenre = getArguments().getString(GENRE);
+
         // set up the station list using R.layout.station_name
         mUrlMap = new HashMap<>(10);
+
         for(int i =0; i < stationNames.length; i++){
             String genre = convertStationNameToGenre(stationNames[i]);
             mUrlMap.put(genre, stationUrls[i]);
@@ -82,10 +85,15 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
             stationName.setText(stationNames[i]);
             txtStationList.add(stationName);
             layMusicStream.addView(stationName);
+            if (genre.equals(mGenre)) {
+                stationName.setCompoundDrawablesWithIntrinsicBounds(R.drawable.play, 0, 0, 0);
+            } else {
+
+                stationName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            }
         }
 
-        // play a station if one has been selected
-        mGenre = getArguments().getString(GENRE);
+        // drwPlay a station if one has been selected
         if (!mGenre.isEmpty()) {
             initMediaPlayer();
         }

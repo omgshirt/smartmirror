@@ -1064,7 +1064,7 @@ public class MainActivity extends AppCompatActivity
      */
     public void speakText(final String phrase) {
         Log.i(Constants.TAG, "speakText :: " + phrase);
-        if (mPreferences.isSpeechEnabled()) {
+        if (mPreferences.isSoundOn()) {
             mTTSHelper.start(phrase);
         }
     }
@@ -1136,8 +1136,8 @@ public class MainActivity extends AppCompatActivity
             case Constants.REMOTE_TOGGLE_SLEEPS_STATE:
                 command = (mirrorSleepState == AWAKE) ? Constants.SLEEP : Constants.WAKE;
                 break;
-            case Constants.REMOTE_TOGGLE_SPEECH:
-                command = (mPreferences.isSpeechEnabled()) ? Preferences.CMD_SPEECH_OFF : Preferences.CMD_SPEECH_ON;
+            case Constants.REMOTE_TOGGLE_SOUND:
+                command = (mPreferences.isSoundOn()) ? Preferences.CMD_SOUND_OFF : Preferences.CMD_SOUND_ON;
                 break;
             case Constants.REMOTE_TOGGLE_TIME_FORMAT:
                 command = (mPreferences.isTimeFormat12hr()) ? Preferences.CMD_TIME_24HR : Preferences.CMD_TIME_12HR;

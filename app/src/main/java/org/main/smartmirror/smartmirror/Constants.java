@@ -138,7 +138,7 @@ public class Constants {
     public static final String REMOTE_INCREASE_SCREEN ="increase screen size";
     public static final String REMOTE_TOGGLE_SLEEPS_STATE = "toggle wake";
     public static final String REMOTE_TOGGLE_LISTENING = "toggle listening";
-    public static final String REMOTE_TOGGLE_SPEECH = "toggle speech";
+    public static final String REMOTE_TOGGLE_SOUND = "toggle sound";
     public static final String REMOTE_TOGGLE_TIME_VISIBLE = "time visible";
     public static final String REMOTE_TOGGLE_WEATHER_VISIBLE = "weather visible";
     public static final String REMOTE_TOGGLE_TIME_FORMAT = "toggle time format";
@@ -170,7 +170,7 @@ public class Constants {
 
             Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
             Preferences.CMD_ENABLE_REMOTE, Preferences.CMD_DISABLE_REMOTE,
-            Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_ON,
+            Preferences.CMD_SOUND_OFF, Preferences.CMD_SOUND_ON, Preferences.CMD_MIRA_SOUND,
 
             Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
             Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
