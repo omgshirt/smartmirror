@@ -25,7 +25,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
 
     public static CacheManager mCacheManager = null;
     public static final String PHOTO_CACHE = "photo cache";
-    public static final int DATA_UPDATE_FREQUENCY = 10;
+    public static final int DATA_UPDATE_FREQUENCY = 86400000;
 
     PhotosASyncTask mAsyncTask;
 
