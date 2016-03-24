@@ -65,9 +65,9 @@
     </string-array>
 
     <string-array name="station_urls">
-        <item name="KCRW">http://www.kcrw.com/music/shows/eclectic24</item>
+        <item name="KCRW">http://kcrw.ic.llnwd.net/stream/kcrw_128aac_music</item>
         <item name="ambient">http://50.7.96.138:8115/stream</item>
-        <item name="KUSC">http://playerservices.streamtheworld.com/pls/KUSCMP128.pls</item>
+        <item name="KUSC">http://14943.live.streamtheworld.com:80/KUSCMP128_SC</item>
         <item name="dance">http://listen.radionomy.com:80/BestClubDance</item>
         <item name="jazz">http://listen.radionomy.com/ABC-Jazz</item>
         <item name="rap">http://108.61.30.179:4040</item>
