@@ -2,7 +2,6 @@ package org.main.smartmirror.smartmirror;
 
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -11,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,10 +29,9 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
             AudioManager.OnAudioFocusChangeListener {
 
     private static final String GENRE = "genre";
-    private static final String TAG = "music streaming";
+    private static final String TAG = "SmartMirror music";
 
-    private LinearLayout layMusicStream;
-    private List<TextView> txtStationList;
+    private HashMap<String, ImageView> mStationIcons;
     private MediaPlayer mMediaPlayer;
     private String mGenre;
     private HashMap<String, String> mUrlMap;
@@ -43,11 +42,9 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
 
     public static MusicStreamFragment NewInstance(String command) {
         Bundle args = new Bundle();
-
-        int index = command.lastIndexOf(" ");
-        command = command.substring( index+1, command.length() );
-
-        args.putString(GENRE, command);
+        String stationGenre = GetGenreFromCommand(command);
+        Log.i(TAG, "creating new MusicStreamFragment :: " + stationGenre);
+        args.putString(GENRE, stationGenre);
         MusicStreamFragment msf = new MusicStreamFragment();
         msf.setArguments(args);
         return msf;
@@ -57,8 +54,7 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.music_stream_fragment, container, false);
-        layMusicStream = (LinearLayout) view;
+        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.music_stream_fragment, container, false);
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
@@ -71,39 +67,74 @@ public class MusicStreamFragment extends Fragment implements MediaPlayer.OnPrepa
         // Create the mapping of genre -> URL from data in arrays.xml
         String[] stationNames = getResources().getStringArray(R.array.station_names);
         String[] stationUrls = getResources().getStringArray(R.array.station_urls);
-        txtStationList = new ArrayList<>();
 
         mGenre = getArguments().getString(GENRE);
 
         // set up the station list using R.layout.station_name
         mUrlMap = new HashMap<>(10);
+        mStationIcons = new HashMap<>(10);
 
         for(int i =0; i < stationNames.length; i++){
-            String genre = convertStationNameToGenre(stationNames[i]);
+            String genre = ConvertStationNameToGenre(stationNames[i]);
             mUrlMap.put(genre, stationUrls[i]);
-            TextView stationName = (TextView) View.inflate(getActivity(), R.layout.station_name, null);
-            stationName.setText(stationNames[i]);
-            txtStationList.add(stationName);
-            layMusicStream.addView(stationName);
-            if (genre.equals(mGenre)) {
-                stationName.setCompoundDrawablesWithIntrinsicBounds(R.drawable.play, 0, 0, 0);
-            } else {
 
-                stationName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-            }
+            LinearLayout layStationInfo = createStationLayout(inflater, container, stationNames[i]);
+            view.addView(layStationInfo);
+
+            // save a reference to the icon so we can change it later
+            ImageView icon = (ImageView)layStationInfo.findViewById(R.id.station_play_icon);
+            mStationIcons.put(genre, icon);
         }
 
         // drwPlay a station if one has been selected
         if (!mGenre.isEmpty()) {
+            setPlayIcon(mGenre);
             initMediaPlayer();
         }
 
         return view;
     }
 
-    public String convertStationNameToGenre(String stationName) {
+    public LinearLayout createStationLayout(LayoutInflater inflater, ViewGroup container, String name) {
+        LinearLayout stationLayout = (LinearLayout) inflater.inflate(R.layout.station_layout, container, false);
+        TextView stationName = (TextView)stationLayout.findViewById(R.id.station_name);
+        stationName.setText(name);
+
+        return stationLayout;
+    }
+
+    // strips extra info from station labels, returning the genre
+    public static String ConvertStationNameToGenre(String stationName) {
         int index = stationName.indexOf(":");
         return stationName.substring(0, index).toLowerCase();
+    }
+
+    // strip the "play " prefix from music commands, return genre name
+    public static String GetGenreFromCommand(String command) {
+        int index = command.lastIndexOf(" ");
+        return command.substring(index + 1, command.length());
+    }
+
+    /**
+     * Open a music stream based on the provided command. Closes any existing MediaPlayer instances.
+     * @param command the mirror command, e.g. "play rock"
+     */
+    public void changeToStation(String command) {
+        mGenre = GetGenreFromCommand(command);
+        setPlayIcon(mGenre);
+        tearDownMediaPlayer();
+        initMediaPlayer();
+    }
+
+    public void setPlayIcon(String genre) {
+        for (String key : mStationIcons.keySet()) {
+            ImageView img = mStationIcons.get(key);
+            if (key.equals(genre)) {
+                img.setVisibility(View.VISIBLE);
+            } else {
+                img.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     @Override

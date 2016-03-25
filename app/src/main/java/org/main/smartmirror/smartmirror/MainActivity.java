@@ -602,6 +602,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void displayFragment(Fragment fragment, String tag, boolean addToBackStack) {
         Log.i(Constants.TAG, "Displaying fragment :: " + tag);
+
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         ft.replace(R.id.content_frame_3, fragment, tag);
@@ -746,16 +747,6 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         }
 
-        setContentVisibility(command);
-    }
-
-
-    /**
-     * Adjust the visible content frames if required by the command. Currently empty.
-     *
-     * @param command command to be executed
-     */
-    private void setContentVisibility(String command) {
         handleCommand(command);
     }
 
@@ -773,14 +764,28 @@ public class MainActivity extends AppCompatActivity
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command: \"" + command + "\"");
         }
 
-        // look for news desk
+        // get current fragment. Reject if command is equal to the tag (it's the same command repeated)
+        Fragment currentFragment = null;
+        if (getCurrentFragment() != null) {
+            currentFragment = getCurrentFragment();
+            if ( currentFragment.getTag().equals(command) ) {
+                Log.i(Constants.TAG, "Command ignored : same as tagged fragment.");
+                return;
+            }
+        }
+
+        // Check whether command is a news desk
         if (Constants.DESK_HASH.contains(command)) {
             fragment = NewsFragment.NewInstance(command);
         }
 
-        // look for music streams
+        // check whether command is a music genre / play command
         if (Constants.MUSIC_HASH.contains(command)) {
-            fragment = MusicStreamFragment.NewInstance(command);
+            if (currentFragment instanceof MusicStreamFragment) {
+                 ((MusicStreamFragment) currentFragment).changeToStation(command);
+            } else {
+                fragment = MusicStreamFragment.NewInstance(command);
+            }
         }
 
         // Create a new fragment based on the command. If the input string is not a fragment,
@@ -792,7 +797,7 @@ public class MainActivity extends AppCompatActivity
                     if (frame3Visibility != View.INVISIBLE) {
                         mForwardStack.add(getCurrentFragment());
                         // Pop back stack if there's any previous fragments
-                        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+                        if (getSupportFragmentManager().getBackStackEntryCount() > 1)
                             getSupportFragmentManager().popBackStack();
                     }
                     break;
