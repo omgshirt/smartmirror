@@ -983,13 +983,11 @@ public class MainActivity extends AppCompatActivity
     // --------------------------------- GMail ---------------------------------------------
 
     public int getUnreadCount() {
-        // TODO: enable this when gmailhomefragment is added
-        int count = 2;
-        /*
-        GmailHomeFragment gmhf = (GmailHomeFragment)getSupportFragmentManager().findFragmentById(R.id.);
+        int count = 0;
+        GmailHomeFragment gmhf = (GmailHomeFragment)getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
         if (gmhf != null)
             count = gmhf.getUnreadCount();
-        */
+
         return count;
     }
 
