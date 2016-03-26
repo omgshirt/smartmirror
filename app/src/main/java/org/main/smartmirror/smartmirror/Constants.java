@@ -31,10 +31,13 @@ public class Constants {
     public static final String MIRA_SLEEP = "mira sleep";
     public static final String OPEN_WINDOW = "open window";
     public static final String OPTIONS = "options";
+    public static final String PAUSE = "pause music";
+    public static final String PLAY = "play music";
     public static final String SCROLL_UP = "scroll up";
     public static final String SCROLL_DOWN = "scroll down";
     public static final String SLEEP = "sleep";
     public static final String SMALL_SCREEN = "small screen";
+    public static final String STOP = "stop music";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
     public static final String WIDE_SCREEN = "wide screen";
@@ -158,11 +161,11 @@ public class Constants {
             MEDIA, MENU, MINIMIZE,
             MIRA_SLEEP, MIRA_WAKE, MUSIC, NIGHT_LIGHT,
             NEWS, NEXT, NINE, ONE,
-            OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
+            OPEN_WINDOW, OPTIONS, PAUSE, PLAY, PHOTOS, QUOTES, SCIENCE,
             SCROLL_DOWN, SCROLL_UP, SPORTS,
             SETTINGS, SEVEN, SHOW_LIGHT, SHOW_HELP,
             SHOW_TIME, SHOW_WEATHER, SIX,
-            SLEEP, SMALL_SCREEN, TAKE_PICTURE,
+            SLEEP, SMALL_SCREEN, STOP, TAKE_PICTURE,
             THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
             WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
 

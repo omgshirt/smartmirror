@@ -1,0 +1,10 @@
+pause music/1e-19/
+stop music/1e-19/
+play music/1e-19/
+play alternative/1e1/
+play ambient/1e1/
+play classical/1e1/
+play dance/1e1/
+play jazz/1e1/
+play rap/1e4/
+play rock/1e2/

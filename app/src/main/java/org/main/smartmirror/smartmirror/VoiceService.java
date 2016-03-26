@@ -29,6 +29,7 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
  */
 public class VoiceService extends Service implements RecognitionListener {
 
+    private final String TAG = "VR";
     private ArrayList<Messenger> mClients = new ArrayList<>();
     private Messenger mMessenger = new Messenger(new IHandler());
     private SpeechRecognizer mSpeechRecognizer;
@@ -40,10 +41,12 @@ public class VoiceService extends Service implements RecognitionListener {
     public static final int CANCEL_SPEECH = 4;
     public static final int SHOW_ICON = 5;
     public static final int HIDE_ICON = 6;
-    private final String KEYWORD_SEARCH = "smartmirror_keys";
-    private final String NGRAM_SEARCH = "ngramSearch";
-    private final String GRAMMAR_SEARCH = "grammarSearch";
-    private final String MIRROR_KPS = "mira";
+    public static final int NORMAL_COMMAND_LIST = 7;
+    public static final int MUSIC_COMMAND_LIST = 8;
+    private final String NORMAL_KWS = "smartmirror_keys";
+    private final String MUSIC_KWS = "music_keys";
+
+    private String searchMode = NORMAL_KWS;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -84,8 +87,8 @@ public class VoiceService extends Service implements RecognitionListener {
     public void startVoice() {
         if (mSpeechInitialized) {
             // issue a short delay
-            //Log.i("VR", "startVoice()");
-            mSpeechRecognizer.startListening(KEYWORD_SEARCH);
+            Log.i(TAG, "startVoice() mode :: " + searchMode);
+            mSpeechRecognizer.startListening(searchMode);
         }
     }
 
@@ -137,13 +140,13 @@ public class VoiceService extends Service implements RecognitionListener {
     public void onPartialResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr().trim();
-            Log.i("VR", "onPartialResult: \"" + text + "\"");
+            Log.i(TAG, "onPartialResult: \"" + text + "\"");
             findCommandInText(text);
         }
     }
 
     /**
-     * Look for recognized commands, starting with the last word.
+     * Look for recognized commands, starting with the first word returned from the VR.
      * Also checks two word pairs (n-1) + (n) from end back towards front of string
      * If a command is found, cancel voice listener and return that command.
      *
@@ -153,16 +156,16 @@ public class VoiceService extends Service implements RecognitionListener {
     public boolean findCommandInText(String text) {
 
         String[] candidates = text.split("\\s+");
-        for (int i = candidates.length - 1; i >= 0; i--) {
-        //for(int i = 0; i < candidates.length; i++) {
+        //for (int i = candidates.length - 1; i >= 0; i--) {
+        for(int i = 0; i < candidates.length; i++) {
             String candidate = "";
 
             for (int j = i; j < candidates.length; j++) {
                 candidate = (candidate + " " + candidates[j]).trim();
-                Log.i("VR", "looking for \"" + candidate + "\"");
+                Log.i(TAG, "looking for \"" + candidate + "\"");
 
                 if (Constants.COMMAND_SET.contains(candidate)) {
-                    Log.i("VR", "found command: " + candidate);
+                    Log.i(TAG, "found command: " + candidate);
                     cancelAndSendResult(candidate);
                     return true;
                 }
@@ -172,7 +175,7 @@ public class VoiceService extends Service implements RecognitionListener {
     }
 
     public void cancelAndSendResult(String text) {
-        //Log.i("VR", "cancelling voice. Result: \"" + text + "\"");
+        //Log.i(TAG, "cancelling voice. Result: \"" + text + "\"");
         mSpeechRecognizer.cancel();
         speechResults(text, RESULT_SPEECH);
         startVoice();
@@ -185,16 +188,15 @@ public class VoiceService extends Service implements RecognitionListener {
     public void onResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String hyp = hypothesis.getHypstr().trim();
-            if (!findCommandInText(hyp)) {
-                Log.i("VR", "onResult: \"" + hyp + "\"");
+            if (Constants.COMMAND_SET.contains(hyp)) {
+                Log.i(TAG, "onResult: \"" + hyp + "\"");
                 speechResults(hyp, RESULT_SPEECH);
                 startVoice();
             }
         } else {
-            Log.i("VR", "onResult(), hypothesis null");
+            Log.i(TAG, "onResult(), hypothesis null");
             startVoice();
         }
-
     }
 
     /**
@@ -202,7 +204,7 @@ public class VoiceService extends Service implements RecognitionListener {
      */
     @Override
     public void onBeginningOfSpeech() {
-        //Log.i("VR", "onBeginningOfSpeech");
+        //Log.i(TAG, "onBeginningOfSpeech");
     }
 
     /**
@@ -210,7 +212,7 @@ public class VoiceService extends Service implements RecognitionListener {
      */
     @Override
     public void onEndOfSpeech() {
-        //Log.i("VR", "onEndOfSpeech()");
+        //Log.i(TAG, "onEndOfSpeech()");
         stopVoice();
     }
 
@@ -230,15 +232,10 @@ public class VoiceService extends Service implements RecognitionListener {
     }
 
     private void switchSearch(String searchName) {
+        searchMode = searchName;
         stopVoice();
-
-        // If we are not spotting, start listening with timeout (10000 ms or 10 seconds).
-        if (searchName.equals(MIRROR_KPS))
-            mSpeechRecognizer.startListening(searchName);
-        else
-            mSpeechRecognizer.startListening(searchName, 5000);
+        startVoice();
     }
-
 
     /**
      * Method that handles the initialization of the dictionary
@@ -295,14 +292,11 @@ public class VoiceService extends Service implements RecognitionListener {
 
         // List of phrases to match against
         File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
-        mSpeechRecognizer.addKeywordSearch(KEYWORD_SEARCH, smartMirrorcommandList);
+        mSpeechRecognizer.addKeywordSearch(NORMAL_KWS, smartMirrorcommandList);
 
-        // search for "Mira" trigger. Hearing this will change to grammar search
-        mSpeechRecognizer.addKeyphraseSearch(MIRROR_KPS, MIRROR_KPS);
-
-        // Create grammar-based search
-        //File smGrammarSearch = new File(assetsDir, "sm-commands.gram");
-        //mSpeechRecognizer.addGrammarSearch(GRAMMAR_SEARCH, smGrammarSearch);
+        // Add music keyword list. This is the short list of commands recognized while music is streaming.
+        File musicCommandList = new File(assetsDir, "music_keys.gram");
+        mSpeechRecognizer.addKeywordSearch(MUSIC_KWS, musicCommandList);
     }
 
     /**
@@ -313,6 +307,7 @@ public class VoiceService extends Service implements RecognitionListener {
 
         @Override
         public void handleMessage(Message msg) {
+            Log.i(TAG, "command :: " + msg.toString());
             switch (msg.what) {
                 case INIT_SPEECH:
                     mClients.add(msg.replyTo);
@@ -328,6 +323,12 @@ public class VoiceService extends Service implements RecognitionListener {
                     //mClients.remove(msg.replyTo);
                     if (mSpeechInitialized)
                         mSpeechRecognizer.cancel();
+                    break;
+                case NORMAL_COMMAND_LIST:
+                    switchSearch(NORMAL_KWS);
+                    break;
+                case MUSIC_COMMAND_LIST:
+                    switchSearch(MUSIC_KWS);
                     break;
                 default:
                     super.handleMessage(msg);

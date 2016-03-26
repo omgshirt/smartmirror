@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity
     private int frame2Visibility = View.VISIBLE;
     private int frame3Visibility = View.VISIBLE;
 
-    private enum FrameSize { CLOSE_SCREEN, SMALL_SCREEN, WIDE_SCREEN, FULL_SCREEN }
+    private enum FrameSize {CLOSE_SCREEN, SMALL_SCREEN, WIDE_SCREEN, FULL_SCREEN}
 
     // Light Sensor
     private SensorManager mSensorManager;
@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity
 
     // Sound effects
     private MediaPlayer mFXPlayer;
+
 
     private Runnable uiTimerRunnable = new Runnable() {
         @Override
@@ -205,7 +206,7 @@ public class MainActivity extends AppCompatActivity
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
         if (mPreferences.isFirstTimeRun()) {
-            startActivity( new Intent(this, AccountActivity.class));
+            startActivity(new Intent(this, AccountActivity.class));
         }
 
         setContentView(R.layout.activity_main);
@@ -461,8 +462,8 @@ public class MainActivity extends AppCompatActivity
      * Set the visibility of the 3 content frames and stores those values for future reference.
      * Passing a null for any parameter will keep that frame in its current state.
      *
-     * @param frameOne View.VISIBILITY
-     * @param frameTwo View.VISIBILITY
+     * @param frameOne   View.VISIBILITY
+     * @param frameTwo   View.VISIBILITY
      * @param frameThree View.VISIBILITY
      */
     protected void setContentFrameValues(@Nullable Integer frameOne, @Nullable Integer frameTwo, @Nullable Integer frameThree) {
@@ -580,7 +581,6 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Display the HelpFragment within content_frame_2
-     *
      */
     private void displayHelpFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -714,7 +714,7 @@ public class MainActivity extends AppCompatActivity
 
         boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
 
-        if (!helpIsVisible && (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP)) ) {
+        if (!helpIsVisible && (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP))) {
             // If frame3 is in any visible state, return it to 'small screen' proportion
             if (frame3Visibility == View.VISIBLE) {
                 setContentFrameValues(FrameSize.SMALL_SCREEN);
@@ -768,7 +768,7 @@ public class MainActivity extends AppCompatActivity
         Fragment currentFragment = null;
         if (getCurrentFragment() != null) {
             currentFragment = getCurrentFragment();
-            if ( currentFragment.getTag().equals(command) ) {
+            if (currentFragment.getTag().equals(command)) {
                 Log.i(Constants.TAG, "Command ignored : same as tagged fragment.");
                 return;
             }
@@ -779,12 +779,14 @@ public class MainActivity extends AppCompatActivity
             fragment = NewsFragment.NewInstance(command);
         }
 
-        // check whether command is a music genre / play command
+        // Check whether command is a music genre. Create new fragment if so.
+        // If current fragment is also a MusicStreamFragment, change stations.
         if (Constants.MUSIC_HASH.contains(command)) {
-            if (currentFragment instanceof MusicStreamFragment) {
-                 ((MusicStreamFragment) currentFragment).changeToStation(command);
+            if (currentFragment instanceof MusicFragment) {
+                ((MusicFragment) currentFragment).changeToStation(command);
+                return;
             } else {
-                fragment = MusicStreamFragment.NewInstance(command);
+                fragment = MusicFragment.NewInstance(command);
             }
         }
 
@@ -840,7 +842,7 @@ public class MainActivity extends AppCompatActivity
                     setContentFrameValues(FrameSize.SMALL_SCREEN);
                     break;
                 case Constants.MUSIC:
-                    fragment = MusicStreamFragment.NewInstance("");
+                    fragment = MusicFragment.NewInstance("");
                     break;
                 case Constants.NIGHT_LIGHT:
                 case Constants.SHOW_LIGHT:
@@ -1026,7 +1028,7 @@ public class MainActivity extends AppCompatActivity
 
     public int getUnreadCount() {
         int count = 0;
-        GmailHomeFragment gmhf = (GmailHomeFragment)getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
+        GmailHomeFragment gmhf = (GmailHomeFragment) getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
         if (gmhf != null)
             count = gmhf.getUnreadCount();
 
@@ -1074,11 +1076,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /** speak text even if speech is disabled in the preferences
-     *
+    /**
+     * speak text even if speech is disabled in the preferences
      */
     public void forceSpeakText(final String phrase) {
-            mTTSHelper.start(phrase);
+        mTTSHelper.start(phrase);
     }
 
     /**
@@ -1136,7 +1138,7 @@ public class MainActivity extends AppCompatActivity
                 command = increaseScreenSize();
                 break;
             case Constants.REMOTE_TOGGLE_LISTENING:
-                command = ( mPreferences.isVoiceEnabled() ) ? Preferences.CMD_VOICE_OFF : Preferences.CMD_VOICE_ON;
+                command = (mPreferences.isVoiceEnabled()) ? Preferences.CMD_VOICE_OFF : Preferences.CMD_VOICE_ON;
                 break;
             case Constants.REMOTE_TOGGLE_SLEEPS_STATE:
                 command = (mirrorSleepState == AWAKE) ? Constants.SLEEP : Constants.WAKE;
@@ -1193,9 +1195,10 @@ public class MainActivity extends AppCompatActivity
     /**
      * Based on the current configuration of the 3 content frames, increase the size of contentFrame3
      * by one step in this order: SMALL_SCREEN -> WIDE_SCREEN -> FULL_SCREEN -> CLOSE_SCREEN
+     *
      * @return command corresponding to new screen sizes
      */
-    private String increaseScreenSize(){
+    private String increaseScreenSize() {
         if (mirrorSleepState != AWAKE) return "";
 
         String command = Constants.SMALL_SCREEN;
@@ -1203,7 +1206,7 @@ public class MainActivity extends AppCompatActivity
         if (contentFrame3.getVisibility() == View.INVISIBLE) {
             command = Constants.SMALL_SCREEN;
         } else if (contentFrame1.getVisibility() == View.VISIBLE &&
-                    contentFrame2.getVisibility() == View.VISIBLE) {
+                contentFrame2.getVisibility() == View.VISIBLE) {
             command = Constants.WIDE_SCREEN;
         } else if (contentFrame1.getVisibility() == View.GONE) {
             command = Constants.CLOSE_SCREEN;
@@ -1286,7 +1289,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void onNextCommand(){
+    public void onNextCommand() {
         //Here we update GmailHomeFragment
         GmailHomeFragment gmailHomeFrag = (GmailHomeFragment)
                 getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
@@ -1294,5 +1297,31 @@ public class MainActivity extends AppCompatActivity
         if (gmailHomeFrag != null) {
             gmailHomeFrag.updateUnreadCount();
         }
+    }
+
+    /**
+     * Configure the voice recognition to use a shorter command list if set to true.
+     * Setting false returns to normal command list.
+     * @param isStreaming music streaming status.
+     */
+    public void setMusicIsStreaming(boolean isStreaming) {
+        int msgType;
+
+        if (isStreaming) {
+            // set VR to music mode
+            msgType = VoiceService.MUSIC_COMMAND_LIST;
+        } else {
+            // set VR to normal mode
+            msgType = VoiceService.NORMAL_COMMAND_LIST;
+        }
+
+        try {
+            Message msg = Message.obtain(null, msgType);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch(RemoteException re) {
+            re.printStackTrace();
+        }
+
     }
 }
