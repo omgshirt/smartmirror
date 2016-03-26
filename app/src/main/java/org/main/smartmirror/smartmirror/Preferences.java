@@ -611,15 +611,22 @@ public class Preferences implements LocationListener {
         }
     }
 
-    public void setTokenId(String mTokenId){
+    public void setUserId(String mTokenId){
         this.mTokenId = mTokenId;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_TOKENID, mTokenId);
         edit.apply();
     }
 
-    public String getTokenId(){
+    public String getUserId(){
         return mTokenId;
+    }
+
+    public String getUsername(){
+        if(!mGmailAccount.isEmpty())
+            return mGmailAccount.substring(0, mGmailAccount.indexOf('@'));
+        else
+            return "";
     }
 
     public void setStayAwake(boolean stayAwake) {

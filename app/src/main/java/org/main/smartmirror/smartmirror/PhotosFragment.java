@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 
-public class PhotosFragment extends Fragment implements CacheManager.CacheListener{
+public class PhotosFragment extends Fragment implements CacheManager.CacheListener {
 
     public static ImageView mPhotoFromPicasa;
     public static ArrayList<Uri> mImageUrlList = new ArrayList<Uri>();
@@ -27,7 +27,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
     public static final String PHOTO_CACHE = "photo cache";
     public static final int DATA_UPDATE_FREQUENCY = 86400000;
 
-    PhotosASyncTask mAsyncTask;
+    private PhotosASyncTask mAsyncTask;
     private Preferences mPreference;
 
     @Override
@@ -51,7 +51,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
 
     public void startPhotosUpdate() {
         Log.i(Constants.TAG, "starting photos update");
-        mAsyncTask = new PhotosASyncTask(getActivity());
+        mAsyncTask = new PhotosASyncTask(getActivity(), mPreference.getUserId(), mPreference.getUsername());
         mAsyncTask.execute();
     }
 
@@ -75,7 +75,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
             Log.i(Constants.TAG, PHOTO_CACHE + " does not exist, creating");
             startPhotosUpdate();
         } else {
-            new PhotosASyncTask(getActivity()).renderPhotos();
+            new PhotosASyncTask(getActivity(), mPreference.getUserId(), mPreference.getUsername()).renderPhotos();
             if (mCacheManager.isExpired(PHOTO_CACHE)) {
                 Log.i(Constants.TAG, PHOTO_CACHE + " expired. Refreshing...");
                 startPhotosUpdate();
@@ -83,12 +83,13 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
         }
     }
 
-    /** When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     *  We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     *  voice recognition, the remote control, etc.
+    /**
+     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
+     * We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
+     * voice recognition, the remote control, etc.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
@@ -114,7 +115,9 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
                 mImageUrlList.clear();
                 mAlbumIdList.clear();
                 startPhotosUpdate();
-            } catch (Exception e) {e.printStackTrace();}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
         Log.i("PHOTO CACHE", "updating expired cache" + cacheName);

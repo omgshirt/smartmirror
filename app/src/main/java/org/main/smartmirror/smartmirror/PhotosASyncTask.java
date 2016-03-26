@@ -30,30 +30,43 @@ import javax.xml.transform.stream.StreamResult;
 
 public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
-    String userID = "smartmirrortesting"; // user ID
-    String uID = "118328364730024898386"; // user ID??
-    String albumID = "6261649979025559057"; // smart mirror album
+    //String userID = "smartmirrortesting"; // user ID
+    //String uID = "118328364730024898386"; // user ID??
+    //String albumID = "6261649979025559057"; // smart mirror album
     //String albumID = "6263091469173478818"; // profile pics
 
-    int numPhotos = 4;
-    int currentPhoto = 0;
+    private int numPhotos = 4;
+    private int currentPhoto = 0;
 
-    String getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + userID;
-    String getPhotosInAlbumPreUrl = "https://picasaweb.google.com/data/feed/api/user/"+userID+"/albumid/";
-    String getLatestPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID+"?kind=photo&max-results="+numPhotos;
-    String getUserPhotos = "https://picasaweb.google.com/data/feed/api/user/"+uID;
+    private String userID;
+    private String uID;
+
+    private String getAlbums;
+    private String getPhotosInAlbumPreUrl;
+    private String getLatestPhotos;
+    private String getUserPhotos;
     //String getAlbums = "https://picasaweb.google.com/data/feed/api/user/"+userID+"?kind=album";
 
-    String imageUrl;
+    private String imageUrl;
 
     private TimerTask mTimerTask;
     private Timer mTimer;
     private Runnable mRunnable;
     private Activity activity;
-    Boolean isTaskCancelled = false;
+    private Boolean isTaskCancelled = false;
 
-    public PhotosASyncTask(Activity activity) {
+    public PhotosASyncTask(Activity activity, String uid, String username) {
         this.activity = activity;
+        this.uID = uid;
+        this.userID = username;
+        setURIs();
+    }
+
+    private void setURIs() {
+        getAlbums = "https://picasaweb.google.com/data/feed/api/user/" + userID;
+        getPhotosInAlbumPreUrl = "https://picasaweb.google.com/data/feed/api/user/" + userID + "/albumid/";
+        getLatestPhotos = "https://picasaweb.google.com/data/feed/api/user/" + uID + "?kind=photo&max-results=" + numPhotos;
+        getUserPhotos = "https://picasaweb.google.com/data/feed/api/user/" + uID;
     }
 
 
@@ -63,14 +76,14 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             if (!isCancelled()) {
                 Log.i("PHOTOS ", "getting albums");
                 traverseForAlbums(getXmlFromUrl(getAlbums));
-                for(int i = 0; i < PhotosFragment.mAlbumIdList.size(); i++) {
+                for (int i = 0; i < PhotosFragment.mAlbumIdList.size(); i++) {
                     String newPhotosUrl = getPhotosInAlbumPreUrl + PhotosFragment.mAlbumIdList.get(i);
                     traverseForPhotos(getXmlFromUrl(newPhotosUrl));
                 }
                 updatePhotosCache(PhotosFragment.mImageUrlList);
             }
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             Log.i("ERR ", e.toString());
 
         }
@@ -106,8 +119,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
             doc = builder.parse(conn.getInputStream());
             //String xmlString = nodeToString(doc.getDocumentElement());
             //Log.i("FULL XML", xmlString);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return doc;
@@ -159,15 +171,15 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
                         if (!isCancelled()) {
                             Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.
                                     get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
-                        }
-                        else if (isCancelled()) isTaskCancelled = true;
-                    } catch (Exception e) {e.printStackTrace();}
+                        } else if (isCancelled()) isTaskCancelled = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     currentPhoto++;
-                    if (currentPhoto > PhotosFragment.mImageUrlList.size()-1) {
+                    if (currentPhoto > PhotosFragment.mImageUrlList.size() - 1) {
                         if (!isCancelled()) {
                             currentPhoto = 0;
-                        }
-                        else if (isCancelled()){
+                        } else if (isCancelled()) {
                             Log.i("Cancelled?", isTaskCancelled.toString());
                             mTimerTask.cancel();
                         }
@@ -183,7 +195,9 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
                 }
             };
             mTimer.scheduleAtFixedRate(mTimerTask, 0, 20000);
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updatePhotosCache(List<Uri> data) {

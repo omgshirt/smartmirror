@@ -1,17 +1,14 @@
 package org.main.smartmirror.smartmirror;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -186,7 +183,7 @@ public class AccountActivity extends AppCompatActivity implements
 //        HttpsURLConnection connection = null;
 //        URL url = null;
 //        try {
-//            url = new URL("https://accounts.google.com/o/oauth2/revoke?token=" + mPreference.getTokenId());
+//            url = new URL("https://accounts.google.com/o/oauth2/revoke?token=" + mPreference.getUserId());
 //            connection = (HttpsURLConnection) url.openConnection();
 //            connection.connect();
 //            if(connection.getResponseCode() == 200){
@@ -288,7 +285,7 @@ public class AccountActivity extends AppCompatActivity implements
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
                 mPreference.setGmailAccount(acct.getEmail());
-                mPreference.setTokenId(acct.getIdToken());
+                mPreference.setUserId(acct.getId());
                 txtGoogleAccountName.setText(acct.getEmail());
                 String[] names = acct.getDisplayName().split("\\s");
                 if (names.length > 0) {
