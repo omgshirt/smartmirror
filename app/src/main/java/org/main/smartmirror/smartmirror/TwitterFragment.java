@@ -82,10 +82,12 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
             for(int i = 0; i < 10; i++){
                 CustomListViewObject co = new CustomListViewObject(mUsers.get(i),mTweets.get(i),mUri.get(i),null);
                 objects.add(co);
-                customAdapter.notifyDataSetChanged();
             }
             TwitterFragment.twitterFeed.setAdapter(customAdapter);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            // TODO: NEVER LEAVE A CATCH BLOCK EMPTY
+        }
+        customAdapter.notifyDataSetChanged();
     }
 
     @Override

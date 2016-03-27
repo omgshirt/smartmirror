@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     private MediaPlayer mMediaPlayer;
     private String mGenre;
     private HashMap<String, String> mUrlMap;
+
+    private TextView txtStreamInfo;
     private AudioManager audioManager;
 
     public MusicFragment() {
@@ -77,7 +80,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.music_stream_fragment, container, false);
+        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.music_fragment, container, false);
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
@@ -86,6 +89,12 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             Log.i(TAG, "failed to get audio focus");
         }
+
+        // configure the StreamInfo marquee. Doesn't work properly when set via XML...
+        txtStreamInfo = (TextView) view.findViewById(R.id.stream_info);
+        txtStreamInfo.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        txtStreamInfo.setSingleLine(true);
+        txtStreamInfo.setMarqueeRepeatLimit(-1);
 
         // Create the mapping of genre -> URL from data in arrays.xml
         String[] stationNames = getResources().getStringArray(R.array.station_names);
@@ -113,6 +122,9 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         if (!mGenre.isEmpty()) {
             setStatusIconVisibility();
             initMediaPlayer();
+        } else {
+            // create a media player to prevent crashes on callbacks
+            mMediaPlayer = new MediaPlayer();
         }
 
         return view;
@@ -132,18 +144,28 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         return stationName.substring(0, index).toLowerCase();
     }
 
-    // strip the "play " prefix from music commands, return genre name
+    // strip the "play " prefix from music or remote commands, return genre name
     public static String GetGenreFromCommand(String command) {
         int index = command.lastIndexOf(" ");
         return command.substring(index + 1, command.length());
     }
 
     /**
-     * Open a music stream based on the provided command. Closes any existing MediaPlayer instances.
+     * Open a music stream based on the provided command. Closes any existing MediaPlayer instances
+     * and immediately starts the selected stream. Ignored if music is currently streaming
      *
      * @param command the mirror command, e.g. "play rock"
      */
     public void changeToStation(String command) {
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) return;
+        startStation(command);
+    }
+
+    /** Like changeToStation, but allows changes if the media player is playing.
+     *
+     * @param command station to play
+     */
+    public void startStation(String command) {
         mGenre = GetGenreFromCommand(command);
         setStatusIconVisibility();
         setIconDrawables(R.drawable.play);
@@ -153,20 +175,20 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     public void pauseStream() {
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-            //((MainActivity)getActivity()).setMusicIsStreaming(false);
             mMediaPlayer.pause();
             setIconDrawables(R.drawable.pause);
             setStatusIconVisibility();
+            txtStreamInfo.setText(R.string.stream_pause);
         }
     }
 
     public void stopStream() {
         if (mMediaPlayer != null) {
-            //((MainActivity)getActivity()).setMusicIsStreaming(false);
             tearDownMediaPlayer();
             setIconDrawables(R.drawable.pause);
             mGenre = "";
             setStatusIconVisibility();
+            txtStreamInfo.setText(R.string.stream_stopped);
         }
     }
 
@@ -176,9 +198,12 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             mMediaPlayer.start();
             setIconDrawables(R.drawable.play);
             setStatusIconVisibility();
+            txtStreamInfo.setText(R.string.stream_playing);
         }
     }
 
+
+    // sets the status icon to visible for the currently selected stream
     public void setStatusIconVisibility() {
         for (String key : mStationIcons.keySet()) {
             ImageView img = mStationIcons.get(key);
@@ -200,6 +225,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     @Override
     public void onResume() {
         super.onResume();
+        txtStreamInfo.setText(R.string.stream_stopped);
+        txtStreamInfo.setSelected(true);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
     }
@@ -208,7 +235,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-        tearDownMediaPlayer();
+        stopStream();
         audioManager.abandonAudioFocus(this);
     }
 
@@ -218,7 +245,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     }
 
-    public void tearDownMediaPlayer() {
+    private void tearDownMediaPlayer() {
         if (mMediaPlayer == null) return;
 
         if (mMediaPlayer.isPlaying()) {
@@ -237,22 +264,19 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     public void initMediaPlayer() {
         Log.i(TAG, "opening stream for: " + mGenre);
         try {
+            txtStreamInfo.setText(R.string.stream_preparing);
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setDataSource(getUrlFromGenre());
             mMediaPlayer.setOnErrorListener(this);
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.prepareAsync();
-            ((MainActivity)getActivity()).setMusicIsStreaming(true);
-            showNowPlaying(true);
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            if (getActivity() instanceof MainActivity) {
-                String msg = getResources().getString(R.string.stream_not_found);
-                ((MainActivity) getActivity()).showToast(msg, Toast.LENGTH_LONG);
-            }
+            txtStreamInfo.setText(R.string.stream_not_found);
         } catch (IllegalStateException ise) {
             ise.printStackTrace();
+            txtStreamInfo.setText(R.string.stream_not_found);
             Log.i(TAG, "illegal state exception - probably thrown by DataSource url");
         }
     }
@@ -271,6 +295,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
      */
     @Override
     public void onPrepared(MediaPlayer mp) {
+        ((MainActivity)getActivity()).setMusicIsStreaming(true);
+        txtStreamInfo.setText(R.string.stream_playing);
         mp.start();
     }
 
@@ -308,9 +334,5 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     public String getUrlFromGenre() {
         return mUrlMap.get(mGenre);
-    }
-
-    public void showNowPlaying(boolean musicIsPlaying) {
-        // TODO: add some banner showing command list while music is streaming
     }
 }

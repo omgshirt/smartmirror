@@ -12,9 +12,12 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
@@ -46,6 +49,11 @@ public class VoiceService extends Service implements RecognitionListener {
     private final String NORMAL_KWS = "smartmirror_keys";
     private final String MUSIC_KWS = "music_keys";
 
+    private HashSet<String> normalSearchSet = new HashSet<>();
+    private HashSet<String> musicSearchSet = new HashSet<>();
+    private HashSet<String> currentSearchSet = new HashSet<>();
+
+    // searchMode tracks the current dictionary
     private String searchMode = NORMAL_KWS;
 
     @Override
@@ -87,8 +95,10 @@ public class VoiceService extends Service implements RecognitionListener {
     public void startVoice() {
         if (mSpeechInitialized) {
             // issue a short delay
-            Log.i(TAG, "startVoice() mode :: " + searchMode);
+            Log.i(TAG, "startVoice. Search mode :: " + searchMode);
             mSpeechRecognizer.startListening(searchMode);
+        } else {
+            Log.e(TAG, "startVoice. Speech not initialized!");
         }
     }
 
@@ -156,15 +166,15 @@ public class VoiceService extends Service implements RecognitionListener {
     public boolean findCommandInText(String text) {
 
         String[] candidates = text.split("\\s+");
-        //for (int i = candidates.length - 1; i >= 0; i--) {
-        for(int i = 0; i < candidates.length; i++) {
+        for (int i = candidates.length - 1; i >= 0; i--) {
+        //for(int i = 0; i < candidates.length; i++) {
             String candidate = "";
 
             for (int j = i; j < candidates.length; j++) {
                 candidate = (candidate + " " + candidates[j]).trim();
                 Log.i(TAG, "looking for \"" + candidate + "\"");
 
-                if (Constants.COMMAND_SET.contains(candidate)) {
+                if (currentSearchSet.contains(candidate)) {
                     Log.i(TAG, "found command: " + candidate);
                     cancelAndSendResult(candidate);
                     return true;
@@ -188,15 +198,14 @@ public class VoiceService extends Service implements RecognitionListener {
     public void onResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String hyp = hypothesis.getHypstr().trim();
-            if (Constants.COMMAND_SET.contains(hyp)) {
+            if (currentSearchSet.contains(hyp)) {
                 Log.i(TAG, "onResult: \"" + hyp + "\"");
                 speechResults(hyp, RESULT_SPEECH);
-                startVoice();
             }
         } else {
             Log.i(TAG, "onResult(), hypothesis null");
-            startVoice();
         }
+        startVoice();
     }
 
     /**
@@ -233,6 +242,7 @@ public class VoiceService extends Service implements RecognitionListener {
 
     private void switchSearch(String searchName) {
         searchMode = searchName;
+        currentSearchSet = (searchMode.equals(NORMAL_KWS)) ? normalSearchSet : musicSearchSet;
         stopVoice();
         startVoice();
     }
@@ -291,12 +301,39 @@ public class VoiceService extends Service implements RecognitionListener {
         mSpeechRecognizer.addListener(this);
 
         // List of phrases to match against
-        File smartMirrorcommandList = new File(assetsDir, "smartmirror_keys.gram");
-        mSpeechRecognizer.addKeywordSearch(NORMAL_KWS, smartMirrorcommandList);
+        File normalCommandList = new File(assetsDir, "smartmirror_keys.gram");
+        mSpeechRecognizer.addKeywordSearch(NORMAL_KWS, normalCommandList);
+        normalSearchSet = createCommandSet(normalCommandList);
+        currentSearchSet = normalSearchSet;
 
         // Add music keyword list. This is the short list of commands recognized while music is streaming.
         File musicCommandList = new File(assetsDir, "music_keys.gram");
         mSpeechRecognizer.addKeywordSearch(MUSIC_KWS, musicCommandList);
+        musicSearchSet = createCommandSet(musicCommandList);
+    }
+
+
+    /**
+     * Create a list of commands from file
+     * @param file input .gram file to evaluate
+     * @return HashSet of commands
+     */
+    private HashSet<String> createCommandSet(File file) {
+        HashSet<String> result = new HashSet<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ( (line = br.readLine()) != null) {
+                int index = line.indexOf('/');
+                result.add(line.substring(0, index));
+            }
+            br.close();
+        } catch(IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        return result;
     }
 
     /**

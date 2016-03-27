@@ -26,22 +26,20 @@ minimize/1e-5/
 mira sleep/1e-20/
 mira wake/1e-20/
 mira sound/1e-15/
-music/1e4/
+music/1e-4/
 news/1e12/
 next/1e2/
 night light/1e-9/
 options/1e-2/
 open window/1e-10/
-pause music/1e-5/
 photos/1e3/
-play music/1e-4/
 quotes/1e6/
 refresh/1e-4/
 remote on/1e-13/
 remote off/1e-10/
 settings/1e-4/
-scroll up/1e4/
 scroll down/1e-12/
+scroll up/1e12/
 sound off/1e-14/
 sound on/1e-9/
 show help/1e-4/

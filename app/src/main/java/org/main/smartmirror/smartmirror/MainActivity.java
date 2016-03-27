@@ -699,7 +699,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public boolean commandWakesFromSleep(String command) {
-        return (command.equals(Constants.WAKE)
+        return (command.equals(Constants.WAKE) || command.equals(Constants.WAKE_UP)
                 || command.equals(Constants.NIGHT_LIGHT)
                 || command.equals(Constants.MIRA_WAKE));
     }
@@ -765,10 +765,10 @@ public class MainActivity extends AppCompatActivity
         }
 
         // get current fragment. Reject if command is equal to the tag (it's the same command repeated)
-        Fragment currentFragment = null;
-        if (getCurrentFragment() != null) {
-            currentFragment = getCurrentFragment();
-            if (currentFragment.getTag().equals(command)) {
+        // Does not apply to music fragments.
+        Fragment currentFragment;
+        if ( (currentFragment = getCurrentFragment()) != null) {
+            if (currentFragment.getTag().equals(command) && !(currentFragment instanceof MusicFragment) ) {
                 Log.i(Constants.TAG, "Command ignored : same as tagged fragment.");
                 return;
             }
@@ -777,17 +777,6 @@ public class MainActivity extends AppCompatActivity
         // Check whether command is a news desk
         if (Constants.DESK_HASH.contains(command)) {
             fragment = NewsFragment.NewInstance(command);
-        }
-
-        // Check whether command is a music genre. Create new fragment if so.
-        // If current fragment is also a MusicStreamFragment, change stations.
-        if (Constants.MUSIC_HASH.contains(command)) {
-            if (currentFragment instanceof MusicFragment) {
-                ((MusicFragment) currentFragment).changeToStation(command);
-                return;
-            } else {
-                fragment = MusicFragment.NewInstance(command);
-            }
         }
 
         // Create a new fragment based on the command. If the input string is not a fragment,
@@ -878,9 +867,36 @@ public class MainActivity extends AppCompatActivity
                     fragment = new TwitterFragment();
                     break;
                 case Constants.WAKE:
+                case Constants.WAKE_UP:
                     break;
                 case Constants.WIDE_SCREEN:
                     setContentFrameValues(FrameSize.WIDE_SCREEN);
+                    break;
+                case Constants.ALTERNATIVE:
+                case Constants.AMBIENT:
+                case Constants.CLASSICAL:
+                case Constants.DANCE:
+                case Constants.JAZZ:
+                case Constants.RAP:
+                case Constants.ROCK:
+                    if (currentFragment instanceof MusicFragment) {
+                        ((MusicFragment) currentFragment).changeToStation(command);
+                    } else {
+                        fragment = MusicFragment.NewInstance(command);
+                    }
+                    break;
+                case Constants.R_ALTERNATIVE:
+                case Constants.R_AMBIENT:
+                case Constants.R_CLASSICAL:
+                case Constants.R_DANCE:
+                case Constants.R_JAZZ:
+                case Constants.R_RAP:
+                case Constants.R_ROCK:
+                    if (currentFragment instanceof MusicFragment) {
+                        ((MusicFragment) currentFragment).startStation(command);
+                    } else {
+                        fragment = MusicFragment.NewInstance(command);
+                    }
                     break;
                 default:
                     broadcastMessage("inputAction", command);
@@ -947,17 +963,16 @@ public class MainActivity extends AppCompatActivity
      * Handle the result of speech input.
      * Normalize inputs when several phrases are paired with the same action ('settings' & 'options')
      *
-     * @param input the command the user gave
+     * @param command voice command returned from VoiceService
      */
     @SuppressWarnings("deprecation")
-    public void handleVoiceCommand(String input) {
-        //String voiceInput = input.trim();
-        Log.i(Constants.TAG, "handleVoiceCommand:\"" + input + "\"");
+    public void handleVoiceCommand(String command) {
+        Log.i(Constants.TAG, "handleVoiceCommand:\"" + command + "\"");
 
         // if voice is disabled, ignore everything except "start listening" and "wake / night light" commands
-        if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(input)) {
-            if (input.equals(Preferences.CMD_VOICE_ON) || input.equals(Preferences.CMD_VOICE_OFF)) {
-                broadcastMessage("inputAction", input);
+        if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(command)) {
+            if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Preferences.CMD_VOICE_OFF)) {
+                broadcastMessage("commandAction", command);
             } else {
                 showToast(getResources().getString(R.string.speech_voice_off_err), Toast.LENGTH_SHORT);
             }
@@ -965,21 +980,21 @@ public class MainActivity extends AppCompatActivity
         }
 
         // show the command to the user
-        showToast(input, Toast.LENGTH_SHORT);
+        showToast(command, Toast.LENGTH_SHORT);
 
-        switch (input) {
+        switch (command) {
             case Preferences.CMD_DISABLE_REMOTE:
-                input = Preferences.CMD_REMOTE_OFF;
+                command = Preferences.CMD_REMOTE_OFF;
                 break;
             case Preferences.CMD_ENABLE_REMOTE:
-                input = Preferences.CMD_REMOTE_ON;
+                command = Preferences.CMD_REMOTE_ON;
                 break;
             case Constants.SHOW_LIGHT:
-                input = Constants.NIGHT_LIGHT;
+                command = Constants.NIGHT_LIGHT;
                 break;
         }
 
-        wakeScreenAndDisplay(input);
+        wakeScreenAndDisplay(command);
     }
 
     public void initSpeechRecognition() {

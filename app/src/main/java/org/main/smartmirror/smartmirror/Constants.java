@@ -3,7 +3,6 @@ package org.main.smartmirror.smartmirror;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class Constants {
 
@@ -79,6 +78,7 @@ public class Constants {
     public static final HashSet<String> DESK_HASH = new HashSet<>(DESK_LIST);
 
     // ------------ MUSIC ------------------
+    // music commands used by voice recognition. these will only work while the music player is paused or stopped.
     public static final String ALTERNATIVE = "play alternative";
     public static final String AMBIENT = "play ambient";
     public static final String CLASSICAL = "play classical";
@@ -86,9 +86,15 @@ public class Constants {
     public static final String JAZZ = "play jazz";
     public static final String RAP = "play rap";
     public static final String ROCK = "play rock";
-    public static final String[] MUSIC_STATIONS = { ALTERNATIVE, AMBIENT, CLASSICAL, DANCE, JAZZ, RAP, ROCK };
-    public static final HashSet<String> MUSIC_HASH = new HashSet<>(Arrays.asList(MUSIC_STATIONS));
 
+    // music commands sent by the remote - these will trigger stations to change while stream is active.
+    public static final String R_ALTERNATIVE = "remote play alternative";
+    public static final String R_AMBIENT = "remote play ambient";
+    public static final String R_CLASSICAL = "remote play classical";
+    public static final String R_DANCE = "remote play dance";
+    public static final String R_JAZZ = "remote play jazz";
+    public static final String R_RAP = "remote play rap";
+    public static final String R_ROCK = "remote play rock";
 
     //--------------HELP-----------------
     public static final String HELP = "help";
@@ -147,46 +153,4 @@ public class Constants {
     public static final String REMOTE_TOGGLE_TIME_FORMAT = "toggle time format";
     public static final String REMOTE_TOGGLE_WEATHER_FORMAT = "toggle weather format";
 
-
-    /** Initialize COMMAND_SET. These are the words the voice recognition will
-     *  actively look for when analyzing user speech. Words or phrases not in this list will not
-     *  be detected.
-     */
-    public static final String[] COMMANDS = {
-            BUSINESS, CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
-            CONDITIONS, EIGHT, FACEBOOK, FIVE,
-            FORECAST, FOUR, FULL_SCREEN, GALLERY, GMAIL,
-            GO_BACK, GO_FORWARD, GO_TO_SLEEP, HELP, HIDE_TIME,
-            HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
-            MEDIA, MENU, MINIMIZE,
-            MIRA_SLEEP, MIRA_WAKE, MUSIC, NIGHT_LIGHT,
-            NEWS, NEXT, NINE, ONE,
-            OPEN_WINDOW, OPTIONS, PAUSE, PLAY, PHOTOS, QUOTES, SCIENCE,
-            SCROLL_DOWN, SCROLL_UP, SPORTS,
-            SETTINGS, SEVEN, SHOW_LIGHT, SHOW_HELP,
-            SHOW_TIME, SHOW_WEATHER, SIX,
-            SLEEP, SMALL_SCREEN, STOP, TAKE_PICTURE,
-            THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
-            WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
-
-            ALTERNATIVE, AMBIENT, CLASSICAL, DANCE, JAZZ, RAP, ROCK,
-
-            Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
-            Preferences.CMD_ENABLE_REMOTE, Preferences.CMD_DISABLE_REMOTE,
-            Preferences.CMD_SOUND_OFF, Preferences.CMD_SOUND_ON, Preferences.CMD_MIRA_SOUND,
-
-            Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
-            Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
-            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC,
-
-            Preferences.CMD_STAY_AWAKE
-    };
-
-    public static HashSet<String> createCommandSet() {
-
-        List<String> commandList = Arrays.asList(COMMANDS);
-        return new HashSet<>(commandList);
-    }
-
-    public static final Set<String> COMMAND_SET = createCommandSet();
 }

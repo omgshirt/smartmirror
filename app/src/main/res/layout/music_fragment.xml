@@ -1,0 +1,18 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".MusicFragment">
+
+    <!-- stream info marquee -->
+    <TextView
+        android:id="@+id/stream_info"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:textStyle="italic"
+        android:textSize="16sp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+       />
+</LinearLayout>

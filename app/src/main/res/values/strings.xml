@@ -47,7 +47,11 @@
     <string name="weather_data_err">Failed to retrieve weather data &#8212; check your internet connection</string>
 
     <!-- Music Strings -->
-    <string name="stream_not_found">Error opening music stream</string>
+    <string name="stream_not_found">"Error opening music stream."</string>
+    <string name="stream_stopped">"...Music stopped:. Say 'play classical' to play the classical station...        ...Music stopped. Say 'play classical' to play the classical station..."</string>
+    <string name="stream_pause">"...Music paused. Say 'play music' to resume or 'stop music' to return to normal command mode..."</string>
+    <string name="stream_playing">"...Music playing. Say 'stop music' or 'pause music' to stop...                 ...Music playing. Say 'stop music' or 'pause music' to stop..."</string>
+    <string name="stream_preparing">"...Preparing the stream &#8212; please wait...             ...Preparing the stream &#8212; please wait..."</string>
 
     <!-- Weather Icons -->
     <string name="weather_sunny">\uf00d</string>
@@ -126,8 +130,5 @@
     <string name="twitter_error">Unable to retrieve twitter data &#8212; check your internet connection</string>
     <string name="news_err">Unable to retrieve news &#8212; check your internet connection</string>
     <string name="photos_err">Unable to retrieve photos &#8212; check your internet connection</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
