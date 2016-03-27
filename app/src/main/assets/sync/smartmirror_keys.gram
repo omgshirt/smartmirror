@@ -1,22 +1,22 @@
-calendar/1e-12/
+calendar/1e-15/
 camera/1e-1/
 camera off/1e-3/
 camera on/1e-3/
 close screen/1e-6/
 close window/1e-6/
 conditions/1e-4/
-current time/1e8/
+current time/1e-5/
 enable remote/1e-10/
 disable remote/1e-7/
 facebook/1e-5/
 forecast/1e-3/
 full screen/1e-5/
 gallery/1e-2/
-gmail/1e2/
-go to sleep/1e-15/
-go back/1e4/
-go forward/1e3/
-help/1e9/
+gmail/1e-4/
+go to sleep/1e-18/
+go back/1e1/
+go forward/1e-3/
+help/1e5/
 hide time/1e2/
 hide weather/1e1/
 hide screen/1e-4/
@@ -38,7 +38,7 @@ refresh/1e-4/
 remote on/1e-13/
 remote off/1e-10/
 settings/1e-4/
-scroll down/1e-12/
+scroll down/1e-15/
 scroll up/1e12/
 sound off/1e-14/
 sound on/1e-9/
@@ -48,15 +48,15 @@ show weather/1e1/
 show light/1e6/
 small screen/1e-8/
 sleep/1e14/
-start listening/1e-12/
+start listening/1e-15/
 stay awake/1e-8/
-stop listening/1e-10/
+stop listening/1e-12/
 take a picture/1e-15/
 time twelve hour/1e-10/
 time twenty-four hour/1e-20/
-twitter/1e1/
-wake/1e10/
-wake up/1e-8/
+twitter/1e-5/
+wake/1e20/
+wake up/1e-10/
 weather english/1e-8/
 weather metric/1e-8/
 wide screen/1e-8/
@@ -80,7 +80,7 @@ article ten/1e-5/
 play alternative/1e-12/
 play ambient/1e-12/
 play classical/1e-12/
-play dance/1e-8/
+play dance/1e-4/
 play jazz/1e-8/
 play rock/1e-8/
-play rap/1e-8/
+play rap/1e-4/
