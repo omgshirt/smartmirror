@@ -79,12 +79,10 @@ public class AccountActivity extends AppCompatActivity implements
         edtWorkAddress.setText(mPreference.getWorkLocation());
 
         setUpTwitterButton();
-        if(mPreference.getGmailAccount().isEmpty()){
-            setUpGoogleButton();
-        } else {
-            sbtnGoogleSignInButton.setVisibility(View.GONE);
-            btnSignOutButton.setVisibility(View.VISIBLE);
-            setUpSignOutButton();
+        setUpSignOutButton();
+        setUpGoogleButton();
+        if (!mPreference.getGmailAccount().isEmpty()) {
+            hideSignInShowSignOutButton();
         }
     }
 
@@ -287,6 +285,7 @@ public class AccountActivity extends AppCompatActivity implements
                 mPreference.setGmailAccount(acct.getEmail());
                 mPreference.setUserId(acct.getId());
                 txtGoogleAccountName.setText(acct.getEmail());
+                hideSignInShowSignOutButton();
                 String[] names = acct.getDisplayName().split("\\s");
                 if (names.length > 0) {
                     mPreference.setUserFirstName(names[0]);
@@ -300,12 +299,17 @@ public class AccountActivity extends AppCompatActivity implements
         }
     }
 
+    private void hideSignInShowSignOutButton() {
+        sbtnGoogleSignInButton.setVisibility(View.GONE);
+        btnSignOutButton.setVisibility(View.VISIBLE);
+    }
+
     // -------------------------------Callbacks------------------------------------------------- //
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        if(connectionResult.hasResolution()){
-            try{
+        if (connectionResult.hasResolution()) {
+            try {
                 connectionResult.startResolutionForResult(this, GOOGLE_REQUEST);
             } catch (IntentSender.SendIntentException e) {
                 mGoogleApiClient.connect();

@@ -19,10 +19,17 @@
                 android:id="@+id/facebook_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
                 android:layout_marginTop="15dp"
                 android:text="Facebook"
                 android:textAppearance="?android:textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/facebook_account_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:text="no account selected"
+                android:textAppearance="?android:textAppearanceMedium" />
 
             <EditText
                 android:id="@+id/facebook_username"
