@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -63,8 +64,9 @@ public class Preferences implements LocationListener {
     public static final float WORK_LAT = -1f;
     public static final float WORK_LONG = -1f;
 
-    public static final String CMD_SPEECH_OFF = "speech off";
-    public static final String CMD_SPEECH_ON = "speech on";
+    public static final String CMD_SOUND_OFF = "sound off";
+    public static final String CMD_SOUND_ON = "sound on";
+    public static final String CMD_MIRA_SOUND ="mira sound"; // toggle sound on / off
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
@@ -92,7 +94,7 @@ public class Preferences implements LocationListener {
     private boolean mRemoteEnabled;                 // Enable / disable remote control connections
     private boolean mVoiceEnabled;                  // Enable / disable voice recognition UNTIL keyword spoken
 
-    private boolean mSpeechEnabled;
+    private boolean mSoundOn;
 
     private String mTimeFormat;
     private String mWeatherUnits;                   // Weather display format (English / metric)
@@ -116,7 +118,7 @@ public class Preferences implements LocationListener {
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
     public static final String TIME_FORMAT_24_HR_SHORT = "H:mm";
-    public static final String TIME_FORMAT_12_HR = "h:mm a";
+    public static final String TIME_FORMAT_12_HR = "h:mm";
     public static final String TIME_FORMAT_12_HR_SHORT = "h:mm";
 
 
@@ -134,20 +136,29 @@ public class Preferences implements LocationListener {
         switch (command) {
 
             // Speech on / off
-            case CMD_SPEECH_OFF:
-                if (isSpeechEnabled()) {
-                    speakText(R.string.speech_off);
-                    setSpeechEnabled(false);
+            case CMD_SOUND_OFF:
+                if (isSoundOn()) {
+                    speakText(R.string.sound_off);
+                    setSoundOn(false);
                 } else {
-                    speakText(R.string.speech_off_err);
+                    ((MainActivity)mActivity).forceSpeakText(mActivity.getResources().getString(R.string.sound_off_err));
                 }
                 break;
-            case CMD_SPEECH_ON:
-                if (isSpeechEnabled()) {
-                    speakText(R.string.speech_on_err);
+            case CMD_SOUND_ON:
+                if (isSoundOn()) {
+                    speakText(R.string.sound_on_err);
                 } else {
-                    speakText(R.string.speech_on);
-                    setSpeechEnabled(true);
+                    setSoundOn(true);
+                    speakText(R.string.sound_on);
+                }
+                break;
+            case CMD_MIRA_SOUND:
+                if (isSoundOn()) {
+                    speakText(R.string.sound_off);
+                    setSoundOn(false);
+                } else {
+                    speakText(R.string.sound_on);
+                    setSoundOn(true);
                 }
                 break;
 
@@ -204,8 +215,15 @@ public class Preferences implements LocationListener {
                 setTimeFormat24hr();
                 break;
 
+            /** CMD_STAY_AWAKE is a toggle */
             case CMD_STAY_AWAKE:
-                setStayAwake(true);
+                if (mStayAwake) {
+                    speakText(R.string.speech_stay_awake_cancel);
+                    setStayAwake(false);
+                } else  {
+                    speakText(R.string.speech_stay_awake);
+                    setStayAwake(true);
+                }
                 break;
 
             default:
@@ -218,7 +236,7 @@ public class Preferences implements LocationListener {
         mActivity = activity;
         mSharedPreferences = mActivity.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        mSpeechEnabled = mSharedPreferences.getBoolean(PREFS_SPEECH_ENABLED, true);
+        mSoundOn = mSharedPreferences.getBoolean(PREFS_SPEECH_ENABLED, true);
 
         // grab saved values from mSharedPreferences if they exist, if not use defaults
         mWeatherUnits = mSharedPreferences.getString(PREFS_WEATHER_UNIT, ENGLISH);
@@ -304,10 +322,12 @@ public class Preferences implements LocationListener {
      * @param unit Units to display
      */
     public void setWeatherUnits(String unit) {
+        if (mWeatherUnits.equals(unit)) return;
+
         if (unit.equals(ENGLISH) || unit.equals(METRIC)) {
             mWeatherUnits = unit;
-            // Invalidate the WEATHER_CACHE
-            CacheManager.getInstance().deleteCache(WeatherFragment.WEATHER_CACHE);
+
+            CacheManager.getInstance().invalidateCache(WeatherFragment.WEATHER_CACHE);
             SharedPreferences.Editor edit = mSharedPreferences.edit();
             edit.putString(PREFS_WEATHER_UNIT, mWeatherUnits);
             edit.apply();
@@ -465,15 +485,25 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
-    public void setSpeechEnabled(boolean enable) {
-        this.mSpeechEnabled = enable;
+    public void setSoundOn(boolean enable) {
+        if (enable == mSoundOn) return;
+        this.mSoundOn = enable;
+
+        float vol = 0f;
+        if (enable) { vol = .5f; }
+
+        AudioManager audio =(AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int newVol = (int) (maxVolume*vol);
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, newVol, 0);
+
         SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putBoolean(PREFS_SPEECH_ENABLED, mSpeechEnabled);
+        edit.putBoolean(PREFS_SPEECH_ENABLED, mSoundOn);
         edit.apply();
     }
 
-    public boolean isSpeechEnabled() {
-        return mSpeechEnabled;
+    public boolean isSoundOn() {
+        return mSoundOn;
     }
 
     // helper sends a string to MainActivity to be spoken
@@ -633,11 +663,8 @@ public class Preferences implements LocationListener {
     }
 
     public void setStayAwake(boolean stayAwake) {
-        if (mStayAwake && stayAwake) {
-            speakText(R.string.speech_stay_awake_err);
-        } else if (stayAwake) {
-            speakText(R.string.speech_stay_awake);
-        }
+        if (mStayAwake == stayAwake) return;
+
         mStayAwake = stayAwake;
         ((MainActivity) mActivity).showStayAwakeIcon(mStayAwake);
     }

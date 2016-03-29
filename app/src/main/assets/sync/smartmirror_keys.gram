@@ -17,7 +17,7 @@ go to sleep/1e-15/
 go back/1e4/
 go forward/1e3/
 help/1e9/
-hide time/1e-2/
+hide time/1e2/
 hide weather/1e1/
 hide screen/1e-4/
 menu/1e4/
@@ -25,6 +25,8 @@ maximize/1e-5/
 minimize/1e-5/
 mira sleep/1e-20/
 mira wake/1e-20/
+mira sound/1e-15/
+music/1e-4/
 news/1e12/
 next/1e2/
 night light/1e-9/
@@ -36,12 +38,12 @@ refresh/1e-4/
 remote on/1e-13/
 remote off/1e-10/
 settings/1e-4/
-scroll up/1e4/
 scroll down/1e-12/
-speech off/1e-10/
-speech on/1e-10/
+scroll up/1e12/
+sound off/1e-14/
+sound on/1e-9/
 show help/1e-4/
-show time/1e-1/
+show time/1e-4/
 show weather/1e1/
 show light/1e6/
 small screen/1e-8/
@@ -84,3 +86,10 @@ economics/1e2/
 opinion/1e2/
 environment/1e-3/
 lifestyle/1e1/
+play alternative/1e-12/
+play ambient/1e-12/
+play classical/1e-12/
+play dance/1e-8/
+play jazz/1e-8/
+play rock/1e-8/
+play rap/1e-8/

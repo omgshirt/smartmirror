@@ -30,7 +30,7 @@ public class CalendarUtil {
 
     public static String dateToStr;
     public static final int ONE_DAY = 86400000;
-    public static final int FIVE_DAYS = ONE_DAY * 5;
+    public static final int LOOK_AHEAD = ONE_DAY * 10;
     public static final int TEN_HOURS = 36000000;
 
     public static final int CALENDAR_ID = 0;

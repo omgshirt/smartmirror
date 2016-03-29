@@ -174,11 +174,14 @@ public class AccountActivity extends AppCompatActivity implements
      * Handles the signing out of Google
      */
     private void signOutOfGoogle() {
+        mGoogleApiClient.connect();
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
                         Log.i(Constants.TAG, "Revoked: " + status);
+                        mPreference.setGmailAccount("");
+                        txtGoogleAccountName.setText(getResources().getString(R.string.no_google_account));
                     }
                 });
 //        HttpsURLConnection connection = null;
@@ -283,6 +286,7 @@ public class AccountActivity extends AppCompatActivity implements
      */
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
                 mPreference.setGmailAccount(acct.getEmail());

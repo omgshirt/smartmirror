@@ -3,14 +3,13 @@ package org.main.smartmirror.smartmirror;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class Constants {
 
 
     public static final String TAG = "SmartMirror";
 
-    //-------- Accont Activity ---------
+    //-------- Account Activity ---------
     public static final String KEY_STORE = "AndroidKeyStore";
     public static final String PICASA = "https://picasaweb.google.com/data/";
     public static final String REVOKE_ACCOUNT = "https://accounts.google.com/o/oauth2/revoke?token=";
@@ -31,10 +30,13 @@ public class Constants {
     public static final String MIRA_SLEEP = "mira sleep";
     public static final String OPEN_WINDOW = "open window";
     public static final String OPTIONS = "options";
+    public static final String PAUSE = "pause music";
+    public static final String PLAY = "play music";
     public static final String SCROLL_UP = "scroll up";
     public static final String SCROLL_DOWN = "scroll down";
     public static final String SLEEP = "sleep";
     public static final String SMALL_SCREEN = "small screen";
+    public static final String STOP = "stop music";
     public static final String WAKE = "wake";
     public static final String WAKE_UP = "wake up";
     public static final String WIDE_SCREEN = "wide screen";
@@ -46,9 +48,11 @@ public class Constants {
     public static final String CALENDAR = "calendar";
     public static final String CAMERA = "camera";
     public static final String FACEBOOK = "facebook";
+    public static final String FORECAST = "forecast";
     public static final String GALLERY = "gallery";
     public static final String GMAIL = "gmail";
     public static final String LIGHT = "light";
+    public static final String MUSIC = "music";
     public static final String NEWS = "news";
     public static final String NIGHT_LIGHT = "night light";
     public static final String PHOTOS = "photos";
@@ -82,12 +86,30 @@ public class Constants {
     public static final List<String> DESK_LIST = Arrays.asList(NEWS_DESKS);
     public static final HashSet<String> DESK_HASH = new HashSet<>(DESK_LIST);
 
+    // ------------ MUSIC ------------------
+    // music commands used by voice recognition. these will only work while the music player is paused or stopped.
+    public static final String ALTERNATIVE = "play alternative";
+    public static final String AMBIENT = "play ambient";
+    public static final String CLASSICAL = "play classical";
+    public static final String DANCE = "play dance";
+    public static final String JAZZ = "play jazz";
+    public static final String RAP = "play rap";
+    public static final String ROCK = "play rock";
+
+    // music commands sent by the remote - these will trigger stations to change while stream is active.
+    public static final String R_ALTERNATIVE = "remote play alternative";
+    public static final String R_AMBIENT = "remote play ambient";
+    public static final String R_CLASSICAL = "remote play classical";
+    public static final String R_DANCE = "remote play dance";
+    public static final String R_JAZZ = "remote play jazz";
+    public static final String R_RAP = "remote play rap";
+    public static final String R_ROCK = "remote play rock";
+
     //--------------HELP-----------------
     public static final String HELP = "help";
 
     //--------------WEATHER--------------
     public static final String CONDITIONS = "conditions";
-    public static final String FORECAST = "forecast";
     public static final String SHOW_WEATHER = "show weather";
     public static final String HIDE_WEATHER = "hide weather";
     public static final String SHOW_TIME = "show time";
@@ -116,43 +138,28 @@ public class Constants {
     public static final String NINE = "article nine";
     public static final String TEN = "article ten";
 
+    public static final String ARTICLE_1 = "article 1";
+    public static final String ARTICLE_2 = "article 2";
+    public static final String ARTICLE_3 = "article 3";
+    public static final String ARTICLE_4 = "article 4";
+    public static final String ARTICLE_5 = "article 5";
+    public static final String ARTICLE_6 = "article 6";
+    public static final String ARTICLE_7 = "article 7";
+    public static final String ARTICLE_8 = "article 8";
+    public static final String ARTICLE_9 = "article 9";
+    public static final String ARTICLE_10 = "article 10";
+
     //--------------GMAIL-----------------
     public static final String NEXT = "next";
 
-    // used to initialize COMMAND_SET
-    public static final String[] COMMANDS = {
-            BUSINESS, CAMERA, CALENDAR, CLOSE_SCREEN, CLOSE_WINDOW,
-            CONDITIONS, EIGHT, FACEBOOK, FIVE,
-            FORECAST, FOUR, FULL_SCREEN, GALLERY, GMAIL,
-            GO_BACK, GO_FORWARD, GO_TO_SLEEP, HELP, HIDE_TIME,
-            HIDE_WEATHER, HIDE_SCREEN, MAXIMIZE,
-            MEDIA, MENU, MINIMIZE,
-            MIRA_SLEEP, MIRA_WAKE, NIGHT_LIGHT,
-            NEWS, NEXT, NINE, ONE,
-            OPEN_WINDOW, OPTIONS, PHOTOS, QUOTES, SCIENCE,
-            SCROLL_DOWN, SCROLL_UP, SPORTS,
-            SETTINGS, SEVEN, SHOW_LIGHT, SHOW_HELP,
-            SHOW_TIME, SHOW_WEATHER, SIX,
-            SLEEP, SMALL_SCREEN, TAKE_PICTURE,
-            THREE, TECHNOLOGY, TIME, TRAVEL, TWITTER, TWO,
-            WAKE, WAKE_UP, WIDE_SCREEN, WORLD,
+    //--------------- Remote Control Specific Commands --------------------
+    public static final String REMOTE_INCREASE_SCREEN ="increase screen size";
+    public static final String REMOTE_TOGGLE_SLEEPS_STATE = "toggle wake";
+    public static final String REMOTE_TOGGLE_LISTENING = "toggle listening";
+    public static final String REMOTE_TOGGLE_SOUND = "toggle sound";
+    public static final String REMOTE_TOGGLE_TIME_VISIBLE = "time visible";
+    public static final String REMOTE_TOGGLE_WEATHER_VISIBLE = "weather visible";
+    public static final String REMOTE_TOGGLE_TIME_FORMAT = "toggle time format";
+    public static final String REMOTE_TOGGLE_WEATHER_FORMAT = "toggle weather format";
 
-            Preferences.CMD_REMOTE_OFF, Preferences.CMD_REMOTE_ON,
-            Preferences.CMD_ENABLE_REMOTE, Preferences.CMD_DISABLE_REMOTE,
-            Preferences.CMD_SPEECH_OFF, Preferences.CMD_SPEECH_ON,
-
-            Preferences.CMD_TIME_24HR, Preferences.CMD_TIME_12HR,
-            Preferences.CMD_VOICE_OFF, Preferences.CMD_VOICE_ON,
-            Preferences.CMD_WEATHER_ENGLISH, Preferences.CMD_WEATHER_METRIC,
-
-            Preferences.CMD_STAY_AWAKE
-    };
-
-    public static HashSet<String> createCommandSet() {
-
-        List<String> commandList = Arrays.asList(COMMANDS);
-        return new HashSet<>(commandList);
-    }
-
-    public static final Set<String> COMMAND_SET = createCommandSet();
 }
