@@ -56,6 +56,7 @@ public class Preferences implements LocationListener {
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
+    public static final String PREFS_FACEBOOK_ACCOUNT = "PREFS_FACEBOOK_ACCOUNT";
     public static final String PREFS_FACEBOOK_CREDENTIALS = "PREFS_FACEBOOK_CREDENTIALS";
 
     // default for work address
@@ -108,6 +109,7 @@ public class Preferences implements LocationListener {
 
     //Google Account Email String
     private String mGmailAccount;
+    private String mFacebookAccount;
     private String mFacebookCredentials;
     private String mTokenId;
 
@@ -235,6 +237,7 @@ public class Preferences implements LocationListener {
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
 
+        mFacebookAccount = mSharedPreferences.getString(PREFS_FACEBOOK_ACCOUNT, "");
         mFacebookCredentials = mSharedPreferences.getString(PREFS_FACEBOOK_CREDENTIALS, "");
 
         // User name
@@ -648,6 +651,17 @@ public class Preferences implements LocationListener {
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_FACEBOOK_CREDENTIALS, mFacebookCredentials);
         edit.apply();
+    }
+
+    public void setFacebookAccount(String mFacebookAccount){
+        this.mFacebookAccount = mFacebookAccount;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_FACEBOOK_ACCOUNT, mFacebookAccount);
+        edit.apply();
+    }
+
+    public String getFacebookAccount(){
+        return mFacebookAccount;
     }
 
     public boolean isLoggedInToFacebook() {

@@ -452,11 +452,11 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
         mCountDownText = (TextView) view.findViewById(R.id.count_down);
-        credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
+        //credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
         //String accountName = ("smartmirrortesting@gmail.com");
         //String accountName = Preferences.mUserAccountPref;
-        String accountName = mPreferences.getGmailAccount();
-        credential.setSelectedAccountName(accountName);
+        //String accountName = mPreferences.getGmailAccount();
+        //credential.setSelectedAccountName(accountName);
         // service = getDriveService(credential);
         return view;
     }
@@ -1064,7 +1064,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         int imageNumber = 1;
         String contactLength = "47899";
         try {
-            url = new URL("https://picasaweb.google.com/data/feed/api/user/smartmirrortesting");
+            url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
             HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
             httpCon.setDoOutput(true);
             httpCon.setRequestMethod("POST");

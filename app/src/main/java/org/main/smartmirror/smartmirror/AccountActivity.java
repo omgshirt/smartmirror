@@ -56,6 +56,7 @@ public class AccountActivity extends AppCompatActivity implements
     private String mAuthSecret;
 
     private TextView txtGoogleAccountName;
+    private TextView txtFacebookAccountName;
     private EditText edtWorkAddress;
     private ViewGroup btnSignOutButton;
 
@@ -74,8 +75,10 @@ public class AccountActivity extends AppCompatActivity implements
         edtWorkAddress = (EditText) findViewById(R.id.work_location);
         sbtnGoogleSignInButton = (SignInButton) findViewById(R.id.google_sign_in_button);
         txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
+        txtFacebookAccountName = (TextView) findViewById(R.id.facebook_account_name);
 
         txtGoogleAccountName.setText(mPreference.getGmailAccount());
+        txtFacebookAccountName.setText(mPreference.getFacebookAccount());
         edtWorkAddress.setText(mPreference.getWorkLocation());
 
         setUpTwitterButton();
