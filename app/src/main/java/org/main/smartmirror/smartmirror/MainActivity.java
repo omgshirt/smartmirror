@@ -49,7 +49,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SensorEventListener, NewsFragment.ArticleSelectedListener {
+        SensorEventListener, NewsFragment.ArticleSelectedListener, GmailFragment.OnNextMessageListener {
 
     // Globals, prefs, debug flags
     public static final boolean DEBUG = true;
