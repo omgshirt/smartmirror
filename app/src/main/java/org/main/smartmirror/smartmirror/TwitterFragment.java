@@ -85,7 +85,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
             }
             TwitterFragment.twitterFeed.setAdapter(customAdapter);
         } catch (Exception e) {
-            // TODO: NEVER LEAVE A CATCH BLOCK EMPTY
+            e.printStackTrace();
         }
         customAdapter.notifyDataSetChanged();
     }
