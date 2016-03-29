@@ -71,7 +71,6 @@ public class Constants {
     public static final String TECHNOLOGY = "technology";
     public static final String TRAVEL = "travel";
     public static final String WORLD = "world";
-    public static final String MUSIC = "music";
     public static final String BOOKS = "books";
     public static final String FASHION = "fashion";
     public static final String MOVIES = "movies";
@@ -81,8 +80,8 @@ public class Constants {
     public static final String ENVIRONMENT = "environment";
     public static final String LIFESTYLE = "lifestyle";
     public static final String NEWS_BODY = "news body";
-    public static final String[] NEWS_DESKS = {BUSINESS, MEDIA, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL,
-            WORLD, MUSIC, BOOKS, FASHION, MOVIES, GAMES, ECONOMICS, OPINION, ENVIRONMENT, LIFESTYLE};
+    public static final String[] NEWS_DESKS = {BUSINESS, BOOKS, ECONOMICS, ENVIRONMENT, FASHION,
+            GAMES, LIFESTYLE, MEDIA, MOVIES, OPINION, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL, WORLD};
     public static final List<String> DESK_LIST = Arrays.asList(NEWS_DESKS);
     public static final HashSet<String> DESK_HASH = new HashSet<>(DESK_LIST);
 

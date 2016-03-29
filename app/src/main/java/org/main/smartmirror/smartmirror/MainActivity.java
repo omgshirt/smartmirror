@@ -776,7 +776,7 @@ public class MainActivity extends AppCompatActivity
 
         // Check whether command is a news desk
         if (Constants.DESK_HASH.contains(command)) {
-            fragment = NewsFragment.NewInstance(command);
+            fragment = NewsFragment.newInstance(command);
         }
 
         // Create a new fragment based on the command. If the input string is not a fragment,
@@ -841,7 +841,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.NEWS:
                     //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
-                    fragment = NewsFragment.NewInstance("world");
+                    fragment = NewsFragment.newInstance("world");
                     break;
                 case Constants.OPEN_WINDOW:
                     if (viewHidden(contentFrame3)) {

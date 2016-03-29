@@ -1,3 +1,4 @@
+books/1e10/
 calendar/1e-12/
 camera/1e-1/
 camera off/1e-3/
@@ -8,10 +9,14 @@ conditions/1e-4/
 current time/1e8/
 enable remote/1e-10/
 disable remote/1e-7/
+economics/1e2/
+environment/1e-3/
 facebook/1e-5/
+fashion/1e3/
 forecast/1e-3/
 full screen/1e-5/
 gallery/1e-2/
+games/1e10/
 gmail/1e2/
 go to sleep/1e-15/
 go back/1e4/
@@ -20,16 +25,19 @@ help/1e9/
 hide time/1e2/
 hide weather/1e1/
 hide screen/1e-4/
+lifestyle/1e1/
 menu/1e4/
 maximize/1e-5/
 minimize/1e-5/
 mira sleep/1e-20/
 mira wake/1e-20/
 mira sound/1e-15/
+movies/1e3/
 music/1e-4/
 news/1e12/
 next/1e2/
 night light/1e-9/
+opinion/1e2/
 options/1e-2/
 open window/1e-10/
 photos/1e3/
@@ -77,15 +85,6 @@ article seven/1e-5/
 article eight/1e-4/
 article nine/1e-8/
 article ten/1e-5/
-fashion/1e3/
-movies/1e3/
-music/1e5/
-books/1e10/
-games/1e10/
-economics/1e2/
-opinion/1e2/
-environment/1e-3/
-lifestyle/1e1/
 play alternative/1e-12/
 play ambient/1e-12/
 play classical/1e-12/
