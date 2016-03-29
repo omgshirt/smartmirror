@@ -20,6 +20,7 @@
     <string name="title_gmail">Gmail</string>
     <string name="title_help">Help</string>
     <string name="title_light">Light</string>
+    <string name="title_music">Music</string>
     <string name="title_news">News</string>
     <string name="title_photos">Photos</string>
     <string name="title_quotes">Quotes</string>
@@ -32,7 +33,7 @@
     <string name="mira_greet_morning">Good morning, %s.</string>
     <string name="mira_greet_afternoon">Good afternoon, %s.</string>
     <string name="mira_greet_night">Good evening, %s.</string>
-    
+
     <!-- Calendar -->
     <string name="calendar_items_err">No Events Found</string>
 
@@ -44,6 +45,13 @@
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
     <string name="weather_data_err">Failed to retrieve weather data &#8212; check your internet connection</string>
+
+    <!-- Music Strings -->
+    <string name="stream_not_found">"Error opening music stream."</string>
+    <string name="stream_stopped">"...Music stopped:. Say 'play classical' to play the classical station...        ...Music stopped. Say 'play classical' to play the classical station..."</string>
+    <string name="stream_pause">"...Music paused. Say 'play music' to resume or 'stop music' to return to normal command mode..."</string>
+    <string name="stream_playing">"...Music playing. Say 'stop music' or 'pause music' to stop...                 ...Music playing. Say 'stop music' or 'pause music' to stop..."</string>
+    <string name="stream_preparing">"...Preparing the stream &#8212; please wait...             ...Preparing the stream &#8212; please wait..."</string>
 
     <!-- Weather Icons -->
     <string name="weather_sunny">\uf00d</string>
@@ -74,8 +82,8 @@
     <string name="settings_system_vol">System Volume</string>
     <string name="settings_music_vol">Speech Volume</string>
 
-    <string name="lbl_speech_on">Speech: On</string>
-    <string name="lbl_speech_off">Speech: Off</string>
+    <string name="lbl_sound_on">Sound: On</string>
+    <string name="lbl_sound_off">Sound: Off</string>
     <string name="lbl_voice_on">Voice Recognition: On</string>
     <string name="lbl_voice_off">Voice Recognition: Off</string>
     <string name="lbl_remote_on">Remote: On</string>
@@ -86,16 +94,17 @@
     <string name="lbl_time_format_24hr">Time: 24-hour</string>
 
     <!-- Text to Speech phrases -->
-    <string name="speech_on">Speech on.</string>
-    <string name="speech_on_err">Speech is on.</string>
-    <string name="speech_off">I\'ll be quiet. Say \'speech on\' to cancel.</string>
-    <string name="speech_off_err">Speech is already off. Oops I shouldn\'t be talking.</string>
+    <string name="sound_on">Sound on.</string>
+    <string name="sound_on_err">Sound is on.</string>
+    <string name="sound_off">I\'ll be quiet. Say \'sound on\' to cancel.</string>
+    <string name="sound_off_err">Sound is already off. Oops. I shouldn\'t be talking.</string>
     <string name="speech_voice_on">I\'m listening</string>
     <string name="speech_voice_on_err">I\'m already listening</string>
     <string name="speech_voice_off">I\'ll ignore you</string>
     <string name="speech_voice_off_err">I\'m still ignoring you</string>
     <string name="speech_stay_awake">I\'ll stay awake. Say \'sleep\' to cancel.</string>
     <string name="speech_stay_awake_err">I\'m staying awake until you say \'sleep\'.</string>
+    <string name="speech_stay_awake_cancel">\'Stay awake\' cancelled.</string>
     <string name="speech_remote_on">Remote control on</string>
     <string name="speech_remote_off">Remote control off</string>
     <string name="speech_weather_english">Weather display English</string>
@@ -109,7 +118,7 @@
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>
     <string name="distance_matrix_api_key">AIzaSyBumZObXEyI5_7Ie0u8ZnrRKAXzojKpDw8</string>
     <string name="guardian_api_key">c6ed3edf-b0c6-4669-8e5c-ba32ba96a65f</string>
-   
+
     <string name="twitter_api_key">mQ51h9ZbAz9Xk2AZtsUBJAGlx</string>
     <string name="twitter_secret">uSRCxg6AqE9DyIiuKjVD2ZzKC7CsGmuUcEljx2yafBwYHW74Rt</string>
     <string name="twitter_access_token">4202759960-FRC4u2oIMHECYgzsQJAtWG8TcHAsMWfF6cNigXG</string>

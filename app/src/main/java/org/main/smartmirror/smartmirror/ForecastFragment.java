@@ -50,7 +50,6 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
     @Override
     public void onStart() {
         super.onStart();
-
         CacheManager.getInstance().registerCacheListener(WeatherFragment.WEATHER_CACHE, this);
     }
 
@@ -62,6 +61,11 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
 
     private void updateForecasts() {
         JSONObject json = (JSONObject) CacheManager.getInstance().get(WeatherFragment.WEATHER_CACHE);
+
+        if (json == null) {
+            Log.e(Constants.TAG, "forecast: json null");
+            return;
+        }
 
         // If cache is empty, return
         if (json.length() == 0) {

@@ -1,5 +1,8 @@
 package org.main.smartmirror.smartmirror;
 
+import android.util.Log;
+
+import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -69,6 +72,43 @@ public class Mira {
 
         mActivity.speakText(String.format( msg, userName ));
      }
+
+
+    public void sayCurrentTime() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        String strMinute, strHour;
+
+        int hourMode = Calendar.HOUR_OF_DAY;
+        if (mPreferences.isTimeFormat12hr()) {
+            hourMode = Calendar.HOUR;
+        }
+        strHour = Integer.toString(calendar.get(hourMode));
+
+        int minute = calendar.get(Calendar.MINUTE);
+        strMinute = Integer.toString(minute);
+
+        // handle times > :00 and < :10
+        if (minute > 0 && minute < 10) {
+            strMinute = ":0" + strMinute;
+        } else if (minute == 0) {
+            strMinute = " ";
+        } else {
+            strMinute = ":" + strMinute;
+        }
+
+        // add AM / PM as necessary
+        if (mPreferences.isTimeFormat12hr()) {
+            String AM_PM = " A M";
+            if (calendar.get(Calendar.AM_PM) == 1) {
+                AM_PM = " P M";
+            }
+            strMinute = strMinute + AM_PM;
+        }
+
+        String result = "the time is " + strHour + strMinute;
+        Log.i(Constants.TAG, "time: " + result);
+        mActivity.speakText(result);
+    }
 
     /**
      * If logged in to a gmail account, Mira says the number of unread messages.
