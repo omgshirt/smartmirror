@@ -29,7 +29,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
     public static ArrayList<String> mUsersAt = new ArrayList<String>();
     public static ArrayList<Uri> mUri = new ArrayList<Uri>();
 
-    public int position = 0;
+    public int twitterFeedPosition = 3;
 
     public static CacheManager mCacheManager = null;
 
@@ -63,14 +63,14 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
             String message = intent.getStringExtra("message");
             Log.d("TwitterArrayList ", "Got message:\"" + message +"\"");
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
-                if (message.contains(Constants.SCROLL_DOWN)) {
-                    position = position + 5;
-                } else if (message.contains(Constants.SCROLL_UP)) {
-                    position = position - 5;
-                    if (position < 0) position = 0;
-                }
                 VoiceScroll sl = new VoiceScroll();
-                sl.scrollListView(message,twitterFeed, position);
+                if (message.contains(Constants.SCROLL_DOWN)) {
+                    twitterFeedPosition = twitterFeedPosition + 5;
+                } else if (message.contains(Constants.SCROLL_UP)) {
+                    twitterFeedPosition = twitterFeedPosition - 5;
+                    if (twitterFeedPosition < 0) twitterFeedPosition = 0;
+                }
+                sl.scrollListView(message,twitterFeed, twitterFeedPosition);
             }
         }
     };
@@ -85,7 +85,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
                 customAdapter.notifyDataSetChanged();
             }
             TwitterFragment.twitterFeed.setAdapter(customAdapter);
-        } catch (Exception e) {}
+        } catch (Exception e) {e.printStackTrace();}
     }
 
     @Override
@@ -133,7 +133,13 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
 
     @Override
     public void onCacheExpired(String cacheName) {
-        if (cacheName.equals(TWITTER_CACHE)) startTwitterUpdate();
+        if (cacheName.equals(TWITTER_CACHE)) {
+            mUri.clear();
+            mUsers.clear();
+            mUsersAt.clear();
+            mTweets.clear();
+            startTwitterUpdate();
+        }
         Log.i("TWITTER CACHE", "updating expired cache" + cacheName);
 
     }

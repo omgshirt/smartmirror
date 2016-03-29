@@ -12,6 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="New Text"
             android:id="@+id/article_number"
             android:layout_marginRight="10dp"
             android:layout_above="@+id/snippet"
@@ -28,6 +29,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="New Text"
             android:id="@+id/header"
             android:paddingLeft="10dp"
             android:layout_alignParentTop="true"
@@ -37,6 +39,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="New Text"
             android:id="@+id/snippet"
             android:paddingLeft="10dp"
             android:layout_below="@+id/header"

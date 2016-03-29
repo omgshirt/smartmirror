@@ -9,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 
@@ -48,7 +46,7 @@ public class CustomAdapter extends BaseAdapter {
         ViewHolder holder = null;
         if (convertView == null) {
             holder = new ViewHolder();
-            convertView = inflater.inflate(R.layout.list_row_layout, null);
+            convertView = inflater.inflate(R.layout.twitter_news_list_row, null);
             holder.header = (TextView) convertView.findViewById(R.id.header);
             holder.snippet = (TextView) convertView.findViewById(R.id.snippet);
             holder.thumbnail = (ImageView) convertView.findViewById(R.id.thumbnail);

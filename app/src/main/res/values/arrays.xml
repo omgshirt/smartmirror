@@ -33,6 +33,14 @@
         <item>technology</item>
         <item>travel</item>
         <item>world</item>
+        <item>fashion</item>
+        <item>movies</item>
+        <item>music</item>
+        <item>games</item>
+        <item>economics</item>
+        <item>lifestyle</item>
+        <item>opinion</item>
+        <item>books</item>
     </string-array>
 
     <string-array name="modes_list">
