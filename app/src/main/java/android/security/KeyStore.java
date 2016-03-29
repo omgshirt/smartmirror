@@ -47,7 +47,9 @@ public class KeyStore {
     // States
     public enum State {
         UNLOCKED, LOCKED, UNINITIALIZED
-    };
+    }
+
+    ;
 
     private static final LocalSocketAddress sAddress = new LocalSocketAddress(
             "keystore", LocalSocketAddress.Namespace.RESERVED);
@@ -64,14 +66,14 @@ public class KeyStore {
     public State state() {
         execute('t');
         switch (mError) {
-        case NO_ERROR:
-            return State.UNLOCKED;
-        case LOCKED:
-            return State.LOCKED;
-        case UNINITIALIZED:
-            return State.UNINITIALIZED;
-        default:
-            throw new AssertionError(mError);
+            case NO_ERROR:
+                return State.UNLOCKED;
+            case LOCKED:
+                return State.LOCKED;
+            case UNINITIALIZED:
+                return State.UNINITIALIZED;
+            default:
+                throw new AssertionError(mError);
         }
     }
 

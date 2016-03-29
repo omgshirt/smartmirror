@@ -293,7 +293,7 @@ public class Crypto {
         KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(ctx)
                 .setAlias(alais)
                 .setKeyType("EC")
-                // curve
+                        // curve
                 .setKeySize(256)
                 .setSubject(
                         new X500Principal(String.format("CN=%s, OU=%s", alais,
@@ -367,7 +367,7 @@ public class Crypto {
     }
 
     public static boolean verifyRsaPss(String signatureStr, String signedStr,
-            String keyAlias) {
+                                       String keyAlias) {
         try {
             RSAPublicKey pubKey = loadRsaPublicKey(keyAlias);
 
@@ -414,7 +414,7 @@ public class Crypto {
     }
 
     public static boolean verifyEc(String signatureStr, String signedStr,
-            String keyAlias) {
+                                   String keyAlias) {
         try {
             PublicKey pubKey = loadPublicKey(keyAlias);
 

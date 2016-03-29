@@ -28,8 +28,8 @@ import android.util.Log;
 
 /**
  * @hide This should not be made public in its present form because it assumes
- *       that private and secret key bytes are available and would preclude the
- *       use of hardware crypto.
+ * that private and secret key bytes are available and would preclude the
+ * use of hardware crypto.
  */
 public class KeyStoreJb43 extends KeyStore {
     private static final String TAG = "KeyStore";
@@ -318,7 +318,7 @@ public class KeyStoreJb43 extends KeyStore {
     }
 
     public boolean duplicate(String srcKey, int srcUid, String destKey,
-            int destUid) {
+                             int destUid) {
         try {
             return mBinder.duplicate(srcKey, srcUid, destKey, destUid) == NO_ERROR;
         } catch (RemoteException e) {

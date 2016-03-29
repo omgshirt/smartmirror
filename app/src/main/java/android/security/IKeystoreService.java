@@ -25,7 +25,7 @@ import android.os.RemoteException;
 /**
  * This must be kept manually in sync with system/security/keystore until AIDL
  * can generate both Java and C++ bindings.
- * 
+ *
  * @hide
  */
 public interface IKeystoreService extends IInterface {
@@ -265,7 +265,7 @@ public interface IKeystoreService extends IInterface {
             }
 
             public int generate(String name, int uid, int keyType, int keySize, int flags,
-                    byte[][] args) throws RemoteException {
+                                byte[][] args) throws RemoteException {
                 Parcel _data = Parcel.obtain();
                 Parcel _reply = Parcel.obtain();
                 int _result;
@@ -559,7 +559,9 @@ public interface IKeystoreService extends IInterface {
             return new IKeystoreService.Stub.Proxy(obj);
         }
 
-        /** Construct the stub at attach it to the interface. */
+        /**
+         * Construct the stub at attach it to the interface.
+         */
         public Stub() {
             attachInterface(this, DESCRIPTOR);
         }

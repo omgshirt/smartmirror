@@ -112,10 +112,14 @@ public class KeyStoreKk extends KeyStore {
         }
 
         switch (ret) {
-            case NO_ERROR: return State.UNLOCKED;
-            case LOCKED: return State.LOCKED;
-            case UNINITIALIZED: return State.UNINITIALIZED;
-            default: throw new AssertionError(mError);
+            case NO_ERROR:
+                return State.UNLOCKED;
+            case LOCKED:
+                return State.LOCKED;
+            case UNINITIALIZED:
+                return State.UNINITIALIZED;
+            default:
+                throw new AssertionError(mError);
         }
     }
 
@@ -232,7 +236,7 @@ public class KeyStoreKk extends KeyStore {
     }
 
     public boolean generate(String key, int uid, int keyType, int keySize, int flags,
-            byte[][] args) {
+                            byte[][] args) {
         try {
             return mBinder.generate(key, uid, keyType, keySize, flags, args) == NO_ERROR;
         } catch (RemoteException e) {
