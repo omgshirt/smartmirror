@@ -28,17 +28,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="14dp" />
-    
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/scroll_view_body">
-    <ListView
-        android:id="@+id/messageBody"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:textSize="13dp" />
 
-</ScrollView>
+    <ScrollView
+        android:id="@+id/scroll_view_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ListView
+            android:id="@+id/messageBody"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:textSize="13dp" />
+
+    </ScrollView>
 
 </LinearLayout>
