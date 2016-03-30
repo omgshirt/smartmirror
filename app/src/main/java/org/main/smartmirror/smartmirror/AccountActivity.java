@@ -57,6 +57,7 @@ public class AccountActivity extends AppCompatActivity implements
 
     private TextView txtGoogleAccountName;
     private TextView txtFacebookAccountName;
+    private TextView txtTwitterAccountName;
     private EditText edtWorkAddress;
     private ViewGroup btnSignOutButton;
 
@@ -76,9 +77,11 @@ public class AccountActivity extends AppCompatActivity implements
         sbtnGoogleSignInButton = (SignInButton) findViewById(R.id.google_sign_in_button);
         txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
         txtFacebookAccountName = (TextView) findViewById(R.id.facebook_account_name);
+        txtTwitterAccountName = (TextView) findViewById(R.id.twitter_account_name);
 
         txtGoogleAccountName.setText(mPreference.getGmailAccount());
         txtFacebookAccountName.setText(mPreference.getFacebookAccount());
+        txtTwitterAccountName.setText(mPreference.getTwitterAccount());
         edtWorkAddress.setText(mPreference.getWorkLocation());
 
         setUpTwitterButton();
@@ -129,6 +132,7 @@ public class AccountActivity extends AppCompatActivity implements
                 mSession = result.data;
                 mUserID = mSession.getUserId();
                 mScreenName = mSession.getUserName();
+                mPreference.setTwitterAccount(mScreenName);
                 String msg = "@" + mSession.getUserName() + " logged in! (#" + mUserID + ")";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
                 Long id = mSession.getId();

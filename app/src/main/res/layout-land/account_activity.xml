@@ -52,10 +52,17 @@
                 android:id="@+id/twitter_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
                 android:layout_marginTop="15dp"
                 android:text="Twitter"
                 android:textAppearance="?android:textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/twitter_account_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:text="no account selected"
+                android:textAppearance="?android:textAppearanceMedium" />
 
             <com.twitter.sdk.android.core.identity.TwitterLoginButton
                 android:id="@+id/twitter_login_button"
