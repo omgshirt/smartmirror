@@ -8,8 +8,15 @@
     <string name="action_settings">Settings</string>
     <string name="remote_connected">Remote Connected</string>
     <string name="remote_disconnected">Remote Disconnected</string>
-    <string name="no_google_account">No Account Selected</string>
+
+    <!-- Account Activity -->
+    <string name="address_input">Address</string>
+    <string name="facebook_email_input">Email</string>
+    <string name="facebook_password_input">Password</string>
     <string name="google_account">Google Account</string>
+    <string name="no_account">No Account Selected</string>
+    <string name="submit_button">Submit</string>
+    <string name="work_location">Work Location</string>
 
     <!-- Module names (used to create Navigation Bar menu) -->
     <string name="title_calendar">Calendar</string>
@@ -39,7 +46,6 @@
 
     <!-- Login -->
     <string name="not_logged_in_err">Sorry, you are not logged in to</string>
-    <string name="login_successful">Successfully logged in as</string>
     <string name="login_err">Oh no! Something went wrong!</string>
 
     <!-- WEATHER STRINGS -->

@@ -1,7 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.Intent;
-import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -34,7 +33,6 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.io.IOException;
 import java.util.List;
-
 
 import io.fabric.sdk.android.Fabric;
 
@@ -316,7 +314,7 @@ public class AccountActivity extends AppCompatActivity implements
     private void resetGoogleAccountValues() {
         mPreference.setGmailAccount("");
         mPreference.setUserId("");
-        txtGoogleAccountName.setText(getResources().getString(R.string.no_google_account));
+        txtGoogleAccountName.setText(getResources().getString(R.string.no_account));
     }
 
     private void hideSignInShowSignOutButton() {
