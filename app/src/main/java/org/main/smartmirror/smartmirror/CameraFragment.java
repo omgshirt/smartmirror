@@ -46,6 +46,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -446,6 +447,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreferences = Preferences.getInstance(getActivity());
+        createNewPicasaAlbum();
     }
 
     @Override
@@ -1058,8 +1060,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     }
 
 
-    public void uploadToPicasa(URL url) {
-
+    public void uploadToPicasa() {
+        URL url;
         String imageTitle = "sm";
         int imageNumber = 1;
         String contactLength = "47899";
@@ -1078,6 +1080,22 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             System.out.println(httpCon.getResponseMessage());
             out.close();
             imageNumber++;
+        } catch (Exception e) {e.printStackTrace();}
+    }
+
+    public void createNewPicasaAlbum() {
+        URL url;
+        try {
+            url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
+            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+            httpCon.setDoOutput(true);
+            httpCon.setRequestMethod("POST");
+            httpCon.setUseCaches( false );
+            OutputStreamWriter out = new OutputStreamWriter(
+                    httpCon.getOutputStream());
+            System.out.println(httpCon.getResponseCode());
+            System.out.println(httpCon.getResponseMessage());
+            out.close();
         } catch (Exception e) {e.printStackTrace();}
 
     }
