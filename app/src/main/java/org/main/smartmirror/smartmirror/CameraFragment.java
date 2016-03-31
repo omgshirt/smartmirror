@@ -38,6 +38,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -51,18 +52,19 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -71,12 +73,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,6 +93,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
+
 
 
 /**
@@ -1061,42 +1067,107 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
 
     public void uploadToPicasa() {
-        URL url;
-        String imageTitle = "sm";
-        int imageNumber = 1;
-        String contactLength = "47899";
-        try {
-            url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("POST");
-            httpCon.setRequestProperty( "Content-Type", "image/jpeg");
-            httpCon.setRequestProperty( "Slug", imageTitle+imageNumber);
-            httpCon.setRequestProperty( "Content-Length", contactLength);
-            httpCon.setUseCaches( false );
-            OutputStreamWriter out = new OutputStreamWriter(
-                    httpCon.getOutputStream());
-            System.out.println(httpCon.getResponseCode());
-            System.out.println(httpCon.getResponseMessage());
-            out.close();
-            imageNumber++;
-        } catch (Exception e) {e.printStackTrace();}
+
+        new Thread() {
+            public void run() {
+                try {
+                    String imageTitle = "sm";
+                    int imageNumber = 1;
+                    String contactLength = "47899";
+                    URL url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
+                    HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+                    httpCon.setDoOutput(true);
+                    httpCon.setRequestMethod("POST");
+                    httpCon.setRequestProperty( "Content-Type", "image/jpeg");
+                    httpCon.setRequestProperty( "Slug", imageTitle+imageNumber);
+                    httpCon.setRequestProperty( "Content-Length", contactLength);
+                    httpCon.setUseCaches( false );
+                    OutputStreamWriter out = new OutputStreamWriter(
+                            httpCon.getOutputStream());
+                    System.out.println(httpCon.getResponseCode());
+                    System.out.println(httpCon.getResponseMessage());
+                    out.close();
+                    imageNumber++;
+                } catch (Exception e) {e.printStackTrace();}
+            }
+        }.start();
     }
 
     public void createNewPicasaAlbum() {
-        URL url;
-        try {
-            url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("POST");
-            httpCon.setUseCaches( false );
-            OutputStreamWriter out = new OutputStreamWriter(
-                    httpCon.getOutputStream());
-            System.out.println(httpCon.getResponseCode());
-            System.out.println(httpCon.getResponseMessage());
-            out.close();
-        } catch (Exception e) {e.printStackTrace();}
+        // formed entry
+        /*
+        <entry xmlns='http://www.w3.org/2005/Atom'
+                xmlns:media='http://search.yahoo.com/mrss/'
+                xmlns:gphoto='http://schemas.google.com/photos/2007'>
+            <title type='text'>Trip To Italy</title>
+            <summary type='text'>This was the recent trip I took to Italy.</summary>
+            <gphoto:location>Italy</gphoto:location>
+            <gphoto:access>public</gphoto:access>
+            <gphoto:timestamp>1152255600000</gphoto:timestamp>
+            <media:group>
+                <media:keywords>italy, vacation</media:keywords>
+            </media:group>
+            <category scheme='http://schemas.google.com/g/2005#kind'
+                term='http://schemas.google.com/photos/2007#album'></category>
+         </entry>
+         */
+
+        new Thread() {
+            public void run() {
+                Long tsLong = System.currentTimeMillis()/1000;
+                String ts = tsLong.toString();
+                HttpPost postRequest = new HttpPost(
+                        "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
+                String content =
+                        "<entry xmlns='http://www.w3.org/2005/Atom'" +
+                                "   xmlns:media='http://search.yahoo.com/mrss/'" +
+                                "   xmlns:gphoto='http://schemas.google.com/photos/2007'>" +
+                                "<title type='text'>Mira</title>" +
+                                "<summary type='text'>Smart Mirror Portraits.</summary>" +
+                                "<gphoto:location> </gphoto:location>" +
+                                "<gphoto:access>public</gphoto:access>" +
+                                "<gphoto:timestamp>"+ ts+"</gphoto:timestamp>" +
+                                "<media:group>" +
+                                "<media:keywords>smart mirror, mira</media:keywords>" +
+                                "</media:group>" +
+                                "<category scheme='http://schemas.google.com/g/2005#kind'" +
+                                "term='http://schemas.google.com/photos/2007#album'></category>" +
+                                "</entry>";
+
+                try {
+                    StringEntity entity = new StringEntity(content);
+                    entity.setContentType(new BasicHeader("Content-Type",
+                            "application/atom+xml"));
+                    postRequest.setEntity(entity);
+
+                    HttpClient httpclient = new DefaultHttpClient();
+                    HttpResponse response = httpclient.execute(postRequest);
+                    Log.i("ALBUM: ", response.toString());
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (ClientProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                /*try {
+                    URL url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
+                    HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+                    httpCon.setDoOutput(true);
+                    httpCon.setRequestMethod("POST");
+                    httpCon.setUseCaches( false );
+                    OutputStreamWriter out = new OutputStreamWriter(
+                            httpCon.getOutputStream());
+                    System.out.println(httpCon.getResponseCode());
+                    System.out.println(httpCon.getResponseMessage());
+                    out.close();
+
+                } catch (Exception e) {e.printStackTrace();}*/
+            }
+        }.start();
 
     }
 
