@@ -296,6 +296,7 @@ public class AccountActivity extends AppCompatActivity implements
             if (acct != null) {
                 mPreference.setGmailAccount(acct.getEmail());
                 mPreference.setUserId(acct.getId());
+                mPreference.setAccessToken(acct.getIdToken());
                 txtGoogleAccountName.setText(acct.getEmail());
                 hideSignInShowSignOutButton();
                 String[] names = acct.getDisplayName().split("\\s");
