@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,11 +26,12 @@ import java.util.ArrayList;
 public class NewsFragment extends Fragment implements CacheManager.CacheListener {
 
     // the guardian api
-    public static String mDefNewsSection = "world";
-    public static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&order-by=newest&q=";
-    public static String mPostURL = "&api-key=";
-    public static String mGuardURL = mPreURL + mDefNewsSection + mPostURL;
-    public static String mNewsSection;
+    private static String mDefNewsSection = "world";
+    private static String mPreURL = "http://content.guardianapis.com/search?show-fields=all&order-by=newest&q=";
+    private static String mPostURL = "&api-key=";
+    private static String mGuardURL = mPreURL + mDefNewsSection + mPostURL;
+    private static String mGuardAPIKey;
+    private String mNewsSection;
 
     // time in seconds before news data is considered old and is discarded
     private final int DATA_UPDATE_FREQUENCY = 1000;
@@ -40,29 +42,26 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
     private TextView txtNewsDesk;
 
-    public int numArticles = 10;
-    public static String thumbnail = "";
-    public static String body = "";
-    public static String trailText = "";
-    public static String webTitle = "";
+    private int numArticles = 10;
+    private String thumbnail;
+    private String body;
+    private String trailText;
+    private String webTitle;
 
-    ListView newsFeed;
-    public ArrayList<String> mHeadline = new ArrayList<String>();
-    public ArrayList<String> mSnippet = new ArrayList<String>();
-    public ArrayList<Uri> mImageURI = new ArrayList<Uri>();
-    public ArrayList<String> mFullArticle = new ArrayList<String>();
-    public ArrayList<String> mArticleNumber = new ArrayList<>();
+    private ListView newsFeed;
+    private ArrayList<String> mHeadline = new ArrayList<String>();
+    private ArrayList<String> mSnippet = new ArrayList<String>();
+    private ArrayList<Uri> mImageURI = new ArrayList<Uri>();
+    private ArrayList<String> mFullArticle = new ArrayList<String>();
+    private ArrayList<String> mArticleNumber = new ArrayList<>();
 
-    public int newsFeedPosition = 0;
+    private int newsFeedPosition = 0;
 
-    Handler mHandler = new Handler();
+    private Handler mHandler = new Handler();
     private ArticleSelectedListener articleSelectedListener;
 
     public interface ArticleSelectedListener {
         void onArticleSelected(String title, String body);
-    }
-
-    public NewsFragment() {
     }
 
     public static NewsFragment newInstance(String section) {
@@ -73,8 +72,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         return fragment;
     }
 
-    static String mGuardAPIKey;
-
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_fragment, container, false);
@@ -91,7 +89,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         return view;
     }
 
-    public void toNewsBodyFragment(int x) {
+    private void toNewsBodyFragment(int x) {
         articleSelectedListener.onArticleSelected(mHeadline.get(x), mFullArticle.get(x));
     }
 
@@ -111,7 +109,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         articleSelectedListener = null;
     }
 
-    public void startNewsUpdate() {
+    private void startNewsUpdate() {
         Log.i(Constants.TAG, "starting news update");
         mGuardURL = mPreURL + mNewsSection + mPostURL + mGuardAPIKey;
         updateNews(mGuardURL);
@@ -126,7 +124,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            txtNewsDesk.setText("");
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             switch (message) {
@@ -169,14 +166,11 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 VoiceScroll sl = new VoiceScroll();
                 if (message.contains(Constants.SCROLL_DOWN)) {
                     newsFeedPosition = newsFeedPosition + 5;
-
                 } else if (message.contains(Constants.SCROLL_UP)) {
                     newsFeedPosition = newsFeedPosition - 5;
                     if (newsFeedPosition < 0) newsFeedPosition = 0;
                 }
-
                 sl.scrollListView(message,newsFeed, newsFeedPosition);
-
             }
 
         }
@@ -225,6 +219,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     }
 
     // when this goes out of view, halt listening
+    @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
@@ -287,7 +282,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 mHeadline.add(webTitle);
                 fields = results.getJSONObject("fields");
                 body = fields.getString("body");
-                mFullArticle.add(body);
+                mFullArticle.add(Html.fromHtml(body).toString());
                 trailText = fields.getString("trailText");
                 mSnippet.add(trailText);
                 try {
@@ -318,7 +313,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         newsFeed.setAdapter(customAdapter);
     }
 
-    public void addToArrayList(ArrayList<String> arrayList) {
+    private void addToArrayList(ArrayList<String> arrayList) {
         arrayList.add("1");
         arrayList.add("2");
         arrayList.add("3");

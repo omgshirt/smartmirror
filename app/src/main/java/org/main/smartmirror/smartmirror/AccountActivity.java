@@ -1,17 +1,13 @@
 package org.main.smartmirror.smartmirror;
 
-import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +34,6 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import java.io.IOException;
 import java.util.List;
 
-
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -49,6 +44,7 @@ public class AccountActivity extends AppCompatActivity implements
 
     private long mUserID;
     private GoogleApiClient mGoogleApiClient;
+    private SignInButton sbtnGoogleSignInButton;
     private Preferences mPreference;
     private TwitterLoginButton mTwitterLoginButton;
     private TwitterSession mSession;
@@ -57,11 +53,11 @@ public class AccountActivity extends AppCompatActivity implements
     private String mAuthToken;
     private String mAuthSecret;
 
-    private TextView edtFacebookUsername;
-    private TextView edtFacebookPassword;
-
     private TextView txtGoogleAccountName;
+    private TextView txtFacebookAccountName;
+    private TextView txtTwitterAccountName;
     private EditText edtWorkAddress;
+    private ViewGroup btnSignOutButton;
 
     public static final int GOOGLE_REQUEST = 1;
     public static final int REQUEST_PERMISSIONS = 2;
@@ -74,24 +70,38 @@ public class AccountActivity extends AppCompatActivity implements
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
 
-        edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
-        edtFacebookPassword  = (EditText) findViewById(R.id.facebook_password);
-
-        if (mPreference.isLoggedInToFacebook()) {
-            // TODO: get values from preferences and set edtFacebookUsername / edtFacebookPassword
-        }
-
-        txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
+        btnSignOutButton = (ViewGroup) findViewById(R.id.google_sign_out_button);
         edtWorkAddress = (EditText) findViewById(R.id.work_location);
+        sbtnGoogleSignInButton = (SignInButton) findViewById(R.id.google_sign_in_button);
+        txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
+        txtFacebookAccountName = (TextView) findViewById(R.id.facebook_account_name);
+        txtTwitterAccountName = (TextView) findViewById(R.id.twitter_account_name);
 
-        if (mPreference.isLoggedInToGmail()) {
-            txtGoogleAccountName.setText(mPreference.getGmailAccount());
-        }
+        txtGoogleAccountName.setText(mPreference.getGmailAccount());
+        txtFacebookAccountName.setText(mPreference.getFacebookAccount());
+        txtTwitterAccountName.setText(mPreference.getTwitterAccount());
         edtWorkAddress.setText(mPreference.getWorkLocation());
 
         setUpTwitterButton();
+        setUpSignOutButton();
         setUpGoogleButton();
+        if (!mPreference.getGmailAccount().isEmpty()) {
+            hideSignInShowSignOutButton();
+        } else {
+            hideSignOutShowSignInButton();
+        }
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
     }
 
     /**
@@ -103,10 +113,10 @@ public class AccountActivity extends AppCompatActivity implements
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestScopes(new Scope(Constants.PICASA), new Scope(GmailScopes.GMAIL_LABELS),
-                new Scope(GmailScopes.GMAIL_READONLY),
-                new Scope(GmailScopes.MAIL_GOOGLE_COM),
-                new Scope(GmailScopes.GMAIL_MODIFY),
-                new Scope(GmailScopes.GMAIL_INSERT))
+                        new Scope(GmailScopes.GMAIL_READONLY),
+                        new Scope(GmailScopes.MAIL_GOOGLE_COM),
+                        new Scope(GmailScopes.GMAIL_MODIFY),
+                        new Scope(GmailScopes.GMAIL_INSERT))
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -134,6 +144,7 @@ public class AccountActivity extends AppCompatActivity implements
                 mSession = result.data;
                 mUserID = mSession.getUserId();
                 mScreenName = mSession.getUserName();
+                mPreference.setTwitterAccount(mScreenName);
                 String msg = "@" + mSession.getUserName() + " logged in! (#" + mUserID + ")";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
                 Long id = mSession.getId();
@@ -152,11 +163,10 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
-     * Handles the Google Button necessities
+     * Sets up the Google Button with its listener
      */
     private void setUpGoogleButton() {
-        SignInButton googleSignInBtn = (SignInButton) findViewById(R.id.google_sign_in_button);
-        googleSignInBtn.setOnClickListener(new View.OnClickListener() {
+        sbtnGoogleSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signInToGoogle();
@@ -165,53 +175,48 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
+     * Sets up the Sign Out button with its listener
+     */
+    private void setUpSignOutButton() {
+        btnSignOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOutOfGoogle();
+            }
+        });
+    }
+
+    /**
+     * Sign in to Google
+     */
+    private void signInToGoogle() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, GOOGLE_REQUEST);
+    }
+
+    /**
      * Handles the signing out of Google
      */
     private void signOutOfGoogle() {
-        mGoogleApiClient.connect();
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
                         Log.i(Constants.TAG, "Revoked: " + status);
-                        mPreference.setGmailAccount("");
-                        txtGoogleAccountName.setText(getResources().getString(R.string.no_google_account));
+                        resetGoogleAccountValues();
+                        hideSignOutShowSignInButton();
                     }
                 });
-//        HttpsURLConnection connection = null;
-//        URL url = null;
-//        try {
-//            url = new URL("https://accounts.google.com/o/oauth2/revoke?token=" + mPreference.getTokenId());
-//            connection = (HttpsURLConnection) url.openConnection();
-//            connection.connect();
-//            if(connection.getResponseCode() == 200){
-//                Log.i(Constants.TAG, "Successfully Logged Out");
-//            }
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            connection.disconnect();
-//        }
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Log.i(Constants.TAG, "Signed out: " + status);
+                    }
+                });
     }
 
     // --------------------------------Helpers------------------------------------------------- //
-
-    /**
-     * Shows the dialog that prompts the user for the number of permissions
-     *
-     * @param message    The message we want to display
-     * @param okListener OnClickListener instance
-     */
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(AccountActivity.this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
 
     /**
      * We listen here for the result from Twitter
@@ -233,20 +238,12 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
-     * Sign into Google
-     */
-    private void signInToGoogle() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, GOOGLE_REQUEST);
-    }
-
-    /**
-     * Handles the Submit button in account_activity
+     * Handles the Submit button press in account_activity
      * layout
      *
      * @param view current view
      */
-    public void handleButtonPress(View view) {
+    public void submitButtonPress(View view) {
         Log.i(Constants.TAG, "Submit Button");
         /*EditText edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
         EditText edtFacebookPassword = (EditText) findViewById(R.id.facebook_password);
@@ -257,7 +254,7 @@ public class AccountActivity extends AppCompatActivity implements
         }*/
         // since by default the work lat and long is set to -1 we are OK
         // to not have an else case here
-        if ( !(edtWorkAddress.getText().toString().isEmpty()) ) {
+        if (!(edtWorkAddress.getText().toString().isEmpty())) {
             mPreference.setWorkLocation(edtWorkAddress.getText().toString());
 
             String strAddress = edtWorkAddress.getText().toString().replace(' ', '+');
@@ -296,9 +293,11 @@ public class AccountActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            if(acct != null) {
+            if (acct != null) {
                 mPreference.setGmailAccount(acct.getEmail());
+                mPreference.setUserId(acct.getId());
                 txtGoogleAccountName.setText(acct.getEmail());
+                hideSignInShowSignOutButton();
                 String[] names = acct.getDisplayName().split("\\s");
                 if (names.length > 0) {
                     mPreference.setUserFirstName(names[0]);
@@ -308,14 +307,32 @@ public class AccountActivity extends AppCompatActivity implements
                 Toast.makeText(this, "No account found!!", Toast.LENGTH_LONG).show();
             }
         } else {
-            Log.i(Constants.TAG, "Google sign in failed");
+            // not logged in!
         }
+    }
+
+    private void resetGoogleAccountValues() {
+        mPreference.setGmailAccount("");
+        mPreference.setUserId("");
+        txtGoogleAccountName.setText(getResources().getString(R.string.no_account));
+    }
+
+    private void hideSignInShowSignOutButton() {
+        sbtnGoogleSignInButton.setVisibility(View.GONE);
+        btnSignOutButton.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSignOutShowSignInButton() {
+        sbtnGoogleSignInButton.setVisibility(View.VISIBLE);
+        btnSignOutButton.setVisibility(View.GONE);
     }
 
     // -------------------------------Callbacks------------------------------------------------- //
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i(Constants.TAG, connectionResult.toString());
+        if (connectionResult.hasResolution()) {
+            Log.i(Constants.TAG, connectionResult.toString());
+        }
     }
 }

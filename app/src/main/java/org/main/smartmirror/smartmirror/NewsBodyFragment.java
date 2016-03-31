@@ -19,13 +19,11 @@ import android.widget.Toast;
 
 public class NewsBodyFragment extends Fragment {
 
-    TextView mTxtBody;
-    TextView mTxtHeadline;
-    ScrollView mScrollView;
+    private TextView mTxtBody;
+    private TextView mTxtHeadline;
+    private ScrollView mScrollView;
 
-    public NewsBodyFragment(){}
-
-    public static NewsBodyFragment NewInstance(String headline, String body){
+    public static NewsBodyFragment newInstance(String headline, String body){
         Bundle args = new Bundle();
         args.putString("headline", headline);
         args.putString("body", body);
@@ -34,6 +32,7 @@ public class NewsBodyFragment extends Fragment {
         return fragment;
     }
 
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_body_fragment, container, false);
 
@@ -43,8 +42,7 @@ public class NewsBodyFragment extends Fragment {
         mScrollView = (ScrollView)view.findViewById(R.id.scrollView);
 
         try {
-            Spanned body = Html.fromHtml(getArguments().getString("body"));
-            mTxtBody.setText(body);
+            mTxtBody.setText(getArguments().getString("body"));
             mTxtHeadline.setText(getArguments().getString("headline"));
         } catch (Exception e) {((MainActivity) getActivity()).showToast(getString(R.string.news_err),
                 Gravity.CENTER, Toast.LENGTH_LONG);}
@@ -81,6 +79,7 @@ public class NewsBodyFragment extends Fragment {
     }
 
     // when this goes out of view, halt listening
+    @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);

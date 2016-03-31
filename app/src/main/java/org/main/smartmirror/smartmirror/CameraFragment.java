@@ -50,15 +50,32 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.FileContent;
+import com.google.api.client.http.HttpResponse;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,6 +85,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 /**
@@ -433,11 +452,11 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
         mCountDownText = (TextView) view.findViewById(R.id.count_down);
-        credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
+        //credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
         //String accountName = ("smartmirrortesting@gmail.com");
         //String accountName = Preferences.mUserAccountPref;
-        String accountName = mPreferences.getGmailAccount();
-        credential.setSelectedAccountName(accountName);
+        //String accountName = mPreferences.getGmailAccount();
+        //credential.setSelectedAccountName(accountName);
         // service = getDriveService(credential);
         return view;
     }
@@ -1036,6 +1055,31 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
         Log.i("DRIVE ID", result.toString());
         return result;
+    }
+
+
+    public void uploadToPicasa(URL url) {
+
+        String imageTitle = "sm";
+        int imageNumber = 1;
+        String contactLength = "47899";
+        try {
+            url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
+            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+            httpCon.setDoOutput(true);
+            httpCon.setRequestMethod("POST");
+            httpCon.setRequestProperty( "Content-Type", "image/jpeg");
+            httpCon.setRequestProperty( "Slug", imageTitle+imageNumber);
+            httpCon.setRequestProperty( "Content-Length", contactLength);
+            httpCon.setUseCaches( false );
+            OutputStreamWriter out = new OutputStreamWriter(
+                    httpCon.getOutputStream());
+            System.out.println(httpCon.getResponseCode());
+            System.out.println(httpCon.getResponseMessage());
+            out.close();
+            imageNumber++;
+        } catch (Exception e) {e.printStackTrace();}
+
     }
 
 }

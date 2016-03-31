@@ -16,8 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
+            android:text="@string/lbl_sound_off"
             android:textColor="@color/white"
-            android:text="@string/lbl_speech_off"
             android:textSize="18sp" />
 
         <Switch
@@ -25,8 +25,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
-            android:textColor="@color/white"
             android:text="@string/lbl_voice_off"
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <Switch
@@ -34,8 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
-            android:textColor="@color/white"
             android:text="@string/lbl_remote_off"
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
 
@@ -46,8 +46,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
             android:switchTextAppearance="@color/white"
-            android:textColor="@color/white"
             android:text="@string/lbl_time_format_24hr"
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <!-- weather display units -->
@@ -57,8 +57,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
             android:switchTextAppearance="@color/white"
-            android:textColor="@color/white"
             android:text="@string/lbl_weather_metric"
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <!-- Change Log In -->
