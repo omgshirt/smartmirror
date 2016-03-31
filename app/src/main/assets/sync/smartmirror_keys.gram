@@ -17,7 +17,7 @@ go to sleep/1e-18/
 go back/1e1/
 go forward/1e-3/
 help/1e5/
-hide time/1e2/
+hide time/1e4/
 hide weather/1e1/
 hide screen/1e-4/
 menu/1e4/
@@ -25,7 +25,7 @@ maximize/1e-5/
 minimize/1e-5/
 mira sleep/1e-20/
 mira wake/1e-20/
-mira sound/1e-15/
+mira sound/1e-18/
 music/1e-4/
 news/1e12/
 next/1e2/
@@ -55,8 +55,7 @@ take a picture/1e-15/
 time twelve hour/1e-10/
 time twenty-four hour/1e-20/
 twitter/1e-5/
-wake/1e20/
-wake up/1e-10/
+wake up/1e-5/
 weather english/1e-8/
 weather metric/1e-8/
 wide screen/1e-8/
@@ -80,7 +79,7 @@ article ten/1e-5/
 play alternative/1e-12/
 play ambient/1e-12/
 play classical/1e-12/
-play dance/1e-4/
+play dance/1e4/
 play jazz/1e-8/
 play rock/1e-8/
-play rap/1e-4/
+play rap/1e4/
