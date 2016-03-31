@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -29,6 +31,7 @@ import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -61,14 +64,19 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -453,7 +461,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreferences = Preferences.getInstance(getActivity());
-        createNewPicasaAlbum();
+        //createNewPicasaAlbum();
+        uploadToPicasa();
     }
 
     @Override
@@ -1067,28 +1076,134 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
 
     public void uploadToPicasa() {
+        // album id 6222738226621199249 or 6261649979025559057
 
         new Thread() {
             public void run() {
-                try {
-                    String imageTitle = "sm";
+                /*try {
+
+                    *//*String imageTitle = "sm";
                     int imageNumber = 1;
                     String contactLength = "47899";
-                    URL url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
+                    URL url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername() + "/albumid/6222738226621199249");
                     HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
                     httpCon.setDoOutput(true);
                     httpCon.setRequestMethod("POST");
                     httpCon.setRequestProperty( "Content-Type", "image/jpeg");
-                    httpCon.setRequestProperty( "Slug", imageTitle+imageNumber);
                     httpCon.setRequestProperty( "Content-Length", contactLength);
+                    httpCon.setRequestProperty( "Slug", imageTitle+imageNumber);
                     httpCon.setUseCaches( false );
                     OutputStreamWriter out = new OutputStreamWriter(
                             httpCon.getOutputStream());
                     System.out.println(httpCon.getResponseCode());
                     System.out.println(httpCon.getResponseMessage());
                     out.close();
+                    imageNumber++;*//*
+
+                    String imageTitle = "sm";
+                    int imageNumber = 1;
+                    String contactLength = "16477";
+                    Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),R.drawable.car_front);
+                    String attachmentName = "bitmap";
+                    String attachmentFileName = "bitmap.bmp";
+                    String crlf = "\r\n";
+                    String twoHyphens = "--";
+                    String boundary =  "*****";
+
+                    URL url = new URL("https://picasaweb.google.com/data/feed/api/user/"+mPreferences.getUsername()+"/albumid/6261649979025559057");
+                    HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
+                    httpUrlConnection.setUseCaches(false);
+                    httpUrlConnection.setDoOutput(true);
+
+                    httpUrlConnection.setRequestMethod("POST");
+                    httpUrlConnection.setRequestProperty("Content-Type", "image/jpeg");
+                    httpUrlConnection.setRequestProperty( "Content-Length", contactLength);
+                    httpUrlConnection.setRequestProperty( "Slug", imageTitle+imageNumber);
+
+                    DataOutputStream request = new DataOutputStream(
+                            httpUrlConnection.getOutputStream());
+
+                    request.writeBytes(twoHyphens + boundary + crlf);
+                    request.writeBytes("Content-Disposition: form-data; name=\"" +
+                            attachmentName + "\";filename=\"" +
+                            attachmentFileName + "\"" + crlf);
+                    request.writeBytes(crlf);
+
+                    byte[] pixels = new byte[bitmap.getWidth() * bitmap.getHeight()];
+                    for (int i = 0; i < bitmap.getWidth(); ++i) {
+                        for (int j = 0; j < bitmap.getHeight(); ++j) {
+                            //we're interested only in the MSB of the first byte,
+                            //since the other 3 bytes are identical for B&W images
+                            pixels[i + j] = (byte) ((bitmap.getPixel(i, j) & 0x80) >> 7);
+                        }
+                    }
+
+                    request.writeBytes(crlf);
+                    request.writeBytes(twoHyphens + boundary +
+                            twoHyphens + crlf);
+
+                    request.write(pixels);
+
+                    request.flush();
+                    request.close();
+
+                    InputStream responseStream = new
+                            BufferedInputStream(httpUrlConnection.getInputStream());
+
+                    BufferedReader responseStreamReader =
+                            new BufferedReader(new InputStreamReader(responseStream));
+
+                    String line = "";
+                    StringBuilder stringBuilder = new StringBuilder();
+
+                    while ((line = responseStreamReader.readLine()) != null) {
+                        stringBuilder.append(line).append("\n");
+                    }
+                    responseStreamReader.close();
+
+                    String response = stringBuilder.toString();
+                    Log.i("UPLOAD", response);
+
+                    responseStream.close();
+                    httpUrlConnection.disconnect();
                     imageNumber++;
-                } catch (Exception e) {e.printStackTrace();}
+
+                } catch (Exception e) {e.printStackTrace();}*/
+                String url = "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername() + "/albumid/6222738226621199249";
+                HttpClient httpClient = new DefaultHttpClient();
+                String root = Environment.getExternalStorageDirectory().toString();
+                Log.i("Directory", root);
+                File file = new File("/storage/emulated/0/Pictures/Screenshots/scrn.png");
+                HttpPost httpPost = new HttpPost(url);
+                httpPost.setHeader("GData-Version", "2");
+                // httpPost.addHeader("MIME-version", "1.0");
+                httpPost.setHeader("Content-type", "image/jpeg");
+                httpPost.setHeader("Slug", "plz-to-love-realcat.jpg");
+                // httpPost.addHeader("Content-Length", String.valueOf(file.length()));
+                // httpPost.setHeader("Authorization", "GoogleLogin auth=" + accessToken);
+                // httpPost.setHeader("Authorization", "OAuth " + accessToken);
+
+                InputStreamEntity reqEntity;
+                org.apache.http.HttpResponse response;
+
+                try {
+                    reqEntity = new InputStreamEntity(new FileInputStream(file), file.length());
+
+                    String CONTENTTYPE_BINARY = "binary/octet-stream";
+                    reqEntity.setContentType(CONTENTTYPE_BINARY);
+                    reqEntity.setChunked(true);
+                    httpPost.setEntity(reqEntity);
+                    response = httpClient.execute(httpPost);
+
+                    Log.d("Picasa Upload", "STATUS CODE : " + response.getStatusLine().getStatusCode());
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (ClientProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }.start();
     }
@@ -1126,12 +1241,12 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                                 "<summary type='text'>Smart Mirror Portraits.</summary>" +
                                 "<gphoto:location> </gphoto:location>" +
                                 "<gphoto:access>public</gphoto:access>" +
-                                "<gphoto:timestamp>"+ ts+"</gphoto:timestamp>" +
+                                "<gphoto:timestamp>"+ ts +"</gphoto:timestamp>" +
                                 "<media:group>" +
                                 "<media:keywords>smart mirror, mira</media:keywords>" +
                                 "</media:group>" +
-                                "<category scheme='http://schemas.google.com/g/2005#kind'" +
-                                "term='http://schemas.google.com/photos/2007#album'></category>" +
+                                "<category scheme='http://schemas.google.com/g/2005#kind'\n" +
+                                "    term='http://schemas.google.com/photos/2007#album'></category>" +
                                 "</entry>";
 
                 try {
@@ -1142,7 +1257,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
                     HttpClient httpclient = new DefaultHttpClient();
                     HttpResponse response = httpclient.execute(postRequest);
-                    Log.i("ALBUM: ", response.toString());
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    Log.i("ALBUM: ", responseBody);
 
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -1151,21 +1267,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
-                /*try {
-                    URL url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
-                    HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-                    httpCon.setDoOutput(true);
-                    httpCon.setRequestMethod("POST");
-                    httpCon.setUseCaches( false );
-                    OutputStreamWriter out = new OutputStreamWriter(
-                            httpCon.getOutputStream());
-                    System.out.println(httpCon.getResponseCode());
-                    System.out.println(httpCon.getResponseMessage());
-                    out.close();
-
-                } catch (Exception e) {e.printStackTrace();}*/
             }
         }.start();
 
