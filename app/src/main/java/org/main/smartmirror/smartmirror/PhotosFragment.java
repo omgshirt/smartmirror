@@ -99,8 +99,10 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
 
     // when this goes out of view, halt listening
     public void onPause() {
-        mAsyncTask.cancel(true);
         super.onPause();
+        if (mAsyncTask != null) {
+            mAsyncTask.cancel(true);
+        }
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         mCacheManager.unRegisterCacheListener(PHOTO_CACHE, this);
         Log.i("PHOTO CACHE", "unregister photos");
