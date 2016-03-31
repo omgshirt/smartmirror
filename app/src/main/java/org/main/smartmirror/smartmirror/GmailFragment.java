@@ -1,14 +1,24 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.app.Fragment;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -22,17 +32,7 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.ScrollView;
-import android.widget.TextView;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,8 +50,6 @@ public class GmailFragment extends Fragment {
     public String mSubject;
     public ListView listViewBody;
     public String mBody;
-
-    public Button nextMessage;
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
@@ -106,17 +104,6 @@ public class GmailFragment extends Fragment {
         textViewFrom = (TextView)view.findViewById(R.id.messageFrom);
         textViewSubject = (TextView)view.findViewById(R.id.messageSubject);
         listViewBody = (ListView) view.findViewById(R.id.messageBody);
-
-        nextMessage = (Button) view.findViewById(R.id.next);
-
-        nextMessage.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Log.i(Constants.TAG, "Before task");
-                displayNextMessage();
-                Log.i(Constants.TAG, "After task");
-            }
-        });
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 

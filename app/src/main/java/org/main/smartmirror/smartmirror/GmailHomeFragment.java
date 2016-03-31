@@ -7,7 +7,6 @@ package org.main.smartmirror.smartmirror;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -234,7 +233,7 @@ public class GmailHomeFragment extends Fragment {
         if (numUnreadPrimary > 0) {
             mailIcon.setVisibility(View.VISIBLE);
             textView.setVisibility(View.VISIBLE);
-            textView.setText(" " +  numUnreadPrimary);
+            textView.setText("(" +  numUnreadPrimary + ") Inbox");
         } else {
             mailIcon.setVisibility(View.GONE);
             textView.setVisibility(View.GONE);

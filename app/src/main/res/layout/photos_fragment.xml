@@ -6,8 +6,9 @@
 
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         android:id="@+id/photo_from_picasa"
         android:layout_gravity="center_horizontal|top" />
+
 </FrameLayout>

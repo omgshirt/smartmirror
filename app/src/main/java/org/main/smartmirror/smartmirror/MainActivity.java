@@ -49,7 +49,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SensorEventListener, NewsFragment.ArticleSelectedListener {
+        SensorEventListener, NewsFragment.ArticleSelectedListener, GmailFragment.OnNextMessageListener {
 
     // Globals, prefs, debug flags
     public static final boolean DEBUG = true;
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onArticleSelected(String articleTitle, String articleBody) {
-        Fragment fragment = NewsBodyFragment.NewInstance(articleTitle, articleBody);
+        Fragment fragment = NewsBodyFragment.newInstance(articleTitle, articleBody);
         displayFragment(fragment, Constants.NEWS_BODY, true);
     }
 
@@ -781,7 +781,7 @@ public class MainActivity extends AppCompatActivity
 
         // Check whether command is a news desk
         if (Constants.DESK_HASH.contains(command)) {
-            fragment = NewsFragment.NewInstance(command);
+            fragment = NewsFragment.newInstance(command);
         }
 
         // Create a new fragment based on the command. If the input string is not a fragment,
@@ -846,7 +846,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.NEWS:
                     //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
-                    fragment = NewsFragment.NewInstance("world");
+                    fragment = NewsFragment.newInstance("world");
                     break;
                 case Constants.OPEN_WINDOW:
                     if (viewHidden(contentFrame3)) {

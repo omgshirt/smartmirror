@@ -57,7 +57,10 @@ public class Preferences implements LocationListener {
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
+    public static final String PREFS_FACEBOOK_ACCOUNT = "PREFS_FACEBOOK_ACCOUNT";
     public static final String PREFS_FACEBOOK_CREDENTIALS = "PREFS_FACEBOOK_CREDENTIALS";
+
+    public static final String PREFS_TWITTER_ACCOUNT = "PREFS_TWITTER_ACCOUNT";
 
     // default for work address
     public static final float WORK_LAT = -1f;
@@ -65,7 +68,7 @@ public class Preferences implements LocationListener {
 
     public static final String CMD_SOUND_OFF = "sound off";
     public static final String CMD_SOUND_ON = "sound on";
-    public static final String CMD_MIRA_SOUND ="mira sound"; // toggle sound on / off
+    public static final String CMD_MIRA_SOUND = "mira sound"; // toggle sound on / off
 
     public static final String CMD_REMOTE_ON = "remote on";
     public static final String CMD_REMOTE_OFF = "remote off";
@@ -110,8 +113,10 @@ public class Preferences implements LocationListener {
 
     //Google Account Email String
     private String mGmailAccount;
+    private String mFacebookAccount;
     private String mFacebookCredentials;
     private String mTokenId;
+    private String mTwitterAccount;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
@@ -218,7 +223,7 @@ public class Preferences implements LocationListener {
                 if (mStayAwake) {
                     speakText(R.string.speech_stay_awake_cancel);
                     setStayAwake(false);
-                } else  {
+                } else {
                     speakText(R.string.speech_stay_awake);
                     setStayAwake(true);
                 }
@@ -253,7 +258,10 @@ public class Preferences implements LocationListener {
         mWorkLatitude = mSharedPreferences.getFloat(PREFS_WORK_LAT, WORK_LAT);
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
 
+        mFacebookAccount = mSharedPreferences.getString(PREFS_FACEBOOK_ACCOUNT, "");
         mFacebookCredentials = mSharedPreferences.getString(PREFS_FACEBOOK_CREDENTIALS, "");
+
+        mTwitterAccount = mSharedPreferences.getString(PREFS_TWITTER_ACCOUNT, "");
 
         // User name
         mUserFirstName = mSharedPreferences.getString(PREFS_FIRST_NAME, "Defaultfirstname");
@@ -297,7 +305,8 @@ public class Preferences implements LocationListener {
         mActivity = null;
     }
 
-    /** Returns the instance of the Preferences class, or creates one if it does not exist.
+    /**
+     * Returns the instance of the Preferences class, or creates one if it does not exist.
      * On start, this will first be called by AccountActivity during the setup phase.
      * It will then be called by MainActivity, which is essential due to the close binding between
      * methods in this class and MainActivity.
@@ -487,11 +496,13 @@ public class Preferences implements LocationListener {
         this.mSoundOn = enable;
 
         float vol = 0f;
-        if (enable) { vol = .5f; }
+        if (enable) {
+            vol = .5f;
+        }
 
-        AudioManager audio =(AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager audio = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int newVol = (int) (maxVolume*vol);
+        int newVol = (int) (maxVolume * vol);
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, newVol, 0);
 
         SharedPreferences.Editor edit = mSharedPreferences.edit();
@@ -560,7 +571,7 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
-    public String getWorkLocation(){
+    public String getWorkLocation() {
         return mWorkLocation;
     }
 
@@ -646,15 +657,22 @@ public class Preferences implements LocationListener {
         }
     }
 
-    public void setTokenId(String mTokenId){
+    public void setUserId(String mTokenId) {
         this.mTokenId = mTokenId;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putString(PREFS_TOKENID, mTokenId);
         edit.apply();
     }
 
-    public String getTokenId(){
+    public String getUserId() {
         return mTokenId;
+    }
+
+    public String getUsername() {
+        if (!mGmailAccount.isEmpty())
+            return mGmailAccount.substring(0, mGmailAccount.indexOf('@'));
+        else
+            return "";
     }
 
     public void setStayAwake(boolean stayAwake) {
@@ -675,10 +693,32 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public void setFacebookAccount(String mFacebookAccount) {
+        this.mFacebookAccount = mFacebookAccount;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_FACEBOOK_ACCOUNT, mFacebookAccount);
+        edit.apply();
+    }
+
+    public String getFacebookAccount() {
+        return mFacebookAccount;
+    }
+
     public boolean isLoggedInToFacebook() {
         if (mFacebookCredentials.equals(""))
             return false;
         else
             return true;
+    }
+
+    public void setTwitterAccount(String mTwitterAccount) {
+        this.mTwitterAccount = mTwitterAccount;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_TWITTER_ACCOUNT, mTwitterAccount);
+        edit.apply();
+    }
+
+    public String getTwitterAccount() {
+        return mTwitterAccount;
     }
 }

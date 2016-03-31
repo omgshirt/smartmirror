@@ -25,6 +25,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
     private String mCurrentLong;
     private String mWorkLat;
     private String mWorkLong;
+    private TextView txtDestination;
     private TextView txtDistance;
     private TextView txtTravelTime;
 
@@ -49,6 +50,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.traffic_fragment, container, false);
         mTrafficLayout = (LinearLayout) view.findViewById(R.id.traffic_layout);
+        txtDestination = (TextView) view.findViewById(R.id.traffic_destination);
         txtDistance = (TextView) view.findViewById(R.id.traffic_distance);
         txtTravelTime = (TextView) view.findViewById(R.id.traffic_delay);
         return view;
@@ -141,11 +143,12 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
                 units = "miles";
             }
 
-            txtDistance.setText("Distance: " + tripDistance + " " + units);
+            txtDestination.setText("Destination: " + mPreference.getWorkLocation());
+            txtDistance.setText("" + tripDistance + " " + units);
 
             String minute = " minute ";
             if (tripCost > 1) minute = " minutes ";
-            txtTravelTime.setText("Time: " + tripTime + " minutes (" + tripCost + minute + trafficFlow + ")");
+            txtTravelTime.setText("" + tripTime + " minutes (" + tripCost + minute + trafficFlow + ")");
         } catch (JSONException e) {
             e.printStackTrace();
         }

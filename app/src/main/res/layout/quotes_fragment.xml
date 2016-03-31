@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="40dp"
+    android:orientation="vertical"
     android:paddingLeft="40dp"
-    android:paddingRight="40dp">
+    android:paddingRight="40dp"
+    android:paddingTop="40dp">
+
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="18sp"
         android:id="@+id/quote_content"
-        android:layout_gravity="center_vertical"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_vertical"
         android:text=""
-        android:textSize="20sp"
+        android:textSize="18sp" />
+
+    <TextView
         android:id="@+id/quote_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/quote_content"
         android:layout_gravity="center_vertical"
         android:layout_marginTop="16dp"
-        android:layout_below="@+id/quote_content"
-        android:layout_alignParentEnd="true" />
+        android:text=""
+        android:textSize="20sp" />
 </RelativeLayout>
