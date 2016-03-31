@@ -141,26 +141,26 @@ public class Preferences implements LocationListener {
             // Speech on / off
             case CMD_SOUND_OFF:
                 if (isSoundOn()) {
-                    speakText(R.string.sound_off);
+                    forceSpeakText(R.string.sound_off);
                     setSoundOn(false);
                 } else {
-                    ((MainActivity) mActivity).forceSpeakText(mActivity.getResources().getString(R.string.sound_off_err));
+                    forceSpeakText(R.string.sound_off_err);
                 }
                 break;
             case CMD_SOUND_ON:
                 if (isSoundOn()) {
-                    speakText(R.string.sound_on_err);
+                    forceSpeakText(R.string.sound_on_err);
                 } else {
                     setSoundOn(true);
-                    speakText(R.string.sound_on);
+                    forceSpeakText(R.string.sound_on);
                 }
                 break;
             case CMD_MIRA_SOUND:
                 if (isSoundOn()) {
-                    speakText(R.string.sound_off);
+                    forceSpeakText(R.string.sound_off);
                     setSoundOn(false);
                 } else {
-                    speakText(R.string.sound_on);
+                    forceSpeakText(R.string.sound_on);
                     setSoundOn(true);
                 }
                 break;
@@ -518,6 +518,11 @@ public class Preferences implements LocationListener {
     private void speakText(int stringId) {
         String text = mActivity.getResources().getString(stringId);
         ((MainActivity) mActivity).speakText(text);
+    }
+
+    private void forceSpeakText(int stringId) {
+        String text = mActivity.getResources().getString(stringId);
+        ((MainActivity) mActivity).forceSpeakText(text);
     }
 
     public double getLatitude() {

@@ -49,16 +49,20 @@ public class CalendarFragment extends Fragment {
         for (int i = 0; i < events.size() && i < 7; i++) {
             CalendarEvent event = events.get(i);
             // create a copy of calendar_item xml.
-            View eventLayout = inflater.inflate(R.layout.calendar_item, null);
+            View eventLayout = inflater.inflate(R.layout.calendar_item, container, false);
 
             // Check if this event happens on the same day as previous event, if not, display Date info
             calendar.setTime(event.start);
             int thisEventDay = calendar.get(Calendar.DAY_OF_YEAR);
             if (thisEventDay != prevEventDay) {
-                TextView txtEventHeader = (TextView) eventLayout.findViewById(R.id.event_header);
-                txtEventHeader.setText(CalendarUtil.getCalendarHeader(event.start));
-                txtEventHeader.setGravity(Gravity.CENTER_HORIZONTAL);
-                txtEventHeader.setVisibility(View.VISIBLE);
+                TextView txtEventDate = (TextView) eventLayout.findViewById(R.id.event_date);
+                txtEventDate.setText(CalendarUtil.getCalendarHeader(event.start));
+                txtEventDate.setGravity(Gravity.CENTER_HORIZONTAL);
+                txtEventDate.setVisibility(View.VISIBLE);
+
+                View lineDivider = eventLayout.findViewById(R.id.line_divider);
+                lineDivider.setVisibility(View.VISIBLE);
+
                 prevEventDay = thisEventDay;
             }
 
@@ -71,13 +75,20 @@ public class CalendarFragment extends Fragment {
             TextView txtEventDesc = (TextView) eventLayout.findViewById(R.id.event_description);
             txtEventDesc.setText(event.description);
 
-            Log.i(Constants.TAG, event.description + " :: day :: " + thisEventDay);
+            //Log.i(Constants.TAG, event.description + " :: day :: " + thisEventDay);
+
+            // Set event location, if it exists
+            if (!event.location.isEmpty()) {
+                TextView txtEventLoc = (TextView) eventLayout.findViewById(R.id.event_location);
+                txtEventLoc.setText(event.location);
+                txtEventLoc.setVisibility(View.VISIBLE);
+            }
 
             // Add 10dp marginTop. This sucks...
             LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            llp.setMargins(0, 0, 0, 6);
-            txtEventDesc.setLayoutParams(llp);
+            llp.setMargins(0, 0, 0, 4);
+            eventLayout.setLayoutParams(llp);
 
             // Add this event to calendarLayout
             calendarLayout.addView(eventLayout);

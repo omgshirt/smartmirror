@@ -26,9 +26,6 @@ public class FacebookFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
-        if (!mPreference.isLoggedInToFacebook()) {
-            removeFacebook();
-        }
     }
 
     @Override
@@ -70,6 +67,9 @@ public class FacebookFragment extends Fragment {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
+        if (!mPreference.isLoggedInToFacebook()) {
+            removeFacebook();
+        }
     }
 
     // when this goes out of view, halt listening
