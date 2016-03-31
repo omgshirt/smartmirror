@@ -57,6 +57,8 @@ public class Preferences implements LocationListener {
     public static final String PREFS_WORK_LAT = "PREFS_WORK_LAT";
     public static final String PREFS_WORK_LONG = "PREFS_WORK_LONG";
 
+    public static final String PREFS_GOOGLE_ACCESS_TOKEN = "PREFS_GOOGLE_ACCESS_TOKEN";
+
     public static final String PREFS_FACEBOOK_ACCOUNT = "PREFS_FACEBOOK_ACCOUNT";
     public static final String PREFS_FACEBOOK_CREDENTIALS = "PREFS_FACEBOOK_CREDENTIALS";
 
@@ -107,16 +109,16 @@ public class Preferences implements LocationListener {
     private double mLatitude;
     private double mLongitude;
 
-    private String mWorkLocation;
+    //Google Account Email String
     private double mWorkLatitude;
     private double mWorkLongitude;
-
-    //Google Account Email String
     private String mGmailAccount;
+    private String mGoogleAccessToken;
     private String mFacebookAccount;
     private String mFacebookCredentials;
     private String mTokenId;
     private String mTwitterAccount;
+    private String mWorkLocation;
 
     private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
     public static final String TIME_FORMAT_24_HR = "H:mm";
@@ -141,26 +143,26 @@ public class Preferences implements LocationListener {
             // Speech on / off
             case CMD_SOUND_OFF:
                 if (isSoundOn()) {
-                    speakText(R.string.sound_off);
+                    forceSpeakText(R.string.sound_off);
                     setSoundOn(false);
                 } else {
-                    ((MainActivity) mActivity).forceSpeakText(mActivity.getResources().getString(R.string.sound_off_err));
+                    forceSpeakText(R.string.sound_off_err);
                 }
                 break;
             case CMD_SOUND_ON:
                 if (isSoundOn()) {
-                    speakText(R.string.sound_on_err);
+                    forceSpeakText(R.string.sound_on_err);
                 } else {
                     setSoundOn(true);
-                    speakText(R.string.sound_on);
+                    forceSpeakText(R.string.sound_on);
                 }
                 break;
             case CMD_MIRA_SOUND:
                 if (isSoundOn()) {
-                    speakText(R.string.sound_off);
+                    forceSpeakText(R.string.sound_off);
                     setSoundOn(false);
                 } else {
-                    speakText(R.string.sound_on);
+                    forceSpeakText(R.string.sound_on);
                     setSoundOn(true);
                 }
                 break;
@@ -250,6 +252,7 @@ public class Preferences implements LocationListener {
 
         // Google Account Email Preferences
         mGmailAccount = mSharedPreferences.getString(PREFS_GMAIL, "");
+        mGoogleAccessToken = mSharedPreferences.getString(PREFS_GOOGLE_ACCESS_TOKEN, "");
         mFirstTimeRun = mSharedPreferences.getBoolean(PREFS_FIRST_TIME_RUN, true);
         mTokenId = mSharedPreferences.getString(PREFS_TOKENID, "");
 
@@ -520,6 +523,11 @@ public class Preferences implements LocationListener {
         ((MainActivity) mActivity).speakText(text);
     }
 
+    private void forceSpeakText(int stringId) {
+        String text = mActivity.getResources().getString(stringId);
+        ((MainActivity) mActivity).forceSpeakText(text);
+    }
+
     public double getLatitude() {
         return mLatitude;
     }
@@ -622,6 +630,13 @@ public class Preferences implements LocationListener {
         edit.apply();
     }
 
+    public String getUsername() {
+        if (!mGmailAccount.isEmpty())
+            return mGmailAccount.substring(0, mGmailAccount.indexOf('@'));
+        else
+            return "";
+    }
+
     public String getUserFirstName() {
         return mUserFirstName;
     }
@@ -645,7 +660,7 @@ public class Preferences implements LocationListener {
     }
 
     public boolean isLoggedInToGmail() {
-        if (mGmailAccount.equals("")) {
+        if (mGmailAccount.isEmpty()) {
             return false;
         } else {
             return true;
@@ -663,11 +678,15 @@ public class Preferences implements LocationListener {
         return mTokenId;
     }
 
-    public String getUsername() {
-        if (!mGmailAccount.isEmpty())
-            return mGmailAccount.substring(0, mGmailAccount.indexOf('@'));
-        else
-            return "";
+    public void setAccessToken(String mGoogleAccessToken) {
+        this.mGoogleAccessToken = mGoogleAccessToken;
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(PREFS_GOOGLE_ACCESS_TOKEN, mGoogleAccessToken);
+        edit.apply();
+    }
+
+    public String getAccessToken() {
+        return mGoogleAccessToken;
     }
 
     public void setStayAwake(boolean stayAwake) {
@@ -700,7 +719,7 @@ public class Preferences implements LocationListener {
     }
 
     public boolean isLoggedInToFacebook() {
-        if (mFacebookCredentials.equals(""))
+        if (mFacebookCredentials.isEmpty())
             return false;
         else
             return true;

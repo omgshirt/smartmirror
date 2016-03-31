@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -194,7 +193,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     public void playStream() {
         if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-            ((MainActivity)getActivity()).setMusicIsStreaming(true);
+            ((MainActivity)getActivity()).setVoiceCommandMode(true);
             mMediaPlayer.start();
             setIconDrawables(R.drawable.play);
             setStatusIconVisibility();
@@ -253,7 +252,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             mMediaPlayer.stop();
         }
 
-        ((MainActivity)getActivity()).setMusicIsStreaming(false);
+        ((MainActivity)getActivity()).setVoiceCommandMode(false);
         mMediaPlayer.release();
         mMediaPlayer = null;
     }
@@ -295,7 +294,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
      */
     @Override
     public void onPrepared(MediaPlayer mp) {
-        ((MainActivity)getActivity()).setMusicIsStreaming(true);
+        ((MainActivity)getActivity()).setVoiceCommandMode(true);
         txtStreamInfo.setText(R.string.stream_playing);
         mp.start();
     }
