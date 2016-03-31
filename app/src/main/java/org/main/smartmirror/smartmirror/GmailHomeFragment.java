@@ -234,7 +234,7 @@ public class GmailHomeFragment extends Fragment {
         if (numUnreadPrimary > 0) {
             mailIcon.setVisibility(View.VISIBLE);
             textView.setVisibility(View.VISIBLE);
-            textView.setText(" " +  numUnreadPrimary);
+            textView.setText("(" +  numUnreadPrimary + ") Inbox");
         } else {
             mailIcon.setVisibility(View.GONE);
             textView.setVisibility(View.GONE);
