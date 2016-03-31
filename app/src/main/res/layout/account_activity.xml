@@ -13,34 +13,48 @@
             android:id="@+id/facebook_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
             android:layout_marginTop="15dp"
-            android:text="Facebook"
+            android:text="@string/facebook_email_input"
             android:textAppearance="?android:textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/facebook_account_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:text="@string/no_account"
+            android:textAppearance="?android:textAppearanceMedium" />
 
         <EditText
             android:id="@+id/facebook_username"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            android:hint="Email"
+            android:hint="@string/facebook_email_input"
             android:inputType="textEmailAddress" />
 
         <EditText
             android:id="@+id/facebook_password"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:hint="Password"
+            android:hint="@string/facebook_password_input"
             android:inputType="textPassword" />
 
         <TextView
             android:id="@+id/twitter_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
             android:layout_marginTop="15dp"
-            android:text="Twitter"
+            android:text="@string/title_twitter"
             android:textAppearance="?android:textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/twitter_account_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:text="@string/no_account"
+            android:textAppearance="?android:textAppearanceMedium" />
 
         <com.twitter.sdk.android.core.identity.TwitterLoginButton
             android:id="@+id/twitter_login_button"
@@ -52,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:text="Google Account"
+            android:text="@string/google_account"
             android:textAppearance="?android:textAppearanceLarge" />
 
         <TextView
@@ -60,7 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="11dp"
-            android:text="no account selected"
+            android:text="@string/no_account"
             android:textAppearance="?android:textAppearanceMedium" />
 
         <com.google.android.gms.common.SignInButton
@@ -80,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            android:text="Work Location"
+            android:text="@string/work_location"
             android:textAppearance="?android:textAppearanceLarge" />
 
         <EditText
@@ -88,7 +102,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            android:hint="Address"
+            android:hint="@string/address_input"
             android:inputType="text" />
 
         <Button
@@ -96,7 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="submitButtonPress"
-            android:text="Submit" />
+            android:text="@string/submit_button" />
     </LinearLayout>
 
 </LinearLayout>

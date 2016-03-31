@@ -1,7 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
 import android.content.Intent;
-import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -35,7 +34,6 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import java.io.IOException;
 import java.util.List;
 
-
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -57,6 +55,7 @@ public class AccountActivity extends AppCompatActivity implements
 
     private TextView txtGoogleAccountName;
     private TextView txtFacebookAccountName;
+    private TextView txtTwitterAccountName;
     private EditText edtWorkAddress;
     private ViewGroup btnSignOutButton;
 
@@ -76,9 +75,11 @@ public class AccountActivity extends AppCompatActivity implements
         sbtnGoogleSignInButton = (SignInButton) findViewById(R.id.google_sign_in_button);
         txtGoogleAccountName = (TextView) findViewById(R.id.google_account_name);
         txtFacebookAccountName = (TextView) findViewById(R.id.facebook_account_name);
+        txtTwitterAccountName = (TextView) findViewById(R.id.twitter_account_name);
 
         txtGoogleAccountName.setText(mPreference.getGmailAccount());
         txtFacebookAccountName.setText(mPreference.getFacebookAccount());
+        txtTwitterAccountName.setText(mPreference.getTwitterAccount());
         edtWorkAddress.setText(mPreference.getWorkLocation());
 
         setUpTwitterButton();
@@ -86,7 +87,21 @@ public class AccountActivity extends AppCompatActivity implements
         setUpGoogleButton();
         if (!mPreference.getGmailAccount().isEmpty()) {
             hideSignInShowSignOutButton();
+        } else {
+            hideSignOutShowSignInButton();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
     }
 
     /**
@@ -129,6 +144,7 @@ public class AccountActivity extends AppCompatActivity implements
                 mSession = result.data;
                 mUserID = mSession.getUserId();
                 mScreenName = mSession.getUserName();
+                mPreference.setTwitterAccount(mScreenName);
                 String msg = "@" + mSession.getUserName() + " logged in! (#" + mUserID + ")";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
                 Long id = mSession.getId();
@@ -171,35 +187,33 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     /**
+     * Sign in to Google
+     */
+    private void signInToGoogle() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, GOOGLE_REQUEST);
+    }
+
+    /**
      * Handles the signing out of Google
      */
     private void signOutOfGoogle() {
-        mGoogleApiClient.connect();
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
                         Log.i(Constants.TAG, "Revoked: " + status);
-                        mPreference.setGmailAccount("");
-                        txtGoogleAccountName.setText(getResources().getString(R.string.no_google_account));
+                        resetGoogleAccountValues();
+                        hideSignOutShowSignInButton();
                     }
                 });
-//        HttpsURLConnection connection = null;
-//        URL url = null;
-//        try {
-//            url = new URL("https://accounts.google.com/o/oauth2/revoke?token=" + mPreference.getUserId());
-//            connection = (HttpsURLConnection) url.openConnection();
-//            connection.connect();
-//            if(connection.getResponseCode() == 200){
-//                Log.i(Constants.TAG, "Successfully Logged Out");
-//            }
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            connection.disconnect();
-//        }
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Log.i(Constants.TAG, "Signed out: " + status);
+                    }
+                });
     }
 
     // --------------------------------Helpers------------------------------------------------- //
@@ -221,14 +235,6 @@ public class AccountActivity extends AppCompatActivity implements
         } else if (requestCode == TWITTER_REQUEST) {
             mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    /**
-     * Sign into Google
-     */
-    private void signInToGoogle() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, GOOGLE_REQUEST);
     }
 
     /**
@@ -256,7 +262,6 @@ public class AccountActivity extends AppCompatActivity implements
         }
         mPreference.setFirstTimeRun(false);
         finish();
-        //Activity();
     }
 
     /**
@@ -306,9 +311,20 @@ public class AccountActivity extends AppCompatActivity implements
         }
     }
 
+    private void resetGoogleAccountValues() {
+        mPreference.setGmailAccount("");
+        mPreference.setUserId("");
+        txtGoogleAccountName.setText(getResources().getString(R.string.no_account));
+    }
+
     private void hideSignInShowSignOutButton() {
         sbtnGoogleSignInButton.setVisibility(View.GONE);
         btnSignOutButton.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSignOutShowSignInButton() {
+        sbtnGoogleSignInButton.setVisibility(View.VISIBLE);
+        btnSignOutButton.setVisibility(View.GONE);
     }
 
     // -------------------------------Callbacks------------------------------------------------- //
@@ -316,12 +332,7 @@ public class AccountActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(this, GOOGLE_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-                mGoogleApiClient.connect();
-            }
+            Log.i(Constants.TAG, connectionResult.toString());
         }
-        Log.i(Constants.TAG, connectionResult.toString());
     }
 }
