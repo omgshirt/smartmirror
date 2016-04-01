@@ -498,12 +498,14 @@ public class Preferences implements LocationListener {
         float vol = 0f;
         if (enable) {
             vol = .5f;
+
         }
 
         AudioManager audio = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         int newVol = (int) (maxVolume * vol);
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, newVol, 0);
+        ((MainActivity)mActivity).showSoundOffIcon(!enable);
 
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_SPEECH_ENABLED, mSoundOn);

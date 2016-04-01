@@ -67,7 +67,7 @@ public class CacheManager {
 
     public static void destroy() {
         mCacheManager = null;
-
+        cacheScheduler.cancel(false);
     }
 
 

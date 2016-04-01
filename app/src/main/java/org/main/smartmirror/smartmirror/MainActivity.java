@@ -64,10 +64,12 @@ public class MainActivity extends AppCompatActivity
     private ViewGroup contentFrame2;
     private ViewGroup contentFrame3;
 
-    private ImageView imgSpeechIcon;
     private ImageView imgRemoteIcon;
     private ImageView imgRemoteDisabledIcon;
+    private ImageView imgSoundOffIcon;
+    private ImageView imgSpeechIcon;
     private ImageView imgStayAwakeIcon;
+
 
     // Set initial fragments & track displayed views
     private String mInitialFragment = Constants.NEWS;
@@ -261,6 +263,11 @@ public class MainActivity extends AppCompatActivity
         imgStayAwakeIcon = (ImageView) findViewById(R.id.stay_awake_icon);
         if (mPreferences.isStayingAwake()) {
             imgStayAwakeIcon.setVisibility(View.VISIBLE);
+        }
+
+        imgSoundOffIcon = (ImageView) findViewById(R.id.sound_off_icon);
+        if (!mPreferences.isSoundOn()) {
+            imgSoundOffIcon.setVisibility(View.VISIBLE);
         }
 
 
@@ -898,7 +905,7 @@ public class MainActivity extends AppCompatActivity
                 case Constants.R_RAP:
                 case Constants.R_ROCK:
                     if (currentFragment instanceof MusicFragment) {
-                        ((MusicFragment) currentFragment).startStation(command);
+                        ((MusicFragment) currentFragment).forceStartStation(command);
                     } else {
                         fragment = MusicFragment.NewInstance(command);
                     }
@@ -961,6 +968,9 @@ public class MainActivity extends AppCompatActivity
         showIcon(imgStayAwakeIcon, display);
     }
 
+    public void showSoundOffIcon(boolean display) {
+        showIcon(imgSoundOffIcon, display);
+    }
 
     // ----------------------- SPEECH RECOGNITION --------------------------
 

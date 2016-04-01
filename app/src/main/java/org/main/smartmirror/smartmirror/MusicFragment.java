@@ -44,6 +44,12 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     public MusicFragment() {
     }
 
+    /**
+     * Create a MusicFragment. If command argument is a station (in the form "genreName:"),
+     * start a fragment playing the given station. If command is not known or empty, no station starts.
+     * @param command station genre
+     * @return instance of MusicFragment
+     */
     public static MusicFragment NewInstance(String command) {
         Bundle args = new Bundle();
         String stationGenre = GetGenreFromCommand(command);
@@ -89,7 +95,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             Log.i(TAG, "failed to get audio focus");
         }
 
-        // configure the StreamInfo marquee. Doesn't work properly when set via XML...
+        // configure the StreamInfo marquee. Doesn't work properly when set via XML... or when set via code :/
         txtStreamInfo = (TextView) view.findViewById(R.id.stream_info);
         txtStreamInfo.setEllipsize(TextUtils.TruncateAt.MARQUEE);
         txtStreamInfo.setSingleLine(true);
@@ -102,8 +108,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         mGenre = getArguments().getString(GENRE);
 
         // set up the station list using R.layout.station_name
-        mUrlMap = new HashMap<>(10);
-        mStationIcons = new HashMap<>(10);
+        mUrlMap = new HashMap<>(stationNames.length);
+        mStationIcons = new HashMap<>(stationNames.length);
 
         for (int i = 0; i < stationNames.length; i++) {
             String genre = ConvertStationNameToGenre(stationNames[i]);
@@ -117,9 +123,9 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             mStationIcons.put(genre, icon);
         }
 
-        // drwPlay a station if one has been selected
+        // Play a station if one was passed to constructor
         if (!mGenre.isEmpty()) {
-            setStatusIconVisibility();
+            setStreamIconVisible();
             initMediaPlayer();
         } else {
             // create a media player to prevent crashes on callbacks
@@ -157,16 +163,16 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
      */
     public void changeToStation(String command) {
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) return;
-        startStation(command);
+        forceStartStation(command);
     }
 
-    /** Like changeToStation, but allows changes if the media player is playing.
+    /** Like changeToStation, but changes to given station even when the media player is playing.
      *
      * @param command station to play
      */
-    public void startStation(String command) {
+    public void forceStartStation(String command) {
         mGenre = GetGenreFromCommand(command);
-        setStatusIconVisibility();
+        setStreamIconVisible();
         setIconDrawables(R.drawable.play);
         tearDownMediaPlayer();
         initMediaPlayer();
@@ -176,7 +182,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
             mMediaPlayer.pause();
             setIconDrawables(R.drawable.pause);
-            setStatusIconVisibility();
+            setStreamIconVisible();
             txtStreamInfo.setText(R.string.stream_pause);
         }
     }
@@ -186,7 +192,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             tearDownMediaPlayer();
             setIconDrawables(R.drawable.pause);
             mGenre = "";
-            setStatusIconVisibility();
+            setStreamIconVisible();
             txtStreamInfo.setText(R.string.stream_stopped);
         }
     }
@@ -196,14 +202,14 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             ((MainActivity)getActivity()).setVoiceCommandMode(true);
             mMediaPlayer.start();
             setIconDrawables(R.drawable.play);
-            setStatusIconVisibility();
+            setStreamIconVisible();
             txtStreamInfo.setText(R.string.stream_playing);
         }
     }
 
 
     // sets the status icon to visible for the currently selected stream
-    public void setStatusIconVisibility() {
+    public void setStreamIconVisible() {
         for (String key : mStationIcons.keySet()) {
             ImageView img = mStationIcons.get(key);
             if (key.equals(mGenre)) {
