@@ -463,7 +463,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreferences = Preferences.getInstance(getActivity());
-        //createNewPicasaAlbum();
+        createNewPicasaAlbum();
         uploadToPicasa();
     }
 
@@ -1182,8 +1182,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 httpPost.setHeader("Content-type", "image/jpeg");
                 httpPost.setHeader("Slug", "plz-to-love-realcat.jpg");
                 // httpPost.addHeader("Content-Length", String.valueOf(file.length()));
-                // httpPost.setHeader("Authorization", "GoogleLogin auth=" + accessToken);
-                // httpPost.setHeader("Authorization", "OAuth " + accessToken);
+                httpPost.setHeader("Authorization", "GoogleLogin auth=" + mPreferences.getAccessToken());
+                // httpPost.setHeader("Authorization", "OAuth " + mPreferences.getAccessToken());
 
                 InputStreamEntity reqEntity;
                 org.apache.http.HttpResponse response;
@@ -1252,6 +1252,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                                 "</entry>";
 
                 try {
+                    postRequest.addHeader(new BasicHeader("GData-Version", "2.0"));
+                    postRequest.addHeader(new BasicHeader("Authorization",
+                            "GoogleLogin auth=" + mPreferences.getAccessToken()));
                     StringEntity entity = new StringEntity(content);
                     entity.setContentType(new BasicHeader("Content-Type",
                             "application/atom+xml"));
