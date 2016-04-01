@@ -33,6 +33,13 @@
         <item>technology</item>
         <item>travel</item>
         <item>world</item>
+        <item>fashion</item>
+        <item>movies</item>
+        <item>games</item>
+        <item>economics</item>
+        <item>lifestyle</item>
+        <item>opinion</item>
+        <item>books</item>
     </string-array>
 
     <string-array name="modes_list">
@@ -47,8 +54,30 @@
         <item>gmail</item>
     </string-array>
 
+
     <string-array name="weather_help">
         <item>conditions</item>
         <item>forecast</item>
+    </string-array>
+
+    <!-- Music Genres - These map to the "music_url" array -->
+    <string-array name="station_names">
+        <item>Alternative: KCRW</item>
+        <item>Ambient: Ambient Sleeping Pill</item>
+        <item>Classical: KUSC</item>
+        <item>Dance: Best Club Dance</item>
+        <item>Jazz: ABC Jazz</item>
+        <item>Rap: HOT 108 JAMZ</item>
+        <item>Rock: KCSN</item>
+    </string-array>
+
+    <string-array name="station_urls">
+        <item name="KCRW">http://kcrw.ic.llnwd.net/stream/kcrw_128aac_music</item>
+        <item name="ambient">http://50.7.96.138:8115/stream</item>
+        <item name="KUSC">http://14943.live.streamtheworld.com:80/KUSCMP128_SC</item>
+        <item name="dance">http://listen.radionomy.com:80/BestClubDance</item>
+        <item name="jazz">http://listen.radionomy.com/ABC-Jazz</item>
+        <item name="rap">http://108.61.30.179:4040</item>
+        <item name="KCSN">http://130.166.82.184:8000/</item>
     </string-array>
 </resources>

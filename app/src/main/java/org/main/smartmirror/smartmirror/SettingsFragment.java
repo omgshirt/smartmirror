@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.RadioGroup;
 import android.widget.Switch;
 
 
@@ -53,15 +52,15 @@ public class SettingsFragment extends Fragment {
         swtSpeechEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mPreferences.setSpeechEnabled(isChecked);
+                mPreferences.setSoundOn(isChecked);
                 if (isChecked) {
-                    swtSpeechEnabled.setText(getResources().getString(R.string.lbl_speech_on));
+                    swtSpeechEnabled.setText(getResources().getString(R.string.lbl_sound_on));
                 } else {
-                    swtSpeechEnabled.setText(getResources().getString(R.string.lbl_speech_off));
+                    swtSpeechEnabled.setText(getResources().getString(R.string.lbl_sound_off));
                 }
             }
         });
-        swtSpeechEnabled.setChecked(mPreferences.isSpeechEnabled());
+        swtSpeechEnabled.setChecked(mPreferences.isSoundOn());
 
         // Voice Enabled Switch
         swtVoiceEnabled = (Switch) view.findViewById(R.id.switch_voice_enabled);
@@ -150,10 +149,14 @@ public class SettingsFragment extends Fragment {
             Boolean checked = false;
             switch (message) {
 
-                case Preferences.CMD_SPEECH_ON:
+                case Preferences.CMD_SOUND_ON:
                     checked = true;
-                case Preferences.CMD_SPEECH_OFF:
+                case Preferences.CMD_SOUND_OFF:
                     swtSpeechEnabled.setChecked(checked);
+                    break;
+
+                case Preferences.CMD_MIRA_SOUND:
+                    swtSpeechEnabled.toggle();
                     break;
 
                 // remote on / off

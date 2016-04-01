@@ -49,7 +49,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SensorEventListener, NewsFragment.ArticleSelectedListener {
+        SensorEventListener, NewsFragment.ArticleSelectedListener, GmailFragment.OnNextMessageListener {
 
     // Globals, prefs, debug flags
     public static final boolean DEBUG = true;
@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity
     private int frame1Visibility = View.VISIBLE;
     private int frame2Visibility = View.VISIBLE;
     private int frame3Visibility = View.VISIBLE;
+
+    private enum FrameSize {CLOSE_SCREEN, SMALL_SCREEN, WIDE_SCREEN, FULL_SCREEN}
 
     // Light Sensor
     private SensorManager mSensorManager;
@@ -120,13 +122,14 @@ public class MainActivity extends AppCompatActivity
     // Sound effects
     private MediaPlayer mFXPlayer;
 
+
     private Runnable uiTimerRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!mPreferences.isStayingAwake()) {
-                clearScreenOnFlag();
-            } else {
+            if (mPreferences.isStayingAwake()) {
                 Log.i(Constants.TAG, "Screen set to stay awake");
+            } else {
+                clearScreenOnFlag();
             }
         }
     };
@@ -203,7 +206,7 @@ public class MainActivity extends AppCompatActivity
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
         if (mPreferences.isFirstTimeRun()) {
-            startActivity( new Intent(this, AccountActivity.class));
+            startActivity(new Intent(this, AccountActivity.class));
         }
 
         setContentView(R.layout.activity_main);
@@ -413,6 +416,7 @@ public class MainActivity extends AppCompatActivity
     protected void enterLightSleep() {
         if (mirrorSleepState != AWAKE) return;
         mPreferences.setStayAwake(false);
+
         mirrorSleepState = LIGHT_SLEEP;
         mInteractionTimeout = DEFAULT_INTERACTION_TIMEOUT;
         resetInteractionTimer();
@@ -424,8 +428,10 @@ public class MainActivity extends AppCompatActivity
         setScreenOffTimeout();
         stopUITimer();
         startLightSensor();
-        mira.appSleeping();
 
+        // Stop any ongoing speech. This may cause sleep messages to fail...
+        mTTSHelper.stop();
+        mira.appSleeping();
     }
 
     // ------------------------ UI Visibility / Content Frames ---------------------------
@@ -434,9 +440,31 @@ public class MainActivity extends AppCompatActivity
         return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
     }
 
+    protected void setContentFrameValues(FrameSize fs) {
+
+        switch (fs) {
+            case CLOSE_SCREEN:
+                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+                break;
+            case SMALL_SCREEN:
+                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                break;
+            case WIDE_SCREEN:
+                setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
+                break;
+            case FULL_SCREEN:
+                setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
+                break;
+        }
+    }
+
     /**
      * Set the visibility of the 3 content frames and stores those values for future reference.
      * Passing a null for any parameter will keep that frame in its current state.
+     *
+     * @param frameOne   View.VISIBILITY
+     * @param frameTwo   View.VISIBILITY
+     * @param frameThree View.VISIBILITY
      */
     protected void setContentFrameValues(@Nullable Integer frameOne, @Nullable Integer frameTwo, @Nullable Integer frameThree) {
         frame1Visibility = (frameOne == null) ? frame1Visibility : frameOne;
@@ -452,7 +480,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Temporarily set content frame visibility to given values
+     * Temporarily sets content frame visibility to given values.
+     * This can be undone by calling restoreContentFrameVisibility()
      */
     private void setContentFrameVisibility(int frameOne, int frameTwo, int frameThree) {
         contentFrame1.setVisibility(frameOne);
@@ -460,7 +489,7 @@ public class MainActivity extends AppCompatActivity
         contentFrame3.setVisibility(frameThree);
     }
 
-    // Restores the screen off to the duration set when the application first ran.
+    // Restore screen off timer to the value captured when the application launched.
     protected void setDefaultScreenOffTimeout() {
         // sanity check to prevent screen lockout from super-short screen timeout settings.
         if (defaultScreenTimeout < 1000) defaultScreenTimeout = 10000;
@@ -472,13 +501,13 @@ public class MainActivity extends AppCompatActivity
         Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SLEEP_DELAY);
     }
 
-    // Flags the system to keep the screen on indefinitely.
+    // Keep the screen on indefinitely.
     protected void addScreenOnFlag() {
         Log.i(Constants.TAG, "Adding FLAG_KEEP_SCREEN_ON");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    // Removes the KEEP_SCREEN_ON flag, allowing the screen to timeout normally.
+    // Clear the KEEP_SCREEN_ON flag, allowing the screen to timeout normally.
     protected void clearScreenOnFlag() {
         Log.i(Constants.TAG, "clearing FLAG_KEEP_SCREEN_ON");
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -515,7 +544,7 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             super.onBackPressed();
         }
     }
@@ -552,7 +581,6 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Display the HelpFragment within content_frame_2
-     *
      */
     private void displayHelpFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -574,6 +602,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void displayFragment(Fragment fragment, String tag, boolean addToBackStack) {
         Log.i(Constants.TAG, "Displaying fragment :: " + tag);
+
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         ft.replace(R.id.content_frame_3, fragment, tag);
@@ -645,8 +674,8 @@ public class MainActivity extends AppCompatActivity
      * If command would wake the application, trigger proper state change and handle the command.
      * <p/>
      * Actions related to commands are processed in this order: Wake the screen, hide the help fragment,
-     * close menu drawer, set content frame visibility, then change fragments and / or broadcast command to
-     * command listeners.
+     * close menu drawer, set content frame visibility, then change fragments or broadcast the command to
+     * any command listeners.
      *
      * @param command input command
      */
@@ -656,12 +685,13 @@ public class MainActivity extends AppCompatActivity
             handleHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP) {
+                // NIGHT_LIGHT will change to that fragment on wake
                 if (command.equals(Constants.NIGHT_LIGHT)) nightLightOnWake = true;
                 exitSleep();
             } else {
                 exitLightSleep();
                 if (command.equals(Constants.NIGHT_LIGHT)) {
-                    // if the command is light (a special case) wake and directly show LightFragment
+                    //wake and directly show LightFragment
                     handleHelpFragment(command);
                 }
             }
@@ -669,7 +699,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public boolean commandWakesFromSleep(String command) {
-        return (command.equals(Constants.WAKE)
+        return (command.equals(Constants.WAKE) || command.equals(Constants.WAKE_UP)
                 || command.equals(Constants.NIGHT_LIGHT)
                 || command.equals(Constants.MIRA_WAKE));
     }
@@ -684,10 +714,10 @@ public class MainActivity extends AppCompatActivity
 
         boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
 
-        if (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP)) {
+        if (!helpIsVisible && (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP))) {
             // If frame3 is in any visible state, return it to 'small screen' proportion
             if (frame3Visibility == View.VISIBLE) {
-                setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                setContentFrameValues(FrameSize.SMALL_SCREEN);
             }
             displayHelpFragment();
         }
@@ -717,16 +747,6 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         }
 
-        setContentVisibility(command);
-    }
-
-
-    /**
-     * Adjust the visible content frames if required by the command. Currently empty.
-     *
-     * @param command command to be executed
-     */
-    private void setContentVisibility(String command) {
         handleCommand(command);
     }
 
@@ -744,7 +764,22 @@ public class MainActivity extends AppCompatActivity
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command: \"" + command + "\"");
         }
 
-        // look for news desk
+        /*
+        Reject if command is same as tag of currentFragment. This prevents several instances of
+        the same fragment type appearing 'on top' of one another, though interleaving is still possible
+        (whereby the back stack would contain fragments in an order such as ABAB).
+
+        Does not apply to music fragments.
+        */
+        Fragment currentFragment;
+        if ((currentFragment = getCurrentFragment()) != null) {
+            if (currentFragment.getTag().equals(command) && !(currentFragment instanceof MusicFragment)) {
+                Log.i(Constants.TAG, "Command ignored : same as tagged fragment.");
+                return;
+            }
+        }
+
+        // Check whether command is a news desk
         if (Constants.DESK_HASH.contains(command)) {
             fragment = NewsFragment.newInstance(command);
         }
@@ -758,7 +793,7 @@ public class MainActivity extends AppCompatActivity
                     if (frame3Visibility != View.INVISIBLE) {
                         mForwardStack.add(getCurrentFragment());
                         // Pop back stack if there's any previous fragments
-                        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+                        if (getSupportFragmentManager().getBackStackEntryCount() > 1)
                             getSupportFragmentManager().popBackStack();
                     }
                     break;
@@ -775,7 +810,7 @@ public class MainActivity extends AppCompatActivity
                 case Constants.CLOSE_SCREEN:
                 case Constants.CLOSE_WINDOW:
                 case Constants.HIDE_SCREEN:
-                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.INVISIBLE);
+                    setContentFrameValues(FrameSize.CLOSE_SCREEN);
                     break;
                 case Constants.FACEBOOK:
                     fragment = new FacebookFragment();
@@ -794,11 +829,14 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.MAXIMIZE:
                 case Constants.FULL_SCREEN:
-                    setContentFrameValues(View.GONE, View.GONE, View.VISIBLE);
+                    setContentFrameValues(FrameSize.FULL_SCREEN);
                     break;
                 case Constants.MINIMIZE:
                 case Constants.SMALL_SCREEN:
-                    setContentFrameValues(View.VISIBLE, View.VISIBLE, View.VISIBLE);
+                    setContentFrameValues(FrameSize.SMALL_SCREEN);
+                    break;
+                case Constants.MUSIC:
+                    fragment = MusicFragment.NewInstance("");
                     break;
                 case Constants.NIGHT_LIGHT:
                 case Constants.SHOW_LIGHT:
@@ -834,9 +872,36 @@ public class MainActivity extends AppCompatActivity
                     fragment = new TwitterFragment();
                     break;
                 case Constants.WAKE:
+                case Constants.WAKE_UP:
                     break;
                 case Constants.WIDE_SCREEN:
-                    setContentFrameValues(View.VISIBLE, View.GONE, View.VISIBLE);
+                    setContentFrameValues(FrameSize.WIDE_SCREEN);
+                    break;
+                case Constants.ALTERNATIVE:
+                case Constants.AMBIENT:
+                case Constants.CLASSICAL:
+                case Constants.DANCE:
+                case Constants.JAZZ:
+                case Constants.RAP:
+                case Constants.ROCK:
+                    if (currentFragment instanceof MusicFragment) {
+                        ((MusicFragment) currentFragment).changeToStation(command);
+                    } else {
+                        fragment = MusicFragment.NewInstance(command);
+                    }
+                    break;
+                case Constants.R_ALTERNATIVE:
+                case Constants.R_AMBIENT:
+                case Constants.R_CLASSICAL:
+                case Constants.R_DANCE:
+                case Constants.R_JAZZ:
+                case Constants.R_RAP:
+                case Constants.R_ROCK:
+                    if (currentFragment instanceof MusicFragment) {
+                        ((MusicFragment) currentFragment).startStation(command);
+                    } else {
+                        fragment = MusicFragment.NewInstance(command);
+                    }
                     break;
                 default:
                     broadcastMessage("inputAction", command);
@@ -903,17 +968,16 @@ public class MainActivity extends AppCompatActivity
      * Handle the result of speech input.
      * Normalize inputs when several phrases are paired with the same action ('settings' & 'options')
      *
-     * @param input the command the user gave
+     * @param command voice command returned from VoiceService
      */
     @SuppressWarnings("deprecation")
-    public void handleVoiceCommand(String input) {
-        //String voiceInput = input.trim();
-        Log.i(Constants.TAG, "handleVoiceCommand:\"" + input + "\"");
+    public void handleVoiceCommand(String command) {
+        Log.i(Constants.TAG, "handleVoiceCommand:\"" + command + "\"");
 
         // if voice is disabled, ignore everything except "start listening" and "wake / night light" commands
-        if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(input)) {
-            if (input.equals(Preferences.CMD_VOICE_ON) || input.equals(Preferences.CMD_VOICE_OFF)) {
-                broadcastMessage("inputAction", input);
+        if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(command)) {
+            if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Preferences.CMD_VOICE_OFF)) {
+                broadcastMessage("commandAction", command);
             } else {
                 showToast(getResources().getString(R.string.speech_voice_off_err), Toast.LENGTH_SHORT);
             }
@@ -921,21 +985,21 @@ public class MainActivity extends AppCompatActivity
         }
 
         // show the command to the user
-        showToast(input, Toast.LENGTH_SHORT);
+        showToast(command, Toast.LENGTH_SHORT);
 
-        switch (input) {
+        switch (command) {
             case Preferences.CMD_DISABLE_REMOTE:
-                input = Preferences.CMD_REMOTE_OFF;
+                command = Preferences.CMD_REMOTE_OFF;
                 break;
             case Preferences.CMD_ENABLE_REMOTE:
-                input = Preferences.CMD_REMOTE_ON;
+                command = Preferences.CMD_REMOTE_ON;
                 break;
             case Constants.SHOW_LIGHT:
-                input = Constants.NIGHT_LIGHT;
+                command = Constants.NIGHT_LIGHT;
                 break;
         }
 
-        wakeScreenAndDisplay(input);
+        wakeScreenAndDisplay(command);
     }
 
     public void initSpeechRecognition() {
@@ -984,7 +1048,7 @@ public class MainActivity extends AppCompatActivity
 
     public int getUnreadCount() {
         int count = 0;
-        GmailHomeFragment gmhf = (GmailHomeFragment)getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
+        GmailHomeFragment gmhf = (GmailHomeFragment) getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
         if (gmhf != null)
             count = gmhf.getUnreadCount();
 
@@ -1027,9 +1091,16 @@ public class MainActivity extends AppCompatActivity
      */
     public void speakText(final String phrase) {
         Log.i(Constants.TAG, "speakText :: " + phrase);
-        if (mPreferences.isSpeechEnabled()) {
+        if (mPreferences.isSoundOn()) {
             mTTSHelper.start(phrase);
         }
+    }
+
+    /**
+     * speak text even if speech is disabled in the preferences
+     */
+    public void forceSpeakText(final String phrase) {
+        mTTSHelper.start(phrase);
     }
 
     /**
@@ -1073,15 +1144,65 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Callback from RemoteServerAsyncTask when a command is received from the remote control.
+     * Callback from RemoteServerAsyncTask when a command is issued by the remote control.
+     * Several commands are generic toggles and will perform different
+     * operations depending on the mirror's current state.
      *
      * @param command String: received command
      */
     public void handleRemoteCommand(String command) {
         Log.i(Constants.TAG, "remote msg :: " + command);
 
-        if (command.equals(Constants.LIGHT)) {
-            command = Constants.NIGHT_LIGHT;
+        switch (command) {
+            case Constants.REMOTE_INCREASE_SCREEN:
+                command = increaseScreenSize();
+                break;
+            case Constants.REMOTE_TOGGLE_LISTENING:
+                command = (mPreferences.isVoiceEnabled()) ? Preferences.CMD_VOICE_OFF : Preferences.CMD_VOICE_ON;
+                break;
+            case Constants.REMOTE_TOGGLE_SLEEPS_STATE:
+                command = (mirrorSleepState == AWAKE) ? Constants.SLEEP : Constants.WAKE;
+                break;
+            case Constants.REMOTE_TOGGLE_SOUND:
+                command = (mPreferences.isSoundOn()) ? Preferences.CMD_SOUND_OFF : Preferences.CMD_SOUND_ON;
+                break;
+            case Constants.REMOTE_TOGGLE_TIME_FORMAT:
+                command = (mPreferences.isTimeFormat12hr()) ? Preferences.CMD_TIME_24HR : Preferences.CMD_TIME_12HR;
+                break;
+            case Constants.REMOTE_TOGGLE_WEATHER_FORMAT:
+                command = (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) ? Preferences.CMD_WEATHER_METRIC :
+                        Preferences.CMD_WEATHER_ENGLISH;
+                break;
+            case Constants.ARTICLE_1:
+                command = Constants.ONE;
+                break;
+            case Constants.ARTICLE_2:
+                command = Constants.TWO;
+                break;
+            case Constants.ARTICLE_3:
+                command = Constants.THREE;
+                break;
+            case Constants.ARTICLE_4:
+                command = Constants.FOUR;
+                break;
+            case Constants.ARTICLE_5:
+                command = Constants.FIVE;
+                break;
+            case Constants.ARTICLE_6:
+                command = Constants.SIX;
+                break;
+            case Constants.ARTICLE_7:
+                command = Constants.SEVEN;
+                break;
+            case Constants.ARTICLE_8:
+                command = Constants.EIGHT;
+                break;
+            case Constants.ARTICLE_9:
+                command = Constants.NINE;
+                break;
+            case Constants.ARTICLE_10:
+                command = Constants.TEN;
+                break;
         }
 
         if (mPreferences.isRemoteEnabled())
@@ -1089,6 +1210,30 @@ public class MainActivity extends AppCompatActivity
         else {
             Log.i(Constants.TAG, "Remote Disabled. Command ignored: \"" + command + "\"");
         }
+    }
+
+    /**
+     * Based on the current configuration of the 3 content frames, increase the size of contentFrame3
+     * by one step in this order: SMALL_SCREEN -> WIDE_SCREEN -> FULL_SCREEN -> CLOSE_SCREEN
+     *
+     * @return command corresponding to new screen sizes
+     */
+    private String increaseScreenSize() {
+        if (mirrorSleepState != AWAKE) return "";
+
+        String command = Constants.SMALL_SCREEN;
+
+        if (contentFrame3.getVisibility() == View.INVISIBLE) {
+            command = Constants.SMALL_SCREEN;
+        } else if (contentFrame1.getVisibility() == View.VISIBLE &&
+                contentFrame2.getVisibility() == View.VISIBLE) {
+            command = Constants.WIDE_SCREEN;
+        } else if (contentFrame1.getVisibility() == View.GONE) {
+            command = Constants.CLOSE_SCREEN;
+        } else if (contentFrame2.getVisibility() == View.GONE) {
+            command = Constants.FULL_SCREEN;
+        }
+        return command;
     }
 
     // --------------------------- LIGHT SENSOR --------------------------------------
@@ -1130,8 +1275,7 @@ public class MainActivity extends AppCompatActivity
         float recentLightAvg = mRecentLightValues.getAverage();
 
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            //Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
-            //Log.i(Constants.TAG, "recent light avg: " + recentLightAvg);
+            Log.i("Light Sensor", "Current value:" + Float.toString(currentLight) + " avg:" + recentLightAvg);
             if (currentLight > recentLightAvg * 3 && lightWakeDelayExceeded()) {
                 // Stop any further callbacks from the sensor.
                 stopLightSensor();
@@ -1164,7 +1308,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void onNextCommand(){
+    public void onNextCommand() {
         //Here we update GmailHomeFragment
         GmailHomeFragment gmailHomeFrag = (GmailHomeFragment)
                 getSupportFragmentManager().findFragmentById(R.id.gmail_home_fragment);
@@ -1172,5 +1316,32 @@ public class MainActivity extends AppCompatActivity
         if (gmailHomeFrag != null) {
             gmailHomeFrag.updateUnreadCount();
         }
+    }
+
+    /**
+     * Configure the voice recognition to use a shorter command when music is actively streaming.
+     * Setting false returns to normal command list.
+     *
+     * @param isMusicStreaming current music streaming status.
+     */
+    public void setVoiceCommandMode(boolean isMusicStreaming) {
+        int msgType;
+
+        if (isMusicStreaming) {
+            // set VR to music mode
+            msgType = VoiceService.MUSIC_COMMAND_LIST;
+        } else {
+            // set VR to normal mode
+            msgType = VoiceService.NORMAL_COMMAND_LIST;
+        }
+
+        try {
+            Message msg = Message.obtain(null, msgType);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException re) {
+            re.printStackTrace();
+        }
+
     }
 }

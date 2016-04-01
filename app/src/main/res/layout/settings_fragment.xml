@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
-            android:text="@string/lbl_speech_off"
+            android:text="@string/lbl_sound_off"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
