@@ -1,8 +1,10 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,6 +14,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -61,7 +67,8 @@ public class AccountActivity extends AppCompatActivity implements
 
     public static final int GOOGLE_REQUEST = 1;
     public static final int REQUEST_PERMISSIONS = 2;
-    public static final int TWITTER_REQUEST = 3;
+    public static final int REQUEST_AUTH_TOKEN = 3;
+    public static final int TWITTER_REQUEST = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +119,8 @@ public class AccountActivity extends AppCompatActivity implements
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
-                .requestScopes(new Scope(Constants.PICASA), new Scope(GmailScopes.GMAIL_LABELS),
+                .requestScopes(new Scope(Constants.PICASA),
+                        new Scope(GmailScopes.GMAIL_LABELS),
                         new Scope(GmailScopes.GMAIL_READONLY),
                         new Scope(GmailScopes.MAIL_GOOGLE_COM),
                         new Scope(GmailScopes.GMAIL_MODIFY),
@@ -205,6 +213,7 @@ public class AccountActivity extends AppCompatActivity implements
                         Log.i(Constants.TAG, "Revoked: " + status);
                         resetGoogleAccountValues();
                         hideSignOutShowSignInButton();
+                        CacheManager.destroy();
                     }
                 });
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
@@ -232,6 +241,7 @@ public class AccountActivity extends AppCompatActivity implements
         if (requestCode == GOOGLE_REQUEST) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
+            new RetrieveTokenTask().execute(mPreference.getGmailAccount());
         } else if (requestCode == TWITTER_REQUEST) {
             mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
         }
@@ -296,7 +306,6 @@ public class AccountActivity extends AppCompatActivity implements
             if (acct != null) {
                 mPreference.setGmailAccount(acct.getEmail());
                 mPreference.setUserId(acct.getId());
-                mPreference.setAccessToken(acct.getIdToken());
                 txtGoogleAccountName.setText(acct.getEmail());
                 hideSignInShowSignOutButton();
                 String[] names = acct.getDisplayName().split("\\s");
@@ -315,6 +324,7 @@ public class AccountActivity extends AppCompatActivity implements
     private void resetGoogleAccountValues() {
         mPreference.setGmailAccount("");
         mPreference.setUserId("");
+        mPreference.setAccessToken("");
         txtGoogleAccountName.setText(getResources().getString(R.string.no_account));
     }
 
@@ -334,6 +344,32 @@ public class AccountActivity extends AppCompatActivity implements
     public void onConnectionFailed(ConnectionResult connectionResult) {
         if (connectionResult.hasResolution()) {
             Log.i(Constants.TAG, connectionResult.toString());
+        }
+    }
+
+    private class RetrieveTokenTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String account = params[0];
+            String scopes = "oauth2:profile email";
+            String token = null;
+            try {
+                token = GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);
+            } catch (IOException e) {
+                Log.e(Constants.TAG, e.getMessage());
+            } catch (UserRecoverableAuthException e) {
+                startActivityForResult(e.getIntent(), REQUEST_AUTH_TOKEN);
+            } catch (GoogleAuthException e) {
+                Log.e(Constants.TAG, e.getMessage());
+            }
+            return token;
+        }
+
+        @Override
+        protected void onPostExecute(String accessToken) {
+            super.onPostExecute(accessToken);
+            mPreference.setAccessToken(accessToken);
         }
     }
 }
