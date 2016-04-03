@@ -164,8 +164,11 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
 
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
                 VoiceScroll sl = new VoiceScroll();
+                int numItemsInFeed = newsFeed.getAdapter().getCount();
                 if (message.contains(Constants.SCROLL_DOWN)) {
                     newsFeedPosition = newsFeedPosition + 5;
+                    if (newsFeedPosition >= numItemsInFeed)
+                        newsFeedPosition = numItemsInFeed;
                 } else if (message.contains(Constants.SCROLL_UP)) {
                     newsFeedPosition = newsFeedPosition - 5;
                     if (newsFeedPosition < 0) newsFeedPosition = 0;

@@ -463,6 +463,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreferences = Preferences.getInstance(getActivity());
+        System.out.println("Username: " + mPreferences.getUsername() + " ACCESS TOKEN: " + mPreferences.getAccessToken());
         createNewPicasaAlbum();
         uploadToPicasa();
     }
@@ -1081,6 +1082,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         // album id 6222738226621199249 or 6261649979025559057
 
         new Thread() {
+            String mAlbumID = "6222738226621199249";
             public void run() {
                 /*try {
 
@@ -1171,10 +1173,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     imageNumber++;
 
                 } catch (Exception e) {e.printStackTrace();}*/
-                String url = "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername() + "/albumid/6222738226621199249";
+
+                String url = "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername() + "/albumid/" + mAlbumID;
                 HttpClient httpClient = new DefaultHttpClient();
-                String root = Environment.getExternalStorageDirectory().toString();
-                Log.i("Directory", root);
                 File file = new File("/storage/emulated/0/Pictures/Screenshots/scrn.png");
                 HttpPost httpPost = new HttpPost(url);
                 httpPost.setHeader("GData-Version", "2");
@@ -1197,7 +1198,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     httpPost.setEntity(reqEntity);
                     response = httpClient.execute(httpPost);
 
-                    Log.d("Picasa Upload", "STATUS CODE : " + response.getStatusLine().getStatusCode());
+                    Log.i("PICASA UPLOAD ", "STATUS CODE : " + response.getStatusLine().getStatusCode());
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
