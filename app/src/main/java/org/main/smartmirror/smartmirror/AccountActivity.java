@@ -205,6 +205,7 @@ public class AccountActivity extends AppCompatActivity implements
                         Log.i(Constants.TAG, "Revoked: " + status);
                         resetGoogleAccountValues();
                         hideSignOutShowSignInButton();
+                        CacheManager.destroy();
                     }
                 });
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(

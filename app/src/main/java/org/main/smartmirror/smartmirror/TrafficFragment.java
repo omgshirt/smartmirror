@@ -146,9 +146,14 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
             txtDestination.setText("Destination: " + mPreference.getWorkLocation());
             txtDistance.setText("" + tripDistance + " " + units);
 
-            String minute = " minute ";
-            if (tripCost > 1) minute = " minutes ";
-            txtTravelTime.setText("" + tripTime + " minutes (" + tripCost + minute + trafficFlow + ")");
+            String time = " minute ";
+            if (tripCost < 60) {
+                if (tripCost > 1) time = " minutes ";
+            } else {
+                time = " hours";
+                if (tripCost > 60) time = " hours";
+            }
+            txtTravelTime.setText(data.getJSONObject("duration").getString("text") + "(" + tripCost + time + trafficFlow + ")");
         } catch (JSONException e) {
             e.printStackTrace();
         }
