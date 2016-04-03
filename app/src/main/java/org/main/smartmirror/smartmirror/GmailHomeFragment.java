@@ -233,6 +233,7 @@ public class GmailHomeFragment extends Fragment {
 
     public void updateUnreadCount(){
         numUnreadPrimary--;
+        numUnreadPrevious--;
         displayEmailCount();
     }
 
