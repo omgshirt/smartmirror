@@ -352,11 +352,11 @@ public class AccountActivity extends AppCompatActivity implements
         @Override
         protected String doInBackground(String... params) {
             String account = params[0];
-            //String scopes = "oauth2:profile email";
-            String scopes = "https://picasaweb.google.com/data/";
+            String scopes = "oauth2:email";
+            //String scopes = "https://picasaweb.google.com/data/";
             String token = null;
             try {
-                token = GoogleAuthUtil.getToken(getApplicationContext(), account, "oauth2:" + scopes);
+                token = GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);
             } catch (IOException e) {
                 Log.e(Constants.TAG, e.getMessage());
             } catch (UserRecoverableAuthException e) {
@@ -371,6 +371,7 @@ public class AccountActivity extends AppCompatActivity implements
         protected void onPostExecute(String accessToken) {
             super.onPostExecute(accessToken);
             mPreference.setAccessToken(accessToken);
+            //mPreference.setAccessToken(accessToken.substring(6));
         }
     }
 }

@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -31,7 +29,6 @@ import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -41,7 +38,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -50,7 +46,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -65,34 +60,22 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.security.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,8 +86,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HttpsURLConnection;
-
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 /**
@@ -117,6 +99,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private static Drive service;
     private GoogleAccountCredential credential;
     private Preferences mPreferences;
+
+    private String mAlbumID;
 
     //Gets current date and time to name pictures
     public static String dateTimeStr;
@@ -465,8 +449,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         super.onCreate(savedInstanceState);
         mPreferences = Preferences.getInstance(getActivity());
         System.out.println("Username: " + mPreferences.getUsername() + " ACCESS TOKEN: " + mPreferences.getAccessToken());
-        createNewPicasaAlbum();
-        uploadToPicasa();
+        //createNewPicasaAlbum();
+        //uploadToPicasa();
     }
 
     @Override
@@ -1080,113 +1064,17 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
 
     public void uploadToPicasa() {
-        // album id 6222738226621199249 or 6261649979025559057
-
         new Thread() {
-            String mAlbumID = "6222738226621199249";
             public void run() {
-                /*try {
-
-                    /*String imageTitle = "sm";
-                    int imageNumber = 1;
-                    String contactLength = "47899";
-                    URL url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername() + "/albumid/6222738226621199249");
-                    HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-                    httpCon.setDoOutput(true);
-                    httpCon.setRequestMethod("POST");
-                    httpCon.setRequestProperty( "Content-Type", "image/jpeg");
-                    httpCon.setRequestProperty( "Content-Length", contactLength);
-                    httpCon.setRequestProperty( "Slug", imageTitle+imageNumber);
-                    httpCon.setUseCaches( false );
-                    OutputStreamWriter out = new OutputStreamWriter(
-                            httpCon.getOutputStream());
-                    System.out.println(httpCon.getResponseCode());
-                    System.out.println(httpCon.getResponseMessage());
-                    out.close();
-                    imageNumber++;*/
-
-                    /*String imageTitle = "sm";
-                    int imageNumber = 1;
-                    String contactLength = "16477";
-                    Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),R.drawable.car_front);
-                    String attachmentName = "bitmap";
-                    String attachmentFileName = "bitmap.bmp";
-                    String crlf = "\r\n";
-                    String twoHyphens = "--";
-                    String boundary =  "*****";
-
-                    URL url = new URL("https://picasaweb.google.com/data/feed/api/user/"+mPreferences.getUsername()+"/albumid/6261649979025559057");
-                    HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
-                    httpUrlConnection.setUseCaches(false);
-                    httpUrlConnection.setDoOutput(true);
-
-                    httpUrlConnection.setRequestMethod("POST");
-                    httpUrlConnection.setRequestProperty("Content-Type", "image/jpeg");
-                    httpUrlConnection.setRequestProperty( "Content-Length", contactLength);
-                    httpUrlConnection.setRequestProperty( "Slug", imageTitle+imageNumber);
-                    httpUrlConnection.setRequestProperty("Authorization", "GoogleLogin auth=" + mPreferences.getAccessToken());
-
-                    DataOutputStream request = new DataOutputStream(
-                            httpUrlConnection.getOutputStream());
-
-                    request.writeBytes(twoHyphens + boundary + crlf);
-                    request.writeBytes("Content-Disposition: form-data; name=\"" +
-                            attachmentName + "\";filename=\"" +
-                            attachmentFileName + "\"" + crlf);
-                    request.writeBytes(crlf);
-
-                    byte[] pixels = new byte[bitmap.getWidth() * bitmap.getHeight()];
-                    for (int i = 0; i < bitmap.getWidth(); ++i) {
-                        for (int j = 0; j < bitmap.getHeight(); ++j) {
-                            //we're interested only in the MSB of the first byte,
-                            //since the other 3 bytes are identical for B&W images
-                            pixels[i + j] = (byte) ((bitmap.getPixel(i, j) & 0x80) >> 7);
-                        }
-                    }
-
-                    request.writeBytes(crlf);
-                    request.writeBytes(twoHyphens + boundary +
-                            twoHyphens + crlf);
-
-                    request.write(pixels);
-
-                    request.flush();
-                    request.close();
-
-                    InputStream responseStream = new
-                            BufferedInputStream(httpUrlConnection.getInputStream());
-
-                    BufferedReader responseStreamReader =
-                            new BufferedReader(new InputStreamReader(responseStream));
-
-                    String line = "";
-                    StringBuilder stringBuilder = new StringBuilder();
-
-                    while ((line = responseStreamReader.readLine()) != null) {
-                        stringBuilder.append(line).append("\n");
-                    }
-                    responseStreamReader.close();
-
-                    String response = stringBuilder.toString();
-                    Log.i("UPLOAD", response);
-
-                    responseStream.close();
-                    httpUrlConnection.disconnect();
-                    imageNumber++;
-
-                } catch (Exception e) {e.printStackTrace();}*/
 
                 String url = "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername() + "/albumid/" + mAlbumID;
                 HttpClient httpClient = new DefaultHttpClient();
                 File file = new File("/storage/emulated/0/Pictures/Screenshots/scrn.png");
                 HttpPost httpPost = new HttpPost(url);
                 httpPost.setHeader("GData-Version", "2");
-                // httpPost.addHeader("MIME-version", "1.0");
                 httpPost.setHeader("Content-type", "image/jpeg");
                 httpPost.setHeader("Slug", "plz-to-love-realcat.jpg");
-                // httpPost.addHeader("Content-Length", String.valueOf(file.length()));
-                httpPost.setHeader("Authorization", "GoogleLogin auth=" + mPreferences.getAccessToken());
-                // httpPost.setHeader("Authorization", "OAuth " + mPreferences.getAccessToken());
+                httpPost.setHeader("Authorization", "OAuth " + mPreferences.getAccessToken());
 
                 InputStreamEntity reqEntity;
                 org.apache.http.HttpResponse response;
@@ -1217,24 +1105,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     }
 
     public void createNewPicasaAlbum() {
-        // formed entry
-        /*
-        <entry xmlns='http://www.w3.org/2005/Atom'
-                xmlns:media='http://search.yahoo.com/mrss/'
-                xmlns:gphoto='http://schemas.google.com/photos/2007'>
-            <title type='text'>Trip To Italy</title>
-            <summary type='text'>This was the recent trip I took to Italy.</summary>
-            <gphoto:location>Italy</gphoto:location>
-            <gphoto:access>public</gphoto:access>
-            <gphoto:timestamp>1152255600000</gphoto:timestamp>
-            <media:group>
-                <media:keywords>italy, vacation</media:keywords>
-            </media:group>
-            <category scheme='http://schemas.google.com/g/2005#kind'
-                term='http://schemas.google.com/photos/2007#album'></category>
-         </entry>
-         */
-
         new Thread() {
             public void run() {
                 Long tsLong = System.currentTimeMillis()/1000;
@@ -1259,8 +1129,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
                 try {
                     postRequest.addHeader(new BasicHeader("GData-Version", "2"));
-                    postRequest.addHeader(new BasicHeader("Authorization",
-                            "GoogleLogin auth=" + mPreferences.getAccessToken()));
+                    postRequest.setHeader("Authorization", "OAuth " + mPreferences.getAccessToken());
                     StringEntity entity = new StringEntity(content);
                     entity.setContentType(new BasicHeader("Content-Type",
                             "application/atom+xml"));
@@ -1269,7 +1138,14 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     HttpClient httpclient = new DefaultHttpClient();
                     HttpResponse response = httpclient.execute(postRequest);
                     String responseBody = EntityUtils.toString(response.getEntity());
-                    Log.i("PICASA ALBUM: ", "Response: " + response.getStatusLine() + "\n" + responseBody);
+                    //Log.i("PICASA ALBUM: ", "Response: " + response.getStatusLine() + "\n" + responseBody);
+                    try {
+                        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                                .parse(new InputSource(new StringReader(responseBody)));
+                        traverseForAlbums(doc);
+                    } catch (Exception e) {e.printStackTrace();}
+
+
 
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -1281,6 +1157,21 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             }
         }.start();
 
+    }
+
+    public void traverseForAlbums(Node node) {
+        NodeList nodeList = node.getChildNodes();
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node currentNode = nodeList.item(i);
+            traverseForAlbums(currentNode);
+        }
+
+        if (node.getNodeName().equals("gphoto:id")) {
+            mAlbumID = node.getTextContent();
+            Log.i("ALBUM ID node", mAlbumID);
+
+        }
     }
 
 }
