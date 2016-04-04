@@ -365,6 +365,7 @@ public class MainActivity extends AppCompatActivity
 
         mNsdHelper.tearDown();
         mRemoteConnection.tearDown();
+        setDefaultScreenOffTimeout();
 
         unbindService(mVoiceConnection);
         mIsBound = false;

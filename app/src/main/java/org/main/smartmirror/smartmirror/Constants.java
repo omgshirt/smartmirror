@@ -64,21 +64,22 @@ public class Constants {
     public static final String TWITTER = "twitter";
 
     // ------------- NEWS ------------
+    public static final String BOOKS = "books";
     public static final String BUSINESS = "business";
+    public static final String ECONOMICS = "economics";
+    public static final String ENVIRONMENT = "environment";
+    public static final String FASHION = "fashion";
+    public static final String GAMES = "games";
+    public static final String LIFESTYLE = "lifestyle";
     public static final String MEDIA = "media";
+    public static final String MOVIES = "movies";
+    public static final String OPINION = "opinion";
     public static final String SCIENCE = "science";
     public static final String SPORTS = "sports";
     public static final String TECHNOLOGY = "technology";
     public static final String TRAVEL = "travel";
     public static final String WORLD = "world";
-    public static final String BOOKS = "books";
-    public static final String FASHION = "fashion";
-    public static final String MOVIES = "movies";
-    public static final String GAMES = "games";
-    public static final String ECONOMICS = "economics";
-    public static final String OPINION = "opinion";
-    public static final String ENVIRONMENT = "environment";
-    public static final String LIFESTYLE = "lifestyle";
+
     public static final String NEWS_BODY = "news body";
     public static final String[] NEWS_DESKS = {BUSINESS, BOOKS, ECONOMICS, ENVIRONMENT, FASHION,
             GAMES, LIFESTYLE, MEDIA, MOVIES, OPINION, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL, WORLD};

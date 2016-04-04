@@ -356,7 +356,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
             // set humidity
             mCurrentHumidity = (int) Math.round((currentHour.getDouble("humidity") * 100));
-            String humidityText = mCurrentHumidity + " " + getActivity().getString(R.string.weather_humidity);
+            //String humidityText = mCurrentHumidity + " " + getActivity().getString(R.string.weather_humidity);
+            String humidityText = "Humidity " + mCurrentHumidity + "%";
             txtCurrentHumidity.setText(humidityText);
 
             // set Wind Speed & Direction
@@ -395,13 +396,19 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     forecastToday.sunset * 1000);
 
             // Set the dailyHigh and dailyLow
-            String maxIcon = getActivity().getString(R.string.weather_therm_high) + " " +
+            /*
+            String maxTemp= getActivity().getString(R.string.weather_therm_high) + " " +
                     forecastToday.maxTemp + weatherDeg;
-            txtDailyHigh.setText(maxIcon);
+                    */
+            String maxTemp = "High " + forecastToday.maxTemp + weatherDeg;
+            txtDailyHigh.setText(maxTemp);
 
-            String minIcon = getActivity().getString(R.string.weather_therm_low) + " " +
+            /*
+            String minTemp = getActivity().getString(R.string.weather_therm_low) + " " +
                     forecastToday.minTemp + weatherDeg;
-            txtDailyLow.setText(minIcon);
+                    */
+            String minTemp = "Low  " + forecastToday.minTemp + weatherDeg;
+            txtDailyLow.setText(minTemp);
 
             // ----------------- 2-Hour forecasts -------------
             for (int i = 1; i <= 7; i++) {
@@ -458,9 +465,13 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             // check for weather alerts.
             if (json.has("alerts")) {
                 mWeatherAlerts = json.getJSONArray("alerts");
-                txtAlerts.setVisibility(View.VISIBLE);
-                txtAlerts.setText(getWeatherAlerts());
-                txtAlerts.setSelected(true);
+                String alertText = getWeatherAlerts();
+                Log.i(Constants.TAG, "alertText: " + alertText);
+                if (alertText.length() > 0) {
+                    txtAlerts.setVisibility(View.VISIBLE);
+                    txtAlerts.setText(getWeatherAlerts());
+                    txtAlerts.setSelected(true);
+                }
             } else {
                 txtAlerts.setVisibility(View.GONE);
             }
@@ -590,7 +601,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
      */
     public static String getDirectionFromBearing(final int bearing) {
         if (bearing < 0 || bearing > 360) return "error";
-        String[] directions = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+        String[] directions = {"North", "NEast", "East", "SEast", "South", "SWest", "West", "NWest"};
         int index = ((int) ((bearing + 22.5) / 45)) % 8;
         return directions[index];
     }
