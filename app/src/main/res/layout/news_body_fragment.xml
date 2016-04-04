@@ -25,7 +25,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="News Body"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="15sp" />
     </ScrollView>

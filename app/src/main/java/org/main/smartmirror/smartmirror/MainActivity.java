@@ -544,7 +544,7 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             super.onBackPressed();
         }
     }
@@ -764,11 +764,16 @@ public class MainActivity extends AppCompatActivity
             Log.i(Constants.TAG, "handleCommand() status:" + mirrorSleepState + " command: \"" + command + "\"");
         }
 
-        // get current fragment. Reject if command is equal to the tag (it's the same command repeated)
-        // Does not apply to music fragments.
+        /*
+        Reject if command is same as tag of currentFragment. This prevents several instances of
+        the same fragment type appearing 'on top' of one another, though interleaving is still possible
+        (whereby the back stack would contain fragments in an order such as ABAB).
+
+        Does not apply to music fragments.
+        */
         Fragment currentFragment;
-        if ( (currentFragment = getCurrentFragment()) != null) {
-            if (currentFragment.getTag().equals(command) && !(currentFragment instanceof MusicFragment) ) {
+        if ((currentFragment = getCurrentFragment()) != null) {
+            if (currentFragment.getTag().equals(command) && !(currentFragment instanceof MusicFragment)) {
                 Log.i(Constants.TAG, "Command ignored : same as tagged fragment.");
                 return;
             }
@@ -1270,8 +1275,7 @@ public class MainActivity extends AppCompatActivity
         float recentLightAvg = mRecentLightValues.getAverage();
 
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            //Log.i(Constants.TAG, "Light sensor value:" + Float.toString(currentLight) );
-            //Log.i(Constants.TAG, "recent light avg: " + recentLightAvg);
+            Log.i("Light Sensor", "Current value:" + Float.toString(currentLight) + " avg:" + recentLightAvg);
             if (currentLight > recentLightAvg * 3 && lightWakeDelayExceeded()) {
                 // Stop any further callbacks from the sensor.
                 stopLightSensor();
@@ -1315,14 +1319,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Configure the voice recognition to use a shorter command list if set to true.
+     * Configure the voice recognition to use a shorter command when music is actively streaming.
      * Setting false returns to normal command list.
-     * @param isStreaming music streaming status.
+     *
+     * @param isMusicStreaming current music streaming status.
      */
-    public void setMusicIsStreaming(boolean isStreaming) {
+    public void setVoiceCommandMode(boolean isMusicStreaming) {
         int msgType;
 
-        if (isStreaming) {
+        if (isMusicStreaming) {
             // set VR to music mode
             msgType = VoiceService.MUSIC_COMMAND_LIST;
         } else {
@@ -1334,7 +1339,7 @@ public class MainActivity extends AppCompatActivity
             Message msg = Message.obtain(null, msgType);
             msg.replyTo = mMessenger;
             mService.send(msg);
-        } catch(RemoteException re) {
+        } catch (RemoteException re) {
             re.printStackTrace();
         }
 

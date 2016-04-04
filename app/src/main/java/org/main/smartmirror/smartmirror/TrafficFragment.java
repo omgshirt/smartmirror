@@ -125,18 +125,9 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
                     .getJSONObject(0)
                     .getJSONArray("elements")
                     .getJSONObject(0);
-            double tripTime = Double.parseDouble(splitString(data.getJSONObject("duration").getString("text")));
-            double tripTimeTraffic = Double.parseDouble(splitString(data.getJSONObject("duration_in_traffic").getString("text")));
             double tripDistance = Double.parseDouble(splitString(data.getJSONObject("distance").getString("text")));
-            double tripCost = tripTimeTraffic - tripTime;
-
-            String trafficFlow = "faster";
-            if ((tripCost) < 0) {
-                tripCost = Math.abs(tripCost);
-                trafficFlow = "slower";
-            } else if (tripCost == 0) {
-                trafficFlow = "no delay";
-            }
+            String tripTime = data.getJSONObject("duration").getString("text");
+            double tripTimeTraffic = Double.parseDouble(splitString(data.getJSONObject("duration_in_traffic").getString("text")));
 
             String units = "kilometers";
             if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
@@ -145,10 +136,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
 
             txtDestination.setText("Destination: " + mPreference.getWorkLocation());
             txtDistance.setText("" + tripDistance + " " + units);
-
-            String minute = " minute ";
-            if (tripCost > 1) minute = " minutes ";
-            txtTravelTime.setText("" + tripTime + " minutes (" + tripCost + minute + trafficFlow + ")");
+            txtTravelTime.setText(tripTime);
         } catch (JSONException e) {
             e.printStackTrace();
         }

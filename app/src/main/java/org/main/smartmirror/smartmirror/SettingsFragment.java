@@ -155,6 +155,10 @@ public class SettingsFragment extends Fragment {
                     swtSpeechEnabled.setChecked(checked);
                     break;
 
+                case Preferences.CMD_MIRA_SOUND:
+                    swtSpeechEnabled.toggle();
+                    break;
+
                 // remote on / off
                 case Preferences.CMD_REMOTE_ON:
                     checked = true;

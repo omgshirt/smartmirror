@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+
 import java.util.ArrayList;
 
 import io.fabric.sdk.android.Fabric;
