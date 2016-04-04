@@ -23,6 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -352,7 +353,7 @@ public class AccountActivity extends AppCompatActivity implements
         @Override
         protected String doInBackground(String... params) {
             String account = params[0];
-            String scopes = "oauth2:profile email";
+            String scopes = "oauth2:email";
             String token = null;
             try {
                 token = GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);

@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -33,9 +34,9 @@ public class CalendarHomeFragment extends Fragment {
 
         // We only want today's events
         TextView txtEventDate = (TextView) mRootView.findViewById(R.id.todays_events);
+        ImageView imgCalendarIcon = (ImageView) mRootView.findViewById(R.id.calendar_home_icon);
         txtEventDate.setText("Today's Events");
         txtEventDate.setGravity(Gravity.CENTER_HORIZONTAL);
-        txtEventDate.setVisibility(View.VISIBLE);
 
         LinearLayout homeCalendarLayout = (LinearLayout) mRootView.findViewById(R.id.calendar_home_layout);
         // read events for the current day
@@ -43,6 +44,9 @@ public class CalendarHomeFragment extends Fragment {
         if (events.size() == 0) {
             hideCalendarHome();
             return mRootView;
+        } else {
+            imgCalendarIcon.setVisibility(View.VISIBLE);
+            txtEventDate.setVisibility(View.VISIBLE);
         }
 
         Calendar calendar = Calendar.getInstance();
