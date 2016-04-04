@@ -347,15 +347,16 @@ public class AccountActivity extends AppCompatActivity implements
         }
     }
 
-    private class RetrieveTokenTask extends AsyncTask<String, Void, String> {
+    public class RetrieveTokenTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
             String account = params[0];
-            String scopes = "oauth2:profile email";
+            //String scopes = "oauth2:profile email";
+            String scopes = "https://picasaweb.google.com/data/";
             String token = null;
             try {
-                token = GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);
+                token = GoogleAuthUtil.getToken(getApplicationContext(), account, "oauth2:" + scopes);
             } catch (IOException e) {
                 Log.e(Constants.TAG, e.getMessage());
             } catch (UserRecoverableAuthException e) {

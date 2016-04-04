@@ -65,6 +65,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
@@ -1086,7 +1087,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             public void run() {
                 /*try {
 
-                    *//*String imageTitle = "sm";
+                    /*String imageTitle = "sm";
                     int imageNumber = 1;
                     String contactLength = "47899";
                     URL url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername() + "/albumid/6222738226621199249");
@@ -1102,9 +1103,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     System.out.println(httpCon.getResponseCode());
                     System.out.println(httpCon.getResponseMessage());
                     out.close();
-                    imageNumber++;*//*
+                    imageNumber++;*/
 
-                    String imageTitle = "sm";
+                    /*String imageTitle = "sm";
                     int imageNumber = 1;
                     String contactLength = "16477";
                     Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),R.drawable.car_front);
@@ -1123,6 +1124,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     httpUrlConnection.setRequestProperty("Content-Type", "image/jpeg");
                     httpUrlConnection.setRequestProperty( "Content-Length", contactLength);
                     httpUrlConnection.setRequestProperty( "Slug", imageTitle+imageNumber);
+                    httpUrlConnection.setRequestProperty("Authorization", "GoogleLogin auth=" + mPreferences.getAccessToken());
 
                     DataOutputStream request = new DataOutputStream(
                             httpUrlConnection.getOutputStream());
@@ -1198,7 +1200,10 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     httpPost.setEntity(reqEntity);
                     response = httpClient.execute(httpPost);
 
-                    Log.i("PICASA UPLOAD ", "STATUS CODE : " + response.getStatusLine().getStatusCode());
+                    // String responseString = new BasicResponseHandler().handleResponse(response);
+                    // Log.i("PICASA UPLOAD ", "STATUS CODE : " + responseString);
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    Log.i("PICASA UPLOAD ", "STATUS CODE : " + response.getStatusLine() + "\n" + responseBody);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -1253,7 +1258,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                                 "</entry>";
 
                 try {
-                    postRequest.addHeader(new BasicHeader("GData-Version", "2.0"));
+                    postRequest.addHeader(new BasicHeader("GData-Version", "2"));
                     postRequest.addHeader(new BasicHeader("Authorization",
                             "GoogleLogin auth=" + mPreferences.getAccessToken()));
                     StringEntity entity = new StringEntity(content);
@@ -1264,7 +1269,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     HttpClient httpclient = new DefaultHttpClient();
                     HttpResponse response = httpclient.execute(postRequest);
                     String responseBody = EntityUtils.toString(response.getEntity());
-                    Log.i("ALBUM: ", responseBody);
+                    Log.i("PICASA ALBUM: ", "Response: " + response.getStatusLine() + "\n" + responseBody);
 
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
