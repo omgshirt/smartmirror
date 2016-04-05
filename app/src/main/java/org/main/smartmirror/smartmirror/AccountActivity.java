@@ -347,12 +347,13 @@ public class AccountActivity extends AppCompatActivity implements
         }
     }
 
-    private class RetrieveTokenTask extends AsyncTask<String, Void, String> {
+    public class RetrieveTokenTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
             String account = params[0];
-            String scopes = "oauth2:profile email";
+            String scopes = "oauth2:email";
+            //String scopes = "https://picasaweb.google.com/data/";
             String token = null;
             try {
                 token = GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);
@@ -370,6 +371,7 @@ public class AccountActivity extends AppCompatActivity implements
         protected void onPostExecute(String accessToken) {
             super.onPostExecute(accessToken);
             mPreference.setAccessToken(accessToken);
+            //mPreference.setAccessToken(accessToken.substring(6));
         }
     }
 }
