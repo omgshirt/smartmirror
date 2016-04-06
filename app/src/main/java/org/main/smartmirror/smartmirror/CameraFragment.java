@@ -46,14 +46,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.http.FileContent;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.FileList;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -96,17 +88,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
 
     private TextView mCountDownText;
-    private static Drive service;
-    private GoogleAccountCredential credential;
     private Preferences mPreferences;
 
     private String mAlbumID;
 
     //Gets current date and time to name pictures
     public static String dateTimeStr;
-
-    //Delay for Cheese
-    public static Handler cheeseHandler = new Handler();
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -115,10 +102,10 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
     static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
+        ORIENTATIONS.append(Surface.ROTATION_0, 0);//was 90
+        ORIENTATIONS.append(Surface.ROTATION_90, 90);//was 0
+        ORIENTATIONS.append(Surface.ROTATION_180, 180);//was 270
+        ORIENTATIONS.append(Surface.ROTATION_270, 270);//was 180
     }
 
     /**
@@ -326,7 +313,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                             mState = STATE_PICTURE_TAKEN;
                             captureStillPicture();
                         } else {
-                            runPrecaptureSequence();
+                            //runPrecaptureSequence();
+                            Log.i(Constants.TAG, "in process Method");
                         }
                     }
                     break;
@@ -449,20 +437,12 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         super.onCreate(savedInstanceState);
         mPreferences = Preferences.getInstance(getActivity());
         System.out.println("Username: " + mPreferences.getUsername() + " ACCESS TOKEN: " + mPreferences.getAccessToken());
-        //createNewPicasaAlbum();
-        //uploadToPicasa();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
         mCountDownText = (TextView) view.findViewById(R.id.count_down);
-        //credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
-        //String accountName = ("smartmirrortesting@gmail.com");
-        //String accountName = Preferences.mUserAccountPref;
-        //String accountName = mPreferences.getGmailAccount();
-        //credential.setSelectedAccountName(accountName);
-        // service = getDriveService(credential);
         return view;
     }
 
@@ -565,7 +545,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 CameraCharacteristics characteristics
                         = manager.getCameraCharacteristics(cameraId);
 
-                // We don't use the rear facing camera.
+                // We don't use the front facing camera.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     continue;
@@ -839,9 +819,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             public void onFinish() {
                 showCameraFeedback("cheese");
                 speakCountdown("cheese");
-                //lockFocus();
                 captureStillPicture();
-                Log.i(Constants.TAG, "Right after lockfocus");
             }
         }.start();
     }
@@ -849,69 +827,64 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     /**
      * Lock the focus as the first step for a still image capture.
      */
-    private void lockFocus() {
-        try {
-            Log.i(Constants.TAG, "Inside lockfocus first");
-            // This is how to tell the camera to lock focus.
-            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
-                    CameraMetadata.CONTROL_AF_TRIGGER_START);
-            Log.i(Constants.TAG, "After first lock focus statement");
-            // Tell #mCaptureCallback to wait for the lock.
-            mState = STATE_WAITING_LOCK;
-            Log.i(Constants.TAG, "After second lock focus statement");
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
-                    mBackgroundHandler);
-            Log.i(Constants.TAG, "After third lock focus statement");
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void lockFocus() {
+//        try {
+//            Log.i(Constants.TAG, "Inside lockfocus first");
+//            // This is how to tell the camera to lock focus.
+//            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
+//                    CameraMetadata.CONTROL_AF_TRIGGER_START);
+//            Log.i(Constants.TAG, "After first lock focus statement");
+//            // Tell #mCaptureCallback to wait for the lock.
+//            mState = STATE_WAITING_LOCK;
+//            Log.i(Constants.TAG, "After second lock focus statement");
+//            mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
+//                    mBackgroundHandler);
+//            Log.i(Constants.TAG, "After third lock focus statement");
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    /**
+//     * Run the precapture sequence for capturing a still image. This method should be called when
+//     * we get a response in {@link #mCaptureCallback} from {@link #lockFocus()}.
+//     */
+//    private void runPrecaptureSequence() {
+//        try {
+//            // This is how to tell the camera to trigger.
+//            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+//                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+//            Log.i(Constants.TAG, "After first runPrecaptureSequence statement");
+//            // Tell #mCaptureCallback to wait for the precapture sequence to be set.
+//            mState = STATE_WAITING_PRECAPTURE;
+//            Log.i(Constants.TAG, "After second runPreCapSequence statement");
+//            mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
+//                    mBackgroundHandler);
+//            Log.i(Constants.TAG, "After third runPReCapSequence statement");
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-    /**
-     * Run the precapture sequence for capturing a still image. This method should be called when
-     * we get a response in {@link #mCaptureCallback} from {@link #lockFocus()}.
-     */
-    private void runPrecaptureSequence() {
-        try {
-            // This is how to tell the camera to trigger.
-            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
-                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
-            Log.i(Constants.TAG, "After first runPrecaptureSequence statement");
-            // Tell #mCaptureCallback to wait for the precapture sequence to be set.
-            mState = STATE_WAITING_PRECAPTURE;
-            Log.i(Constants.TAG, "After second runPreCapSequence statement");
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
-                    mBackgroundHandler);
-            Log.i(Constants.TAG, "After third runPReCapSequence statement");
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Capture a still picture. This method should be called when we get a response in
-     * {@link #mCaptureCallback} from both {@link #lockFocus()}.
-     */
+//    /**
+//     * Capture a still picture. This method should be called when we get a response in
+//     * {@link #mCaptureCallback} from both {@link #lockFocus()}.
+//     */
     private void captureStillPicture() {
         try {
-            Log.i(Constants.TAG, "First line in captureStillPicture");
             final Activity activity = getActivity();
             if (null == activity || null == mCameraDevice) {
                 return;
             }
-            Log.i(Constants.TAG, "After if in captureStillPicture");
             // This is the CaptureRequest.Builder that we use to take a picture.
             final CaptureRequest.Builder captureBuilder =
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            Log.i(Constants.TAG, "after final CaptureRequest in captureSTillPicture");
             captureBuilder.addTarget(mImageReader.getSurface());
-            Log.i(Constants.TAG, "after captureBuilder add Target");
             // Use the same AE and AF modes as the preview.
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
                     CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             captureBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-            Log.i(Constants.TAG, "After setting autofocus and flash modes in captureStillPicture");
 
             // Orientation
             int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -924,7 +897,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    //showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
@@ -985,7 +957,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             try {
                 FileOutputStream output = new FileOutputStream(mFile);
                 output.write(bytes);
-                //saveFileToDrive();
                 uploadToPicasa();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1008,38 +979,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         }
     }
 
-    private Drive getDriveService(GoogleAccountCredential credential) {
-        return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
-                .build();
-    }
-
-    private void saveFileToDrive() {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // File's binary content
-                    java.io.File fileContent = new java.io.File(mFile.getPath());
-                    FileContent mediaContent = new FileContent("image/jpeg", fileContent);
-
-                    // File's metadata.
-                    com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-                    body.setTitle(fileContent.getName());
-                    body.setMimeType("image/jpeg");
-
-                    com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-                    retrieveAllFiles(service);
-                    // showCameraFeedback("Upload to Drive Successful!");
-                } catch (UserRecoverableAuthIOException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        t.start();
-    }
-
     public static String getCurrentDateTime() {
         Date curDateTime = new Date();
         SimpleDateFormat format = new SimpleDateFormat();
@@ -1054,28 +993,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public static void setCurrentDateTime(String dateTimeString) {
         dateTimeStr = dateTimeString;
     }
-
-    public static List<com.google.api.services.drive.model.File> retrieveAllFiles(Drive service) throws IOException {
-        List<com.google.api.services.drive.model.File> result = new ArrayList<com.google.api.services.drive.model.File>();
-        Drive.Files.List request = service.files().list();
-
-        do {
-            try {
-                FileList files = request.execute();
-
-                result.addAll(files.getItems());
-                request.setPageToken(files.getNextPageToken());
-            } catch (IOException e) {
-                System.out.println("An error occurred: " + e);
-                request.setPageToken(null);
-            }
-        } while (request.getPageToken() != null &&
-                request.getPageToken().length() > 0);
-
-        Log.i("DRIVE ID", result.toString());
-        return result;
-    }
-
 
     public void uploadToPicasa() {
         new Thread() {
