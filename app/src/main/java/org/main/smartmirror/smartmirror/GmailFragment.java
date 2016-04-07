@@ -268,6 +268,8 @@ public class GmailFragment extends Fragment {
 
                     Message message2 = mService.users().messages().get(user, message.getId()).execute();
 
+                    Message message1 = mService.users().messages().modify(user, message.getId(), mods).execute();
+
                     int headerSize = message2.getPayload().getHeaders().size();
 
                     //Get who message is from
@@ -316,7 +318,7 @@ public class GmailFragment extends Fragment {
                 textViewSubject.setVisibility(View.VISIBLE);
                 textViewTo.setText("To: " + mTo + "\n");
                 textViewFrom.setText("From: " + mFrom + "\n");
-                textViewSubject.setText("Subject: " + mSubject + "\n");
+                textViewSubject.setText("Subject: " + mSubject);
                 textViewBody.setText(mBody);
                 mCallback.onNextCommand();
             }
