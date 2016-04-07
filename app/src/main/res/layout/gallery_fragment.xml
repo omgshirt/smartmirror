@@ -10,10 +10,4 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true" />
 
-    <TextView
-        android:id="@+id/image_facts"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:textColor="@color/white" />
-
 </LinearLayout>
