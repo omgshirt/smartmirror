@@ -127,7 +127,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
                     .getJSONObject(0);
             double tripDistance = Double.parseDouble(splitString(data.getJSONObject("distance").getString("text")));
             String tripTime = data.getJSONObject("duration").getString("text");
-            double tripTimeTraffic = Double.parseDouble(splitString(data.getJSONObject("duration_in_traffic").getString("text")));
+            // double tripTimeTraffic = Double.parseDouble(splitString(data.getJSONObject("duration_in_traffic").getString("text")));
 
             String units = "kilometers";
             if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {

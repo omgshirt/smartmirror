@@ -42,6 +42,7 @@ public class Constants {
 
     //--------------FACEBOOK-------------
     public static final String FACEBOOK_URL = "https://m.facebook.com/";
+    public static final String FACEBOOK_SMARTMIRROR = "https://m.facebook.com/Smart-Mirror-384754131698096";
 
     //--------------FRAGMENTS------------
     public static final String CALENDAR = "calendar";
