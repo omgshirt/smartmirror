@@ -118,7 +118,8 @@ public class Preferences implements LocationListener {
     private String mTokenId;
     private String mTwitterAccount;
 
-    private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
+    //private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
+    private String mDateFormat = "EEE MMM d";
     public static final String TIME_FORMAT_24_HR = "H:mm";
     public static final String TIME_FORMAT_24_HR_SHORT = "H:mm";
     public static final String TIME_FORMAT_12_HR = "h:mm";

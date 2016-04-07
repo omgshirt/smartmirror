@@ -4,8 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
     tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
     <!-- Date and time -->
     <LinearLayout
@@ -19,28 +17,26 @@
             android:id="@+id/time_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="40sp" />
+            android:textSize="22sp" />
 
         <TextClock
             android:id="@+id/date_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:textSize="30sp" />
+            android:layout_marginStart="10dp"
+            android:textSize="22sp" />
     </LinearLayout>
 
     <include
         android:id="@+id/date_divider"
-        layout="@layout/line_divider"
-        />
+        layout="@layout/line_divider" />
 
     <!-- WeatherLayout: Current weather and hourly forecasts -->
     <LinearLayout
         android:id="@+id/layout_weather"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginBottom="3dp"
         android:orientation="vertical">
 
         <!-- Weather Alerts -->
@@ -48,41 +44,50 @@
             android:id="@+id/alert_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:ellipsize="marquee"
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
             android:textColor="#d1735c"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:visibility="gone" />
 
         <!-- Current weather, temp and humidity-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="3">
 
             <!-- current conditions icon -->
-            <TextView
-                android:id="@+id/weather_icon"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:textSize="40sp" />
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_gravity="start">
 
-            <!-- current temp -->
-            <TextView
-                android:id="@+id/current_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:textSize="40sp" />
+                <TextView
+                    android:id="@+id/weather_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="40sp" />
+
+                <!-- current temp -->
+                <TextView
+                    android:id="@+id/current_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="40sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="20dp"
-                android:gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
                 android:orientation="vertical">
 
                 <!-- current humidity -->
@@ -103,7 +108,8 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center_vertical"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <!-- daily high -->
@@ -131,7 +137,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="7">
+            android:weightSum="6">
 
             <include
                 android:id="@+id/forecast_1"

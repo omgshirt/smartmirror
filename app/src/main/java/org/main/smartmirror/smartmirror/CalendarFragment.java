@@ -35,9 +35,8 @@ public class CalendarFragment extends Fragment {
 
         // Display error if no events found
         if (events.size() == 0) {
-            TextView noEvents = new TextView(getContext());
-            noEvents.setText(getContext().getString(R.string.calendar_items_err));
-            noEvents.setTextSize(26);
+            TextView noEvents = ErrorMessageFactory.buildErrorMessage(getContext(),
+                    getContext().getString(R.string.calendar_items_err));
             calendarLayout.addView(noEvents);
             return rootView;
         }

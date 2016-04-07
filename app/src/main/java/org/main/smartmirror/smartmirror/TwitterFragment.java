@@ -78,7 +78,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
 
     public void renderTwitter() {
         ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
-        CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
+        CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects, false);
         try {
             for(int i = 0; i < 10; i++){
                 CustomListViewObject co = new CustomListViewObject(mUsers.get(i),mTweets.get(i),mUri.get(i),null);

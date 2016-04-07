@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/list_twitter"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/twitter_title"
+        android:textSize="22sp" />
+
+    <include layout="@layout/line_divider" />
+
+    <ListView
+        android:id="@+id/list_twitter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
 

@@ -3,8 +3,7 @@
     android:id="@+id/news_body_fragment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="15dp">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/txtHeadline"
@@ -25,7 +24,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="News Body"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="15sp" />
     </ScrollView>

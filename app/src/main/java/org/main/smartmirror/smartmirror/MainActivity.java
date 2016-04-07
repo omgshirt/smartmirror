@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity
 
 
     // Set initial fragments & track displayed views
-    private String mInitialFragment = Constants.NEWS;
+    private String mInitialFragment = Constants.WORLD;
     private Stack<Fragment> mForwardStack;
 
     // FrameSize maintains the size of the content window between state changes

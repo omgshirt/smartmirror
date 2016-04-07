@@ -380,12 +380,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     " " + mCurrentWind + " " + windFormat;
             txtCurrentWind.setText(windSpeed);
 
-
-            // ---------------- 3-Day Forecast ---------------
-            /*
-                Moved to ForecastFragment
-            */
-
             JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
             JSONObject today = dailyData.getJSONObject(0);
             forecastToday = new DailyForecast(today);
@@ -395,18 +389,10 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     forecastToday.sunrise * 1000,
                     forecastToday.sunset * 1000);
 
-            // Set the dailyHigh and dailyLow
-            /*
-            String maxTemp= getActivity().getString(R.string.weather_therm_high) + " " +
-                    forecastToday.maxTemp + weatherDeg;
-                    */
+            // Set dailyHigh and dailyLow
             String maxTemp = "High " + forecastToday.maxTemp + weatherDeg;
             txtDailyHigh.setText(maxTemp);
 
-            /*
-            String minTemp = getActivity().getString(R.string.weather_therm_low) + " " +
-                    forecastToday.minTemp + weatherDeg;
-                    */
             String minTemp = "Low  " + forecastToday.minTemp + weatherDeg;
             txtDailyLow.setText(minTemp);
 
@@ -601,7 +587,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
      */
     public static String getDirectionFromBearing(final int bearing) {
         if (bearing < 0 || bearing > 360) return "error";
-        String[] directions = {"North", "NEast", "East", "SEast", "South", "SWest", "West", "NWest"};
+        String[] directions = {"North", "N East", "East", "S East", "South", "S West", "West", "N West"};
         int index = ((int) ((bearing + 22.5) / 45)) % 8;
         return directions[index];
     }

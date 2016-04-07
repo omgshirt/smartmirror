@@ -8,8 +8,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/settings_title"
+            android:textSize="22sp" />
+
+        <include layout="@layout/line_divider" />
 
         <Switch
             android:id="@+id/switch_speech_enabled"
@@ -64,10 +72,14 @@
         <!-- Change Log In -->
         <Button
             android:id="@+id/change_account_button"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_margin="6dp"
-            android:padding="3dp"
-            android:text="Account Setup" />
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="@string/settings_account_btn" />
     </LinearLayout>
 </ScrollView>

@@ -53,7 +53,6 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     private ArrayList<String> mSnippet = new ArrayList<String>();
     private ArrayList<Uri> mImageURI = new ArrayList<Uri>();
     private ArrayList<String> mFullArticle = new ArrayList<String>();
-    private ArrayList<String> mArticleNumber = new ArrayList<>();
 
     private int newsFeedPosition = 0;
 
@@ -82,9 +81,10 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
         newsFeed = (ListView) view.findViewById(R.id.list_news);
 
         mNewsSection = getArguments().getString("newsSection");
+        if (mNewsSection.length() > 1) {
+            txtNewsDesk.setText(mNewsSection.substring(0, 1).toUpperCase() + mNewsSection.substring(1));
+        }
         mGuardAPIKey = getString(R.string.guardian_api_key); // the guardian api key
-
-        txtNewsDesk.setText(mNewsSection.toUpperCase());
 
         return view;
     }
@@ -158,7 +158,7 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                     toNewsBodyFragment(9);
                     break;
                 default:
-                    txtNewsDesk.setText(mNewsSection.toUpperCase());
+                    //txtNewsDesk.setText(mNewsSection.toUpperCase());
 
             }
 
@@ -299,36 +299,17 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
             Log.e("NEWS ERROR", e.toString());
         }
 
-        addToArrayList(mArticleNumber);
         ArrayList<CustomListViewObject> objects = new ArrayList<CustomListViewObject>();
-        CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects);
+        CustomAdapter customAdapter = new CustomAdapter(getActivity(), objects, true);
         try {
             for(int j = 0; j < numArticles; j++){
-                CustomListViewObject co = new CustomListViewObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j), mArticleNumber.get(j));
+                CustomListViewObject co = new CustomListViewObject(mHeadline.get(j),mSnippet.get(j),mImageURI.get(j), Integer.toString(j+1));
                 objects.add(co);
                 customAdapter.notifyDataSetChanged();
             }
 
         } catch (Exception e) {Log.i("NEWS", e.toString());}
         newsFeed.setAdapter(customAdapter);
-    }
-
-    private void addToArrayList(ArrayList<String> arrayList) {
-        arrayList.add("1");
-        arrayList.add("2");
-        arrayList.add("3");
-        arrayList.add("4");
-        arrayList.add("5");
-        arrayList.add("6");
-        arrayList.add("7");
-        arrayList.add("8");
-        arrayList.add("9");
-        arrayList.add("10");
-        arrayList.add("11");
-        arrayList.add("12");
-        arrayList.add("13");
-        arrayList.add("14");
-        arrayList.add("15");
     }
 
     /**

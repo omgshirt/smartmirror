@@ -202,13 +202,13 @@ public class GmailHomeFragment extends Fragment {
 
             if(messageResponse.size() == 1){
                 numUnreadPrimary = 0;
-            }else {
+            } else {
 
-                Log.i(Constants.TAG, "Message Response: " + messageResponse.size());
+                //Log.i(Constants.TAG, "Message Response: " + messageResponse.size());
 
                 List<Message> messages = messageResponse.getMessages();
                 numUnreadPrimary = messages.size();
-                Log.i(Constants.TAG, "Messages: " + messages.toString());
+                //Log.i(Constants.TAG, "Messages: " + messages.toString());
             }
             List<String> labels = new ArrayList<String>();
             return labels;
