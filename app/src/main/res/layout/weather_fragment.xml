@@ -28,7 +28,7 @@
     </LinearLayout>
 
     <include
-        android:id="@+id/date_divider"
+        android:id="@+id/time_divider"
         layout="@layout/line_divider" />
 
     <!-- WeatherLayout: Current weather and hourly forecasts -->

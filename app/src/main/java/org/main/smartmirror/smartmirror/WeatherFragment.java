@@ -31,10 +31,9 @@ import java.util.Locale;
 
 
 /**
- * Fragment that displays the weather information
- * <p/>
+ * Fragment that displays current weather information
+ *
  * Commands :
- * "forecast" speaks the 3-day forecast
  * "conditions" speaks the current conditions
  */
 public class WeatherFragment extends Fragment implements CacheManager.CacheListener {
@@ -43,6 +42,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     Preferences mPreferences;
 
     private LinearLayout layTimeLayout;
+    private View layTimeDivider;
     private LinearLayout layWeatherLayout;
     private TextView txtWeatherIcon;
     private TextClock clkTime;
@@ -96,6 +96,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         View view = inflater.inflate(R.layout.weather_fragment, container, false);
 
         layTimeLayout = (LinearLayout) view.findViewById(R.id.layout_time);
+        layTimeDivider = (View) view.findViewById(R.id.time_divider);
         layWeatherLayout = (LinearLayout) view.findViewById(R.id.layout_weather);
         txtCurrentHumidity = (TextView) view.findViewById(R.id.current_humidity);
         txtCurrentTemp = (TextView) view.findViewById(R.id.current_temp);
@@ -178,7 +179,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     showWeather();
                     break;
                 case Constants.TIME:
-                    // TODO: move this broadcast receiver into Mira?
                     Mira mira = Mira.getInstance((MainActivity)getActivity());
                     mira.sayCurrentTime();
                     break;
@@ -251,11 +251,13 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     public void hideTime() {
         layTimeLayout.setVisibility(View.GONE);
+        layTimeDivider.setVisibility(View.GONE);
         saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
     public void showTime() {
         layTimeLayout.setVisibility(View.VISIBLE);
+        layTimeDivider.setVisibility(View.VISIBLE);
         saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
