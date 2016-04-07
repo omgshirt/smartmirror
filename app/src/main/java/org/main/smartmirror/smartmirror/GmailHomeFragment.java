@@ -46,7 +46,6 @@ public class GmailHomeFragment extends Fragment {
     public ImageView mailIcon;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private String PREF_ACCOUNT_NAME = "";
     public int numUnreadPrimary;
     public int numUnreadPrevious;
     private Preferences mPreference;
@@ -215,7 +214,6 @@ public class GmailHomeFragment extends Fragment {
         @Override
         protected void onPostExecute(List<String> output) {
             if(numUnreadPrevious<numUnreadPrimary) {
-                //Here is where Mira says,"You have new mail"
                 speakNewNotifications();
                 numUnreadPrevious = numUnreadPrimary;
             }

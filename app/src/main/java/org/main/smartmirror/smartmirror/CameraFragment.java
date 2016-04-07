@@ -823,52 +823,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         }.start();
     }
 
-    /**
-     * Lock the focus as the first step for a still image capture.
-     */
-//    private void lockFocus() {
-//        try {
-//            Log.i(Constants.TAG, "Inside lockfocus first");
-//            // This is how to tell the camera to lock focus.
-//            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
-//                    CameraMetadata.CONTROL_AF_TRIGGER_START);
-//            Log.i(Constants.TAG, "After first lock focus statement");
-//            // Tell #mCaptureCallback to wait for the lock.
-//            mState = STATE_WAITING_LOCK;
-//            Log.i(Constants.TAG, "After second lock focus statement");
-//            mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
-//                    mBackgroundHandler);
-//            Log.i(Constants.TAG, "After third lock focus statement");
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    /**
-//     * Run the precapture sequence for capturing a still image. This method should be called when
-//     * we get a response in {@link #mCaptureCallback} from {@link #lockFocus()}.
-//     */
-//    private void runPrecaptureSequence() {
-//        try {
-//            // This is how to tell the camera to trigger.
-//            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
-//                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
-//            Log.i(Constants.TAG, "After first runPrecaptureSequence statement");
-//            // Tell #mCaptureCallback to wait for the precapture sequence to be set.
-//            mState = STATE_WAITING_PRECAPTURE;
-//            Log.i(Constants.TAG, "After second runPreCapSequence statement");
-//            mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
-//                    mBackgroundHandler);
-//            Log.i(Constants.TAG, "After third runPReCapSequence statement");
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-//    /**
-//     * Capture a still picture. This method should be called when we get a response in
-//     * {@link #mCaptureCallback} from both {@link #lockFocus()}.
-//     */
     private void captureStillPicture() {
         try {
             final Activity activity = getActivity();

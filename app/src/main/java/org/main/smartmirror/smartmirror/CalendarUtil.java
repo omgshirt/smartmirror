@@ -31,11 +31,9 @@ public class CalendarUtil {
     public static String dateToStr;
     public static final int ONE_DAY = 86400000;
     public static final int LOOK_AHEAD = ONE_DAY * 10;
-    public static final int TEN_HOURS = 36000000;
 
     public static final int CALENDAR_ID = 0;
     public static final int EVENT_NAME = 1;
-    public static final int EVENT_DESC = 2;
     public static final int EVENT_START = 3;
     public static final int EVENT_END = 4;
     public static final int EVENT_LOC = 5;
