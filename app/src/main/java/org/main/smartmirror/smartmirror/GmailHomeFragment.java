@@ -79,7 +79,6 @@ public class GmailHomeFragment extends Fragment {
             @Override
             public void run() {
                 numUnreadPrevious = numUnreadPrimary;
-                Log.i(Constants.TAG, "Previous" + numUnreadPrevious);
                 new MakeRequestTask(mCredential).execute();
 
             }
@@ -202,13 +201,8 @@ public class GmailHomeFragment extends Fragment {
             if(messageResponse.size() == 1){
                 numUnreadPrimary = 0;
             }else {
-
-                Log.i(Constants.TAG, "Message Response: " + messageResponse.size());
-
                 List<Message> messages = messageResponse.getMessages();
                 numUnreadPrimary = messages.size();
-                Log.i(Constants.TAG, "Messages: " + messages.toString());
-
             }
             List<String> labels = new ArrayList<String>();
             return labels;
@@ -223,7 +217,6 @@ public class GmailHomeFragment extends Fragment {
             if(numUnreadPrevious<numUnreadPrimary) {
                 //Here is where Mira says,"You have new mail"
                 speakNewNotifications();
-                Log.i(Constants.TAG, "UnreadCountIncreased: updating");
                 numUnreadPrevious = numUnreadPrimary;
             }
             displayEmailCount();

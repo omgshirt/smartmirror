@@ -49,7 +49,6 @@ public class GmailFragment extends Fragment {
     public String mFrom;
     public TextView textViewSubject;
     public String mSubject;
-   // public ListView listViewBody;
     public String mBody;
 
     public ScrollView scrollViewBody;
@@ -57,7 +56,6 @@ public class GmailFragment extends Fragment {
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private String PREF_ACCOUNT_NAME = "";
 
     //SCOPES - Note: When adding/deleting scopes, it is necessary to reauthorize by:
     //               1. Remove SmartMirror from Google Account by going to Connected Apps and Services
@@ -77,7 +75,7 @@ public class GmailFragment extends Fragment {
 
     //Interface for updating Gmail Unread Count
     public interface OnNextMessageListener {
-        public void onNextCommand();
+        void onNextCommand();
     }
 
 
@@ -178,7 +176,7 @@ public class GmailFragment extends Fragment {
         if (isDeviceOnline()) {
             new MakeRequestTask(mCredential).execute();
         }else{
-            Log.i(Constants.TAG, "SOMETHING WRONG HERE");
+            Log.i(Constants.TAG, "Error in GmailFragment");
         }
     }
 
@@ -238,9 +236,7 @@ public class GmailFragment extends Fragment {
                 return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
-                Log.i(Constants.TAG, "CATCHING EXCEPTION E");
                 cancel(true);
-                Log.i(Constants.TAG, mLastError.toString());
                 return null;
             }
         }
@@ -273,8 +269,6 @@ public class GmailFragment extends Fragment {
                 for (Message message : messages) {
 
                     Message message2 = mService.users().messages().get(user, message.getId()).execute();
-
-                    Message message1 = mService.users().messages().modify(user, message.getId(), mods).execute();
 
                     int headerSize = message2.getPayload().getHeaders().size();
 
@@ -326,9 +320,6 @@ public class GmailFragment extends Fragment {
                 textViewFrom.setText("From: " + mFrom + "\n");
                 textViewSubject.setText("Subject: " + mSubject + "\n");
                 textViewBody.setText(mBody);
-//                ArrayAdapter<String> arrayAdapter =
-//                        new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
-                //listViewBody.setAdapter(arrayAdapter);
                 mCallback.onNextCommand();
             }
         }

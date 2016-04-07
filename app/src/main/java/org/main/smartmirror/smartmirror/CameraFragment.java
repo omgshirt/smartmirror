@@ -314,7 +314,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                             captureStillPicture();
                         } else {
                             //runPrecaptureSequence();
-                            Log.i(Constants.TAG, "in process Method");
                         }
                     }
                     break;
@@ -1001,9 +1000,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 String url = "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername()
                         + "/albumid/" + album;
                 HttpClient httpClient = new DefaultHttpClient();
-                Log.i(Constants.TAG, "Before creating file");
                 File file = new File(mFile.getPath());
-                Log.i(Constants.TAG, "After setting File: " + mFile.getPath().toString());
                 HttpPost httpPost = new HttpPost(url);
                 httpPost.setHeader("GData-Version", "2");
                 httpPost.setHeader("Content-type", "image/jpeg");
