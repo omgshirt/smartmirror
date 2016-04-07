@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -54,6 +53,8 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     private Runnable mRunnable;
     private Activity activity;
     private Boolean isTaskCancelled = false;
+
+    public static int mPhotosReferencePoint;
 
     public PhotosASyncTask(Activity activity, String uid, String username) {
         this.activity = activity;
@@ -136,7 +137,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
         if (node.getNodeName().equals("media:content")) {
             Element durationElement = (Element) node;
             imageUrl = durationElement.getAttribute("url");
-            Log.i("PHOTO URL", imageUrl);
+            //Log.i("PHOTO URL", imageUrl);
             PhotosFragment.mImageUrlList.add(Uri.parse(imageUrl));
         }
     }
@@ -152,9 +153,9 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
         if (node.getNodeName().equals("gphoto:id")) {
             albumID = node.getTextContent();
-            Log.i("ALBUM ID node", albumID);
+            //Log.i("ALBUM ID node", albumID);
             PhotosFragment.mAlbumIdList.add(albumID);
-            Log.i("ALBUM IDs", PhotosFragment.mAlbumIdList.toString());
+            //Log.i("ALBUM IDs", PhotosFragment.mAlbumIdList.toString());
 
         }
     }
@@ -170,15 +171,15 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
                     try {
                         if (!isCancelled()) {
                             Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.
-                                    get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                                    get(PhotosFragment.mCurrentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
                         } else if (isCancelled()) isTaskCancelled = true;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    currentPhoto++;
+                    PhotosFragment.mCurrentPhoto++;
                     if (currentPhoto > PhotosFragment.mImageUrlList.size() - 1) {
                         if (!isCancelled()) {
-                            currentPhoto = 0;
+                            PhotosFragment.mCurrentPhoto = 0;
                         } else if (isCancelled()) {
                             Log.i("Cancelled?", isTaskCancelled.toString());
                             mTimerTask.cancel();
@@ -204,5 +205,6 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
         PhotosFragment.mCacheManager.addCache(PhotosFragment.PHOTO_CACHE, data, PhotosFragment.DATA_UPDATE_FREQUENCY);
         Log.i("PHOTOS CACHE", "updating " + PhotosFragment.PHOTO_CACHE);
     }
+
 
 }

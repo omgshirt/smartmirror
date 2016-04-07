@@ -977,6 +977,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     // Log.i("PICASA UPLOAD ", "STATUS CODE : " + responseString);
                     String responseBody = EntityUtils.toString(response.getEntity());
                     Log.i("PICASA UPLOAD ", "STATUS CODE : " + response.getStatusLine() + "\n" + responseBody);
+                    if(response.getStatusLine().equals("201")) {
+                        showToast("Photo Uploaded Successfully");
+                    }
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -1024,6 +1027,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     HttpResponse response = httpclient.execute(postRequest);
                     String responseBody = EntityUtils.toString(response.getEntity());
                     //Log.i("PICASA ALBUM: ", "Response: " + response.getStatusLine() + "\n" + responseBody);
+                    if(response.getStatusLine().equals("201")) {
+                        showToast("New Album Created Successfully");
+                    }
                     try {
                         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                                 .parse(new InputSource(new StringReader(responseBody)));

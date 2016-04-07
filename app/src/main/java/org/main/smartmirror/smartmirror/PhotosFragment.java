@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 
-public class PhotosFragment extends Fragment implements CacheManager.CacheListener {
+public class PhotosFragment extends Fragment implements CacheManager.CacheListener{
 
     public static ImageView mPhotoFromPicasa;
     public static ArrayList<Uri> mImageUrlList = new ArrayList<Uri>();
@@ -29,6 +29,8 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
 
     private PhotosASyncTask mAsyncTask;
     private Preferences mPreference;
+
+    public static int mCurrentPhoto = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -139,5 +141,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
         ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.PHOTOS, true);
         ((MainActivity) getActivity()).speakText(getResources().getString(R.string.speech_not_logged_in_err));
     }
+
+
 
 }
