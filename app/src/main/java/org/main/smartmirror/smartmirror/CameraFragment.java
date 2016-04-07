@@ -102,10 +102,10 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
     static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 0);//was 90
-        ORIENTATIONS.append(Surface.ROTATION_90, 90);//was 0
-        ORIENTATIONS.append(Surface.ROTATION_180, 180);//was 270
-        ORIENTATIONS.append(Surface.ROTATION_270, 270);//was 180
+        ORIENTATIONS.append(Surface.ROTATION_0, 90);//was 90/0
+        ORIENTATIONS.append(Surface.ROTATION_90, 0);//was 0/90
+        ORIENTATIONS.append(Surface.ROTATION_180, 270);//was 270/180
+        ORIENTATIONS.append(Surface.ROTATION_270, 180);//was 180/270
     }
 
     /**
@@ -546,7 +546,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
                 // We don't use the front facing camera.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
 

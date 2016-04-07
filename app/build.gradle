@@ -59,9 +59,6 @@ dependencies {
     compile('com.google.api-client:google-api-client-android:1.20.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    compile('com.google.apis:google-api-services-drive:v2-rev170-1.20.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
     compile('com.google.apis:google-api-services-gmail:v1-rev29-1.20.0') {
         exclude group: 'org.apache.httpcomponents'
     }
