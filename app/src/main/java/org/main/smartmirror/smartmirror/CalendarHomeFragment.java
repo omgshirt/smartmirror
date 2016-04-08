@@ -39,7 +39,7 @@ public class CalendarHomeFragment extends Fragment {
         txtEventDate.setText("Today's Events");
         txtEventDate.setGravity(Gravity.CENTER_HORIZONTAL);
 
-        View lineDivider = todaysEventsLayout.findViewById(R.id.line_divider);
+        View lineDivider = todaysEventsLayout.findViewById(R.id.calendar_day_divider);
         // read events for the current day
         List<CalendarEvent> events = CalendarUtil.getCalendarEvents(getContext(), CalendarUtil.ONE_DAY);
 

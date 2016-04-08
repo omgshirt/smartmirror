@@ -134,7 +134,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
                 units = "miles";
             }
 
-            txtDestination.setText("Destination: " + mPreference.getWorkLocation());
+            txtDestination.setText(mPreference.getWorkLocation());
             txtDistance.setText("" + tripDistance + " " + units);
             txtTravelTime.setText(tripTime);
         } catch (JSONException e) {
