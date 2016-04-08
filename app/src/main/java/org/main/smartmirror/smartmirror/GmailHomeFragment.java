@@ -85,7 +85,7 @@ public class GmailHomeFragment extends Fragment {
 
         // set a thread to check update in gmailUnreadCount.
         if (unreadCountScheduler == null) {
-            unreadCountScheduler = scheduler.scheduleAtFixedRate(messageCountUpdater, 10, 10, TimeUnit.SECONDS);
+            unreadCountScheduler = scheduler.scheduleAtFixedRate(messageCountUpdater, 10, 60, TimeUnit.SECONDS);
         }
 
         return view;
