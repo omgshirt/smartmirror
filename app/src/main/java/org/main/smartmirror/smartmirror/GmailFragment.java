@@ -15,8 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -48,12 +47,13 @@ public class GmailFragment extends Fragment {
     public String mFrom;
     public TextView textViewSubject;
     public String mSubject;
-    public ListView listViewBody;
     public String mBody;
+
+    public ScrollView scrollViewBody;
+    public TextView textViewBody;
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private String PREF_ACCOUNT_NAME = "";
 
     //SCOPES - Note: When adding/deleting scopes, it is necessary to reauthorize by:
     //               1. Remove SmartMirror from Google Account by going to Connected Apps and Services
@@ -73,7 +73,7 @@ public class GmailFragment extends Fragment {
 
     //Interface for updating Gmail Unread Count
     public interface OnNextMessageListener {
-        public void onNextCommand();
+        void onNextCommand();
     }
 
 
@@ -103,7 +103,8 @@ public class GmailFragment extends Fragment {
         textViewTo = (TextView)view.findViewById(R.id.messageTo);
         textViewFrom = (TextView)view.findViewById(R.id.messageFrom);
         textViewSubject = (TextView)view.findViewById(R.id.messageSubject);
-        listViewBody = (ListView) view.findViewById(R.id.messageBody);
+        scrollViewBody = (ScrollView) view.findViewById(R.id.scroll_view_body);
+        textViewBody = (TextView) view.findViewById(R.id.messageBody);
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -124,22 +125,12 @@ public class GmailFragment extends Fragment {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
-            Log.d("GmailArrayList ", "Got message:\"" + message +"\"");
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
-                int position = 0;
-                if (message.contains(Constants.SCROLL_DOWN)) {
-                    position = position + 5;
-                } else if (message.contains(Constants.SCROLL_UP)) {
-                    position = position - 5;
-                    if (position < 0) position = 0;
-                }
                 VoiceScroll sl = new VoiceScroll();
-                sl.scrollListView(message, listViewBody, position);
+                sl.scrollScrollView(message,scrollViewBody);
             }
             else if(message.contains(Constants.NEXT)){
-                Log.i(Constants.TAG, "In Broadcast Listener");
                 displayNextMessage();
             }
         }
@@ -183,7 +174,7 @@ public class GmailFragment extends Fragment {
         if (isDeviceOnline()) {
             new MakeRequestTask(mCredential).execute();
         }else{
-            Log.i(Constants.TAG, "SOMETHING WRONG HERE");
+            Log.i(Constants.TAG, "Error in GmailFragment");
         }
     }
 
@@ -239,14 +230,11 @@ public class GmailFragment extends Fragment {
          */
         @Override
         protected List<String> doInBackground(Void... params) {
-            try { Log.i(Constants.TAG, " GET DATA TEST");
+            try {
                 return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
-                Log.i(Constants.TAG, "CATCHING EXCEPTION E");
                 cancel(true);
-                Log.i(Constants.TAG, mLastError.toString());
-                // Log.i(Constants.TAG, isCancelled() + "ISCANCELLED TEST");
                 return null;
             }
         }
@@ -257,7 +245,6 @@ public class GmailFragment extends Fragment {
          * @throws IOException
          */
         private List<String> getDataFromApi() throws IOException {
-
             // Get the labels in the user's account.
             String user = "me";
             String query = "in:inbox is:unread category:primary";
@@ -309,7 +296,6 @@ public class GmailFragment extends Fragment {
                     messageList.add(mBody);
                 }
             }
-            Log.i(Constants.TAG, "TEST CHECK WHEN NEW TASK CREATED");
             return messageList;
         }
 
@@ -332,18 +318,14 @@ public class GmailFragment extends Fragment {
                 textViewSubject.setVisibility(View.VISIBLE);
                 textViewTo.setText("To: " + mTo + "\n");
                 textViewFrom.setText("From: " + mFrom + "\n");
-                textViewSubject.setText("Subject: " + mSubject + "\n");
-                ArrayAdapter<String> arrayAdapter =
-                        new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, messageList);
-                listViewBody.setAdapter(arrayAdapter);
+                textViewSubject.setText("Subject: " + mSubject);
+                textViewBody.setText(mBody);
                 mCallback.onNextCommand();
             }
         }
     }
 
     public void displayNextMessage(){
-        Log.i(Constants.TAG, "In displayNextMEssage Before");
         new MakeRequestTask(mCredential).execute();
-        Log.i(Constants.TAG, "In displayNextMEssage After");
     }
 }

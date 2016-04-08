@@ -46,8 +46,8 @@ public class GmailHomeFragment extends Fragment {
     public ImageView mailIcon;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private String PREF_ACCOUNT_NAME = "";
     public int numUnreadPrimary;
+    public int numUnreadPrevious;
     private Preferences mPreference;
     private static final String[] SCOPES = { GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM };
 
@@ -77,12 +77,9 @@ public class GmailHomeFragment extends Fragment {
         final Runnable messageCountUpdater = new Runnable() {
             @Override
             public void run() {
-                int numUnreadPrevious = numUnreadPrimary;
+                numUnreadPrevious = numUnreadPrimary;
                 new MakeRequestTask(mCredential).execute();
-                if(numUnreadPrevious<numUnreadPrimary) {
-                    //Here is where Mira says,"You have new mail"
-                    Log.i(Constants.TAG, "UnreadCount: updating");
-                }
+
             }
         };
 
@@ -203,12 +200,8 @@ public class GmailHomeFragment extends Fragment {
             if(messageResponse.size() == 1){
                 numUnreadPrimary = 0;
             }else {
-
-                Log.i(Constants.TAG, "Message Response: " + messageResponse.size());
-
                 List<Message> messages = messageResponse.getMessages();
                 numUnreadPrimary = messages.size();
-                Log.i(Constants.TAG, "Messages: " + messages.toString());
             }
             List<String> labels = new ArrayList<String>();
             return labels;
@@ -220,12 +213,17 @@ public class GmailHomeFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<String> output) {
+            if(numUnreadPrevious<numUnreadPrimary) {
+                speakNewNotifications();
+                numUnreadPrevious = numUnreadPrimary;
+            }
             displayEmailCount();
         }
     }
 
     public void updateUnreadCount(){
         numUnreadPrimary--;
+        numUnreadPrevious--;
         displayEmailCount();
     }
 
@@ -240,4 +238,22 @@ public class GmailHomeFragment extends Fragment {
     public int getUnreadCount() {
         return numUnreadPrimary;
     }
+
+    private void speakNewNotifications() {
+        int numNewMessages = numUnreadPrimary - numUnreadPrevious;
+        String text = " You have " + numNewMessages + " new messages.";
+        String textSingle = " You have " + numNewMessages + " new message.";
+
+        if (!text.equals("") && numNewMessages==1) {
+            speakText(textSingle);
+        }
+        else if(!text.equals("")){
+            speakText(text);
+        }
+    }
+
+    private void speakText(String text) {
+        ((MainActivity) getActivity()).speakText(text);
+    }
+
 }
