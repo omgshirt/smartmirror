@@ -30,7 +30,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
     public static ArrayList<String> mUsersAt = new ArrayList<String>();
     public static ArrayList<Uri> mUri = new ArrayList<Uri>();
 
-    public int twitterFeedPosition = 3;
+    public int twitterFeedPosition = 5;
 
     public static CacheManager mCacheManager = null;
 
@@ -63,15 +63,26 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
             // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             Log.d("TwitterArrayList ", "Got message:\"" + message +"\"");
+
             if (message.contains(Constants.SCROLL_DOWN) || message.contains(Constants.SCROLL_UP)) {
                 VoiceScroll sl = new VoiceScroll();
+                int numItemsInFeed = twitterFeed.getAdapter().getCount();
                 if (message.contains(Constants.SCROLL_DOWN)) {
                     twitterFeedPosition = twitterFeedPosition + 5;
+                    if (twitterFeedPosition >= numItemsInFeed)
+                        twitterFeedPosition = numItemsInFeed;
                 } else if (message.contains(Constants.SCROLL_UP)) {
-                    twitterFeedPosition = twitterFeedPosition - 5;
-                    if (twitterFeedPosition < 0) twitterFeedPosition = 0;
+                    twitterFeedPosition = twitterFeedPosition - 8;
+                    if (twitterFeedPosition >= numItemsInFeed) {
+                        twitterFeedPosition = twitterFeedPosition - 5;
+                    }
+                    else if (twitterFeedPosition <= 0) {
+                        twitterFeedPosition = 0;
+                    }
                 }
+                System.out.println("TWITTER FEED POSITION " + twitterFeedPosition);
                 sl.scrollListView(message,twitterFeed, twitterFeedPosition);
+                if (twitterFeedPosition == 0) twitterFeedPosition = 5;
             }
         }
     };

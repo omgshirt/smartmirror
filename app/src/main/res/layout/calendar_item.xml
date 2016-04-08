@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- represents one calendar event. Time will include start and/or end time -->
+<?xml version="1.0" encoding="utf-8"?><!-- represents one calendar event. Time will include start and/or end time -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,33 +6,37 @@
 
     <TextView
         android:id="@+id/event_date"
-        android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
-        android:visibility="gone"/>
+        android:textSize="18sp"
+        android:visibility="gone" />
+
     <View
         android:id="@+id/calendar_day_divider"
         android:layout_width="match_parent"
-        android:layout_height= ".5dp"
-        android:paddingBottom="4dp"
+        android:layout_height=".5dp"
         android:background="@color/white"
-        android:visibility="gone"/>
+        android:paddingBottom="4dp"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/event_time"
-        android:textSize="16sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/event_description"
-        android:textSize="16sp"
-        android:textStyle="italic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/event_location"
-        android:textSize="16sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/event_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/event_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
         android:visibility="gone" />
 </LinearLayout>

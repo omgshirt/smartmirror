@@ -14,7 +14,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_vertical"
-        android:text=""
         android:textSize="18sp" />
 
     <TextView
@@ -25,6 +24,5 @@
         android:layout_below="@+id/quote_content"
         android:layout_gravity="center_vertical"
         android:layout_marginTop="16dp"
-        android:text=""
         android:textSize="20sp" />
 </RelativeLayout>

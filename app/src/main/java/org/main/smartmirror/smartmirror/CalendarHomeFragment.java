@@ -2,10 +2,13 @@ package org.main.smartmirror.smartmirror;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.List;
@@ -27,38 +30,56 @@ public class CalendarHomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mRootView = inflater.inflate(R.layout.calendar_home_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.calendar_home_fragment, container, false);
+        LinearLayout homeCalendarLayout = (LinearLayout) rootView.findViewById(R.id.calendar_home_fragment_layout);
+        // create a copy of calendar_item xml.
+        View todaysEventsLayout = inflater.inflate(R.layout.calendar_item, container, false);
+        // We only want today's events
+        TextView txtEventDate = (TextView) todaysEventsLayout.findViewById(R.id.event_date);
+        txtEventDate.setText("Today's Events");
+        txtEventDate.setGravity(Gravity.CENTER_HORIZONTAL);
 
-        LinearLayout homeCalendarLayout = (LinearLayout) mRootView.findViewById(R.id.calendar_home_layout);
+        View lineDivider = todaysEventsLayout.findViewById(R.id.calendar_day_divider);
         // read events for the current day
         List<CalendarEvent> events = CalendarUtil.getCalendarEvents(getContext(), CalendarUtil.ONE_DAY);
-        if (events.size() == 0) {
-            hideCalendarHome();
-            return mRootView;
-        }
 
         Calendar calendar = Calendar.getInstance();
 
-        return mRootView;
-    }
+        for (int i = 0; i < events.size() && i < 7; i++) {
+            CalendarEvent event = events.get(i);
+            lineDivider.setVisibility(View.VISIBLE);
+            txtEventDate.setVisibility(View.VISIBLE);
+            // Check if this event happens on the same day as previous event, if not, display Date info
+            calendar.setTime(event.start);
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (!mPreferences.isLoggedInToGmail()) {
-            hideCalendarHome();
-        } else {
-            showCalendarHome();
+            // Set event time
+            TextView txtEventTime = (TextView) todaysEventsLayout.findViewById(R.id.event_time);
+            String eventTime = event.startString + " - " + event.endString;
+            txtEventTime.setText(eventTime);
+
+            // Set event description
+            TextView txtEventDesc = (TextView) todaysEventsLayout.findViewById(R.id.event_description);
+            txtEventDesc.setText(event.description);
+
+            // Set event location, if it exists
+            if (!event.location.isEmpty()) {
+                TextView txtEventLoc = (TextView) todaysEventsLayout.findViewById(R.id.event_location);
+                txtEventLoc.setText(event.location);
+                txtEventLoc.setVisibility(View.VISIBLE);
+            }
+
+            // Add 10dp marginTop. This sucks...
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            llp.setMargins(0, 0, 0, 4);
+            todaysEventsLayout.setLayoutParams(llp);
+
+            // Add this event to calendarLayout
+
+
+            homeCalendarLayout.addView(todaysEventsLayout);
         }
-    }
 
-    private void hideCalendarHome() {
-        // set view gone
-        mRootView.setVisibility(View.GONE);
-    }
-
-    private void showCalendarHome() {
-        // set view visible
-        mRootView.setVisibility(View.VISIBLE);
+        return rootView;
     }
 }

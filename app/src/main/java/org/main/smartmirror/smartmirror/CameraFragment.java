@@ -26,6 +26,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -46,38 +47,30 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.http.FileContent;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.FileList;
+import com.squareup.picasso.Picasso;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,10 +78,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HttpsURLConnection;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 /**
@@ -98,15 +93,16 @@ import javax.net.ssl.HttpsURLConnection;
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
 
     private TextView mCountDownText;
-    private static Drive service;
-    private GoogleAccountCredential credential;
     private Preferences mPreferences;
+
+    private String mAlbumID;
+
+    private TimerTask mTimerTask;
+    private Timer mTimer;
+    private Runnable mRunnable;
 
     //Gets current date and time to name pictures
     public static String dateTimeStr;
-
-    //Delay for Cheese
-    public static Handler cheeseHandler = new Handler();
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -115,10 +111,10 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
     static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
+        ORIENTATIONS.append(Surface.ROTATION_0, 90);//was 90/0
+        ORIENTATIONS.append(Surface.ROTATION_90, 0);//was 0/90
+        ORIENTATIONS.append(Surface.ROTATION_180, 270);//was 270/180
+        ORIENTATIONS.append(Surface.ROTATION_270, 180);//was 180/270
     }
 
     /**
@@ -326,7 +322,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                             mState = STATE_PICTURE_TAKEN;
                             captureStillPicture();
                         } else {
-                            runPrecaptureSequence();
+                            //runPrecaptureSequence();
                         }
                     }
                     break;
@@ -448,18 +444,13 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreferences = Preferences.getInstance(getActivity());
+        System.out.println("Username: " + mPreferences.getUsername() + " ACCESS TOKEN: " + mPreferences.getAccessToken());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
         mCountDownText = (TextView) view.findViewById(R.id.count_down);
-        //credential = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(DriveScopes.DRIVE));
-        //String accountName = ("smartmirrortesting@gmail.com");
-        //String accountName = Preferences.mUserAccountPref;
-        //String accountName = mPreferences.getGmailAccount();
-        //credential.setSelectedAccountName(accountName);
-        // service = getDriveService(credential);
         return view;
     }
 
@@ -562,9 +553,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 CameraCharacteristics characteristics
                         = manager.getCameraCharacteristics(cameraId);
 
-                // We don't use the rear facing camera.
+                // We don't use the front facing camera.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
 
@@ -825,7 +816,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     /**
      * Initiate a still image capture.
      */
-    private void takePicture() {
+    public void takePicture() {
         new CountDownTimer(4000, 1000) {
 
             public void onTick(long millisUntilFinished) {
@@ -836,50 +827,11 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             public void onFinish() {
                 showCameraFeedback("cheese");
                 speakCountdown("cheese");
-                lockFocus();
+                captureStillPicture();
             }
         }.start();
     }
 
-    /**
-     * Lock the focus as the first step for a still image capture.
-     */
-    private void lockFocus() {
-        try {
-            // This is how to tell the camera to lock focus.
-            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
-                    CameraMetadata.CONTROL_AF_TRIGGER_START);
-            // Tell #mCaptureCallback to wait for the lock.
-            mState = STATE_WAITING_LOCK;
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
-                    mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Run the precapture sequence for capturing a still image. This method should be called when
-     * we get a response in {@link #mCaptureCallback} from {@link #lockFocus()}.
-     */
-    private void runPrecaptureSequence() {
-        try {
-            // This is how to tell the camera to trigger.
-            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
-                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
-            // Tell #mCaptureCallback to wait for the precapture sequence to be set.
-            mState = STATE_WAITING_PRECAPTURE;
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
-                    mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Capture a still picture. This method should be called when we get a response in
-     * {@link #mCaptureCallback} from both {@link #lockFocus()}.
-     */
     private void captureStillPicture() {
         try {
             final Activity activity = getActivity();
@@ -890,7 +842,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             final CaptureRequest.Builder captureBuilder =
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(mImageReader.getSurface());
-
             // Use the same AE and AF modes as the preview.
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
                     CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
@@ -908,7 +859,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    //showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
@@ -969,7 +919,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             try {
                 FileOutputStream output = new FileOutputStream(mFile);
                 output.write(bytes);
-                // saveFileToDrive();
+                uploadToPicasa();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -991,38 +941,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         }
     }
 
-    private Drive getDriveService(GoogleAccountCredential credential) {
-        return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
-                .build();
-    }
-
-    private void saveFileToDrive() {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // File's binary content
-                    java.io.File fileContent = new java.io.File(mFile.getPath());
-                    FileContent mediaContent = new FileContent("image/jpeg", fileContent);
-
-                    // File's metadata.
-                    com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-                    body.setTitle(fileContent.getName());
-                    body.setMimeType("image/jpeg");
-
-                    com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
-                    retrieveAllFiles(service);
-                    // showCameraFeedback("Upload to Drive Successful!");
-                } catch (UserRecoverableAuthIOException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        t.start();
-    }
-
     public static String getCurrentDateTime() {
         Date curDateTime = new Date();
         SimpleDateFormat format = new SimpleDateFormat();
@@ -1038,50 +956,127 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         dateTimeStr = dateTimeString;
     }
 
-    public static List<com.google.api.services.drive.model.File> retrieveAllFiles(Drive service) throws IOException {
-        List<com.google.api.services.drive.model.File> result = new ArrayList<com.google.api.services.drive.model.File>();
-        Drive.Files.List request = service.files().list();
+    public void uploadToPicasa() {
+        new Thread() {
+            public void run() {
+                String album = "6261649979025559057";
+                String url = "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername()
+                        + "/albumid/" + album;
+                HttpClient httpClient = new DefaultHttpClient();
+                File file = new File(mFile.getPath());
+                HttpPost httpPost = new HttpPost(url);
+                httpPost.setHeader("GData-Version", "2");
+                httpPost.setHeader("Content-type", "image/jpeg");
+                httpPost.setHeader("Slug", "testone.jpg");
+                httpPost.setHeader("Authorization", "OAuth " + mPreferences.getAccessToken());
 
-        do {
-            try {
-                FileList files = request.execute();
+                InputStreamEntity reqEntity;
+                org.apache.http.HttpResponse response;
 
-                result.addAll(files.getItems());
-                request.setPageToken(files.getNextPageToken());
-            } catch (IOException e) {
-                System.out.println("An error occurred: " + e);
-                request.setPageToken(null);
+                try {
+                    reqEntity = new InputStreamEntity(new FileInputStream(file), file.length());
+
+                    String CONTENTTYPE_BINARY = "binary/octet-stream";
+                    reqEntity.setContentType(CONTENTTYPE_BINARY);
+                    reqEntity.setChunked(true);
+                    httpPost.setEntity(reqEntity);
+                    response = httpClient.execute(httpPost);
+
+                    // String responseString = new BasicResponseHandler().handleResponse(response);
+                    // Log.i("PICASA UPLOAD ", "STATUS CODE : " + responseString);
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    Log.i("PICASA UPLOAD ", "STATUS CODE : " + response.getStatusLine() + "\n" + responseBody);
+                    if(response.getStatusLine().toString().contains("201")) {
+                        mCountDownText.post(new Runnable() {
+                            public void run() {
+                                mCountDownText.setText("Photo Uploaded Successfully");
+                            }
+                        });
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (ClientProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        } while (request.getPageToken() != null &&
-                request.getPageToken().length() > 0);
-
-        Log.i("DRIVE ID", result.toString());
-        return result;
+        }.start();
     }
 
+    public void createNewPicasaAlbum() {
+        new Thread() {
+            public void run() {
+                Long tsLong = System.currentTimeMillis()/1000;
+                String ts = tsLong.toString();
+                HttpPost postRequest = new HttpPost(
+                        "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
+                String content =
+                        "<entry xmlns='http://www.w3.org/2005/Atom'" +
+                                "   xmlns:media='http://search.yahoo.com/mrss/'" +
+                                "   xmlns:gphoto='http://schemas.google.com/photos/2007'>" +
+                                "<title type='text'>Mira</title>" +
+                                "<summary type='text'>Smart Mirror Portraits.</summary>" +
+                                "<gphoto:location> </gphoto:location>" +
+                                "<gphoto:access>public</gphoto:access>" +
+                                "<gphoto:timestamp>"+ ts +"</gphoto:timestamp>" +
+                                "<media:group>" +
+                                "<media:keywords>smart mirror, mira</media:keywords>" +
+                                "</media:group>" +
+                                "<category scheme='http://schemas.google.com/g/2005#kind'\n" +
+                                "    term='http://schemas.google.com/photos/2007#album'></category>" +
+                                "</entry>";
 
-    public void uploadToPicasa(URL url) {
+                try {
+                    postRequest.addHeader(new BasicHeader("GData-Version", "2"));
+                    postRequest.setHeader("Authorization", "OAuth " + mPreferences.getAccessToken());
+                    StringEntity entity = new StringEntity(content);
+                    entity.setContentType(new BasicHeader("Content-Type",
+                            "application/atom+xml"));
+                    postRequest.setEntity(entity);
 
-        String imageTitle = "sm";
-        int imageNumber = 1;
-        String contactLength = "47899";
-        try {
-            url = new URL("https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("POST");
-            httpCon.setRequestProperty( "Content-Type", "image/jpeg");
-            httpCon.setRequestProperty( "Slug", imageTitle+imageNumber);
-            httpCon.setRequestProperty( "Content-Length", contactLength);
-            httpCon.setUseCaches( false );
-            OutputStreamWriter out = new OutputStreamWriter(
-                    httpCon.getOutputStream());
-            System.out.println(httpCon.getResponseCode());
-            System.out.println(httpCon.getResponseMessage());
-            out.close();
-            imageNumber++;
-        } catch (Exception e) {e.printStackTrace();}
+                    HttpClient httpclient = new DefaultHttpClient();
+                    HttpResponse response = httpclient.execute(postRequest);
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    //Log.i("PICASA ALBUM: ", "Response: " + response.getStatusLine() + "\n" + responseBody);
+                    if(response.getStatusLine().toString().contains("201")) {
+                        mCountDownText.post(new Runnable() {
+                            public void run() {
+                                mCountDownText.setText("New Album Created Successfully");
+                            }
+                        });
+                    }
+                    try {
+                        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                                .parse(new InputSource(new StringReader(responseBody)));
+                        traverseForAlbums(doc);
+                    } catch (Exception e) {e.printStackTrace();}
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (ClientProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
 
     }
 
+    public void traverseForAlbums(Node node) {
+        NodeList nodeList = node.getChildNodes();
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node currentNode = nodeList.item(i);
+            traverseForAlbums(currentNode);
+        }
+
+        if (node.getNodeName().equals("gphoto:id")) {
+            mAlbumID = node.getTextContent();
+            Log.i("ALBUM ID node", mAlbumID);
+
+        }
+    }
 }
+

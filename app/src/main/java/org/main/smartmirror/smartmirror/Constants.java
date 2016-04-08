@@ -12,7 +12,6 @@ public class Constants {
     //-------- Account Activity ---------
     public static final String KEY_STORE = "AndroidKeyStore";
     public static final String PICASA = "https://picasaweb.google.com/data/";
-    public static final String REVOKE_ACCOUNT = "https://accounts.google.com/o/oauth2/revoke?token=";
     public static final String GMAIL_PROVIDER_PERMISSION = "com.google.android.gm.permission.READ_CONTENT_PROVIDER";
 
     //-------------- DISPLAY -----------
@@ -44,6 +43,7 @@ public class Constants {
 
     //--------------FACEBOOK-------------
     public static final String FACEBOOK_URL = "https://m.facebook.com/";
+    public static final String FACEBOOK_SMARTMIRROR = "https://m.facebook.com/Smart-Mirror-384754131698096";
 
     //--------------FRAGMENTS------------
     public static final String CALENDAR = "calendar";
