@@ -33,7 +33,7 @@ public class CalendarHomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.calendar_home_fragment, container, false);
         LinearLayout homeCalendarLayout = (LinearLayout) rootView.findViewById(R.id.calendar_home_fragment_layout);
         // create a copy of calendar_item xml.
-        View todaysEventsLayout = inflater.inflate(R.layout.calendar_item, container/, false);
+        View todaysEventsLayout = inflater.inflate(R.layout.calendar_item, container, false);
         // We only want today's events
         TextView txtEventDate = (TextView) todaysEventsLayout.findViewById(R.id.event_date);
         txtEventDate.setText("Today's Events");
