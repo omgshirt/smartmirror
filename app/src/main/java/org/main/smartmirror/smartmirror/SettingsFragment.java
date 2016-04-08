@@ -173,6 +173,10 @@ public class SettingsFragment extends Fragment {
                     swtVoiceEnabled.setChecked(checked);
                     break;
 
+                case Constants.MIRA_LISTEN:
+                    swtVoiceEnabled.toggle();
+                    break;
+
                 // weather english / metric
                 case Preferences.CMD_WEATHER_ENGLISH:
                     checked = true;

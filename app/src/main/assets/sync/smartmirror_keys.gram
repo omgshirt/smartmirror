@@ -28,9 +28,10 @@ hide screen/1e-4/
 lifestyle/1e1/
 maximize/1e-5/
 minimize/1e-5/
+mira listen/1e-25/
 mira sleep/1e-16/
-mira wake/1e-20/
 mira sound/1e-18/
+mira wake/1e-20/
 movies/1e3/
 music/1e-4/
 news/1e12/

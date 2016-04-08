@@ -178,19 +178,31 @@ public class Preferences implements LocationListener {
 
             // Voice recognition on / off
             case CMD_VOICE_OFF:
-                if (isVoiceEnabled())
+                if (isVoiceEnabled()) {
                     speakText(R.string.speech_voice_off);
-                else
+                    setVoiceEnabled(false);
+                } else {
                     speakText(R.string.speech_voice_off_err);
-                setVoiceEnabled(false);
+                }
                 break;
 
             case CMD_VOICE_ON:
-                if (isVoiceEnabled())
+                if (isVoiceEnabled()) {
                     speakText(R.string.speech_voice_on_err);
-                else
+                } else {
                     speakText(R.string.speech_voice_on);
-                setVoiceEnabled(true);
+                    setVoiceEnabled(true);
+                }
+                break;
+
+            case Constants.MIRA_LISTEN:
+                if (isVoiceEnabled()) {
+                    speakText(R.string.speech_voice_off);
+                    setVoiceEnabled(false);
+                } else {
+                    speakText(R.string.speech_voice_on);
+                    setVoiceEnabled(true);
+                }
                 break;
 
             // weather units
@@ -485,6 +497,8 @@ public class Preferences implements LocationListener {
      * @param isEnabled boolean
      */
     public void setVoiceEnabled(boolean isEnabled) {
+        Log.i(Constants.TAG, "setVoiceEnabled :: " + isEnabled);
+        if (isEnabled == mVoiceEnabled) return;
         this.mVoiceEnabled = isEnabled;
         ((MainActivity) mActivity).showSpeechIcon(isEnabled);
         SharedPreferences.Editor edit = mSharedPreferences.edit();

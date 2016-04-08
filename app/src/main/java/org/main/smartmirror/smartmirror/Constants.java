@@ -26,8 +26,9 @@ public class Constants {
     public static final String MAXIMIZE = "maximize";
     public static final String MENU = "menu";
     public static final String MINIMIZE = "minimize";
-    public static final String MIRA_WAKE = "mira wake";
+    public static final String MIRA_LISTEN = "mira listen";
     public static final String MIRA_SLEEP = "mira sleep";
+    public static final String MIRA_WAKE = "mira wake";
     public static final String OPEN_WINDOW = "open window";
     public static final String OPTIONS = "options";
     public static final String PAUSE = "pause music";

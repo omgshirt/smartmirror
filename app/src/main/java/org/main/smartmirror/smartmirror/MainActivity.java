@@ -987,7 +987,8 @@ public class MainActivity extends AppCompatActivity
 
         // if voice is disabled, ignore everything except "start listening" and "wake / night light" commands
         if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(command)) {
-            if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Preferences.CMD_VOICE_OFF)) {
+            if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Preferences.CMD_VOICE_OFF) ||
+                    command.equals(Constants.MIRA_LISTEN)) {
                 broadcastMessage("commandAction", command);
             } else {
                 showToast(getResources().getString(R.string.speech_voice_off_err), Toast.LENGTH_SHORT);
