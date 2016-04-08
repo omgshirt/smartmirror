@@ -26,6 +26,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -45,6 +46,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -75,6 +78,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -91,6 +96,10 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     private Preferences mPreferences;
 
     private String mAlbumID;
+
+    private TimerTask mTimerTask;
+    private Timer mTimer;
+    private Runnable mRunnable;
 
     //Gets current date and time to name pictures
     public static String dateTimeStr;
@@ -807,7 +816,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     /**
      * Initiate a still image capture.
      */
-    private void takePicture() {
+    public void takePicture() {
         new CountDownTimer(4000, 1000) {
 
             public void onTick(long millisUntilFinished) {
@@ -977,10 +986,13 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     // Log.i("PICASA UPLOAD ", "STATUS CODE : " + responseString);
                     String responseBody = EntityUtils.toString(response.getEntity());
                     Log.i("PICASA UPLOAD ", "STATUS CODE : " + response.getStatusLine() + "\n" + responseBody);
-                    if(response.getStatusLine().equals("201")) {
-                        showToast("Photo Uploaded Successfully");
+                    if(response.getStatusLine().toString().contains("201")) {
+                        mCountDownText.post(new Runnable() {
+                            public void run() {
+                                mCountDownText.setText("Photo Uploaded Successfully");
+                            }
+                        });
                     }
-
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (ClientProtocolException e) {
@@ -1027,16 +1039,18 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     HttpResponse response = httpclient.execute(postRequest);
                     String responseBody = EntityUtils.toString(response.getEntity());
                     //Log.i("PICASA ALBUM: ", "Response: " + response.getStatusLine() + "\n" + responseBody);
-                    if(response.getStatusLine().equals("201")) {
-                        showToast("New Album Created Successfully");
+                    if(response.getStatusLine().toString().contains("201")) {
+                        mCountDownText.post(new Runnable() {
+                            public void run() {
+                                mCountDownText.setText("New Album Created Successfully");
+                            }
+                        });
                     }
                     try {
                         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                                 .parse(new InputSource(new StringReader(responseBody)));
                         traverseForAlbums(doc);
                     } catch (Exception e) {e.printStackTrace();}
-
-
 
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -1064,5 +1078,5 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
         }
     }
-
 }
+
