@@ -141,6 +141,25 @@ public class Preferences implements LocationListener {
     private void handleSettingsCommand(String command) {
         switch (command) {
 
+            // Voice recognition on / off
+            case CMD_VOICE_OFF:
+                if (isVoiceEnabled()) {
+                    speakText(R.string.speech_voice_off);
+                    setVoiceEnabled(false);
+                } else {
+                    speakText(R.string.speech_voice_off_err);
+                }
+                break;
+
+            case CMD_VOICE_ON:
+                if (isVoiceEnabled()) {
+                    speakText(R.string.speech_voice_on_err);
+                } else {
+                    speakText(R.string.speech_voice_on);
+                    setVoiceEnabled(true);
+                }
+                break;
+
             // Speech on / off
             case CMD_SOUND_OFF:
                 if (isSoundOn()) {
@@ -176,25 +195,6 @@ public class Preferences implements LocationListener {
             case CMD_REMOTE_ON:
                 speakText(R.string.speech_remote_on);
                 setRemoteEnabled(true);
-                break;
-
-            // Voice recognition on / off
-            case CMD_VOICE_OFF:
-                if (isVoiceEnabled()) {
-                    speakText(R.string.speech_voice_off);
-                    setVoiceEnabled(false);
-                } else {
-                    speakText(R.string.speech_voice_off_err);
-                }
-                break;
-
-            case CMD_VOICE_ON:
-                if (isVoiceEnabled()) {
-                    speakText(R.string.speech_voice_on_err);
-                } else {
-                    speakText(R.string.speech_voice_on);
-                    setVoiceEnabled(true);
-                }
                 break;
 
             case Constants.MIRA_LISTEN:

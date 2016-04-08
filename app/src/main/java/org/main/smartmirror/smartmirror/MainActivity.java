@@ -384,6 +384,7 @@ public class MainActivity extends AppCompatActivity
     private void broadcastMessage(String intentName, String msg) {
         Intent intent = new Intent(intentName);
         intent.putExtra("message", msg);
+        //Log.i(Constants.TAG, "broadcastMessage:\"" + msg + "\"");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -983,13 +984,14 @@ public class MainActivity extends AppCompatActivity
      */
     @SuppressWarnings("deprecation")
     public void handleVoiceCommand(String command) {
+
         Log.i(Constants.TAG, "handleVoiceCommand:\"" + command + "\"");
 
         // if voice is disabled, ignore everything except "start listening" and "wake / night light" commands
         if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(command)) {
             if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Preferences.CMD_VOICE_OFF) ||
                     command.equals(Constants.MIRA_LISTEN)) {
-                broadcastMessage("commandAction", command);
+                broadcastMessage("inputAction", command);
             } else {
                 showToast(getResources().getString(R.string.speech_voice_off_err), Toast.LENGTH_SHORT);
             }
