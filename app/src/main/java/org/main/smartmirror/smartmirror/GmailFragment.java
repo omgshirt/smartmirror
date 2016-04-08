@@ -52,6 +52,8 @@ public class GmailFragment extends Fragment {
     public ScrollView scrollViewBody;
     public TextView textViewBody;
 
+    public View subjBodyDiv;
+
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
 
@@ -105,6 +107,8 @@ public class GmailFragment extends Fragment {
         textViewSubject = (TextView)view.findViewById(R.id.messageSubject);
         scrollViewBody = (ScrollView) view.findViewById(R.id.scroll_view_body);
         textViewBody = (TextView) view.findViewById(R.id.messageBody);
+        subjBodyDiv = view.findViewById(R.id.subject_body_divider);
+        subjBodyDiv.setVisibility(View.GONE);
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -313,12 +317,14 @@ public class GmailFragment extends Fragment {
                 textViewTo.setText(mTo);
                 textViewFrom.setVisibility(View.GONE);
                 textViewSubject.setVisibility(View.GONE);
+                subjBodyDiv.setVisibility(View.GONE);
             }else {
                 textViewFrom.setVisibility(View.VISIBLE);
                 textViewSubject.setVisibility(View.VISIBLE);
                 textViewTo.setText("To: " + mTo + "\n");
                 textViewFrom.setText("From: " + mFrom + "\n");
                 textViewSubject.setText("Subject: " + mSubject);
+                subjBodyDiv.setVisibility(View.VISIBLE);
                 textViewBody.setText(mBody);
                 mCallback.onNextCommand();
             }

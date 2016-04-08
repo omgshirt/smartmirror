@@ -29,6 +29,14 @@
         android:layout_height="wrap_content"
         android:textSize="14sp" />
 
+    <View
+        android:id="@+id/subject_body_divider"
+        android:layout_width="match_parent"
+        android:layout_height=".5dp"
+        android:background="@color/white"
+        android:paddingBottom="4dp"
+        android:visibility="gone" />
+
     <ScrollView
         android:id="@+id/scroll_view_body"
         android:layout_width="wrap_content"
