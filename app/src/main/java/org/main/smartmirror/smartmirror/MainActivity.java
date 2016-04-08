@@ -64,13 +64,15 @@ public class MainActivity extends AppCompatActivity
     private ViewGroup contentFrame2;
     private ViewGroup contentFrame3;
 
-    private ImageView imgSpeechIcon;
     private ImageView imgRemoteIcon;
     private ImageView imgRemoteDisabledIcon;
+    private ImageView imgSoundOffIcon;
+    private ImageView imgSpeechIcon;
     private ImageView imgStayAwakeIcon;
 
+
     // Set initial fragments & track displayed views
-    private String mInitialFragment = Constants.NEWS;
+    private String mInitialFragment = Constants.WORLD;
     private Stack<Fragment> mForwardStack;
 
     // FrameSize maintains the size of the content window between state changes
@@ -263,6 +265,11 @@ public class MainActivity extends AppCompatActivity
             imgStayAwakeIcon.setVisibility(View.VISIBLE);
         }
 
+        imgSoundOffIcon = (ImageView) findViewById(R.id.sound_off_icon);
+        if (!mPreferences.isSoundOn()) {
+            imgSoundOffIcon.setVisibility(View.VISIBLE);
+        }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -358,6 +365,7 @@ public class MainActivity extends AppCompatActivity
 
         mNsdHelper.tearDown();
         mRemoteConnection.tearDown();
+        setDefaultScreenOffTimeout();
 
         unbindService(mVoiceConnection);
         mIsBound = false;
@@ -898,7 +906,7 @@ public class MainActivity extends AppCompatActivity
                 case Constants.R_RAP:
                 case Constants.R_ROCK:
                     if (currentFragment instanceof MusicFragment) {
-                        ((MusicFragment) currentFragment).startStation(command);
+                        ((MusicFragment) currentFragment).forceStartStation(command);
                     } else {
                         fragment = MusicFragment.NewInstance(command);
                     }
@@ -961,6 +969,9 @@ public class MainActivity extends AppCompatActivity
         showIcon(imgStayAwakeIcon, display);
     }
 
+    public void showSoundOffIcon(boolean display) {
+        showIcon(imgSoundOffIcon, display);
+    }
 
     // ----------------------- SPEECH RECOGNITION --------------------------
 

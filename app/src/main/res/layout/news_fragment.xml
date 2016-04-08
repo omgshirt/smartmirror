@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:animateLayoutChanges="true"
-    android:padding="15dp">
+    android:paddingBottom="8dp">
 
     <TextView
         android:id="@+id/news_desk_title"
@@ -12,6 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <include
+        layout="@layout/line_divider"/>
 
     <ListView
         android:layout_width="match_parent"

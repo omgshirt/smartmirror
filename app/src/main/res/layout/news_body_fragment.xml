@@ -3,8 +3,7 @@
     android:id="@+id/news_body_fragment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="15dp">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/txtHeadline"

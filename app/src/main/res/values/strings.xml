@@ -42,10 +42,14 @@
     <string name="mira_greet_night">Good evening, %s.</string>
 
     <!-- Calendar -->
+    <string name="calendar_title">Calendar</string>
     <string name="calendar_items_err">No Events Found</string>
 
+    <!-- forecast -->
+    <string name="forecast_title">Forecast</string>
+
     <!-- Login -->
-    <string name="not_logged_in_err">Sorry, you are not logged in to</string>
+    <string name="not_logged_in_err">"You are not logged in to %s\nGo to 'Settings' -> 'Account Setup' to change"</string>
     <string name="login_err">Oh no! Something went wrong!</string>
 
     <!-- WEATHER STRINGS -->
@@ -53,6 +57,7 @@
     <string name="weather_data_err">Failed to retrieve weather data &#8212; check your internet connection</string>
 
     <!-- Music Strings -->
+    <string name="music_title">Music</string>
     <string name="stream_not_found">"Error opening music stream."</string>
     <string name="stream_stopped">"...Music stopped:. Say 'play classical' to play the classical station...        ...Music stopped. Say 'play classical' to play the classical station..."</string>
     <string name="stream_pause">"...Music paused. Say 'play music' to resume or 'stop music' to return to normal command mode..."</string>
@@ -84,6 +89,8 @@
     <string name="weather_therm_low">\uf053</string>
 
     <!-- Settings strings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_account_btn">Account Setup</string>
     <string name="settings_weather_units">Weather Units</string>
     <string name="settings_system_vol">System Volume</string>
     <string name="settings_music_vol">Speech Volume</string>
@@ -119,6 +126,9 @@
     <string name="speech_weather_metric_err">Weather display is already set to metric</string>
     <string name="speech_remote_off_err">The remote is disabled.</string>
     <string name="speech_not_logged_in_err">You\'re not logged in!</string>
+
+    <!-- twitter -->
+    <string name="twitter_title">Twitter</string>
 
     <!-- api keys -->
     <string name="dark_sky_forecast_api_key">b8ec8fb1eca367cf424a8fb853d942f0</string>

@@ -2,7 +2,6 @@ package org.main.smartmirror.smartmirror;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,9 +35,8 @@ public class CalendarFragment extends Fragment {
 
         // Display error if no events found
         if (events.size() == 0) {
-            TextView noEvents = new TextView(getContext());
-            noEvents.setText(getContext().getString(R.string.calendar_items_err));
-            noEvents.setTextSize(26);
+            TextView noEvents = ErrorMessageFactory.buildErrorMessage(getContext(),
+                    getContext().getString(R.string.calendar_items_err));
             calendarLayout.addView(noEvents);
             return rootView;
         }
@@ -60,7 +58,7 @@ public class CalendarFragment extends Fragment {
                 txtEventDate.setGravity(Gravity.CENTER_HORIZONTAL);
                 txtEventDate.setVisibility(View.VISIBLE);
 
-                View lineDivider = eventLayout.findViewById(R.id.line_divider);
+                View lineDivider = eventLayout.findViewById(R.id.calendar_day_divider);
                 lineDivider.setVisibility(View.VISIBLE);
 
                 prevEventDay = thisEventDay;
