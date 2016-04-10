@@ -60,7 +60,7 @@ public class Preferences implements LocationListener {
     public static final String PREFS_GOOGLE_ACCESS_TOKEN = "PREFS_GOOGLE_ACCESS_TOKEN";
 
     public static final String PREFS_FACEBOOK_ACCOUNT = "PREFS_FACEBOOK_ACCOUNT";
-    public static final String PREFS_FACEBOOK_CREDENTIALS = "PREFS_FACEBOOK_CREDENTIALS";
+    public static final String PREFS_FACEBOOK_CREDENTIAL = "PREFS_FACEBOOK_CREDENTIAL";
 
     public static final String PREFS_TWITTER_ACCOUNT = "PREFS_TWITTER_ACCOUNT";
 
@@ -115,7 +115,7 @@ public class Preferences implements LocationListener {
     private String mGmailAccount;
     private String mGoogleAccessToken;
     private String mFacebookAccount;
-    private String mFacebookCredentials;
+    private String mFacebookCredential;
     private String mTokenId;
     private String mTwitterAccount;
     private String mWorkLocation;
@@ -263,7 +263,7 @@ public class Preferences implements LocationListener {
         mWorkLongitude = mSharedPreferences.getFloat(PREFS_WORK_LONG, WORK_LONG);
 
         mFacebookAccount = mSharedPreferences.getString(PREFS_FACEBOOK_ACCOUNT, "");
-        mFacebookCredentials = mSharedPreferences.getString(PREFS_FACEBOOK_CREDENTIALS, "");
+        mFacebookCredential = mSharedPreferences.getString(PREFS_FACEBOOK_CREDENTIAL, "");
 
         mTwitterAccount = mSharedPreferences.getString(PREFS_TWITTER_ACCOUNT, "");
 
@@ -703,12 +703,17 @@ public class Preferences implements LocationListener {
         return mStayAwake;
     }
 
-    public void setFacebookCredentials(String mFacebookCredentials) {
-        this.mFacebookCredentials = mFacebookCredentials;
+    public void setFacebookCredential(String mFacebookCredentials) {
+        this.mFacebookCredential = mFacebookCredentials;
         SharedPreferences.Editor edit = mSharedPreferences.edit();
-        edit.putString(PREFS_FACEBOOK_CREDENTIALS, mFacebookCredentials);
+        edit.putString(PREFS_FACEBOOK_CREDENTIAL, mFacebookCredentials);
         edit.apply();
     }
+
+    public String getFacebookCredential(){
+        return mFacebookCredential;
+    }
+
 
     public void setFacebookAccount(String mFacebookAccount) {
         this.mFacebookAccount = mFacebookAccount;
@@ -722,7 +727,7 @@ public class Preferences implements LocationListener {
     }
 
     public boolean isLoggedInToFacebook() {
-        if (mFacebookCredentials.isEmpty())
+        if (mFacebookCredential.isEmpty())
             return false;
         else
             return true;
