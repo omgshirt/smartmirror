@@ -195,7 +195,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
                     activity.runOnUiThread(mRunnable);
                 }
             };
-            mTimer.scheduleAtFixedRate(mTimerTask, 0, 20000);
+            mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
         } catch (Exception e) {
             e.printStackTrace();
         }
