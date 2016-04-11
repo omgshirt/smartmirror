@@ -16,13 +16,10 @@ import java.util.List;
  */
 public class CalendarHomeFragment extends Fragment {
 
-    private Preferences mPreferences;
-    private View mRootView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPreferences = Preferences.getInstance(getActivity());
     }
 
     @Override
@@ -60,6 +57,10 @@ public class CalendarHomeFragment extends Fragment {
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             llp.setMargins(0, 0, 0, 6);
             eventLayout.setLayoutParams(llp);
+        }
+
+        if (events.size() == 0) {
+            rootView.setVisibility(View.GONE);
         }
 
         return rootView;

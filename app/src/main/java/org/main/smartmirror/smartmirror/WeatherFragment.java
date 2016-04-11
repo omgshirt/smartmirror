@@ -247,6 +247,9 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         clkTime.setFormat24Hour(mPreferences.getTimeFormat());
         clkDate.setFormat12Hour(mPreferences.getDateFormat());
         clkDate.setFormat24Hour(mPreferences.getDateFormat());
+
+        // also update hourly forecast format!
+        startWeatherUpdate();
     }
 
     public void hideTime() {
@@ -263,11 +266,13 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     public void hideWeather() {
         layWeatherLayout.setVisibility(View.GONE);
+        layTimeDivider.setVisibility(View.GONE);
         saveVisibilityPreference(WEATHER_VISIBLE_PREF, layWeatherLayout.getVisibility());
     }
 
     public void showWeather() {
         layWeatherLayout.setVisibility(View.VISIBLE);
+        layTimeDivider.setVisibility(View.VISIBLE);
         saveVisibilityPreference(WEATHER_VISIBLE_PREF, layWeatherLayout.getVisibility());
     }
 
@@ -321,6 +326,9 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                         public void run() {
                             ((MainActivity) getActivity()).showToast(getString(R.string.weather_data_err),
                                     Gravity.CENTER, Toast.LENGTH_LONG);
+                            if (mCacheManager.isExpired(WEATHER_CACHE)) {
+                                hideWeather();
+                            }
                             updateWeatherCache(null);
                         }
                     });

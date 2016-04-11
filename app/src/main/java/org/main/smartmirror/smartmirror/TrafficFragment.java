@@ -132,6 +132,11 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
 
             txtDestination.setText(mPreference.getWorkLocation());
             txtTravelTime.setText(tripTime);
+
+            // make sure traffic is now visible!
+            showTraffic();
+        } catch (NullPointerException npe) {
+          npe.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -164,6 +169,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
                         public void run() {
                             ((MainActivity) getActivity()).showToast("error no traffic found",
                                     Gravity.CENTER, Toast.LENGTH_LONG);
+                            hideTraffic();
                             updateTrafficCache(null);
                         }
                     });

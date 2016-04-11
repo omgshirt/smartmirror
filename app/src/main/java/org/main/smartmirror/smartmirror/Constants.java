@@ -128,27 +128,27 @@ public class Constants {
     public static final String TWITTER_CONSUMER_SECRET = "WP9HyhszNP2x4Y9WGPtF5DfXT23v55O515PrukTCpkewuuNngT";
 
     //--------------NEWS--------------
-    public static final String ONE = "article one";
-    public static final String TWO = "article two";
-    public static final String THREE = "article three";
-    public static final String FOUR = "article four";
-    public static final String FIVE = "article five";
-    public static final String SIX = "article six";
-    public static final String SEVEN = "article seven";
-    public static final String EIGHT = "article eight";
-    public static final String NINE = "article nine";
-    public static final String TEN = "article ten";
+    public static final String ONE = "read one";
+    public static final String TWO = "read two";
+    public static final String THREE = "read three";
+    public static final String FOUR = "read four";
+    public static final String FIVE = "read five";
+    public static final String SIX = "read six";
+    public static final String SEVEN = "read seven";
+    public static final String EIGHT = "read eight";
+    public static final String NINE = "read nine";
+    public static final String TEN = "read ten";
 
-    public static final String ARTICLE_1 = "article 1";
-    public static final String ARTICLE_2 = "article 2";
-    public static final String ARTICLE_3 = "article 3";
-    public static final String ARTICLE_4 = "article 4";
-    public static final String ARTICLE_5 = "article 5";
-    public static final String ARTICLE_6 = "article 6";
-    public static final String ARTICLE_7 = "article 7";
-    public static final String ARTICLE_8 = "article 8";
-    public static final String ARTICLE_9 = "article 9";
-    public static final String ARTICLE_10 = "article 10";
+    public static final String REMOTE_ARTICLE_1 = "article 1";
+    public static final String REMOTE_ARTICLE_2 = "article 2";
+    public static final String REMOTE_ARTICLE_3 = "article 3";
+    public static final String REMOTE_ARTICLE_4 = "article 4";
+    public static final String REMOTE_ARTICLE_5 = "article 5";
+    public static final String REMOTE_ARTICLE_6 = "article 6";
+    public static final String REMOTE_ARTICLE_7 = "article 7";
+    public static final String REMOTE_ARTICLE_8 = "article 8";
+    public static final String REMOTE_ARTICLE_9 = "article 9";
+    public static final String REMOTE_ARTICLE_10 = "article 10";
 
     //--------------GMAIL-----------------
     public static final String NEXT = "next";
