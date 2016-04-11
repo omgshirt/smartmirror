@@ -54,6 +54,19 @@
         <item>gmail</item>
     </string-array>
 
+    <string-array name="music_commands">
+        <item>pause music</item>
+        <item>stop music</item>
+        <item>play music</item>
+        <item>play alternative</item>
+        <item>play ambient</item>
+        <item>play classical</item>
+        <item>play dance</item>
+        <item>play jazz</item>
+        <item>play rap</item>
+        <item>play rock</item>
+    </string-array>
+
 
     <string-array name="weather_help">
         <item>conditions</item>

@@ -1,13 +1,8 @@
 package org.main.smartmirror.smartmirror;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +11,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Timer;
@@ -27,7 +22,7 @@ import java.util.TimerTask;
  */
 public class HelpFragment extends Fragment {
 
-    private RelativeLayout mHelpLayout;
+    private LinearLayout mHelpLayout;
     private Runnable mRunnable;
     private Timer mTimer;
     private TimerTask mTimerTask;
@@ -94,7 +89,7 @@ public class HelpFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.help_fragment, container, false);
-        mHelpLayout = (RelativeLayout) view.findViewById(R.id.help_layout);
+        mHelpLayout = (LinearLayout) view.findViewById(R.id.help_layout);
         mHelpLayout.setVisibility(View.INVISIBLE);
 
         String name = getArguments().getString("name");
@@ -142,6 +137,12 @@ public class HelpFragment extends Fragment {
                 arrayContent = res.getStringArray(R.array.camera_help);
                 strContent = buildupStringFromArrays(arrayContent);
                 txtCurrentHelpHeader.setText("Controls");
+                txtCurrentHelpContent.setText(strContent);
+                break;
+            case Constants.MUSIC:
+                arrayContent = res.getStringArray(R.array.music_commands);
+                strContent = buildupStringFromArrays(arrayContent);
+                txtCurrentHelpHeader.setText(name.substring(0,1).toUpperCase() + name.substring(1) + " - Help");
                 txtCurrentHelpContent.setText(strContent);
                 break;
             // night light
