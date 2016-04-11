@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -53,6 +54,8 @@ public class GmailFragment extends Fragment {
     public TextView textViewBody;
 
     public View subjBodyDiv;
+
+    public LinearLayout fromSubBody;
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
@@ -109,6 +112,9 @@ public class GmailFragment extends Fragment {
         textViewBody = (TextView) view.findViewById(R.id.messageBody);
         subjBodyDiv = view.findViewById(R.id.subject_body_divider);
         subjBodyDiv.setVisibility(View.GONE);
+        fromSubBody = (LinearLayout) view.findViewById(R.id.gmail_view);
+
+
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -253,14 +259,14 @@ public class GmailFragment extends Fragment {
             String user = "me";
             String query = "in:inbox is:unread category:primary";
 
-            List<String> labelsToRemove = new ArrayList<String>();
+            List<String> labelsToRemove = new ArrayList<>();
             labelsToRemove.add("UNREAD");
 
             ListMessagesResponse messageResponse =
                     mService.users().messages().list(user).setQ(query).setMaxResults(Long.valueOf(1)).execute();
 
             if(messageResponse.size()==1){
-                mTo = "No New Messages...";
+                mTo = getResources().getString(R.string.no_new_messages);
             }else {
 
                 List<Message> messages = messageResponse.getMessages();
@@ -278,24 +284,24 @@ public class GmailFragment extends Fragment {
 
                     //Get who message is from
                     for (int i = 0; i < headerSize; i++) {
-                        if (message2.getPayload().getHeaders().get(i).getName().toString().equals("From")) {
-                            mFrom = new String(message2.getPayload().getHeaders().get(i).getValue().toString());
+                        if (message2.getPayload().getHeaders().get(i).getName().equals("From")) {
+                            mFrom =  message2.getPayload().getHeaders().get(i).getValue();
                         }
                     }
                     //Get subject of message
                     for (int j = 0; j < headerSize; j++) {
-                        if (message2.getPayload().getHeaders().get(j).getName().toString().equals("Subject")) {
-                            mSubject = new String(message2.getPayload().getHeaders().get(j).getValue().toString());
+                        if (message2.getPayload().getHeaders().get(j).getName().equals("Subject")) {
+                            mSubject = message2.getPayload().getHeaders().get(j).getValue();
                         }
                     }
                     //Get who message is to
                     for (int k = 0; k < headerSize; k++) {
-                        if (message2.getPayload().getHeaders().get(k).getName().toString().equals(("To"))) {
-                            mTo = new String(message2.getPayload().getHeaders().get(k).getValue().toString());
+                        if (message2.getPayload().getHeaders().get(k).getName().equals(("To"))) {
+                            mTo = message2.getPayload().getHeaders().get(k).getValue();
                         }
                     }
                     //Get the body of the message
-                    byte[] bodyBytes = Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().getData().trim().toString()); // get body
+                    byte[] bodyBytes = Base64.decodeBase64(message2.getPayload().getParts().get(0).getBody().getData().trim()); // get body
                     mBody = new String(bodyBytes, "UTF-8");
                     messageList.add(mBody);
                 }
@@ -311,20 +317,20 @@ public class GmailFragment extends Fragment {
         @Override
         protected void onPostExecute(List<String> output) {
 
-            textViewTitle.setText("Inbox");
+            textViewTitle.setText(getResources().getString(R.string.inbox));
 
-            if(mTo=="No New Messages..."){
+            if(mTo.equals(getResources().getString(R.string.no_new_messages))){
                 textViewTo.setText(mTo);
-                textViewFrom.setVisibility(View.GONE);
-                textViewSubject.setVisibility(View.GONE);
-                subjBodyDiv.setVisibility(View.GONE);
+                fromSubBody.setVisibility(View.GONE);
+                mCallback.onNextCommand();
             }else {
-                textViewFrom.setVisibility(View.VISIBLE);
-                textViewSubject.setVisibility(View.VISIBLE);
-                textViewTo.setText("To: " + mTo + "\n");
-                textViewFrom.setText("From: " + mFrom + "\n");
-                textViewSubject.setText("Subject: " + mSubject);
-                subjBodyDiv.setVisibility(View.VISIBLE);
+                fromSubBody.setVisibility(View.VISIBLE);
+                String to = "To: " + mTo;
+                String from = "From: " + mFrom;
+                String subject = "Subject: " + mSubject;
+                textViewTo.setText(to);
+                textViewFrom.setText(from);
+                textViewSubject.setText(subject);
                 textViewBody.setText(mBody);
                 mCallback.onNextCommand();
             }

@@ -21,6 +21,11 @@
         android:layout_height="wrap_content"
         android:textSize="16sp" />
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/gmail_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
     <TextView
         android:id="@+id/messageFrom"
         android:layout_width="wrap_content"
@@ -59,5 +64,7 @@
             android:textSize="13sp" />
 
     </ScrollView>
+
+    </LinearLayout>
 
 </LinearLayout>
