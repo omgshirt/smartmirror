@@ -12,7 +12,6 @@ public class Constants {
     //-------- Account Activity ---------
     public static final String KEY_STORE = "AndroidKeyStore";
     public static final String PICASA = "https://picasaweb.google.com/data/";
-    public static final String REVOKE_ACCOUNT = "https://accounts.google.com/o/oauth2/revoke?token=";
     public static final String GMAIL_PROVIDER_PERMISSION = "com.google.android.gm.permission.READ_CONTENT_PROVIDER";
 
     //-------------- DISPLAY -----------
@@ -26,8 +25,9 @@ public class Constants {
     public static final String MAXIMIZE = "maximize";
     public static final String MENU = "menu";
     public static final String MINIMIZE = "minimize";
-    public static final String MIRA_WAKE = "mira wake";
+    public static final String MIRA_LISTEN = "mira listen";
     public static final String MIRA_SLEEP = "mira sleep";
+    public static final String MIRA_WAKE = "mira wake";
     public static final String OPEN_WINDOW = "open window";
     public static final String OPTIONS = "options";
     public static final String PAUSE = "pause music";
@@ -43,6 +43,7 @@ public class Constants {
 
     //--------------FACEBOOK-------------
     public static final String FACEBOOK_URL = "https://m.facebook.com/";
+    public static final String FACEBOOK_SMARTMIRROR = "https://m.facebook.com/Smart-Mirror-384754131698096";
 
     //--------------FRAGMENTS------------
     public static final String CALENDAR = "calendar";
@@ -64,24 +65,25 @@ public class Constants {
     public static final String TWITTER = "twitter";
 
     // ------------- NEWS ------------
+    public static final String BOOKS = "books";
     public static final String BUSINESS = "business";
+    public static final String ECONOMICS = "economics";
+    public static final String ENVIRONMENT = "environment";
+    public static final String FASHION = "fashion";
+    public static final String GAMES = "games";
+    public static final String LIFESTYLE = "lifestyle";
     public static final String MEDIA = "media";
+    public static final String MOVIES = "movies";
+    public static final String OPINION = "opinion";
     public static final String SCIENCE = "science";
     public static final String SPORTS = "sports";
     public static final String TECHNOLOGY = "technology";
     public static final String TRAVEL = "travel";
     public static final String WORLD = "world";
-    public static final String BOOKS = "books";
-    public static final String FASHION = "fashion";
-    public static final String MOVIES = "movies";
-    public static final String GAMES = "games";
-    public static final String ECONOMICS = "economics";
-    public static final String OPINION = "opinion";
-    public static final String ENVIRONMENT = "environment";
-    public static final String LIFESTYLE = "lifestyle";
+
     public static final String NEWS_BODY = "news body";
     public static final String[] NEWS_DESKS = {BUSINESS, BOOKS, ECONOMICS, ENVIRONMENT, FASHION,
-            GAMES, LIFESTYLE, MEDIA, MOVIES, OPINION, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL, WORLD};
+            GAMES, LIFESTYLE, MEDIA, MOVIES, NEWS, OPINION, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL, WORLD};
     public static final List<String> DESK_LIST = Arrays.asList(NEWS_DESKS);
     public static final HashSet<String> DESK_HASH = new HashSet<>(DESK_LIST);
 

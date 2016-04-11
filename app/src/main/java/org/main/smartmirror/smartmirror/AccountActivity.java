@@ -23,6 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -347,13 +348,12 @@ public class AccountActivity extends AppCompatActivity implements
         }
     }
 
-    public class RetrieveTokenTask extends AsyncTask<String, Void, String> {
+    private class RetrieveTokenTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
             String account = params[0];
             String scopes = "oauth2:email";
-            //String scopes = "https://picasaweb.google.com/data/";
             String token = null;
             try {
                 token = GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);
@@ -371,7 +371,6 @@ public class AccountActivity extends AppCompatActivity implements
         protected void onPostExecute(String accessToken) {
             super.onPostExecute(accessToken);
             mPreference.setAccessToken(accessToken);
-            //mPreference.setAccessToken(accessToken.substring(6));
         }
     }
 }

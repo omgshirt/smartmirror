@@ -13,7 +13,7 @@
         android:visibility="gone" />
 
     <View
-        android:id="@+id/line_divider"
+        android:id="@+id/calendar_day_divider"
         android:layout_width="match_parent"
         android:layout_height=".5dp"
         android:background="@color/white"

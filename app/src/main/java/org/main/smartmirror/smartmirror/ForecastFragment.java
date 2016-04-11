@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -19,7 +20,6 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.zip.Inflater;
 
 public class ForecastFragment extends Fragment implements CacheManager.CacheListener {
 
@@ -99,7 +99,7 @@ public class ForecastFragment extends Fragment implements CacheManager.CacheList
                 String resourceName = "daily_forecast_" + i;
                 int layoutId = getContext().getResources().getIdentifier(resourceName, "id",
                         getActivity().getPackageName());
-                LinearLayout forecastLayout = (LinearLayout) view.findViewById(layoutId);
+                RelativeLayout forecastLayout = (RelativeLayout) view.findViewById(layoutId);
 
                 TextView txtDay = (TextView) forecastLayout.findViewById(R.id.daily_forecast_day);
                 TextView txtForecastIcon = (TextView) forecastLayout.findViewById(R.id.daily_forecast_icon);

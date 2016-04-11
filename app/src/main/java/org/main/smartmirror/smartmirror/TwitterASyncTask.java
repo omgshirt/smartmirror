@@ -87,7 +87,7 @@ public class TwitterASyncTask extends AsyncTask<String, Void, String> {
                 CustomListViewObject co = new CustomListViewObject(TwitterFragment.mUsers.get(i),TwitterFragment.mTweets.get(i),TwitterFragment.mUri.get(i), null);
                 objects.add(co);
             }
-            CustomAdapter customAdapter = new CustomAdapter(MainActivity.getContextForApplication(), objects);
+            CustomAdapter customAdapter = new CustomAdapter(MainActivity.getContextForApplication(), objects, false);
             TwitterFragment.twitterFeed.setAdapter(customAdapter);
         } catch (Exception e) {}
 

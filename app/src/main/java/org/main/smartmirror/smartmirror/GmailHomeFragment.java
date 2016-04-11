@@ -12,7 +12,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -203,8 +202,8 @@ public class GmailHomeFragment extends Fragment {
                 List<Message> messages = messageResponse.getMessages();
                 numUnreadPrimary = messages.size();
             }
-            List<String> labels = new ArrayList<String>();
-            return labels;
+
+            return  new ArrayList<>();
         }
 
         @Override
@@ -231,7 +230,8 @@ public class GmailHomeFragment extends Fragment {
         if (numUnreadPrimary > 0) {
             mailIcon.setVisibility(View.VISIBLE);
             textView.setVisibility(View.VISIBLE);
-            textView.setText("(" +  numUnreadPrimary + ") Inbox");
+            String text = getResources().getString(R.string.gmail_home_inbox);
+            textView.setText(String.format(text, numUnreadPrimary));
         }
     }
 

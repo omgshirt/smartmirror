@@ -22,10 +22,17 @@ public class FacebookFragment extends Fragment {
     private ScrollView mScrollView;
     private WebView mWebview;
 
+    private String mUrl;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
+        if(mPreference.isLoggedInToFacebook()){
+            mUrl = Constants.FACEBOOK_URL;
+        } else {
+            mUrl = Constants.FACEBOOK_SMARTMIRROR;
+        }
     }
 
     @Override
@@ -36,7 +43,7 @@ public class FacebookFragment extends Fragment {
         mWebview = (WebView) view.findViewById(R.id.facebook_webview);
         mWebview.getSettings().setJavaScriptEnabled(true);
         mWebview.setWebViewClient(new webClient());
-        mWebview.loadUrl(Constants.FACEBOOK_URL);
+        mWebview.loadUrl(mUrl);
         return view;
     }
 
@@ -67,24 +74,12 @@ public class FacebookFragment extends Fragment {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("inputAction"));
-        if (!mPreference.isLoggedInToFacebook()) {
-            removeFacebook();
-        }
     }
 
     // when this goes out of view, halt listening
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-    }
-
-    /**
-     * Removes facebook fragment, speaks error, and displays error message
-     */
-    private void removeFacebook() {
-        ((MainActivity) getActivity()).removeFragment(Constants.FACEBOOK);
-        ((MainActivity) getActivity()).displayNotSignedInFragment(Constants.FACEBOOK, true);
-        ((MainActivity) getActivity()).speakText(getResources().getString(R.string.speech_not_logged_in_err));
     }
 
     private class webClient extends WebViewClient {

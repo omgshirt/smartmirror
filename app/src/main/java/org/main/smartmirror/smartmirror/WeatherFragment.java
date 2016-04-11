@@ -31,10 +31,9 @@ import java.util.Locale;
 
 
 /**
- * Fragment that displays the weather information
- * <p/>
+ * Fragment that displays current weather information
+ *
  * Commands :
- * "forecast" speaks the 3-day forecast
  * "conditions" speaks the current conditions
  */
 public class WeatherFragment extends Fragment implements CacheManager.CacheListener {
@@ -43,6 +42,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     Preferences mPreferences;
 
     private LinearLayout layTimeLayout;
+    private View layTimeDivider;
     private LinearLayout layWeatherLayout;
     private TextView txtWeatherIcon;
     private TextClock clkTime;
@@ -96,6 +96,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         View view = inflater.inflate(R.layout.weather_fragment, container, false);
 
         layTimeLayout = (LinearLayout) view.findViewById(R.id.layout_time);
+        layTimeDivider = (View) view.findViewById(R.id.time_divider);
         layWeatherLayout = (LinearLayout) view.findViewById(R.id.layout_weather);
         txtCurrentHumidity = (TextView) view.findViewById(R.id.current_humidity);
         txtCurrentTemp = (TextView) view.findViewById(R.id.current_temp);
@@ -178,7 +179,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     showWeather();
                     break;
                 case Constants.TIME:
-                    // TODO: move this broadcast receiver into Mira?
                     Mira mira = Mira.getInstance((MainActivity)getActivity());
                     mira.sayCurrentTime();
                     break;
@@ -251,11 +251,13 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     public void hideTime() {
         layTimeLayout.setVisibility(View.GONE);
+        layTimeDivider.setVisibility(View.GONE);
         saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
     public void showTime() {
         layTimeLayout.setVisibility(View.VISIBLE);
+        layTimeDivider.setVisibility(View.VISIBLE);
         saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
@@ -356,7 +358,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
             // set humidity
             mCurrentHumidity = (int) Math.round((currentHour.getDouble("humidity") * 100));
-            String humidityText = mCurrentHumidity + " " + getActivity().getString(R.string.weather_humidity);
+            //String humidityText = mCurrentHumidity + " " + getActivity().getString(R.string.weather_humidity);
+            String humidityText = "Humidity " + mCurrentHumidity + "%";
             txtCurrentHumidity.setText(humidityText);
 
             // set Wind Speed & Direction
@@ -379,12 +382,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     " " + mCurrentWind + " " + windFormat;
             txtCurrentWind.setText(windSpeed);
 
-
-            // ---------------- 3-Day Forecast ---------------
-            /*
-                Moved to ForecastFragment
-            */
-
             JSONArray dailyData = json.getJSONObject("daily").getJSONArray("data");
             JSONObject today = dailyData.getJSONObject(0);
             forecastToday = new DailyForecast(today);
@@ -394,14 +391,12 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                     forecastToday.sunrise * 1000,
                     forecastToday.sunset * 1000);
 
-            // Set the dailyHigh and dailyLow
-            String maxIcon = getActivity().getString(R.string.weather_therm_high) + " " +
-                    forecastToday.maxTemp + weatherDeg;
-            txtDailyHigh.setText(maxIcon);
+            // Set dailyHigh and dailyLow
+            String maxTemp = "High " + forecastToday.maxTemp + weatherDeg;
+            txtDailyHigh.setText(maxTemp);
 
-            String minIcon = getActivity().getString(R.string.weather_therm_low) + " " +
-                    forecastToday.minTemp + weatherDeg;
-            txtDailyLow.setText(minIcon);
+            String minTemp = "Low  " + forecastToday.minTemp + weatherDeg;
+            txtDailyLow.setText(minTemp);
 
             // ----------------- 2-Hour forecasts -------------
             for (int i = 1; i <= 7; i++) {
@@ -458,9 +453,13 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             // check for weather alerts.
             if (json.has("alerts")) {
                 mWeatherAlerts = json.getJSONArray("alerts");
-                txtAlerts.setVisibility(View.VISIBLE);
-                txtAlerts.setText(getWeatherAlerts());
-                txtAlerts.setSelected(true);
+                String alertText = getWeatherAlerts();
+                Log.i(Constants.TAG, "alertText: " + alertText);
+                if (alertText.length() > 0) {
+                    txtAlerts.setVisibility(View.VISIBLE);
+                    txtAlerts.setText(getWeatherAlerts());
+                    txtAlerts.setSelected(true);
+                }
             } else {
                 txtAlerts.setVisibility(View.GONE);
             }
@@ -590,7 +589,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
      */
     public static String getDirectionFromBearing(final int bearing) {
         if (bearing < 0 || bearing > 360) return "error";
-        String[] directions = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+        String[] directions = {"North", "N East", "East", "S East", "South", "S West", "West", "N West"};
         int index = ((int) ((bearing + 22.5) / 45)) % 8;
         return directions[index];
     }

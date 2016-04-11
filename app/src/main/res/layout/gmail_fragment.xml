@@ -8,26 +8,36 @@
         android:id="@+id/gmailTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Inbox"
         android:layout_gravity="center"
         android:textSize="20sp" />
+
+    <include
+        layout="@layout/line_divider" />
 
     <TextView
         android:id="@+id/messageTo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/messageFrom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:textSize="16sp" />
+
+    <include
+        layout="@layout/line_divider" />
 
     <TextView
         android:id="@+id/messageSubject"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:textSize="16sp" />
+
+    <include
+        layout="@layout/line_divider" />
 
     <View
         android:id="@+id/subject_body_divider"
@@ -44,9 +54,10 @@
 
         <TextView
             android:id="@+id/messageBody"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="13sp" />
+
     </ScrollView>
 
 </LinearLayout>

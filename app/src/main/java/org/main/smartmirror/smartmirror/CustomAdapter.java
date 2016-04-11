@@ -18,16 +18,17 @@ public class CustomAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private ArrayList<CustomListViewObject> objects;
     Context context;
+    private boolean showNumbers;
 
     private class ViewHolder {
         TextView header;
         TextView snippet;
         ImageView thumbnail;
-        TextView articleNumber;
     }
 
-    public CustomAdapter(Context context, ArrayList<CustomListViewObject> objects) {
+    public CustomAdapter(Context context, ArrayList<CustomListViewObject> objects, boolean showNumber) {
         inflater = LayoutInflater.from(context);
+        showNumbers = showNumber;
         this.objects = objects;
     }
 
@@ -51,16 +52,19 @@ public class CustomAdapter extends BaseAdapter {
             holder.header = (TextView) convertView.findViewById(R.id.header);
             holder.snippet = (TextView) convertView.findViewById(R.id.snippet);
             holder.thumbnail = (ImageView) convertView.findViewById(R.id.thumbnail);
-            holder.articleNumber = (TextView) convertView.findViewById(R.id.article_number);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         try {
-            holder.header.setText(objects.get(position).getProp1());
+            String number = "";
+            if (showNumbers) {
+                number = Integer.toString(position + 1) + " - ";
+            }
+            String articleTitle = number + objects.get(position).getProp1();
+            holder.header.setText(articleTitle);
             holder.snippet.setText(objects.get(position).getProp2());
             Picasso.with(MainActivity.getContextForApplication()).load(objects.get(position).getProp3()).fit().centerInside().into(holder.thumbnail);
-            holder.articleNumber.setText(objects.get(position).getProp4());
         } catch (Exception e) {}
 
 

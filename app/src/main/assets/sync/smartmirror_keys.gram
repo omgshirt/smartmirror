@@ -12,13 +12,13 @@ disable remote/1e-7/
 economics/1e2/
 environment/1e-3/
 facebook/1e-5/
-fashion/1e3/
+fashion/1e6/
 forecast/1e-3/
 full screen/1e-5/
 gallery/1e-2/
 games/1e10/
 gmail/1e-4/
-go to sleep/1e-18/
+go to sleep/1e-14/
 go back/1e1/
 go forward/1e-3/
 help/1e5/
@@ -26,12 +26,12 @@ hide time/1e4/
 hide weather/1e1/
 hide screen/1e-4/
 lifestyle/1e1/
-menu/1e4/
 maximize/1e-5/
 minimize/1e-5/
-mira sleep/1e-20/
-mira wake/1e-20/
+mira listen/1e-25/
+mira sleep/1e-16/
 mira sound/1e-18/
+mira wake/1e-20/
 movies/1e3/
 music/1e-4/
 news/1e12/
@@ -43,19 +43,18 @@ open window/1e-10/
 photos/1e3/
 quotes/1e6/
 refresh/1e-4/
-remote on/1e-13/
-remote off/1e-10/
-settings/1e-4/
+remote on/1e-6/
+remote off/1e-3/
+settings/1e-5/
 scroll down/1e-15/
-scroll up/1e12/
-sound off/1e-14/
+scroll up/1e10/
+sound off/1e-4/
 sound on/1e-9/
 show help/1e-4/
 show time/1e-4/
 show weather/1e1/
 show light/1e6/
 small screen/1e-8/
-sleep/1e14/
 start listening/1e-15/
 stay awake/1e-8/
 stop listening/1e-12/
@@ -72,7 +71,7 @@ media/1e10/
 science/1e3/
 sports/1e8/
 technology/1e3/
-travel/1e4/
+travel/1e9/
 world/1e25/
 article one/1e-5/
 article two/1e-5/
@@ -84,10 +83,10 @@ article seven/1e-5/
 article eight/1e-4/
 article nine/1e-8/
 article ten/1e-5/
-play alternative/1e-12/
+play alternative/1e-18/
 play ambient/1e-12/
 play classical/1e-12/
-play dance/1e4/
+play dance/1e8/
 play jazz/1e-8/
 play rock/1e-8/
-play rap/1e4/
+play rap/1e8/

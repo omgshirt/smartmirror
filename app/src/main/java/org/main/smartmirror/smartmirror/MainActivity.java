@@ -64,13 +64,15 @@ public class MainActivity extends AppCompatActivity
     private ViewGroup contentFrame2;
     private ViewGroup contentFrame3;
 
-    private ImageView imgSpeechIcon;
     private ImageView imgRemoteIcon;
     private ImageView imgRemoteDisabledIcon;
+    private ImageView imgSoundOffIcon;
+    private ImageView imgSpeechIcon;
     private ImageView imgStayAwakeIcon;
 
+
     // Set initial fragments & track displayed views
-    private String mInitialFragment = Constants.NEWS;
+    private String mInitialFragment = Constants.WORLD;
     private Stack<Fragment> mForwardStack;
 
     // FrameSize maintains the size of the content window between state changes
@@ -263,6 +265,11 @@ public class MainActivity extends AppCompatActivity
             imgStayAwakeIcon.setVisibility(View.VISIBLE);
         }
 
+        imgSoundOffIcon = (ImageView) findViewById(R.id.sound_off_icon);
+        if (!mPreferences.isSoundOn()) {
+            imgSoundOffIcon.setVisibility(View.VISIBLE);
+        }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -358,6 +365,7 @@ public class MainActivity extends AppCompatActivity
 
         mNsdHelper.tearDown();
         mRemoteConnection.tearDown();
+        setDefaultScreenOffTimeout();
 
         unbindService(mVoiceConnection);
         mIsBound = false;
@@ -376,6 +384,7 @@ public class MainActivity extends AppCompatActivity
     private void broadcastMessage(String intentName, String msg) {
         Intent intent = new Intent(intentName);
         intent.putExtra("message", msg);
+        //Log.i(Constants.TAG, "broadcastMessage:\"" + msg + "\"");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -898,7 +907,7 @@ public class MainActivity extends AppCompatActivity
                 case Constants.R_RAP:
                 case Constants.R_ROCK:
                     if (currentFragment instanceof MusicFragment) {
-                        ((MusicFragment) currentFragment).startStation(command);
+                        ((MusicFragment) currentFragment).forceStartStation(command);
                     } else {
                         fragment = MusicFragment.NewInstance(command);
                     }
@@ -961,6 +970,9 @@ public class MainActivity extends AppCompatActivity
         showIcon(imgStayAwakeIcon, display);
     }
 
+    public void showSoundOffIcon(boolean display) {
+        showIcon(imgSoundOffIcon, display);
+    }
 
     // ----------------------- SPEECH RECOGNITION --------------------------
 
@@ -972,12 +984,14 @@ public class MainActivity extends AppCompatActivity
      */
     @SuppressWarnings("deprecation")
     public void handleVoiceCommand(String command) {
+
         Log.i(Constants.TAG, "handleVoiceCommand:\"" + command + "\"");
 
         // if voice is disabled, ignore everything except "start listening" and "wake / night light" commands
         if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(command)) {
-            if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Preferences.CMD_VOICE_OFF)) {
-                broadcastMessage("commandAction", command);
+            if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Preferences.CMD_VOICE_OFF) ||
+                    command.equals(Constants.MIRA_LISTEN)) {
+                broadcastMessage("inputAction", command);
             } else {
                 showToast(getResources().getString(R.string.speech_voice_off_err), Toast.LENGTH_SHORT);
             }
@@ -1322,12 +1336,12 @@ public class MainActivity extends AppCompatActivity
      * Configure the voice recognition to use a shorter command when music is actively streaming.
      * Setting false returns to normal command list.
      *
-     * @param isMusicStreaming current music streaming status.
+     * @param commandListType MusicFragment.MUSIC_COMMAND_LIST or MusicFragment.NORMAL_COMMAND_LIST
      */
-    public void setVoiceCommandMode(boolean isMusicStreaming) {
+    public void setVoiceCommandMode(int commandListType) {
         int msgType;
 
-        if (isMusicStreaming) {
+        if (commandListType == MusicFragment.MUSIC_COMMAND_LIST) {
             // set VR to music mode
             msgType = VoiceService.MUSIC_COMMAND_LIST;
         } else {

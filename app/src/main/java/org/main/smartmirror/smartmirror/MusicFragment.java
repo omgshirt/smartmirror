@@ -30,6 +30,8 @@ import java.util.HashMap;
 public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         AudioManager.OnAudioFocusChangeListener {
 
+    public static final int NORMAL_COMMAND_LIST = 0;
+    public static final int MUSIC_COMMAND_LIST = 1;
     private static final String GENRE = "genre";
     private static final String TAG = "SmartMirror music";
 
@@ -44,6 +46,12 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     public MusicFragment() {
     }
 
+    /**
+     * Create a MusicFragment. If command argument is a station (in the form "genreName:"),
+     * start a fragment playing the given station. If command is not known or empty, no station starts.
+     * @param command station genre
+     * @return instance of MusicFragment
+     */
     public static MusicFragment NewInstance(String command) {
         Bundle args = new Bundle();
         String stationGenre = GetGenreFromCommand(command);
@@ -89,7 +97,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             Log.i(TAG, "failed to get audio focus");
         }
 
-        // configure the StreamInfo marquee. Doesn't work properly when set via XML...
+        // configure the StreamInfo marquee. Doesn't work properly when set via XML... or when set via code :/
         txtStreamInfo = (TextView) view.findViewById(R.id.stream_info);
         txtStreamInfo.setEllipsize(TextUtils.TruncateAt.MARQUEE);
         txtStreamInfo.setSingleLine(true);
@@ -102,8 +110,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         mGenre = getArguments().getString(GENRE);
 
         // set up the station list using R.layout.station_name
-        mUrlMap = new HashMap<>(10);
-        mStationIcons = new HashMap<>(10);
+        mUrlMap = new HashMap<>(stationNames.length);
+        mStationIcons = new HashMap<>(stationNames.length);
 
         for (int i = 0; i < stationNames.length; i++) {
             String genre = ConvertStationNameToGenre(stationNames[i]);
@@ -117,9 +125,9 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             mStationIcons.put(genre, icon);
         }
 
-        // drwPlay a station if one has been selected
+        // Play a station if one was passed to constructor
         if (!mGenre.isEmpty()) {
-            setStatusIconVisibility();
+            setStreamIconVisible();
             initMediaPlayer();
         } else {
             // create a media player to prevent crashes on callbacks
@@ -157,53 +165,56 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
      */
     public void changeToStation(String command) {
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) return;
-        startStation(command);
+        forceStartStation(command);
     }
 
-    /** Like changeToStation, but allows changes if the media player is playing.
+    /** Like changeToStation, but changes to given station even when the media player is currently playing.
      *
      * @param command station to play
      */
-    public void startStation(String command) {
+    public void forceStartStation(String command) {
         mGenre = GetGenreFromCommand(command);
-        setStatusIconVisibility();
+        setStreamIconVisible();
         setIconDrawables(R.drawable.play);
+        ((MainActivity)getActivity()).setVoiceCommandMode(MUSIC_COMMAND_LIST);
         tearDownMediaPlayer();
         initMediaPlayer();
     }
 
     public void pauseStream() {
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            ((MainActivity)getActivity()).setVoiceCommandMode(NORMAL_COMMAND_LIST);
             mMediaPlayer.pause();
             setIconDrawables(R.drawable.pause);
-            setStatusIconVisibility();
+            setStreamIconVisible();
             txtStreamInfo.setText(R.string.stream_pause);
         }
     }
 
     public void stopStream() {
         if (mMediaPlayer != null) {
+            ((MainActivity)getActivity()).setVoiceCommandMode(NORMAL_COMMAND_LIST);
             tearDownMediaPlayer();
             setIconDrawables(R.drawable.pause);
             mGenre = "";
-            setStatusIconVisibility();
+            setStreamIconVisible();
             txtStreamInfo.setText(R.string.stream_stopped);
         }
     }
 
     public void playStream() {
         if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-            ((MainActivity)getActivity()).setVoiceCommandMode(true);
+            ((MainActivity)getActivity()).setVoiceCommandMode(MUSIC_COMMAND_LIST);
             mMediaPlayer.start();
             setIconDrawables(R.drawable.play);
-            setStatusIconVisibility();
+            setStreamIconVisible();
             txtStreamInfo.setText(R.string.stream_playing);
         }
     }
 
 
     // sets the status icon to visible for the currently selected stream
-    public void setStatusIconVisibility() {
+    public void setStreamIconVisible() {
         for (String key : mStationIcons.keySet()) {
             ImageView img = mStationIcons.get(key);
             if (key.equals(mGenre)) {
@@ -251,8 +262,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             Log.i(TAG, "stopping music");
             mMediaPlayer.stop();
         }
-
-        ((MainActivity)getActivity()).setVoiceCommandMode(false);
+        Preferences prefs = Preferences.getInstance(getActivity());
+        prefs.setStayAwake(false);
         mMediaPlayer.release();
         mMediaPlayer = null;
     }
@@ -294,8 +305,10 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
      */
     @Override
     public void onPrepared(MediaPlayer mp) {
-        ((MainActivity)getActivity()).setVoiceCommandMode(true);
+        ((MainActivity)getActivity()).setVoiceCommandMode(MUSIC_COMMAND_LIST);
         txtStreamInfo.setText(R.string.stream_playing);
+        Preferences prefs = Preferences.getInstance(getActivity());
+        prefs.setStayAwake(true);
         mp.start();
     }
 

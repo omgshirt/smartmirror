@@ -120,7 +120,8 @@ public class Preferences implements LocationListener {
     private String mTwitterAccount;
     private String mWorkLocation;
 
-    private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
+    //private String mDateFormat = "EEE LLL d";      // SimpleDateFormat string for date display
+    private String mDateFormat = "EEE MMM d";
     public static final String TIME_FORMAT_24_HR = "H:mm";
     public static final String TIME_FORMAT_24_HR_SHORT = "H:mm";
     public static final String TIME_FORMAT_12_HR = "h:mm";
@@ -139,6 +140,25 @@ public class Preferences implements LocationListener {
 
     private void handleSettingsCommand(String command) {
         switch (command) {
+
+            // Voice recognition on / off
+            case CMD_VOICE_OFF:
+                if (isVoiceEnabled()) {
+                    speakText(R.string.speech_voice_off);
+                    setVoiceEnabled(false);
+                } else {
+                    speakText(R.string.speech_voice_off_err);
+                }
+                break;
+
+            case CMD_VOICE_ON:
+                if (isVoiceEnabled()) {
+                    speakText(R.string.speech_voice_on_err);
+                } else {
+                    speakText(R.string.speech_voice_on);
+                    setVoiceEnabled(true);
+                }
+                break;
 
             // Speech on / off
             case CMD_SOUND_OFF:
@@ -177,21 +197,14 @@ public class Preferences implements LocationListener {
                 setRemoteEnabled(true);
                 break;
 
-            // Voice recognition on / off
-            case CMD_VOICE_OFF:
-                if (isVoiceEnabled())
+            case Constants.MIRA_LISTEN:
+                if (isVoiceEnabled()) {
                     speakText(R.string.speech_voice_off);
-                else
-                    speakText(R.string.speech_voice_off_err);
-                setVoiceEnabled(false);
-                break;
-
-            case CMD_VOICE_ON:
-                if (isVoiceEnabled())
-                    speakText(R.string.speech_voice_on_err);
-                else
+                    setVoiceEnabled(false);
+                } else {
                     speakText(R.string.speech_voice_on);
-                setVoiceEnabled(true);
+                    setVoiceEnabled(true);
+                }
                 break;
 
             // weather units
@@ -487,6 +500,8 @@ public class Preferences implements LocationListener {
      * @param isEnabled boolean
      */
     public void setVoiceEnabled(boolean isEnabled) {
+        Log.i(Constants.TAG, "setVoiceEnabled :: " + isEnabled);
+        if (isEnabled == mVoiceEnabled) return;
         this.mVoiceEnabled = isEnabled;
         ((MainActivity) mActivity).showSpeechIcon(isEnabled);
         SharedPreferences.Editor edit = mSharedPreferences.edit();
@@ -501,12 +516,14 @@ public class Preferences implements LocationListener {
         float vol = 0f;
         if (enable) {
             vol = .5f;
+
         }
 
         AudioManager audio = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         int newVol = (int) (maxVolume * vol);
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, newVol, 0);
+        ((MainActivity)mActivity).showSoundOffIcon(!enable);
 
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putBoolean(PREFS_SPEECH_ENABLED, mSoundOn);

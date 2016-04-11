@@ -60,7 +60,7 @@
         <item>forecast</item>
     </string-array>
 
-    <!-- Music Genres - These map to the "music_url" array -->
+    <!-- Music Genres - These map to the "music_url" array. Stations added here will be shown in MusicFragment  -->
     <string-array name="station_names">
         <item>Alternative: KCRW</item>
         <item>Ambient: Ambient Sleeping Pill</item>
