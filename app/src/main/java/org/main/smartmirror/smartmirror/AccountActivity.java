@@ -276,7 +276,6 @@ public class AccountActivity extends AppCompatActivity implements
             try {
                 SecretKey secret = AESHelper.generateKey(mDeviceId);
                 byte[] encrypted = AESHelper.encryptMsg(edtFacebookPassword.getText().toString(), secret);
-                Log.d("ENCRYPT", encrypted.toString());
                 mPreference.setFacebookCredential(Base64.encodeToString(encrypted, Base64.DEFAULT));
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
