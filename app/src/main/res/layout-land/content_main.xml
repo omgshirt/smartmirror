@@ -86,28 +86,34 @@
                 android:name="org.main.smartmirror.smartmirror.WeatherFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 tools:layout="@layout/weather_fragment" />
-
-            <fragment
-                android:id="@+id/traffic_fragment"
-                android:name="org.main.smartmirror.smartmirror.TrafficFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout="@layout/traffic_fragment" />
-
-            <fragment
-                android:id="@+id/calendar_home_fragment"
-                android:name="org.main.smartmirror.smartmirror.CalendarHomeFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout="@layout/calendar_home_fragment" />
 
             <fragment
                 android:id="@+id/gmail_home_fragment"
                 android:name="org.main.smartmirror.smartmirror.GmailHomeFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 tools:layout="@layout/gmail_home_fragment" />
+
+            <fragment
+                android:id="@+id/calendar_home_fragment"
+                android:name="org.main.smartmirror.smartmirror.CalendarHomeFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                tools:layout="@layout/calendar_home_fragment" />
+
+            <fragment
+                android:id="@+id/traffic_fragment"
+                android:name="org.main.smartmirror.smartmirror.TrafficFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                tools:layout="@layout/traffic_fragment" />
+
+
         </LinearLayout>
 
         <LinearLayout

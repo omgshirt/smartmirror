@@ -1336,12 +1336,12 @@ public class MainActivity extends AppCompatActivity
      * Configure the voice recognition to use a shorter command when music is actively streaming.
      * Setting false returns to normal command list.
      *
-     * @param isMusicStreaming current music streaming status.
+     * @param commandListType MusicFragment.MUSIC_COMMAND_LIST or MusicFragment.NORMAL_COMMAND_LIST
      */
-    public void setVoiceCommandMode(boolean isMusicStreaming) {
+    public void setVoiceCommandMode(int commandListType) {
         int msgType;
 
-        if (isMusicStreaming) {
+        if (commandListType == MusicFragment.MUSIC_COMMAND_LIST) {
             // set VR to music mode
             msgType = VoiceService.MUSIC_COMMAND_LIST;
         } else {
