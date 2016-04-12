@@ -45,10 +45,31 @@ public class FacebookFragment extends Fragment {
         mPreference = Preferences.getInstance(getActivity());
         mDeviceId = Settings.Secure.getString(getActivity().getContentResolver(),
                 Settings.Secure.ANDROID_ID);
+        if (mPreference.isLoggedInToFacebook()) {
+            mUrl = Constants.FACEBOOK_URL;
+        } else {
+            mUrl = Constants.FACEBOOK_SMARTMIRROR;
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.facebook_fragment, container, false);
+        mScrollView = (ScrollView) view.findViewById(R.id.facebook_scrollview);
+        mWebview = (WebView) view.findViewById(R.id.facebook_webview);
+        mWebview.getSettings().setJavaScriptEnabled(true);
+        mWebview.setWebViewClient(new webClient());
+        mWebview.loadUrl(mUrl);
+        return view;
+    }
+
+    private String retrieveCredentials() {
+        String plain = "";
         try {
             SecretKey key = AESHelper.generateKey(mDeviceId);
             byte[] array = Base64.decode(mPreference.getFacebookCredential(), Base64.DEFAULT);
-            String plain = AESHelper.decryptMsg(array, key);
+            plain = AESHelper.decryptMsg(array, key);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeySpecException e) {
@@ -68,25 +89,8 @@ public class FacebookFragment extends Fragment {
         } catch (InvalidParameterSpecException e) {
             e.printStackTrace();
         }
-        if(mPreference.isLoggedInToFacebook()){
-            mUrl = Constants.FACEBOOK_URL;
-        } else {
-            mUrl = Constants.FACEBOOK_SMARTMIRROR;
-        }
+        return plain;
     }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.facebook_fragment, container, false);
-        mScrollView = (ScrollView) view.findViewById(R.id.facebook_scrollview);
-        mWebview = (WebView) view.findViewById(R.id.facebook_webview);
-        mWebview.getSettings().setJavaScriptEnabled(true);
-        mWebview.setWebViewClient(new webClient());
-        mWebview.loadUrl(mUrl);
-        return view;
-    }
-
 
     // ----------------------- Local Broadcast Receiver -----------------------
 
