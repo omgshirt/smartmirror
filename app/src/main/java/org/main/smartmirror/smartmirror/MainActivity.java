@@ -708,7 +708,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public boolean commandWakesFromSleep(String command) {
-        return (command.equals(Constants.WAKE) || command.equals(Constants.WAKE_UP)
+        return (command.equals(Constants.WAKE)
+                || command.equals(Constants.WAKE_UP)
+                || command.equals(Constants.MIRROR_MIRROR)
                 || command.equals(Constants.NIGHT_LIGHT)
                 || command.equals(Constants.MIRA_WAKE));
     }
@@ -882,6 +884,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.WAKE:
                 case Constants.WAKE_UP:
+                case Constants.MIRROR_MIRROR:
                     break;
                 case Constants.WIDE_SCREEN:
                     setContentFrameValues(FrameSize.WIDE_SCREEN);
