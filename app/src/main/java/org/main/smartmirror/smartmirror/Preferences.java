@@ -141,6 +141,25 @@ public class Preferences implements LocationListener {
     private void handleSettingsCommand(String command) {
         switch (command) {
 
+            // Voice recognition on / off
+            case CMD_VOICE_OFF:
+                if (isVoiceEnabled()) {
+                    speakText(R.string.speech_voice_off);
+                    setVoiceEnabled(false);
+                } else {
+                    speakText(R.string.speech_voice_off_err);
+                }
+                break;
+
+            case CMD_VOICE_ON:
+                if (isVoiceEnabled()) {
+                    speakText(R.string.speech_voice_on_err);
+                } else {
+                    speakText(R.string.speech_voice_on);
+                    setVoiceEnabled(true);
+                }
+                break;
+
             // Speech on / off
             case CMD_SOUND_OFF:
                 if (isSoundOn()) {
@@ -178,21 +197,14 @@ public class Preferences implements LocationListener {
                 setRemoteEnabled(true);
                 break;
 
-            // Voice recognition on / off
-            case CMD_VOICE_OFF:
-                if (isVoiceEnabled())
+            case Constants.MIRA_LISTEN:
+                if (isVoiceEnabled()) {
                     speakText(R.string.speech_voice_off);
-                else
-                    speakText(R.string.speech_voice_off_err);
-                setVoiceEnabled(false);
-                break;
-
-            case CMD_VOICE_ON:
-                if (isVoiceEnabled())
-                    speakText(R.string.speech_voice_on_err);
-                else
+                    setVoiceEnabled(false);
+                } else {
                     speakText(R.string.speech_voice_on);
-                setVoiceEnabled(true);
+                    setVoiceEnabled(true);
+                }
                 break;
 
             // weather units
@@ -488,6 +500,8 @@ public class Preferences implements LocationListener {
      * @param isEnabled boolean
      */
     public void setVoiceEnabled(boolean isEnabled) {
+        Log.i(Constants.TAG, "setVoiceEnabled :: " + isEnabled);
+        if (isEnabled == mVoiceEnabled) return;
         this.mVoiceEnabled = isEnabled;
         ((MainActivity) mActivity).showSpeechIcon(isEnabled);
         SharedPreferences.Editor edit = mSharedPreferences.edit();

@@ -26,7 +26,6 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
     private String mWorkLat;
     private String mWorkLong;
     private TextView txtDestination;
-    private TextView txtDistance;
     private TextView txtTravelTime;
 
     private Handler mHandler = new Handler();
@@ -51,7 +50,6 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
         View view = inflater.inflate(R.layout.traffic_fragment, container, false);
         mTrafficLayout = (LinearLayout) view.findViewById(R.id.traffic_layout);
         txtDestination = (TextView) view.findViewById(R.id.traffic_destination);
-        txtDistance = (TextView) view.findViewById(R.id.traffic_distance);
         txtTravelTime = (TextView) view.findViewById(R.id.traffic_delay);
         return view;
     }
@@ -125,18 +123,20 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
                     .getJSONObject(0)
                     .getJSONArray("elements")
                     .getJSONObject(0);
-            double tripDistance = Double.parseDouble(splitString(data.getJSONObject("distance").getString("text")));
             String tripTime = data.getJSONObject("duration").getString("text");
-            // double tripTimeTraffic = Double.parseDouble(splitString(data.getJSONObject("duration_in_traffic").getString("text")));
 
-            String units = "kilometers";
+            String units = "km";
             if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
-                units = "miles";
+                units = "mi";
             }
 
             txtDestination.setText(mPreference.getWorkLocation());
-            txtDistance.setText("" + tripDistance + " " + units);
             txtTravelTime.setText(tripTime);
+
+            // make sure traffic is now visible!
+            showTraffic();
+        } catch (NullPointerException npe) {
+          npe.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -169,6 +169,7 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
                         public void run() {
                             ((MainActivity) getActivity()).showToast("error no traffic found",
                                     Gravity.CENTER, Toast.LENGTH_LONG);
+                            hideTraffic();
                             updateTrafficCache(null);
                         }
                     });

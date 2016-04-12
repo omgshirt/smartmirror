@@ -45,6 +45,9 @@
     <string name="calendar_title">Calendar</string>
     <string name="calendar_items_err">No Events Found</string>
 
+    <!-- gmailHome -->
+    <string name="gmail_home_inbox">(%d) Inbox</string>
+
     <!-- forecast -->
     <string name="forecast_title">Forecast</string>
 

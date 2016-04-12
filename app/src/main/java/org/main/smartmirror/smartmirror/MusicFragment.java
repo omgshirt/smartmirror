@@ -30,6 +30,8 @@ import java.util.HashMap;
 public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         AudioManager.OnAudioFocusChangeListener {
 
+    public static final int NORMAL_COMMAND_LIST = 0;
+    public static final int MUSIC_COMMAND_LIST = 1;
     private static final String GENRE = "genre";
     private static final String TAG = "SmartMirror music";
 
@@ -166,7 +168,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         forceStartStation(command);
     }
 
-    /** Like changeToStation, but changes to given station even when the media player is playing.
+    /** Like changeToStation, but changes to given station even when the media player is currently playing.
      *
      * @param command station to play
      */
@@ -174,12 +176,14 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         mGenre = GetGenreFromCommand(command);
         setStreamIconVisible();
         setIconDrawables(R.drawable.play);
+        ((MainActivity)getActivity()).setVoiceCommandMode(MUSIC_COMMAND_LIST);
         tearDownMediaPlayer();
         initMediaPlayer();
     }
 
     public void pauseStream() {
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            ((MainActivity)getActivity()).setVoiceCommandMode(NORMAL_COMMAND_LIST);
             mMediaPlayer.pause();
             setIconDrawables(R.drawable.pause);
             setStreamIconVisible();
@@ -189,6 +193,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     public void stopStream() {
         if (mMediaPlayer != null) {
+            ((MainActivity)getActivity()).setVoiceCommandMode(NORMAL_COMMAND_LIST);
             tearDownMediaPlayer();
             setIconDrawables(R.drawable.pause);
             mGenre = "";
@@ -199,7 +204,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
 
     public void playStream() {
         if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-            ((MainActivity)getActivity()).setVoiceCommandMode(true);
+            ((MainActivity)getActivity()).setVoiceCommandMode(MUSIC_COMMAND_LIST);
             mMediaPlayer.start();
             setIconDrawables(R.drawable.play);
             setStreamIconVisible();
@@ -257,8 +262,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             Log.i(TAG, "stopping music");
             mMediaPlayer.stop();
         }
-
-        ((MainActivity)getActivity()).setVoiceCommandMode(false);
+        Preferences prefs = Preferences.getInstance(getActivity());
+        prefs.setStayAwake(false);
         mMediaPlayer.release();
         mMediaPlayer = null;
     }
@@ -300,8 +305,10 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
      */
     @Override
     public void onPrepared(MediaPlayer mp) {
-        ((MainActivity)getActivity()).setVoiceCommandMode(true);
+        ((MainActivity)getActivity()).setVoiceCommandMode(MUSIC_COMMAND_LIST);
         txtStreamInfo.setText(R.string.stream_playing);
+        Preferences prefs = Preferences.getInstance(getActivity());
+        prefs.setStayAwake(true);
         mp.start();
     }
 
