@@ -1,9 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-/**
- * Created by Master N on 2/10/2016.
- */
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -84,7 +80,7 @@ public class GmailHomeFragment extends Fragment {
 
         // set a thread to check update in gmailUnreadCount.
         if (unreadCountScheduler == null) {
-            unreadCountScheduler = scheduler.scheduleAtFixedRate(messageCountUpdater, 10, 10, TimeUnit.SECONDS);
+            unreadCountScheduler = scheduler.scheduleAtFixedRate(messageCountUpdater, 10, 60, TimeUnit.SECONDS);
         }
 
         return view;
@@ -232,6 +228,10 @@ public class GmailHomeFragment extends Fragment {
             textView.setVisibility(View.VISIBLE);
             String text = getResources().getString(R.string.gmail_home_inbox);
             textView.setText(String.format(text, numUnreadPrimary));
+        }
+        else{
+            mailIcon.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
         }
     }
 
