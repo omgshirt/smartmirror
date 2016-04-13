@@ -1092,7 +1092,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         @Override
         protected String doInBackground(String... params) {
             String account = params[0];
-            String scopes = "oauth2:email";
+            String scopes = "oauth2:profile email";
             String token = null;
             try {
                 token = GoogleAuthUtil.getToken(getActivity().getApplicationContext(), account, scopes);
