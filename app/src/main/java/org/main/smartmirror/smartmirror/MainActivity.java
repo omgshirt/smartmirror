@@ -708,7 +708,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public boolean commandWakesFromSleep(String command) {
-        return (command.equals(Constants.WAKE) || command.equals(Constants.WAKE_UP)
+        return (command.equals(Constants.WAKE)
+                || command.equals(Constants.WAKE_UP)
+                || command.equals(Constants.MIRROR_MIRROR)
                 || command.equals(Constants.NIGHT_LIGHT)
                 || command.equals(Constants.MIRA_WAKE));
     }
@@ -882,6 +884,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case Constants.WAKE:
                 case Constants.WAKE_UP:
+                case Constants.MIRROR_MIRROR:
                     break;
                 case Constants.WIDE_SCREEN:
                     setContentFrameValues(FrameSize.WIDE_SCREEN);
@@ -1187,34 +1190,34 @@ public class MainActivity extends AppCompatActivity
                 command = (mPreferences.getWeatherUnits().equals(Preferences.ENGLISH)) ? Preferences.CMD_WEATHER_METRIC :
                         Preferences.CMD_WEATHER_ENGLISH;
                 break;
-            case Constants.ARTICLE_1:
+            case Constants.REMOTE_ARTICLE_1:
                 command = Constants.ONE;
                 break;
-            case Constants.ARTICLE_2:
+            case Constants.REMOTE_ARTICLE_2:
                 command = Constants.TWO;
                 break;
-            case Constants.ARTICLE_3:
+            case Constants.REMOTE_ARTICLE_3:
                 command = Constants.THREE;
                 break;
-            case Constants.ARTICLE_4:
+            case Constants.REMOTE_ARTICLE_4:
                 command = Constants.FOUR;
                 break;
-            case Constants.ARTICLE_5:
+            case Constants.REMOTE_ARTICLE_5:
                 command = Constants.FIVE;
                 break;
-            case Constants.ARTICLE_6:
+            case Constants.REMOTE_ARTICLE_6:
                 command = Constants.SIX;
                 break;
-            case Constants.ARTICLE_7:
+            case Constants.REMOTE_ARTICLE_7:
                 command = Constants.SEVEN;
                 break;
-            case Constants.ARTICLE_8:
+            case Constants.REMOTE_ARTICLE_8:
                 command = Constants.EIGHT;
                 break;
-            case Constants.ARTICLE_9:
+            case Constants.REMOTE_ARTICLE_9:
                 command = Constants.NINE;
                 break;
-            case Constants.ARTICLE_10:
+            case Constants.REMOTE_ARTICLE_10:
                 command = Constants.TEN;
                 break;
         }

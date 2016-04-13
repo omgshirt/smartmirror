@@ -44,13 +44,3 @@ public class AESHelper {
         return decryptString;
     }
 }
-
-
-/* to Encrypt
-    SecretKey secret = EncUtil.generateKey();
-    EncUtil.encryptMsg(<String to Encrypt>, secret))
-*/
-
-/* to Decrypt
-    EncUtil.decryptMsg(<byte[]>, secret))
-*/

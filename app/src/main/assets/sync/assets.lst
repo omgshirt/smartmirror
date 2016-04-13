@@ -1,4 +1,6 @@
 cmudict-en-us.dict
+smartmirror_keys.gram
+music_keys.gram
 en-phone.dmp
 en-us-ptm/README
 en-us-ptm/feat.params
@@ -8,6 +10,3 @@ en-us-ptm/noisedict
 en-us-ptm/sendump
 en-us-ptm/transition_matrices
 en-us-ptm/variances
-sm-commands.gram
-smartmirror_keys.gram
-music_keys.gram

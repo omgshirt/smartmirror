@@ -3,5 +3,5 @@
     android:layout_width="150dp"
     android:layout_height=".5dp"
     android:background="@color/white"
-    android:layout_marginTop="3dp"
-    android:layout_marginBottom="3dp" />
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp" />

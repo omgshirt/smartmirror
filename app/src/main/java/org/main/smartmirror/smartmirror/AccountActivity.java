@@ -1,12 +1,13 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +17,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -39,7 +38,17 @@ import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -56,7 +65,8 @@ public class AccountActivity extends AppCompatActivity implements
     private TwitterLoginButton mTwitterLoginButton;
     private TwitterSession mSession;
 
-    private String mScreenName;
+    private String mDeviceId;
+    private String mTwitterAccount;
     private String mAuthToken;
     private String mAuthSecret;
 
@@ -74,6 +84,9 @@ public class AccountActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mDeviceId = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
         initializeApis();
         setContentView(R.layout.account_activity);
         mPreference = Preferences.getInstance(this);
@@ -152,8 +165,8 @@ public class AccountActivity extends AppCompatActivity implements
 
                 mSession = result.data;
                 mUserID = mSession.getUserId();
-                mScreenName = mSession.getUserName();
-                mPreference.setTwitterAccount(mScreenName);
+                mTwitterAccount = mSession.getUserName();
+                mPreference.setTwitterAccount(mTwitterAccount);
                 String msg = "@" + mSession.getUserName() + " logged in! (#" + mUserID + ")";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
                 Long id = mSession.getId();
@@ -256,13 +269,34 @@ public class AccountActivity extends AppCompatActivity implements
      */
     public void submitButtonPress(View view) {
         Log.i(Constants.TAG, "Submit Button");
-        /*EditText edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
+        EditText edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
         EditText edtFacebookPassword = (EditText) findViewById(R.id.facebook_password);
-        if (edtFacebookPassword.getText().toString().equals("") && edtFacebookUsername.getText().toString().equals("")) {
-            AESHelper.encryptMsg(facebookUsername.getText().toString() + "::" + facebookPassword.getText().toString(), mPreference.getSecret());
-            edFacebookPassword = null;
+        if (!(edtFacebookPassword.getText().toString().isEmpty()) && !(edtFacebookUsername.getText().toString().isEmpty())) {
+            mPreference.setFacebookAccount(edtFacebookUsername.getText().toString());
+            try {
+                SecretKey secret = AESHelper.generateKey(mDeviceId);
+                byte[] encrypted = AESHelper.encryptMsg(edtFacebookPassword.getText().toString(), secret);
+                mPreference.setFacebookCredential(Base64.encodeToString(encrypted, Base64.DEFAULT));
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
+            } catch (NoSuchPaddingException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IllegalBlockSizeException e) {
+                e.printStackTrace();
+            } catch (BadPaddingException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            } catch (InvalidParameterSpecException e) {
+                e.printStackTrace();
+            }
+            edtFacebookPassword = null;
             edtFacebookUsername = null;
-        }*/
+        }
         // since by default the work lat and long is set to -1 we are OK
         // to not have an else case here
         if (!(edtWorkAddress.getText().toString().isEmpty())) {
