@@ -54,7 +54,6 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     private Activity activity;
     private Boolean isTaskCancelled = false;
 
-    public static int mPhotosReferencePoint;
 
     public PhotosASyncTask(Activity activity, String uid, String username) {
         this.activity = activity;
@@ -74,15 +73,13 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String[] params) {
         try {
-            if (!isCancelled()) {
-                Log.i("PHOTOS ", "getting albums");
-                traverseForAlbums(getXmlFromUrl(getAlbums));
-                for (int i = 0; i < PhotosFragment.mAlbumIdList.size(); i++) {
-                    String newPhotosUrl = getPhotosInAlbumPreUrl + PhotosFragment.mAlbumIdList.get(i);
-                    traverseForPhotos(getXmlFromUrl(newPhotosUrl));
-                }
-                updatePhotosCache(PhotosFragment.mImageUrlList);
+            Log.i("PHOTOS ", "getting albums");
+            traverseForAlbums(getXmlFromUrl(getAlbums));
+            for (int i = 0; i < PhotosFragment.mAlbumIdList.size(); i++) {
+                String newPhotosUrl = getPhotosInAlbumPreUrl + PhotosFragment.mAlbumIdList.get(i);
+                traverseForPhotos(getXmlFromUrl(newPhotosUrl));
             }
+            updatePhotosCache(PhotosFragment.mImageUrlList);
 
         } catch (Exception e) {
             Log.i("ERR ", e.toString());
@@ -93,8 +90,7 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String message) {
-        if (isCancelled()) cancel(true);
-        renderPhotos();
+        new PhotosFragment().renderPhotos();
     }
 
     private String nodeToString(Node node) {
@@ -160,46 +156,73 @@ public class PhotosASyncTask extends AsyncTask<String, Void, String> {
         }
     }
 
-    public void renderPhotos() {
-        try {
+    /*public void renderPhotos() {
+        if(!isCancelled()) {
+            try {
+                mTimer = new Timer();
+                // initialize the runnable that will handle the task
+                mRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (!isCancelled()) {
+                                Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.
+                                        get(currentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
+                            } else if (isCancelled()) {
+                                isTaskCancelled = true;
+                                mTimerTask.cancel();
+                                cancel(true);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if(isCancelled()) {
+                            Log.i("Cancelled?", isTaskCancelled.toString());
+                            mTimerTask.cancel();
+                            cancel(true);
+                        }
+                        else if (!isCancelled()) {
+                            currentPhoto++;
+                            if (currentPhoto > PhotosFragment.mImageUrlList.size() - 1) {
+                                currentPhoto = 0;
+                            }
+                            Log.i("Cancelled?", isTaskCancelled.toString());
+                        }
 
-            mTimer = new Timer();
-            // initialize the runnable that will handle the task
-            mRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (!isCancelled()) {
-                            Picasso.with(MainActivity.getContextForApplication()).load(PhotosFragment.mImageUrlList.
-                                    get(PhotosFragment.mCurrentPhoto)).fit().centerInside().into(PhotosFragment.mPhotoFromPicasa);
-                        } else if (isCancelled()) isTaskCancelled = true;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    PhotosFragment.mCurrentPhoto++;
+                    *//*currentPhoto++;
                     if (currentPhoto > PhotosFragment.mImageUrlList.size() - 1) {
                         if (!isCancelled()) {
-                            PhotosFragment.mCurrentPhoto = 0;
+                            currentPhoto = 0;
+                            Log.i("Cancelled?", isTaskCancelled.toString());
                         } else if (isCancelled()) {
                             Log.i("Cancelled?", isTaskCancelled.toString());
                             mTimerTask.cancel();
+                            cancel(true);
+                        }
+                    }*//*
+
+                    }
+                };
+
+                // initialize the timer task that will run on the UI
+                mTimerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(isCancelled()) {
+                            mTimerTask.cancel();
+                        }
+                        else {
+                            activity.runOnUiThread(mRunnable);
                         }
                     }
-                }
-            };
-
-            // initialize the timer task that will run on the UI
-            mTimerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    activity.runOnUiThread(mRunnable);
-                }
-            };
-            mTimer.scheduleAtFixedRate(mTimerTask, 0, 20000);
-        } catch (Exception e) {
-            e.printStackTrace();
+                };
+                mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-    }
+
+    }*/
 
     private void updatePhotosCache(List<Uri> data) {
         PhotosFragment.mCacheManager.addCache(PhotosFragment.PHOTO_CACHE, data, PhotosFragment.DATA_UPDATE_FREQUENCY);

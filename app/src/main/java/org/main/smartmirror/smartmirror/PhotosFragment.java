@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -14,7 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class PhotosFragment extends Fragment implements CacheManager.CacheListener{
@@ -29,8 +34,12 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
 
     private PhotosASyncTask mAsyncTask;
     private Preferences mPreference;
+    private static TimerTask mTimerTask;
+    private Timer mTimer;
+    private Runnable mRunnable;
+    private int mCurrentPhoto = 0;
 
-    public static int mCurrentPhoto = 0;
+    static MainActivity mainActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +48,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
         if (!mPreference.isLoggedInToGmail()) {
             removePhotos();
         }
+        mainActivity = new MainActivity();
     }
 
     @Override
@@ -77,7 +87,8 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
             Log.i(Constants.TAG, PHOTO_CACHE + " does not exist, creating");
             startPhotosUpdate();
         } else {
-            new PhotosASyncTask(getActivity(), mPreference.getUserId(), mPreference.getUsername()).renderPhotos();
+            //new PhotosASyncTask(getActivity(), mPreference.getUserId(), mPreference.getUsername()).execute();
+            renderPhotos();
             if (mCacheManager.isExpired(PHOTO_CACHE)) {
                 Log.i(Constants.TAG, PHOTO_CACHE + " expired. Refreshing...");
                 startPhotosUpdate();
@@ -102,20 +113,42 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
     // when this goes out of view, halt listening
     public void onPause() {
         super.onPause();
-        if (mAsyncTask != null) {
-            mAsyncTask.cancel(true);
-        }
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         mCacheManager.unRegisterCacheListener(PHOTO_CACHE, this);
         Log.i("PHOTO CACHE", "unregister photos");
+        try {
+            mTimerTask.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        try {
+            mTimerTask.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            mTimerTask.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onCacheExpired(String cacheName) {
         if (cacheName.equals(PHOTO_CACHE)) {
             try {
-                mAsyncTask.cancel(true);
+                //mAsyncTask.cancel(true);
+                mTimerTask.cancel();
                 mImageUrlList.clear();
                 mAlbumIdList.clear();
                 startPhotosUpdate();
@@ -142,6 +175,42 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
         ((MainActivity) getActivity()).speakText(getResources().getString(R.string.speech_not_logged_in_err));
     }
 
+    public void renderPhotos() {
+        try {
+            mTimer = new Timer();
+            // initialize the runnable that will handle the task
+            mRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    //Log.i("PHOTOS Fragment ","Load photos");
+                    try {
+                        Picasso.with(getActivity()).load(mImageUrlList.
+                                get(mCurrentPhoto)).fit().centerInside().into(mPhotoFromPicasa);
+                        mCurrentPhoto++;
+                        if (mCurrentPhoto > mImageUrlList.size() - 1) {
+                            mCurrentPhoto = 0;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
 
+            // initialize the timer task that will run on the UI
+            mTimerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    //Log.i("PHOTOS Fragment ","Creating new timer task");
+                    /*if (getActivity() == null)
+                        return;*/
+                    mainActivity.runOnUiThread(mRunnable);
+                }
+            };
+            mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }
