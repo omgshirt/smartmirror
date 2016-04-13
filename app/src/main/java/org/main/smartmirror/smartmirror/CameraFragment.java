@@ -47,6 +47,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.ConnectionResult;
 import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpResponse;
@@ -103,6 +107,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
 
     //Gets current date and time to name pictures
     public static String dateTimeStr;
+    public static final int REQUEST_AUTH_TOKEN = 3;
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -457,6 +462,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     @Override
     public void onStart() {
         super.onStart();
+        new RetrieveTokenTask().execute(mPreferences.getGmailAccount());
         if (!mPreferences.isLoggedInToGmail()) {
             removeCamera();
         }
@@ -986,7 +992,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     // Log.i("PICASA UPLOAD ", "STATUS CODE : " + responseString);
                     String responseBody = EntityUtils.toString(response.getEntity());
                     Log.i("PICASA UPLOAD ", "STATUS CODE : " + response.getStatusLine() + "\n" + responseBody);
-                    if(response.getStatusLine().toString().contains("201")) {
+                    if (response.getStatusLine().toString().contains("201")) {
                         mCountDownText.post(new Runnable() {
                             public void run() {
                                 mCountDownText.setText("Photo Uploaded Successfully");
@@ -1007,7 +1013,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public void createNewPicasaAlbum() {
         new Thread() {
             public void run() {
-                Long tsLong = System.currentTimeMillis()/1000;
+                Long tsLong = System.currentTimeMillis() / 1000;
                 String ts = tsLong.toString();
                 HttpPost postRequest = new HttpPost(
                         "https://picasaweb.google.com/data/feed/api/user/" + mPreferences.getUsername());
@@ -1019,7 +1025,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                                 "<summary type='text'>Smart Mirror Portraits.</summary>" +
                                 "<gphoto:location> </gphoto:location>" +
                                 "<gphoto:access>public</gphoto:access>" +
-                                "<gphoto:timestamp>"+ ts +"</gphoto:timestamp>" +
+                                "<gphoto:timestamp>" + ts + "</gphoto:timestamp>" +
                                 "<media:group>" +
                                 "<media:keywords>smart mirror, mira</media:keywords>" +
                                 "</media:group>" +
@@ -1039,7 +1045,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     HttpResponse response = httpclient.execute(postRequest);
                     String responseBody = EntityUtils.toString(response.getEntity());
                     //Log.i("PICASA ALBUM: ", "Response: " + response.getStatusLine() + "\n" + responseBody);
-                    if(response.getStatusLine().toString().contains("201")) {
+                    if (response.getStatusLine().toString().contains("201")) {
                         mCountDownText.post(new Runnable() {
                             public void run() {
                                 mCountDownText.setText("New Album Created Successfully");
@@ -1050,7 +1056,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                                 .parse(new InputSource(new StringReader(responseBody)));
                         traverseForAlbums(doc);
-                    } catch (Exception e) {e.printStackTrace();}
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -1076,6 +1084,32 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             mAlbumID = node.getTextContent();
             Log.i("ALBUM ID node", mAlbumID);
 
+        }
+    }
+
+    private class RetrieveTokenTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String account = params[0];
+            String scopes = "oauth2:email";
+            String token = null;
+            try {
+                token = GoogleAuthUtil.getToken(getActivity().getApplicationContext(), account, scopes);
+            } catch (IOException e) {
+                Log.e(Constants.TAG, e.getMessage());
+            } catch (UserRecoverableAuthException e) {
+                startActivityForResult(e.getIntent(), REQUEST_AUTH_TOKEN);
+            } catch (GoogleAuthException e) {
+                Log.e(Constants.TAG, e.getMessage());
+            }
+            return token;
+        }
+
+        @Override
+        protected void onPostExecute(String accessToken) {
+            super.onPostExecute(accessToken);
+            mPreferences.setAccessToken(accessToken);
         }
     }
 }
