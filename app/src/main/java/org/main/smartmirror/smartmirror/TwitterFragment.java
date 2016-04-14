@@ -74,7 +74,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
                     }
                     twitterFeed.smoothScrollToPosition(twitterFeedPosition);
                 } else if (message.contains(Constants.SCROLL_UP)) {
-                    twitterFeedPosition = twitterFeedPosition - 12;
+                    twitterFeedPosition = twitterFeedPosition - 15;
                     if (twitterFeedPosition >= numItemsInFeed) {
                         twitterFeedPosition = twitterFeedPosition - 8;
                     }
@@ -158,6 +158,7 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
             mUsersAt.clear();
             mTweets.clear();
             startTwitterUpdate();
+            twitterFeedPosition = 5;
         }
         Log.i("TWITTER CACHE", "updating expired cache" + cacheName);
 
