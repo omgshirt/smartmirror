@@ -591,7 +591,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Display the HelpFragment within content_frame_2
      */
-    private void displayHelpFragment() {
+    private void createHelpFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = HelpFragment.newInstance(getCurrentFragment().getTag());
         ft.replace(R.id.content_frame_2, fragment, Constants.HELP);
@@ -730,7 +730,7 @@ public class MainActivity extends AppCompatActivity
             if (frame3Visibility == View.VISIBLE) {
                 setContentFrameValues(FrameSize.SMALL_SCREEN);
             }
-            displayHelpFragment();
+            createHelpFragment();
         }
 
         if (helpIsVisible) {

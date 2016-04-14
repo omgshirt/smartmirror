@@ -17,24 +17,18 @@
         <item>take a picture</item>
     </array>
 
-    <string-array name="facebook_help">
-        <item>scroll up</item>
-        <item>scroll down</item>
-    </string-array>
-
     <string-array name="general_help">
-        <item>Go Back</item>
-        <item>Help</item>
-        <item>Conditions</item>
-        <item>Settings</item>
-        <item>\'Go to Sleep\' \'Mira Sleep\'</item>
-        <item>Wake</item>
+
+        <item>Mira Sleep | Go To Sleep</item>
+        <item>Mira Wake | Wake Up</item>
+        <item>Start | Stop Listening</item>
+        <item>Go Back | Forward</item>
+        <item>Scroll Up | Down</item>
+        <item>Sound On | Off</item>
+        <item>Enable | Disable Remote</item>
+        <item>Weather English | Metric</item>
         <item>Show | Hide Time</item>
         <item>Show | Hide Weather</item>
-        <item>Start | Stop Listening</item>
-        <item>Enable | Disable Camera</item>
-        <item>Enable | Disable Remote</item>
-        <item>\'Weather English\' \'Weather Metric\'</item>
     </string-array>
 
     <string-array name="guardian_sections">
@@ -61,13 +55,13 @@
         <item>forecast</item>
         <item>gallery</item>
         <item>gmail</item>
-        <item>night light</item>
+        <item>help</item>
+        <item>Night Light</item>
         <item>music</item>
+        <item>photos</item>
         <item>quotes</item>
         <item>settings</item>
         <item>twitter</item>
-        <item>traffic</item>
-        <item>gmail</item>
     </string-array>
 
     <string-array name="music_commands">

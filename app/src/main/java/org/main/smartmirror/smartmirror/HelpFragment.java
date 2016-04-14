@@ -3,6 +3,7 @@ package org.main.smartmirror.smartmirror;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,7 @@ public class HelpFragment extends Fragment {
         fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
         fadeOut.setStartOffset(fadeInTime + displayLength);
         fadeOut.setDuration(fadeOutTime);
+        fadeOut.setRepeatCount(0);
 
         // Create our animation
         final AnimationSet animation = new AnimationSet(false);
@@ -67,7 +69,7 @@ public class HelpFragment extends Fragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                removeHelpFragment();
+                //removeHelpFragment();
             }
 
             @Override
@@ -111,7 +113,7 @@ public class HelpFragment extends Fragment {
         // Modes
         arrayContent = res.getStringArray(R.array.modes_list);
         strContent = buildupStringFromArrays(arrayContent);
-        txtModeHeader.setText("Mode");
+        txtModeHeader.setText("Help");
         txtModeContent.setText(strContent);
         // News
         arrayContent = res.getStringArray(R.array.guardian_sections);
@@ -121,17 +123,10 @@ public class HelpFragment extends Fragment {
         // General
         arrayContent = res.getStringArray(R.array.general_help);
         strContent = buildupStringFromArrays(arrayContent);
-        txtHelpHeader.setText("General Help");
+        txtHelpHeader.setText("Other Commands");
         txtHelpContent.setText(strContent);
 
         switch (name) {
-            // facebook
-            case Constants.FACEBOOK:
-                arrayContent = res.getStringArray(R.array.facebook_help);
-                strContent = buildupStringFromArrays(arrayContent);
-                txtCurrentHelpHeader.setText(name.substring(0, 1).toUpperCase() + name.substring(1) + " - Help");
-                txtCurrentHelpContent.setText(strContent);
-                break;
             // camera
             case Constants.CAMERA:
                 arrayContent = res.getStringArray(R.array.camera_help);
@@ -160,6 +155,7 @@ public class HelpFragment extends Fragment {
         mTimerTask = new TimerTask() {
             @Override
             public void run() {
+                Log.i(Constants.TAG, "starting help TimerTask");
                 getActivity().runOnUiThread(mRunnable);
             }
         };
@@ -187,7 +183,9 @@ public class HelpFragment extends Fragment {
      * The equivalent of Activity.finish()
      */
     private void removeHelpFragment() {
+        Log.i(Constants.TAG, "HelpFragment is removing itself");
         mTimerTask.cancel();
+        Log.i(Constants.TAG, "cancelling mTimerTask");
         ((MainActivity) getActivity()).removeFragment(Constants.HELP);
     }
 
@@ -195,5 +193,6 @@ public class HelpFragment extends Fragment {
     public void onPause() {
         super.onPause();
         mTimerTask.cancel();
+        Log.i(Constants.TAG, "cancelling mTimerTask");
     }
 }
