@@ -166,12 +166,15 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 VoiceScroll sl = new VoiceScroll();
                 int numItemsInFeed = newsFeed.getAdapter().getCount();
                 if (message.contains(Constants.SCROLL_DOWN)) {
-                    newsFeedPosition = newsFeedPosition + 5;
-                    if (newsFeedPosition >= numItemsInFeed)
+                    newsFeedPosition = newsFeedPosition + 8;
+                    if (newsFeedPosition >= numItemsInFeed) {
                         newsFeedPosition = numItemsInFeed;
+                    }
                 } else if (message.contains(Constants.SCROLL_UP)) {
-                    newsFeedPosition = newsFeedPosition - 5;
-                    if (newsFeedPosition < 0) newsFeedPosition = 0;
+                    newsFeedPosition = newsFeedPosition - 9;
+                    if (newsFeedPosition < 0) {
+                        newsFeedPosition = 0;
+                    }
                 }
                 sl.scrollListView(message,newsFeed, newsFeedPosition);
             }
