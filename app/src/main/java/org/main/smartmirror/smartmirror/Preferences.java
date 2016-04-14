@@ -103,6 +103,9 @@ public class Preferences implements LocationListener {
     private String mTimeFormat;
     private String mWeatherUnits;                   // Weather display format (English / metric)
 
+    private boolean isWeatherVisible;
+    private boolean isTimeVisible;
+
     private boolean mFirstTimeRun;
 
     private boolean mStayAwake;                     // if true, screen will stay on until cancelled
@@ -305,6 +308,9 @@ public class Preferences implements LocationListener {
             }
         }
 
+        isWeatherVisible = true;
+        isTimeVisible = true;
+
         Log.d("Location", "lat:" + Double.toString(mLatitude));
         Log.d("Location", "long:" + Double.toString(mLongitude));
 
@@ -362,6 +368,22 @@ public class Preferences implements LocationListener {
 
     public boolean weatherIsEnglish() {
         return mWeatherUnits.equals(ENGLISH);
+    }
+
+    public boolean isWeatherVisible() {
+        return isWeatherVisible;
+    }
+
+    public void setIsWeatherVisible(boolean isWeatherVisible) {
+        this.isWeatherVisible = isWeatherVisible;
+    }
+
+    public boolean isTimeVisible() {
+        return isTimeVisible;
+    }
+
+    public void setIsTimeVisible(boolean isTimeVisible) {
+        this.isTimeVisible = isTimeVisible;
     }
 
     /**

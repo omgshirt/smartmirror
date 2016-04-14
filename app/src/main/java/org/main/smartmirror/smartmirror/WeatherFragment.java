@@ -71,7 +71,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     private CacheManager mCacheManager = null;
     // time in seconds before weather data expires
-    private final int DATA_UPDATE_FREQUENCY = 600;
+    private final int WEATHER_UPDATE_INTERVAL = 600;
     public static final String WEATHER_CACHE = "weather cache";
 
     Handler mHandler = new Handler();
@@ -96,7 +96,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         View view = inflater.inflate(R.layout.weather_fragment, container, false);
 
         layTimeLayout = (LinearLayout) view.findViewById(R.id.layout_time);
-        layTimeDivider = (View) view.findViewById(R.id.time_divider);
+        layTimeDivider = view.findViewById(R.id.time_divider);
         layWeatherLayout = (LinearLayout) view.findViewById(R.id.layout_weather);
         txtCurrentHumidity = (TextView) view.findViewById(R.id.current_humidity);
         txtCurrentTemp = (TextView) view.findViewById(R.id.current_temp);
@@ -253,24 +253,28 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     }
 
     public void hideTime() {
+        mPreferences.setIsTimeVisible(false);
         layTimeLayout.setVisibility(View.GONE);
         layTimeDivider.setVisibility(View.GONE);
         saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
     public void showTime() {
+        mPreferences.setIsTimeVisible(true);
         layTimeLayout.setVisibility(View.VISIBLE);
         layTimeDivider.setVisibility(View.VISIBLE);
         saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
     public void hideWeather() {
+        mPreferences.setIsWeatherVisible(false);
         layWeatherLayout.setVisibility(View.GONE);
         layTimeDivider.setVisibility(View.GONE);
         saveVisibilityPreference(WEATHER_VISIBLE_PREF, layWeatherLayout.getVisibility());
     }
 
     public void showWeather() {
+        mPreferences.setIsWeatherVisible(true);
         layWeatherLayout.setVisibility(View.VISIBLE);
         layTimeDivider.setVisibility(View.VISIBLE);
         saveVisibilityPreference(WEATHER_VISIBLE_PREF, layWeatherLayout.getVisibility());
@@ -324,19 +328,16 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 if (json == null) {
                     mHandler.post(new Runnable() {
                         public void run() {
-                            ((MainActivity) getActivity()).showToast(getString(R.string.weather_data_err),
-                                    Gravity.CENTER, Toast.LENGTH_LONG);
-                            if (mCacheManager.isExpired(WEATHER_CACHE)) {
-                                hideWeather();
-                            }
-                            updateWeatherCache(null);
+                            ((MainActivity) getActivity()).showToast(getString(R.string.weather_data_err), Gravity.CENTER, Toast.LENGTH_LONG);
+                            mCacheManager.invalidateCache(WEATHER_CACHE);
+                            hideWeather();
                         }
                     });
                 } else {
                     mHandler.post(new Runnable() {
                         public void run() {
                             Log.i(Constants.TAG, "New weather data downloaded");
-                            updateWeatherCache(json);
+                            updateWeatherCache(json, WEATHER_UPDATE_INTERVAL);
                             renderWeather(json);
                         }
                     });
@@ -345,9 +346,9 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         }.start();
     }
 
-    private void updateWeatherCache(JSONObject data) {
+    private void updateWeatherCache(JSONObject data, int time ) {
         // Update the WEATHER_CACHE stored in cacheManager or create new if it doesn't exist.
-        mCacheManager.addCache(WEATHER_CACHE, data, DATA_UPDATE_FREQUENCY);
+        mCacheManager.addCache(WEATHER_CACHE, data, time);
     }
 
     private void renderWeather(JSONObject json) {
@@ -476,6 +477,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             e.printStackTrace();
             Log.e("DarkSky", "One or more fields not found in the JSON data");
         }
+
+        if (mPreferences.isWeatherVisible()) showWeather();
     }
 
 

@@ -12,12 +12,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -287,7 +289,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         } catch (IllegalStateException ise) {
             ise.printStackTrace();
             txtStreamInfo.setText(R.string.stream_not_found);
-            Log.i(TAG, "illegal state exception - probably thrown by DataSource url");
+            Log.i(TAG, "illegal state exception - probably thrown by bad source url");
         }
     }
 
@@ -297,6 +299,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
         Log.i(TAG, "media player error code: " + what + " extra: " + extra);
+        ((MainActivity) getActivity()).showToast(getString(R.string.stream_not_found), Gravity.CENTER, Toast.LENGTH_LONG);
+        stopStream();
         return true;
     }
 
