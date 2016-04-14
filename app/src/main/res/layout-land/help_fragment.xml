@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:layout_marginEnd="15dp"
     android:layout_marginStart="15dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#ffffff">
 
     <!-- current fragment -->
     <TextView
@@ -13,16 +14,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#000000" />
 
     <View
         android:id="@+id/help_divider"
-        style="@style/Divider" />
+        style="@style/Divider"
+        android:background="#000000" />
 
     <TextView
         android:id="@+id/fragment_help_content"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="#000000" />
 
     <!-- available sections -->
     <TextView
@@ -30,14 +34,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#000000" />
 
     <View style="@style/Divider" />
 
     <TextView
         android:id="@+id/mode_content"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="#000000" />
 
     <!-- news sections -->
     <TextView
@@ -45,14 +51,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#000000" />
 
     <View style="@style/Divider" />
 
     <TextView
         android:id="@+id/news_content"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="#000000" />
 
     <!-- general help -->
     <TextView
@@ -60,13 +68,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#000000" />
 
     <View style="@style/Divider" />
 
     <TextView
         android:id="@+id/general_help_content"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="#000000" />
 
 </LinearLayout>

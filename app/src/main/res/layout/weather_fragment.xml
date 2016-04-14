@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context="org.main.smartmirror.smartmirror.WeatherFragment">
+    tools:context="org.main.smartmirror.smartmirror.WeatherFragment"
+    android:background="#ffffff">
     <!-- Date and time -->
     <LinearLayout
         android:id="@+id/layout_time"
@@ -17,14 +18,16 @@
             android:id="@+id/time_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22sp" />
+            android:textSize="22sp"
+            android:textColor="#000000" />
 
         <TextClock
             android:id="@+id/date_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:textSize="22sp" />
+            android:textSize="22sp"
+            android:textColor="#000000" />
     </LinearLayout>
 
     <include
@@ -73,14 +76,16 @@
                     android:id="@+id/weather_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="40sp" />
+                    android:textSize="40sp"
+                    android:textColor="#000000" />
 
                 <!-- current temp -->
                 <TextView
                     android:id="@+id/current_temp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="40sp" />
+                    android:textSize="40sp"
+                    android:textColor="#000000" />
             </LinearLayout>
 
             <LinearLayout
@@ -96,14 +101,16 @@
                     android:id="@+id/current_humidity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textColor="#000000" />
 
                 <!-- current wind -->
                 <TextView
                     android:id="@+id/current_wind"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textColor="#000000" />
             </LinearLayout>
 
             <LinearLayout
@@ -119,7 +126,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="High"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textColor="#000000" />
 
                 <!-- daily low -->
                 <TextView
@@ -127,7 +135,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Low "
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textColor="#000000" />
             </LinearLayout>
 
         </LinearLayout>

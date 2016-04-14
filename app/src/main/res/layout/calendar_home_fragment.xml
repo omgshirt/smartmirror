@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="#ffffff">
 
     <include layout="@layout/line_divider_short" />
 
@@ -16,7 +17,8 @@
             android:layout_height="22dp"
             android:layout_gravity="top"
             android:layout_marginEnd="10dp"
-            android:src="@drawable/calendar" />
+            android:src="@drawable/calendar"
+            android:background="#000000" />
 
         <LinearLayout
             android:id="@+id/calendar_home_fragment_layout"

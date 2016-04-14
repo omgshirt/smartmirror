@@ -5,7 +5,8 @@
     android:layout_marginStart="2dp"
     android:layout_weight="1"
     android:gravity="center_horizontal"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#ffffff">
 
     <!-- icon -->
     <TextView
@@ -13,7 +14,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:textColor="#000000" />
 
     <!-- time -->
     <TextView
@@ -21,7 +23,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textSize="13sp" />
+        android:textSize="13sp"
+        android:textColor="#000000" />
 
     <!-- temp -->
     <TextView
@@ -29,7 +32,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textColor="#000000" />
 
 
     <!-- chance of rain -->
@@ -43,13 +47,15 @@
             android:id="@+id/forecast_umbrella"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#000000" />
 
         <TextView
             android:id="@+id/forecast_rain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#000000" />
     </LinearLayout>
 </LinearLayout>

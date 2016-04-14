@@ -3,7 +3,8 @@
     android:id="@+id/traffic_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="#ffffff">
 
     <include layout="@layout/line_divider_short" />
 
@@ -18,7 +19,8 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_marginEnd="10dp"
-            android:src="@drawable/car_front" />
+            android:src="@drawable/car_front"
+            android:background="#000000" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,12 +31,14 @@
                 android:id="@+id/traffic_destination"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textColor="#000000" />
             <TextView
                 android:id="@+id/traffic_delay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textColor="#000000" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
