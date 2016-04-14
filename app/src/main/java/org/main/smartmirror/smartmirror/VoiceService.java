@@ -292,7 +292,7 @@ public class VoiceService extends Service implements RecognitionListener {
                 .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
 
                         // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setKeywordThreshold(1e-4f)
+                .setKeywordThreshold(1e-10f)
 
                         // Use context-independent phonetic search, context-dependent is too slow for mobile
                 .setBoolean("-allphone_ci", true)

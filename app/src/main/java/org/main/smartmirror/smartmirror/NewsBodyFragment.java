@@ -82,6 +82,4 @@ public class NewsBodyFragment extends Fragment {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
-
-
 }

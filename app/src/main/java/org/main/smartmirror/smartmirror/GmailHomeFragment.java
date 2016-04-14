@@ -1,9 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-/**
- * Created by Master N on 2/10/2016.
- */
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +8,12 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -43,6 +41,7 @@ public class GmailHomeFragment extends Fragment {
 
     public TextView textView;
     public ImageView mailIcon;
+    public View lineDiv;
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     public int numUnreadPrimary;
@@ -63,7 +62,7 @@ public class GmailHomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.gmail_home_fragment, container, false);
         textView = (TextView)view.findViewById(R.id.num_unread);
         mailIcon = (ImageView) view.findViewById(R.id.mail_icon);
-
+        lineDiv = view.findViewById(R.id.line_div_short);
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getActivity().getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff())
@@ -84,7 +83,7 @@ public class GmailHomeFragment extends Fragment {
 
         // set a thread to check update in gmailUnreadCount.
         if (unreadCountScheduler == null) {
-            unreadCountScheduler = scheduler.scheduleAtFixedRate(messageCountUpdater, 10, 10, TimeUnit.SECONDS);
+            unreadCountScheduler = scheduler.scheduleAtFixedRate(messageCountUpdater, 10, 60, TimeUnit.SECONDS);
         }
 
         return view;
@@ -230,8 +229,14 @@ public class GmailHomeFragment extends Fragment {
         if (numUnreadPrimary > 0) {
             mailIcon.setVisibility(View.VISIBLE);
             textView.setVisibility(View.VISIBLE);
+            lineDiv.setVisibility(View.VISIBLE);
             String text = getResources().getString(R.string.gmail_home_inbox);
             textView.setText(String.format(text, numUnreadPrimary));
+        }
+        else{
+            lineDiv.setVisibility(View.GONE);
+            mailIcon.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
         }
     }
 

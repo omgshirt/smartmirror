@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,18 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ScrollView;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
 
 public class FacebookFragment extends Fragment {
 
@@ -22,13 +36,16 @@ public class FacebookFragment extends Fragment {
     private ScrollView mScrollView;
     private WebView mWebview;
 
+    private String mDeviceId;
     private String mUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreference = Preferences.getInstance(getActivity());
-        if(mPreference.isLoggedInToFacebook()){
+        mDeviceId = Settings.Secure.getString(getActivity().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+        if (mPreference.isLoggedInToFacebook()) {
             mUrl = Constants.FACEBOOK_URL;
         } else {
             mUrl = Constants.FACEBOOK_SMARTMIRROR;
@@ -47,6 +64,33 @@ public class FacebookFragment extends Fragment {
         return view;
     }
 
+    private String retrieveCredentials() {
+        String plain = "";
+        try {
+            SecretKey key = AESHelper.generateKey(mDeviceId);
+            byte[] array = Base64.decode(mPreference.getFacebookCredential(), Base64.DEFAULT);
+            plain = AESHelper.decryptMsg(array, key);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (InvalidParameterSpecException e) {
+            e.printStackTrace();
+        }
+        return plain;
+    }
 
     // ----------------------- Local Broadcast Receiver -----------------------
 
@@ -77,6 +121,7 @@ public class FacebookFragment extends Fragment {
     }
 
     // when this goes out of view, halt listening
+    @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);

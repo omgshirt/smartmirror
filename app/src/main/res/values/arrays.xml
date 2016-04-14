@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string-array name="article_commands">
+        <item>article 1</item>
+        <item>article 2</item>
+        <item>article 3</item>
+        <item>article 4</item>
+        <item>article 5</item>
+        <item>article 6</item>
+        <item>article 7</item>
+        <item>article 8</item>
+        <item>article 9</item>
+        <item>article 10</item>
+    </string-array>
     <array name="camera_help">
         <item>take a picture</item>
     </array>
@@ -55,6 +67,20 @@
         <item>settings</item>
         <item>twitter</item>
         <item>traffic</item>
+        <item>gmail</item>
+    </string-array>
+
+    <string-array name="music_commands">
+        <item>pause music</item>
+        <item>stop music</item>
+        <item>play music</item>
+        <item>play alternative</item>
+        <item>play ambient</item>
+        <item>play classical</item>
+        <item>play dance</item>
+        <item>play jazz</item>
+        <item>play rap</item>
+        <item>play rock</item>
     </string-array>
 
 

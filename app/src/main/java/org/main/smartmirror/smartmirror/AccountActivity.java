@@ -1,12 +1,12 @@
 package org.main.smartmirror.smartmirror;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,21 +14,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
+import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.services.gmail.GmailScopes;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -39,24 +35,34 @@ import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import io.fabric.sdk.android.Fabric;
 
 /**
  * Activity that handles the Account Credentials and Work address
  */
-public class AccountActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener {
+public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private long mUserID;
     private GoogleApiClient mGoogleApiClient;
     private SignInButton sbtnGoogleSignInButton;
-    private Preferences mPreference;
+    private Preferences mPreferences;
     private TwitterLoginButton mTwitterLoginButton;
     private TwitterSession mSession;
 
-    private String mScreenName;
+    private String mDeviceId;
+    private String mTwitterAccount;
     private String mAuthToken;
     private String mAuthSecret;
 
@@ -68,15 +74,17 @@ public class AccountActivity extends AppCompatActivity implements
 
     public static final int GOOGLE_REQUEST = 1;
     public static final int REQUEST_PERMISSIONS = 2;
-    public static final int REQUEST_AUTH_TOKEN = 3;
     public static final int TWITTER_REQUEST = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mDeviceId = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
         initializeApis();
         setContentView(R.layout.account_activity);
-        mPreference = Preferences.getInstance(this);
+        mPreferences = Preferences.getInstance(this);
 
         btnSignOutButton = (ViewGroup) findViewById(R.id.google_sign_out_button);
         edtWorkAddress = (EditText) findViewById(R.id.work_location);
@@ -85,15 +93,15 @@ public class AccountActivity extends AppCompatActivity implements
         txtFacebookAccountName = (TextView) findViewById(R.id.facebook_account_name);
         txtTwitterAccountName = (TextView) findViewById(R.id.twitter_account_name);
 
-        txtGoogleAccountName.setText(mPreference.getGmailAccount());
-        txtFacebookAccountName.setText(mPreference.getFacebookAccount());
-        txtTwitterAccountName.setText(mPreference.getTwitterAccount());
-        edtWorkAddress.setText(mPreference.getWorkLocation());
+        txtGoogleAccountName.setText(mPreferences.getGmailAccount());
+        txtFacebookAccountName.setText(mPreferences.getFacebookAccount());
+        txtTwitterAccountName.setText(mPreferences.getTwitterAccount());
+        edtWorkAddress.setText(mPreferences.getWorkLocation());
 
         setUpTwitterButton();
         setUpSignOutButton();
         setUpGoogleButton();
-        if (!mPreference.getGmailAccount().isEmpty()) {
+        if (!mPreferences.getGmailAccount().isEmpty()) {
             hideSignInShowSignOutButton();
         } else {
             hideSignOutShowSignInButton();
@@ -152,8 +160,8 @@ public class AccountActivity extends AppCompatActivity implements
 
                 mSession = result.data;
                 mUserID = mSession.getUserId();
-                mScreenName = mSession.getUserName();
-                mPreference.setTwitterAccount(mScreenName);
+                mTwitterAccount = mSession.getUserName();
+                mPreferences.setTwitterAccount(mTwitterAccount);
                 String msg = "@" + mSession.getUserName() + " logged in! (#" + mUserID + ")";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
                 Long id = mSession.getId();
@@ -242,7 +250,6 @@ public class AccountActivity extends AppCompatActivity implements
         if (requestCode == GOOGLE_REQUEST) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
-            new RetrieveTokenTask().execute(mPreference.getGmailAccount());
         } else if (requestCode == TWITTER_REQUEST) {
             mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
         }
@@ -256,22 +263,43 @@ public class AccountActivity extends AppCompatActivity implements
      */
     public void submitButtonPress(View view) {
         Log.i(Constants.TAG, "Submit Button");
-        /*EditText edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
+        EditText edtFacebookUsername = (EditText) findViewById(R.id.facebook_username);
         EditText edtFacebookPassword = (EditText) findViewById(R.id.facebook_password);
-        if (edtFacebookPassword.getText().toString().equals("") && edtFacebookUsername.getText().toString().equals("")) {
-            AESHelper.encryptMsg(facebookUsername.getText().toString() + "::" + facebookPassword.getText().toString(), mPreference.getSecret());
-            edFacebookPassword = null;
+        if (!(edtFacebookPassword.getText().toString().isEmpty()) && !(edtFacebookUsername.getText().toString().isEmpty())) {
+            mPreferences.setFacebookAccount(edtFacebookUsername.getText().toString());
+            try {
+                SecretKey secret = AESHelper.generateKey(mDeviceId);
+                byte[] encrypted = AESHelper.encryptMsg(edtFacebookPassword.getText().toString(), secret);
+                mPreferences.setFacebookCredential(Base64.encodeToString(encrypted, Base64.DEFAULT));
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
+            } catch (NoSuchPaddingException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IllegalBlockSizeException e) {
+                e.printStackTrace();
+            } catch (BadPaddingException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            } catch (InvalidParameterSpecException e) {
+                e.printStackTrace();
+            }
+            edtFacebookPassword = null;
             edtFacebookUsername = null;
-        }*/
+        }
         // since by default the work lat and long is set to -1 we are OK
         // to not have an else case here
         if (!(edtWorkAddress.getText().toString().isEmpty())) {
-            mPreference.setWorkLocation(edtWorkAddress.getText().toString());
+            mPreferences.setWorkLocation(edtWorkAddress.getText().toString());
 
             String strAddress = edtWorkAddress.getText().toString().replace(' ', '+');
             convertAddressToLatLong(strAddress);
         }
-        mPreference.setFirstTimeRun(false);
+        mPreferences.setFirstTimeRun(false);
         finish();
     }
 
@@ -287,8 +315,8 @@ public class AccountActivity extends AppCompatActivity implements
             addressList = geocoder.getFromLocationName(addressInput, 5);
             if (addressList != null) {
                 // interested in only the first result
-                mPreference.setWorkLatitude(addressList.get(0).getLatitude());
-                mPreference.setWorkLongitude(addressList.get(0).getLongitude());
+                mPreferences.setWorkLatitude(addressList.get(0).getLatitude());
+                mPreferences.setWorkLongitude(addressList.get(0).getLongitude());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -305,14 +333,14 @@ public class AccountActivity extends AppCompatActivity implements
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
-                mPreference.setGmailAccount(acct.getEmail());
-                mPreference.setUserId(acct.getId());
+                mPreferences.setGmailAccount(acct.getEmail());
+                mPreferences.setUserId(acct.getId());
                 txtGoogleAccountName.setText(acct.getEmail());
                 hideSignInShowSignOutButton();
                 String[] names = acct.getDisplayName().split("\\s");
                 if (names.length > 0) {
-                    mPreference.setUserFirstName(names[0]);
-                    mPreference.setUserLastName(names[names.length - 1]);
+                    mPreferences.setUserFirstName(names[0]);
+                    mPreferences.setUserLastName(names[names.length - 1]);
                 }
             } else {
                 Toast.makeText(this, "No account found!!", Toast.LENGTH_LONG).show();
@@ -323,9 +351,9 @@ public class AccountActivity extends AppCompatActivity implements
     }
 
     private void resetGoogleAccountValues() {
-        mPreference.setGmailAccount("");
-        mPreference.setUserId("");
-        mPreference.setAccessToken("");
+        mPreferences.setGmailAccount("");
+        mPreferences.setUserId("");
+        mPreferences.setAccessToken("");
         txtGoogleAccountName.setText(getResources().getString(R.string.no_account));
     }
 
@@ -339,38 +367,10 @@ public class AccountActivity extends AppCompatActivity implements
         btnSignOutButton.setVisibility(View.GONE);
     }
 
-    // -------------------------------Callbacks------------------------------------------------- //
-
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         if (connectionResult.hasResolution()) {
             Log.i(Constants.TAG, connectionResult.toString());
-        }
-    }
-
-    private class RetrieveTokenTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            String account = params[0];
-            String scopes = "oauth2:email";
-            String token = null;
-            try {
-                token = GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);
-            } catch (IOException e) {
-                Log.e(Constants.TAG, e.getMessage());
-            } catch (UserRecoverableAuthException e) {
-                startActivityForResult(e.getIntent(), REQUEST_AUTH_TOKEN);
-            } catch (GoogleAuthException e) {
-                Log.e(Constants.TAG, e.getMessage());
-            }
-            return token;
-        }
-
-        @Override
-        protected void onPostExecute(String accessToken) {
-            super.onPostExecute(accessToken);
-            mPreference.setAccessToken(accessToken);
         }
     }
 }

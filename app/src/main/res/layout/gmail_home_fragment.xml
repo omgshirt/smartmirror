@@ -5,6 +5,7 @@
     android:layout_height="wrap_content">
 
     <include
+        android:id="@+id/line_div_short"
         layout="@layout/line_divider_short"/>
 
     <LinearLayout

@@ -48,6 +48,10 @@
     <!-- gmailHome -->
     <string name="gmail_home_inbox">(%d) Inbox</string>
 
+    <!-- Gmail Fragment -->
+    <string name="no_new_messages">No New Messages</string>
+    <string name="inbox">Inbox</string>
+
     <!-- forecast -->
     <string name="forecast_title">Forecast</string>
 
