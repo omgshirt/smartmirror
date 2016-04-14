@@ -68,21 +68,26 @@ public class TwitterFragment extends Fragment implements CacheManager.CacheListe
                 VoiceScroll sl = new VoiceScroll();
                 int numItemsInFeed = twitterFeed.getAdapter().getCount();
                 if (message.contains(Constants.SCROLL_DOWN)) {
-                    twitterFeedPosition = twitterFeedPosition + 5;
-                    if (twitterFeedPosition >= numItemsInFeed)
-                        twitterFeedPosition = numItemsInFeed;
-                } else if (message.contains(Constants.SCROLL_UP)) {
-                    twitterFeedPosition = twitterFeedPosition - 8;
+                    twitterFeedPosition = twitterFeedPosition + 10;
                     if (twitterFeedPosition >= numItemsInFeed) {
-                        twitterFeedPosition = twitterFeedPosition - 5;
+                        twitterFeedPosition = numItemsInFeed;
+                    }
+                    twitterFeed.smoothScrollToPosition(twitterFeedPosition);
+                } else if (message.contains(Constants.SCROLL_UP)) {
+                    twitterFeedPosition = twitterFeedPosition - 12;
+                    if (twitterFeedPosition >= numItemsInFeed) {
+                        twitterFeedPosition = twitterFeedPosition - 8;
                     }
                     else if (twitterFeedPosition <= 0) {
                         twitterFeedPosition = 0;
                     }
+                    twitterFeed.smoothScrollToPosition(twitterFeedPosition);
                 }
-                System.out.println("TWITTER FEED POSITION " + twitterFeedPosition);
-                sl.scrollListView(message,twitterFeed, twitterFeedPosition);
-                if (twitterFeedPosition == 0) twitterFeedPosition = 5;
+                //System.out.println("TWITTER FEED POSITION " + twitterFeedPosition);
+                //sl.scrollListView(message,twitterFeed, twitterFeedPosition);
+                if (twitterFeedPosition == 0) {
+                    twitterFeedPosition = 5;
+                }
             }
         }
     };
