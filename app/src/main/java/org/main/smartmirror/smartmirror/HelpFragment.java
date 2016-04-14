@@ -138,11 +138,6 @@ public class HelpFragment extends Fragment {
                 txtCurrentHelpHeader.setText(name.substring(0,1).toUpperCase() + name.substring(1) + " - Help");
                 txtCurrentHelpContent.setText(strContent);
                 break;
-            // night light
-            case Constants.NIGHT_LIGHT:
-                txtCurrentHelpHeader.setText("Color Options:");
-                txtCurrentHelpContent.setText(strContent);
-                break;
             default:
                 txtCurrentHelpHeader.setVisibility(View.GONE);
                 vwDivider.setVisibility(View.GONE);

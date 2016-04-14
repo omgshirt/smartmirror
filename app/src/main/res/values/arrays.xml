@@ -65,9 +65,8 @@
         <item>music</item>
         <item>quotes</item>
         <item>settings</item>
-        <item>twitter</item>
         <item>traffic</item>
-        <item>gmail</item>
+        <item>twitter</item>
     </string-array>
 
     <string-array name="music_commands">
