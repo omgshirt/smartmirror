@@ -83,7 +83,7 @@ public class Constants {
 
     public static final String NEWS_BODY = "news body";
     public static final String[] NEWS_DESKS = {BUSINESS, BOOKS, ECONOMICS, ENVIRONMENT, FASHION,
-            GAMES, LIFESTYLE, MEDIA, MOVIES, NEWS, OPINION, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL, WORLD};
+            GAMES, LIFESTYLE, MEDIA, MOVIES, OPINION, SCIENCE, SPORTS, TECHNOLOGY, TRAVEL, WORLD};
     public static final List<String> DESK_LIST = Arrays.asList(NEWS_DESKS);
     public static final HashSet<String> DESK_HASH = new HashSet<>(DESK_LIST);
 

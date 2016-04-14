@@ -11,47 +11,50 @@
     </string-array>
 
     <string-array name="general_help">
-        <item>Back | Go Back</item>
+        <item>Go Back</item>
         <item>Help</item>
         <item>Conditions</item>
         <item>Settings</item>
-        <item>Sleep | Mira Sleep</item>
+        <item>\'Go to Sleep\' \'Mira Sleep\'</item>
         <item>Wake</item>
         <item>Show | Hide Time</item>
         <item>Show | Hide Weather</item>
         <item>Start | Stop Listening</item>
         <item>Enable | Disable Camera</item>
         <item>Enable | Disable Remote</item>
-        <item>Weather English | Metric</item>
+        <item>\'Weather English\' \'Weather Metric\'</item>
     </string-array>
 
     <string-array name="guardian_sections">
+        <item>books</item>
         <item>business</item>
+        <item>economics</item>
+        <item>fashion</item>
+        <item>games</item>
+        <item>lifestyle</item>
         <item>media</item>
+        <item>movies</item>
+        <item>opinion</item>
         <item>science</item>
         <item>sports</item>
         <item>technology</item>
         <item>travel</item>
         <item>world</item>
-        <item>fashion</item>
-        <item>movies</item>
-        <item>games</item>
-        <item>economics</item>
-        <item>lifestyle</item>
-        <item>opinion</item>
-        <item>books</item>
     </string-array>
 
     <string-array name="modes_list">
         <item>calendar</item>
         <item>camera</item>
         <item>facebook</item>
+        <item>forecast</item>
         <item>gallery</item>
-        <item>light</item>
+        <item>gmail</item>
+        <item>night light</item>
+        <item>music</item>
         <item>quotes</item>
+        <item>settings</item>
         <item>twitter</item>
         <item>traffic</item>
-        <item>gmail</item>
     </string-array>
 
 

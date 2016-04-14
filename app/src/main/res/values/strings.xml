@@ -55,6 +55,9 @@
     <string name="not_logged_in_err">"You are not logged in to %s\nGo to 'Settings' -> 'Account Setup' to change"</string>
     <string name="login_err">Oh no! Something went wrong!</string>
 
+    <!-- News -->
+    <string name="news_section_details">The following news desks are available:</string>
+
     <!-- WEATHER STRINGS -->
     <string name="place_not_found">Cannot Find Location</string>
     <string name="weather_data_err">Failed to retrieve weather data &#8212; check your internet connection</string>

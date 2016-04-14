@@ -854,8 +854,7 @@ public class MainActivity extends AppCompatActivity
                     fragment = new LightFragment();
                     break;
                 case Constants.NEWS:
-                    //NewsFragment.mGuardURL = NewsFragment.mDefaultGuardURL;
-                    fragment = NewsFragment.newInstance("world");
+                    fragment = new NewsSectionListFragment();
                     break;
                 case Constants.OPEN_WINDOW:
                     if (viewHidden(contentFrame3)) {
