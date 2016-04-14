@@ -87,6 +87,6 @@ play alternative/1e-18/
 play ambient/1e-12/
 play classical/1e-12/
 play dance/1e8/
-play jazz/1e-8/
-play rock/1e-8/
+play jazz/1e-3/
+play rock/1e-3/
 play rap/1e8/
