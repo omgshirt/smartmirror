@@ -1,5 +1,7 @@
 package org.main.smartmirror.smartmirror;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,14 +26,15 @@ import java.util.TimerTask;
 public class HelpFragment extends Fragment {
 
     private LinearLayout mHelpLayout;
-    private Runnable mRunnable;
-    private Timer mTimer;
-    private TimerTask mTimerTask;
+    //private Runnable mRunnable;
+    //private Timer mTimer;
+    //private TimerTask mTimerTask;
+
+    private AnimationSet animation;
 
     private final int fadeInTime = 2000;
     private final int fadeOutTime = 2000;
     private final int durationTime = 20000;
-    private final int displayLength = fadeInTime + durationTime + fadeOutTime;
 
     public static HelpFragment newInstance(String fragName) {
         Bundle args = new Bundle();
@@ -44,55 +47,13 @@ public class HelpFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTimer = new Timer();
-        // Set-up the fade in
-        Animation fadeIn = new AlphaAnimation(0, 1);
-        fadeIn.setInterpolator(new DecelerateInterpolator());
-        fadeIn.setDuration(fadeInTime);
-
-        // Set-up the fade out
-        Animation fadeOut = new AlphaAnimation(1, 0);
-        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
-        fadeOut.setStartOffset(fadeInTime + displayLength);
-        fadeOut.setDuration(fadeOutTime);
-        fadeOut.setRepeatCount(0);
-
-        // Create our animation
-        final AnimationSet animation = new AnimationSet(false);
-        animation.addAnimation(fadeIn);
-        animation.addAnimation(fadeOut);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                //removeHelpFragment();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        // Set the runnable
-        mRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // Start the animation
-                mHelpLayout.setAnimation(animation);
-                mHelpLayout.setVisibility(View.VISIBLE);
-            }
-        };
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.help_fragment, container, false);
         mHelpLayout = (LinearLayout) view.findViewById(R.id.help_layout);
-        mHelpLayout.setVisibility(View.INVISIBLE);
+        //mHelpLayout.setVisibility(View.INVISIBLE);
 
         String name = getArguments().getString("name");
         Resources res = getResources();
@@ -152,15 +113,28 @@ public class HelpFragment extends Fragment {
                 break;
         }
 
-        mTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                Log.i(Constants.TAG, "starting help TimerTask");
-                getActivity().runOnUiThread(mRunnable);
-            }
-        };
-        mTimer.scheduleAtFixedRate(mTimerTask, 0, displayLength);
+        runFadeAnimations();
+
         return view;
+    }
+
+    public void runFadeAnimations() {
+        // Set-up the fade in
+        Animation fadeIn = new AlphaAnimation(0f, 1f);
+        fadeIn.setInterpolator(new DecelerateInterpolator());
+        fadeIn.setStartOffset(0);
+        fadeIn.setFillAfter(true);
+        fadeIn.setDuration(fadeInTime);
+
+        // Set-up the fade out
+        Animation fadeOut = new AlphaAnimation(1f, 0f);
+        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
+        fadeOut.setDuration(fadeOutTime);
+        fadeOut.setStartOffset(durationTime);
+        fadeOut.setFillAfter(true);
+
+        mHelpLayout.startAnimation(fadeIn);
+        mHelpLayout.startAnimation(fadeOut);
     }
 
     /**
@@ -184,15 +158,15 @@ public class HelpFragment extends Fragment {
      */
     private void removeHelpFragment() {
         Log.i(Constants.TAG, "HelpFragment is removing itself");
-        mTimerTask.cancel();
-        Log.i(Constants.TAG, "cancelling mTimerTask");
+        //mTimerTask.cancel();
+        //Log.i(Constants.TAG, "cancelling mTimerTask");
         ((MainActivity) getActivity()).removeFragment(Constants.HELP);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mTimerTask.cancel();
-        Log.i(Constants.TAG, "cancelling mTimerTask");
+        //mTimerTask.cancel();
+        //Log.i(Constants.TAG, "cancelling mTimerTask");
     }
 }

@@ -1,5 +1,6 @@
 package org.main.smartmirror.smartmirror;
 
+import android.app.ActionBar;
 import android.app.KeyguardManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         SensorEventListener, NewsFragment.ArticleSelectedListener, GmailFragment.OnNextMessageListener {
 
     // Globals, prefs, debug flags
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     private static Context mContext;
     private Preferences mPreferences;
 
@@ -285,10 +286,17 @@ public class MainActivity extends AppCompatActivity
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_FULLSCREEN;
-        //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;    // commented out to keep nav buttons for testing
         //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
         //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
+        try {
+            ActionBar actionBar = getActionBar();
+            actionBar.hide();
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
+
         decorView.setSystemUiVisibility(uiOptions);
     }
 

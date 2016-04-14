@@ -18,12 +18,12 @@
     </array>
 
     <string-array name="general_help">
-
         <item>Mira Sleep | Go To Sleep</item>
         <item>Mira Wake | Wake Up</item>
         <item>Start | Stop Listening</item>
         <item>Go Back | Forward</item>
         <item>Scroll Up | Down</item>
+        <item>Small | Wide | Full Screen</item>
         <item>Sound On | Off</item>
         <item>Enable | Disable Remote</item>
         <item>Weather English | Metric</item>
