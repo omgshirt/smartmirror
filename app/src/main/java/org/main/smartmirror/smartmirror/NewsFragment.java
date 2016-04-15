@@ -90,7 +90,9 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
     }
 
     private void toNewsBodyFragment(int x) {
-        articleSelectedListener.onArticleSelected(mHeadline.get(x), mFullArticle.get(x));
+        if (mHeadline.size() > 0) {
+            articleSelectedListener.onArticleSelected(mHeadline.get(x), mFullArticle.get(x));
+        }
     }
 
     @Override

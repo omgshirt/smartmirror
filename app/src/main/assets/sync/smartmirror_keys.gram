@@ -18,7 +18,7 @@ full screen/1e-5/
 gallery/1e-2/
 games/1e10/
 gmail/1e-4/
-go to sleep/1e-14/
+go to sleep/1e25/
 go back/1e-3/
 go forward/1e-3/
 help/1e5/
@@ -28,10 +28,10 @@ hide screen/1e-4/
 lifestyle/1e1/
 maximize/1e-5/
 minimize/1e-5/
-mira listen/1e-25/
-mira sleep/1e-16/
+mira listen/1e25/
+mira sleep/1e25/
 mira sound/1e-18/
-mira wake/1e-20/
+mira wake/1e25/
 mirror mirror on the wall/1e-25/
 movies/1e3/
 music/1e-4/
@@ -65,14 +65,14 @@ show time/1e-4/
 show weather/1e1/
 show light/1e6/
 small screen/1e-8/
-start listening/1e-15/
+start listening/1e25/
 stay awake/1e-8/
-stop listening/1e-12/
+stop listening/1e25/
 take a picture/1e-15/
 time twelve hour/1e-10/
 time twenty-four hour/1e-20/
 twitter/1e-5/
-wake up/1e-5/
+wake up/1e25/
 weather english/1e-8/
 weather metric/1e-8/
 wide screen/1e-8/

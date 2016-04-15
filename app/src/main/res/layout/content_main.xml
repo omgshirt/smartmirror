@@ -52,6 +52,8 @@
         android:id="@+id/content_frame_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
         android:orientation="vertical">
 
         <fragment

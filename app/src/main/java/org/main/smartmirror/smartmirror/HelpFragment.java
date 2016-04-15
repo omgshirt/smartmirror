@@ -26,9 +26,6 @@ import java.util.TimerTask;
 public class HelpFragment extends Fragment {
 
     private LinearLayout mHelpLayout;
-    //private Runnable mRunnable;
-    //private Timer mTimer;
-    //private TimerTask mTimerTask;
 
     private AnimationSet animation;
 
@@ -53,7 +50,6 @@ public class HelpFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.help_fragment, container, false);
         mHelpLayout = (LinearLayout) view.findViewById(R.id.help_layout);
-        //mHelpLayout.setVisibility(View.INVISIBLE);
 
         String name = getArguments().getString("name");
         Resources res = getResources();
@@ -113,7 +109,7 @@ public class HelpFragment extends Fragment {
 
     public void runFadeAnimations() {
         // Set-up the fade in
-        Animation fadeIn = new AlphaAnimation(0f, 1f);
+        Animation fadeIn = new AlphaAnimation(0.01f, 1f);
         fadeIn.setInterpolator(new DecelerateInterpolator());
         fadeIn.setStartOffset(0);
         fadeIn.setFillAfter(true);
