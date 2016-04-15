@@ -44,14 +44,11 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.ConnectionResult;
-import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -96,7 +93,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 @TargetApi(23)
 public class CameraFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
 
-    private TextView mCountDownText;
     private Preferences mPreferences;
 
     private String mAlbumID;
@@ -379,15 +375,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     }
 
     /**
-     * Displays feedback to the user as to what the camera is doing.
-     *
-     * @param text the countdown to display.
-     */
-    private void showCameraFeedback(final String text) {
-        mCountDownText.setText(text);
-    }
-
-    /**
      * Speaks the countdown timer
      *
      * @param text The message to speak.
@@ -455,7 +442,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
-        mCountDownText = (TextView) view.findViewById(R.id.count_down);
         return view;
     }
 
@@ -826,12 +812,10 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         new CountDownTimer(4000, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                showCameraFeedback(String.valueOf(millisUntilFinished / 1000));
                 speakCountdown(String.valueOf(millisUntilFinished / 1000));
             }
 
             public void onFinish() {
-                showCameraFeedback("cheese");
                 speakCountdown("cheese");
                 captureStillPicture();
             }
@@ -992,13 +976,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     // Log.i("PICASA UPLOAD ", "STATUS CODE : " + responseString);
                     String responseBody = EntityUtils.toString(response.getEntity());
                     Log.i("PICASA UPLOAD ", "STATUS CODE : " + response.getStatusLine() + "\n" + responseBody);
-                    if (response.getStatusLine().toString().contains("201")) {
-                        mCountDownText.post(new Runnable() {
-                            public void run() {
-                                mCountDownText.setText("Photo Uploaded Successfully");
-                            }
-                        });
-                    }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (ClientProtocolException e) {
@@ -1045,13 +1022,6 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                     HttpResponse response = httpclient.execute(postRequest);
                     String responseBody = EntityUtils.toString(response.getEntity());
                     //Log.i("PICASA ALBUM: ", "Response: " + response.getStatusLine() + "\n" + responseBody);
-                    if (response.getStatusLine().toString().contains("201")) {
-                        mCountDownText.post(new Runnable() {
-                            public void run() {
-                                mCountDownText.setText("New Album Created Successfully");
-                            }
-                        });
-                    }
                     try {
                         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                                 .parse(new InputSource(new StringReader(responseBody)));
@@ -1092,7 +1062,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
         @Override
         protected String doInBackground(String... params) {
             String account = params[0];
-            String scopes = "oauth2:profile email";
+            String scopes = "oauth2:email";
             String token = null;
             try {
                 token = GoogleAuthUtil.getToken(getActivity().getApplicationContext(), account, scopes);

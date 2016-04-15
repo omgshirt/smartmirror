@@ -282,12 +282,12 @@ public class NewsFragment extends Fragment implements CacheManager.CacheListener
                 response = json.getJSONObject("response");
                 results = response.getJSONArray("results").getJSONObject(i);
                 webTitle = results.getString("webTitle");
-                mHeadline.add(webTitle);
+                mHeadline.add(Html.fromHtml(webTitle).toString());
                 fields = results.getJSONObject("fields");
                 body = fields.getString("body");
                 mFullArticle.add(Html.fromHtml(body).toString());
                 trailText = fields.getString("trailText");
-                mSnippet.add(trailText);
+                mSnippet.add(Html.fromHtml(trailText).toString());
                 try {
                     thumbnail = fields.getString("thumbnail");
                     mImageURI.add(Uri.parse(thumbnail));

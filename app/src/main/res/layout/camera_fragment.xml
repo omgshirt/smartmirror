@@ -7,14 +7,6 @@
         android:id="@+id/texture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"/>
-
-    <TextView
-        android:id="@+id/count_down"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/texture"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
