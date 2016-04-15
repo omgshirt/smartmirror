@@ -1,92 +1,92 @@
-books/1e10/
-calendar/1e-12/
-camera/1e-1/
-camera off/1e-3/
-camera on/1e-3/
-close screen/1e-6/
-close window/1e-6/
-conditions/1e-4/
-current time/1e-5/
-enable remote/1e-10/
-disable remote/1e-7/
-economics/1e2/
-environment/1e-3/
-facebook/1e-5/
-fashion/1e6/
-forecast/1e-3/
-full screen/1e-5/
-gallery/1e-2/
-games/1e10/
-gmail/1e-4/
-go to sleep/1e-14/
-go back/1e-3/
-go forward/1e-3/
-help/1e5/
-hide time/1e4/
-hide weather/1e1/
-hide screen/1e-4/
-lifestyle/1e1/
-maximize/1e-5/
-minimize/1e-5/
-mira listen/1e-25/
-mira sleep/1e-16/
-mira sound/1e-18/
-mira wake/1e-20/
-mirror mirror on the wall/1e-25/
-movies/1e3/
-music/1e-4/
-news/1e12/
-next/1e2/
-night light/1e-5/
-opinion/1e2/
-options/1e-2/
-open window/1e-10/
-photos/1e3/
-quotes/1e6/
-article one/1e5/
-article two/1e5/
-article three/1e6/
-article four/1e5/
-article five/1e5/
-article six/1e5/
-article seven/1e5/
-article eight/1e12/
-article nine/1e8/
-article ten/1e5/
-remote on/1e-6/
-remote off/1e-3/
-settings/1e-5/
-scroll down/1e-15/
-scroll up/1e10/
-sound off/1e-4/
-sound on/1e-9/
-show help/1e-4/
-show time/1e-4/
-show weather/1e1/
-show light/1e6/
-small screen/1e-8/
-start listening/1e-15/
-stay awake/1e-8/
-stop listening/1e-12/
-take a picture/1e-15/
-time twelve hour/1e-10/
-time twenty-four hour/1e-20/
-twitter/1e-5/
-wake up/1e-5/
-weather english/1e-8/
-weather metric/1e-8/
-wide screen/1e-8/
-business/1e5/
-media/1e10/
-science/1e3/
-sports/1e8/
-technology/1e3/
-travel/1e9/
-world/1e25/
-play alternative/1e-18/
-play ambient/1e-12/
-play classical/1e-12/
-play dance/1e8/
-play jazz/1e-3/
-play rock/1e-3/
-play rap/1e8/
+books/1e-5/
+calendar/1e-20/
+camera/1e-15/
+camera off/1e-11/
+camera on/1e-11/
+close screen/1e-14/
+close window/1e-14/
+conditions/1e-15/
+current time/1e-14/
+enable remote/1e-18/
+disable remote/1e-15/
+economics/1e-6/
+environment/1e-11/
+facebook/1e-11/
+fashion/1e-5/
+forecast/1e-11/
+full screen/1e-15/
+gallery/1e-12/
+games/1e-1/
+gmail/1e-14/
+go to sleep/1e-30/
+go back/1e-11/
+go forward/1e-11/
+help/1e-10/
+hide time/1e-4/
+hide weather/1e-7/
+hide screen/1e-10/
+lifestyle/1e-7/
+maximize/1e-13/
+minimize/1e-13/
+mira listen/1e-30/
+mira sleep/1e-25/
+mira sound/1e-20/
+mira wake/1e-25/
+mirror mirror on the wall/1e-35/
+movies/1e-5/
+music/1e-10/
+news/1e2/
+next/1e-7/
+night light/1e-15/
+opinion/1e-6/
+options/1e-8/
+open window/1e-15/
+photos/1e-20/
+quotes/1e-8/
+article one/1e-5/
+article two/1e-5/
+article three/1e-6/
+article four/1e-5/
+article five/1e-5/
+article six/1e-5/
+article seven/1e-5/
+article eight/1e2/
+article nine/1e-5/
+article ten/1e-5/
+remote on/1e-15/
+remote off/1e-8/
+settings/1e-15/
+scroll down/1e-25/
+scroll up/1e-10/
+sound off/1e-14/
+sound on/1e-19/
+show help/1e-14/
+show time/1e-14/
+show weather/1e-10/
+show light/1e-3/
+small screen/1e-18/
+start listening/1e-25/
+stay awake/1e-18/
+stop listening/1e-22/
+take a picture/1e-25/
+time twelve hour/1e-20/
+time twenty-four hour/1e-30/
+twitter/1e-15/
+wake up/1e-15/
+weather english/1e-18/
+weather metric/1e-18/
+wide screen/1e-25/
+business/1e-5/
+media/1e1/
+science/1e-3/
+sports/1e-3/
+technology/1e-13/
+travel/1e1/
+world/1e15/
+play alternative/1e-28/
+play ambient/1e-22/
+play classical/1e-22/
+play dance/1e-5/
+play jazz/1e-13/
+play rock/1e-13/
+play rap/1e-2/
