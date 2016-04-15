@@ -63,8 +63,6 @@ public class HelpFragment extends Fragment {
         View vwDivider = view.findViewById(R.id.help_divider);
         TextView txtModeHeader = (TextView) view.findViewById(R.id.mode_header);
         TextView txtModeContent = (TextView) view.findViewById(R.id.mode_content);
-        TextView txtNewsHelpHeader = (TextView) view.findViewById(R.id.news_header);
-        TextView txtNewsHelpContent = (TextView) view.findViewById(R.id.news_content);
         TextView txtHelpHeader = (TextView) view.findViewById(R.id.general_help_header);
         TextView txtHelpContent = (TextView) view.findViewById(R.id.general_help_content);
 
@@ -76,11 +74,6 @@ public class HelpFragment extends Fragment {
         strContent = buildupStringFromArrays(arrayContent);
         txtModeHeader.setText("Help");
         txtModeContent.setText(strContent);
-        // News
-        arrayContent = res.getStringArray(R.array.guardian_sections);
-        strContent = buildupStringFromArrays(arrayContent);
-        txtNewsHelpHeader.setText("News");
-        txtNewsHelpContent.setText(strContent);
         // General
         arrayContent = res.getStringArray(R.array.general_help);
         strContent = buildupStringFromArrays(arrayContent);
