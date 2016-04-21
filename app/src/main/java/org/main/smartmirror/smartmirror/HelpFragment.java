@@ -3,14 +3,12 @@ package org.main.smartmirror.smartmirror;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,8 +19,6 @@ import android.widget.TextView;
 public class HelpFragment extends Fragment {
 
     private LinearLayout mHelpLayout;
-
-    private AnimationSet animation;
 
     private final int fadeInTime = 2000;
     private final int fadeOutTime = 2000;
@@ -35,7 +31,6 @@ public class HelpFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,12 +54,12 @@ public class HelpFragment extends Fragment {
         // Modes
         arrayContent = res.getStringArray(R.array.modes_list);
         strContent = buildupStringFromArrays(arrayContent);
-        txtModeHeader.setText("Help");
+        txtModeHeader.setText(R.string.title_help);
         txtModeContent.setText(strContent);
         // General
         arrayContent = res.getStringArray(R.array.general_help);
         strContent = buildupStringFromArrays(arrayContent);
-        txtHelpHeader.setText("Other Commands");
+        txtHelpHeader.setText(R.string.title_help_other);
         txtHelpContent.setText(strContent);
 
         switch (name) {
@@ -92,11 +87,10 @@ public class HelpFragment extends Fragment {
     }
 
     public void startFadeAnimations() {
+
         // Set-up the fade in
         Animation fadeIn = new AlphaAnimation(0.01f, 1f);
         fadeIn.setInterpolator(new DecelerateInterpolator());
-        fadeIn.setStartOffset(0);
-        fadeIn.setFillAfter(true);
         fadeIn.setDuration(fadeInTime);
 
         // Set-up the fade out
@@ -105,6 +99,26 @@ public class HelpFragment extends Fragment {
         fadeOut.setDuration(fadeOutTime);
         fadeOut.setStartOffset(durationTime);
         fadeOut.setFillAfter(true);
+
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                // after fading out, remove this fragment
+                if (getActivity() != null) {
+                    ((MainActivity) getActivity()).removeFragment(Constants.HELP);
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
 
         mHelpLayout.startAnimation(fadeIn);
         mHelpLayout.startAnimation(fadeOut);
@@ -125,15 +139,6 @@ public class HelpFragment extends Fragment {
         }
         return str;
     }
-
-    /**
-     * The equivalent of Activity.finish()
-     */
-    private void removeHelpFragment() {
-        Log.i(Constants.TAG, "HelpFragment is removing itself");
-        ((MainActivity) getActivity()).removeFragment(Constants.HELP);
-    }
-
     @Override
     public void onResume() {
         super.onPause();

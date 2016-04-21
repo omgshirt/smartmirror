@@ -637,7 +637,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(Constants.TAG, "removing fragment: " + tag);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-        if (fragment != null) {
+        if (fragment != null && !fragment.isRemoving()) {
             ft.remove(fragment);
             ft.commit();
         }
