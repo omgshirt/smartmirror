@@ -10,7 +10,7 @@
 
     <!-- current fragment -->
     <TextView
-        android:id="@+id/fragment_help_header"
+        android:id="@+id/current_help_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
@@ -22,7 +22,7 @@
         style="@style/Divider" />
 
     <TextView
-        android:id="@+id/fragment_help_content"
+        android:id="@+id/current_help_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

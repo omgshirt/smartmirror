@@ -8,12 +8,10 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -69,6 +67,10 @@ public class GmailHomeFragment extends Fragment {
                 .setSelectedAccountName(mPreference.getGmailAccount());
         mCredential.setSelectedAccountName(mPreference.getGmailAccount());
 
+        if (savedInstanceState == null ) {
+            lineDiv.setVisibility(View.GONE);
+        }
+
         ScheduledThreadPoolExecutor scheduler = (ScheduledThreadPoolExecutor)
                 Executors.newScheduledThreadPool(1);
 
@@ -77,7 +79,6 @@ public class GmailHomeFragment extends Fragment {
             public void run() {
                 numUnreadPrevious = numUnreadPrimary;
                 new MakeRequestTask(mCredential).execute();
-
             }
         };
 
@@ -211,7 +212,7 @@ public class GmailHomeFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<String> output) {
-            if(numUnreadPrevious<numUnreadPrimary) {
+            if(numUnreadPrevious < numUnreadPrimary) {
                 speakNewNotifications();
                 numUnreadPrevious = numUnreadPrimary;
             }

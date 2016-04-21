@@ -45,6 +45,8 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
     private TextView txtStreamInfo;
     private AudioManager audioManager;
 
+    private boolean mediaPlayerPreparing = false;
+
     public MusicFragment() {
     }
 
@@ -147,7 +149,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         return stationLayout;
     }
 
-    // strips extra info from station labels, returning the genre
+    // strips extra info from station labels, returning only the genre
     public static String ConvertStationNameToGenre(String stationName) {
         int index = stationName.indexOf(":");
         return stationName.substring(0, index).toLowerCase();
@@ -170,7 +172,9 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         forceStartStation(command);
     }
 
-    /** Like changeToStation, but changes to given station even when the media player is currently playing.
+    /**
+     * Like changeToStation, but changes to the given station even if the media player
+     * is currently playing another station.
      *
      * @param command station to play
      */
@@ -183,6 +187,9 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         initMediaPlayer();
     }
 
+    /**
+     * Pause a stream that is currently playing.
+     */
     public void pauseStream() {
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
             ((MainActivity)getActivity()).setVoiceCommandMode(NORMAL_COMMAND_LIST);
@@ -193,6 +200,23 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         }
     }
 
+    /**
+     * Play a stream that is currently paused.
+     */
+    public void playStream() {
+        if (mMediaPlayer != null && !mediaPlayerPreparing && !mMediaPlayer.isPlaying()) {
+            ((MainActivity)getActivity()).setVoiceCommandMode(MUSIC_COMMAND_LIST);
+            mMediaPlayer.start();
+            setIconDrawables(R.drawable.play);
+            setStreamIconVisible();
+            txtStreamInfo.setText(R.string.stream_playing);
+        }
+    }
+
+    /**
+     * Stop any currently playing stream.
+     * Called by onPause and when the fragment receives a 'stop' command.
+     */
     public void stopStream() {
         if (mMediaPlayer != null) {
             ((MainActivity)getActivity()).setVoiceCommandMode(NORMAL_COMMAND_LIST);
@@ -203,17 +227,6 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             txtStreamInfo.setText(R.string.stream_stopped);
         }
     }
-
-    public void playStream() {
-        if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-            ((MainActivity)getActivity()).setVoiceCommandMode(MUSIC_COMMAND_LIST);
-            mMediaPlayer.start();
-            setIconDrawables(R.drawable.play);
-            setStreamIconVisible();
-            txtStreamInfo.setText(R.string.stream_playing);
-        }
-    }
-
 
     // sets the status icon to visible for the currently selected stream
     public void setStreamIconVisible() {
@@ -261,9 +274,10 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         if (mMediaPlayer == null) return;
 
         if (mMediaPlayer.isPlaying()) {
-            Log.i(TAG, "stopping music");
+            Log.i(TAG, "stopping music stream");
             mMediaPlayer.stop();
         }
+        mediaPlayerPreparing = false;
         Preferences prefs = Preferences.getInstance(getActivity());
         prefs.setStayAwake(false);
         mMediaPlayer.release();
@@ -283,12 +297,16 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
             mMediaPlayer.setOnErrorListener(this);
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.prepareAsync();
+            mediaPlayerPreparing = true;
         } catch (IOException ioe) {
             ioe.printStackTrace();
             txtStreamInfo.setText(R.string.stream_not_found);
+            mediaPlayerPreparing = false;
         } catch (IllegalStateException ise) {
             ise.printStackTrace();
             txtStreamInfo.setText(R.string.stream_not_found);
+            mediaPlayerPreparing = false;
+
             Log.i(TAG, "illegal state exception - probably thrown by bad source url");
         }
     }
@@ -313,6 +331,7 @@ public class MusicFragment extends Fragment implements MediaPlayer.OnPreparedLis
         txtStreamInfo.setText(R.string.stream_playing);
         Preferences prefs = Preferences.getInstance(getActivity());
         prefs.setStayAwake(true);
+        mediaPlayerPreparing = false;
         mp.start();
     }
 

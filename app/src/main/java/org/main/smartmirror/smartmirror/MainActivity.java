@@ -287,9 +287,9 @@ public class MainActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;    // commented out to keep nav buttons for testing
-        //| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
-        //| View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
+                | View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
         try {
             ActionBar actionBar = getActionBar();
             actionBar.hide();
@@ -606,11 +606,6 @@ public class MainActivity extends AppCompatActivity
         ft.commit();
     }
 
-    public void displayNotSignedInFragment(String tag, boolean addToBackStack) {
-        Fragment fragment = NotSignedInFragment.newInstance(getCurrentFragment().getTag());
-        displayFragment(fragment, tag, addToBackStack);
-    }
-
     /**
      * Display the fragment within content_frame_3
      *
@@ -685,6 +680,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Show an error fragment when a user is not logged in to a web service
+     */
+    public void displayNotSignedInFragment(String tag, boolean addToBackStack) {
+        Fragment fragment = NotSignedInFragment.newInstance(getCurrentFragment().getTag());
+        displayFragment(fragment, tag, addToBackStack);
+    }
+
+    /**
      * Entry point for processing user commands.
      * <p/>
      * If sleeping, this will ignore commands except those which cause a state transition to "awake".
@@ -733,7 +736,7 @@ public class MainActivity extends AppCompatActivity
 
         boolean helpIsVisible = (null != getSupportFragmentManager().findFragmentByTag(Constants.HELP));
 
-        if (!helpIsVisible && (command.equals(Constants.HELP) || command.equals(Constants.SHOW_HELP))) {
+        if (!helpIsVisible && (command.equals(Constants.HELP) )) {
             // If frame3 is in any visible state, return it to 'small screen' proportion
             if (frame3Visibility == View.VISIBLE) {
                 setContentFrameValues(FrameSize.SMALL_SCREEN);
@@ -844,7 +847,6 @@ public class MainActivity extends AppCompatActivity
                     fragment = new GmailFragment();
                     break;
                 case Constants.HELP:
-                case Constants.SHOW_HELP:
                     break;
                 case Constants.MAXIMIZE:
                 case Constants.FULL_SCREEN:

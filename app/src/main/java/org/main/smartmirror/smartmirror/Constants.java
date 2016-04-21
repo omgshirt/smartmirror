@@ -61,7 +61,6 @@ public class Constants {
     public static final String QUOTES = "quotes";
     public static final String SETTINGS = "settings";
     public static final String SHOW_LIGHT = "show light";
-    public static final String SHOW_HELP = "show help";
     public static final String TIME = "current time";
     public static final String TWITTER = "twitter";
 

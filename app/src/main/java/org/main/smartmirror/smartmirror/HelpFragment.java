@@ -1,7 +1,5 @@
 package org.main.smartmirror.smartmirror;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,9 +14,6 @@ import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Class that handles the help dialog which shows the commands the user can issue
@@ -41,10 +36,6 @@ public class HelpFragment extends Fragment {
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,8 +45,8 @@ public class HelpFragment extends Fragment {
         String name = getArguments().getString("name");
         Resources res = getResources();
 
-        TextView txtCurrentHelpHeader = (TextView) view.findViewById(R.id.fragment_help_header);
-        TextView txtCurrentHelpContent = (TextView) view.findViewById(R.id.fragment_help_content);
+        TextView txtCurrentHelpHeader = (TextView) view.findViewById(R.id.current_help_header);
+        TextView txtCurrentHelpContent = (TextView) view.findViewById(R.id.current_help_content);
         View vwDivider = view.findViewById(R.id.help_divider);
         TextView txtModeHeader = (TextView) view.findViewById(R.id.mode_header);
         TextView txtModeContent = (TextView) view.findViewById(R.id.mode_content);
@@ -81,18 +72,13 @@ public class HelpFragment extends Fragment {
             case Constants.CAMERA:
                 arrayContent = res.getStringArray(R.array.camera_help);
                 strContent = buildupStringFromArrays(arrayContent);
-                txtCurrentHelpHeader.setText("Controls");
+                txtCurrentHelpHeader.setText(R.string.title_camera);
                 txtCurrentHelpContent.setText(strContent);
                 break;
             case Constants.MUSIC:
                 arrayContent = res.getStringArray(R.array.music_commands);
                 strContent = buildupStringFromArrays(arrayContent);
-                txtCurrentHelpHeader.setText(name.substring(0,1).toUpperCase() + name.substring(1) + " - Help");
-                txtCurrentHelpContent.setText(strContent);
-                break;
-            // night light
-            case Constants.NIGHT_LIGHT:
-                txtCurrentHelpHeader.setText("Color Options:");
+                txtCurrentHelpHeader.setText(R.string.title_music);
                 txtCurrentHelpContent.setText(strContent);
                 break;
             default:
@@ -102,12 +88,10 @@ public class HelpFragment extends Fragment {
                 break;
         }
 
-        runFadeAnimations();
-
         return view;
     }
 
-    public void runFadeAnimations() {
+    public void startFadeAnimations() {
         // Set-up the fade in
         Animation fadeIn = new AlphaAnimation(0.01f, 1f);
         fadeIn.setInterpolator(new DecelerateInterpolator());
@@ -147,15 +131,18 @@ public class HelpFragment extends Fragment {
      */
     private void removeHelpFragment() {
         Log.i(Constants.TAG, "HelpFragment is removing itself");
-        //mTimerTask.cancel();
-        //Log.i(Constants.TAG, "cancelling mTimerTask");
         ((MainActivity) getActivity()).removeFragment(Constants.HELP);
+    }
+
+    @Override
+    public void onResume() {
+        super.onPause();
+        startFadeAnimations();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //mTimerTask.cancel();
-        //Log.i(Constants.TAG, "cancelling mTimerTask");
+        mHelpLayout.clearAnimation();
     }
 }

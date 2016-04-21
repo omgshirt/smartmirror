@@ -1,14 +1,9 @@
 package org.main.smartmirror.smartmirror;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +29,6 @@ public class QuoteFragment extends Fragment {
 
     private ArrayList<String> mQuoteList;
     private ArrayList<String> mQuoteAuthor;
-    private Runnable mRunnable;
     private TextView txtQuoteAuthor;
     private TextView txtQuoteContent;
     private Timer mTimer;
@@ -53,57 +47,20 @@ public class QuoteFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i(Constants.TAG, "QuoteFragment onCreate");
         mTimer = new Timer();
         // Loading Font Face
         mQuoteFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/PTM55FT.ttf");
 
-        // Set-up the fade in
-        Animation fadeIn = new AlphaAnimation(0, 1);
-        fadeIn.setInterpolator(new DecelerateInterpolator());
-        fadeIn.setDuration(fadeInTime);
-
-        // Set-up the fade out
-        Animation fadeOut = new AlphaAnimation(1, 0);
-        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
-        fadeOut.setStartOffset(fadeInTime + quoteDisplayLength);
-        fadeOut.setDuration(fadeOutTime);
-
-        // Create our animation
-        final AnimationSet animation = new AnimationSet(false);
-        animation.addAnimation(fadeIn);
-        animation.addAnimation(fadeOut);
-
         setUpQuotes();
         refreshAvailableQuotes();
-
-        // Set the runnable
-        mRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // Set the Random quote in the Text View
-                int randomQuote = mAvailableQuotes.get(nextQuote);
-                txtQuoteContent.setText(mQuoteList.get(randomQuote));
-                txtQuoteAuthor.setText(mQuoteAuthor.get(randomQuote));
-                // Start the animation
-                txtQuoteAuthor.startAnimation(animation);
-                txtQuoteContent.startAnimation(animation);
-
-                nextQuote = (++nextQuote) % mQuoteList.size();
-            }
-        };
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.quotes_fragment, container, false);
 
-        mTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(mRunnable);
-            }
-        };
-        mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
+        Log.i(Constants.TAG, "QuoteFragment onCreateView");
 
         // Set-up the text views
         txtQuoteAuthor = (TextView) view.findViewById(R.id.quote_author);
@@ -170,41 +127,58 @@ public class QuoteFragment extends Fragment {
         Collections.shuffle(mAvailableQuotes);
     }
 
-    // ----------------------- Local Broadcast Receiver -----------------------
+    private Runnable createAnimationRunnable() {
+        // Set-up the fade in
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator());
+        fadeIn.setDuration(fadeInTime);
 
-    // Create a handler for received Intents. This will be called whenever an Intent
-    // with an action named "inputAction" is broadcast.
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("message");
-            Log.d("Quotes", "Got message:\"" + message + "\"");
-            switch (message) {
-                case Constants.GO_BACK:
-                    getFragmentManager().popBackStack();
-                    break;
+        // Set-up the fade out
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
+        fadeOut.setStartOffset(fadeInTime + quoteDisplayLength);
+        fadeOut.setDuration(fadeOutTime);
+
+        // Create our animation
+        final AnimationSet animation = new AnimationSet(false);
+        animation.addAnimation(fadeIn);
+        animation.addAnimation(fadeOut);
+
+        // Set the runnable
+        return new Runnable() {
+            @Override
+            public void run() {
+                // Set the Random quote in the Text View
+                int randomQuote = mAvailableQuotes.get(nextQuote);
+                txtQuoteContent.setText(mQuoteList.get(randomQuote));
+                txtQuoteAuthor.setText(mQuoteAuthor.get(randomQuote));
+                // Start the animation
+                txtQuoteAuthor.startAnimation(animation);
+                txtQuoteContent.startAnimation(animation);
+
+                nextQuote = (++nextQuote) % mQuoteList.size();
             }
-        }
-    };
+        };
+    }
 
-    /**
-     * When this fragment becomes visible, start listening to broadcasts sent from MainActivity.
-     * We're interested in the 'inputAction' intent, which carries any inputs send to MainActivity from
-     * voice recognition, the remote control, etc.
-     */
     @Override
     public void onResume() {
         super.onResume();
 
-        //LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-        //        new IntentFilter("inputAction"));
+        final Runnable animationRunnable = createAnimationRunnable();
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(animationRunnable);
+            }
+        };
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, totalDisplayTime);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+
         mTimerTask.cancel();
-        //LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 }
