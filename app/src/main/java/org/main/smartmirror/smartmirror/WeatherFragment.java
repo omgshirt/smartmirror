@@ -67,12 +67,15 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
     private DailyForecast forecastToday;
     private JSONArray mWeatherAlerts;
-    private boolean mShowFullAlerts = true;
+    private boolean mShowFullAlerts = false;
 
     private CacheManager mCacheManager = null;
     // time in seconds before weather data expires
     private final int WEATHER_UPDATE_INTERVAL = 600;
     public static final String WEATHER_CACHE = "weather cache";
+
+    // number of hours between forecasts
+    private static final int FORECAST_INTERVAL = 2;
 
     Handler mHandler = new Handler();
 
@@ -161,10 +164,12 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 case Preferences.CMD_TIME_12HR:
                     mPreferences.setTimeFormat12hr();
                     updateTimeDisplay();
+                    startWeatherUpdate();
                     break;
                 case Preferences.CMD_TIME_24HR:
                     mPreferences.setTimeFormat24hr();
                     updateTimeDisplay();
+                    startWeatherUpdate();
                     break;
                 case Constants.HIDE_TIME:
                     hideTime();
@@ -247,9 +252,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         clkTime.setFormat24Hour(mPreferences.getTimeFormat());
         clkDate.setFormat12Hour(mPreferences.getDateFormat());
         clkDate.setFormat24Hour(mPreferences.getDateFormat());
-
-        // also update hourly forecast format!
-        startWeatherUpdate();
     }
 
     public void hideTime() {
@@ -408,12 +410,15 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             txtDailyLow.setText(minTemp);
 
             // ----------------- 2-Hour forecasts -------------
-            for (int i = 1; i <= 7; i++) {
+            for (int i = 1; i <= 6; i++) {
+
                 String resourceName = "forecast_" + i;
                 int layoutId = getContext().getResources().getIdentifier(resourceName, "id",
                         getActivity().getPackageName());
+
                 LinearLayout forecastLayout = (LinearLayout) getActivity().findViewById(layoutId);
-                JSONObject forecast = hourlyArray.getJSONObject(i * 2);
+
+                JSONObject forecast = hourlyArray.getJSONObject(i * FORECAST_INTERVAL);
 
                 // Forecast time
                 TextView timeForecast = (TextView) forecastLayout.findViewById(R.id.forecast_time);
@@ -434,36 +439,29 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 String icon = forecast.getString("icon");
                 setWeatherIcon(getActivity(), weatherFont, iconForecast, icon, forecastToday.sunrise, forecastToday.sunset);
 
-                TextView txtUmbrella = (TextView) forecastLayout.findViewById(R.id.forecast_umbrella);
                 TextView rainForecast = (TextView) forecastLayout.findViewById(R.id.forecast_rain);
 
                 int rainProb = (int) (forecast.getDouble("precipProbability") * 100);
 
                 // show chance of rain if >= 10%
                 if (rainProb >= 10) {
-
-                    // umbrella icon : disabled
-                    /*
-                    txtUmbrella.setTypeface(weatherFont);
-                    txtUmbrella.setText(getActivity().getResources().getString(R.string.weather_umbrella));
-                    txtUmbrella.setVisibility(View.VISIBLE);
-                    */
-
                     // Chance of rain
                     String chanceOfRain = Integer.toString(rainProb) + "%";
                     rainForecast.setText(chanceOfRain);
                     rainForecast.setVisibility(View.VISIBLE);
                 } else {
-                    txtUmbrella.setVisibility(View.GONE);
                     rainForecast.setVisibility(View.GONE);
                 }
             }
 
+
+
             // check for weather alerts.
             if (json.has("alerts")) {
+                //Log.i(Constants.TAG, "WeatherAlert text :: " + json.getJSONArray("alerts").toString());
+
                 mWeatherAlerts = json.getJSONArray("alerts");
                 String alertText = getWeatherAlerts();
-                Log.i(Constants.TAG, "alertText: " + alertText);
                 if (alertText.length() > 0) {
                     txtAlerts.setVisibility(View.VISIBLE);
                     txtAlerts.setText(getWeatherAlerts());
@@ -474,7 +472,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             Log.e("DarkSky", "One or more fields not found in the JSON data");
         }
 
@@ -582,6 +579,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
      */
     @Override
     public void onCacheExpired(String cacheName) {
+        Log.i(Constants.TAG, "WeatherFragment.onCacheExpired(" + cacheName + ")");
         if (cacheName.equals(WEATHER_CACHE)) startWeatherUpdate();
     }
 

@@ -125,6 +125,9 @@ public class MainActivity extends AppCompatActivity
     // Sound effects
     private MediaPlayer mFXPlayer;
 
+    // Cancel Audio routing to headphones
+    private HeadphoneAudioCanceller mHeadphoneAudioCanceller;
+
 
     private Runnable uiTimerRunnable = new Runnable() {
         @Override
@@ -203,26 +206,28 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         mContext = getApplicationContext();
+        setContentView(R.layout.activity_main);
+        mira = Mira.getInstance(this);
 
         // Load any application preferences. If prefs do not exist, set them to defaults
         mPreferences = Preferences.getInstance(this);
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
+        // On first run, show the AccountActivity for setup.
         if (mPreferences.isFirstTimeRun()) {
             startActivity(new Intent(this, AccountActivity.class));
         }
 
-        setContentView(R.layout.activity_main);
-        mira = Mira.getInstance(this);
-
+        // Set up the forward stack. This mimics the action of the back stack, allowing
+        // users to navigate forwards through data displays.
         if (mForwardStack == null)
             mForwardStack = new Stack<>();
 
         /*
-         content frames hold data displays.
-         frame1 = weather
-         frame2 = help
-         frame3 = data / variable
+         Initialize the content frames.
+         frame1 = weather / gmail / calendar / traffic
+         frame2 = help area
+         frame3 = user-selected
         */
         contentFrame1 = (ViewGroup) findViewById(R.id.content_frame_1);
         contentFrame2 = (ViewGroup) findViewById(R.id.content_frame_2);
@@ -233,6 +238,8 @@ public class MainActivity extends AppCompatActivity
         // TextToSpeech (TTS) init
         mTTSHelper = new TTSHelper(this);
 
+        // Get the system screen timeout. This value should be written back to the system settings
+        // when the application finishes.
         try {
             defaultScreenTimeout = Settings.System.getInt(getContentResolver(),
                     Settings.System.SCREEN_OFF_TIMEOUT);
@@ -244,12 +251,13 @@ public class MainActivity extends AppCompatActivity
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
 
-        // Start Network Discovery Service (NSD) & create handler
+        // Start Network Discovery Service (NSD) & create handler for communication with RemoteConnection class.
         mRemoteHandler = new RemoteHandler();
         mRemoteConnection = new RemoteConnection(this, mRemoteHandler);
         mNsdHelper = new NsdHelper(this);
 
         // Status Icons: Remote / Remote Disabled / Speech / Stay Awake
+        // Initialize and display icons based on current preference settings
         imgRemoteIcon = (ImageView) findViewById(R.id.remote_icon);
         imgRemoteDisabledIcon = (ImageView) findViewById(R.id.remote_dc_icon);
         if (!mPreferences.isRemoteEnabled()) {
@@ -272,6 +280,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
+        // Set up the navigation drawer. This is useful for debugging, but could be remove on release.
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, null, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -281,15 +290,23 @@ public class MainActivity extends AppCompatActivity
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        // Hide UI and actionbar
+        // Hide UI items, force full screen view and hide the actionbar
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION    // commented out to keep nav buttons for testing
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // req API 19
-                | View.SYSTEM_UI_FLAG_IMMERSIVE;      // req API 19
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        decorView.setSystemUiVisibility(uiOptions);
+
+        // Set audio manager to force audio over HDMI.
+        // This is essential when using a lav mic for audio input as the system will attempt to route
+        // audio output to the headphone jack.
+        mHeadphoneAudioCanceller = new HeadphoneAudioCanceller(this);
+
+        // Hide the action bar
         try {
             ActionBar actionBar = getActionBar();
             actionBar.hide();
@@ -297,7 +314,6 @@ public class MainActivity extends AppCompatActivity
             npe.printStackTrace();
         }
 
-        decorView.setSystemUiVisibility(uiOptions);
     }
 
     public static Context getContextForApplication() {
@@ -371,6 +387,8 @@ public class MainActivity extends AppCompatActivity
         mPreferences.destroy();
         CacheManager.destroy();
 
+        mHeadphoneAudioCanceller.teardown();
+
         mNsdHelper.tearDown();
         mRemoteConnection.tearDown();
         setDefaultScreenOffTimeout();
@@ -400,9 +418,8 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Calling forces device to bypass keyguard if enabled.
-     * It will not override password, pattern or biometric
-     * locks if enabled from the system settings. Acquiring the wakelock in this method will trigger
-     * the application to move from the onStop to onRestart.
+     * It will not override password, pattern or biometric locks if enabled from the system settings.
+     * Acquiring the wakelock in this method will trigger the application to move from onStop to onRestart.
      */
     @SuppressWarnings("deprecation")
     protected void exitSleep() {
@@ -457,6 +474,10 @@ public class MainActivity extends AppCompatActivity
         return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
     }
 
+    /**
+     * Sets visibility for the 3 content frames based on the FrameSize parameter.
+     * @param fs FrameSize
+     */
     protected void setContentFrameValues(FrameSize fs) {
 
         switch (fs) {
@@ -518,13 +539,17 @@ public class MainActivity extends AppCompatActivity
         Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SLEEP_DELAY);
     }
 
-    // Keep the screen on indefinitely.
+    /**
+     * Keep the screen on indefinitely.
+     */
     protected void addScreenOnFlag() {
         Log.i(Constants.TAG, "Adding FLAG_KEEP_SCREEN_ON");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    // Clear the KEEP_SCREEN_ON flag, allowing the screen to timeout normally.
+    /**
+     * Clear the KEEP_SCREEN_ON flag, allowing the screen to timeout normally.
+     */
     protected void clearScreenOnFlag() {
         Log.i(Constants.TAG, "clearing FLAG_KEEP_SCREEN_ON");
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -532,7 +557,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Start a timer to track interval between user interactions.
-     * When expired, clear the screen on flag so the screen can time out per system settings.
+     * When this timers expires, clear the screen on flag so the screen can sleep per system settings.
      */
     protected void resetInteractionTimer() {
         stopUITimer();
@@ -607,10 +632,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Display the fragment within content_frame_3
+     * Display a fragment within content_frame_3
      *
      * @param fragment       fragment to show
-     * @param addToBackStack if fragment should be added to back stack
+     * @param addToBackStack if true, fragment will be added to the back stack
      */
     private void displayFragment(Fragment fragment, String tag, boolean addToBackStack) {
         Log.i(Constants.TAG, "Displaying fragment :: " + tag);
@@ -629,7 +654,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Remove the fragment given by tag if it exists
+     * Remove the fragment given by tag (if it exists)
      *
      * @param tag tag to remove
      */
