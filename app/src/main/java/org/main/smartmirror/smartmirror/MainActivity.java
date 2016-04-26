@@ -290,29 +290,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        // Hide UI items, force full screen view and hide the actionbar
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_IMMERSIVE;
-        decorView.setSystemUiVisibility(uiOptions);
 
         // Set audio manager to force audio over HDMI.
         // This is essential when using a lav mic for audio input as the system will attempt to route
         // audio output to the headphone jack.
-        mHeadphoneAudioCanceller = new HeadphoneAudioCanceller(this);
-
-        // Hide the action bar
-        try {
-            ActionBar actionBar = getActionBar();
-            actionBar.hide();
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-        }
+        //mHeadphoneAudioCanceller = new HeadphoneAudioCanceller(this);
 
     }
 
@@ -331,6 +313,8 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.i(Constants.TAG, "onStart");
+
+        setUIFlags();
 
         if (mirrorSleepState == ASLEEP) {
             restoreContentFrameVisibility();
@@ -387,7 +371,7 @@ public class MainActivity extends AppCompatActivity
         mPreferences.destroy();
         CacheManager.destroy();
 
-        mHeadphoneAudioCanceller.teardown();
+        //mHeadphoneAudioCanceller.teardown();
 
         mNsdHelper.tearDown();
         mRemoteConnection.tearDown();
@@ -469,6 +453,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     // ------------------------ UI Visibility / Content Frames ---------------------------
+
+    public void setUIFlags() {
+        // Hide UI items, force full screen view and hide the actionbar
+        Log.i(Constants.TAG, "setting UI flags");
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
 
     public boolean viewHidden(View view) {
         return (view.getVisibility() == View.INVISIBLE || view.getVisibility() == View.GONE);
@@ -1326,7 +1324,7 @@ public class MainActivity extends AppCompatActivity
         float recentLightAvg = mRecentLightValues.getAverage();
 
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            Log.i("Light Sensor", "Current value:" + Float.toString(currentLight) + " avg:" + recentLightAvg);
+            //Log.i("Light Sensor", "Current value:" + Float.toString(currentLight) + " avg:" + recentLightAvg);
             if (currentLight > recentLightAvg * 3 && lightWakeDelayExceeded()) {
                 // Stop any further callbacks from the sensor.
                 stopLightSensor();

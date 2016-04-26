@@ -16,7 +16,7 @@ camera off/1e-3/
 camera on/1e-3/
 close screen/1e-6/
 close window/1e-6/
-conditions/1e-4/
+conditions/1e-7/
 current time/1e-5/
 disable remote/1e-7/
 enable remote/1e-10/
@@ -40,7 +40,7 @@ lifestyle/1e1/
 maximize/1e-5/
 media/1e10/
 minimize/1e-5/
-mira listen/1e-25/
+mira listen/1e-18/
 mira sleep/1e-16/
 mira sound/1e-18/
 mira wake/1e-20/
