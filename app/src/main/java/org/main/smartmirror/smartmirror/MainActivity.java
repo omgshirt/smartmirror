@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity
         // Set audio manager to force audio over HDMI.
         // This is essential when using a lav mic for audio input as the system will attempt to route
         // audio output to the headphone jack.
-        //mHeadphoneAudioCanceller = new HeadphoneAudioCanceller(this);
+        mHeadphoneAudioCanceller = new HeadphoneAudioCanceller(this);
 
     }
 
@@ -371,7 +371,7 @@ public class MainActivity extends AppCompatActivity
         mPreferences.destroy();
         CacheManager.destroy();
 
-        //mHeadphoneAudioCanceller.teardown();
+        mHeadphoneAudioCanceller.teardown();
 
         mNsdHelper.tearDown();
         mRemoteConnection.tearDown();

@@ -31,7 +31,7 @@ games/1e10/
 gmail/1e-4/
 go back/1e-3/
 go forward/1e-3/
-go to sleep/1e-14/
+go to sleep/1e-18/
 help/1e5/
 hide time/1e4/
 hide weather/1e1/
@@ -40,7 +40,7 @@ lifestyle/1e1/
 maximize/1e-5/
 media/1e10/
 minimize/1e-5/
-mira listen/1e-18/
+mira listen/1e-12/
 mira sleep/1e-16/
 mira sound/1e-18/
 mira wake/1e-20/
