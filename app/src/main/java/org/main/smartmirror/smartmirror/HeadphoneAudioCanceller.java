@@ -21,8 +21,14 @@ public class HeadphoneAudioCanceller extends BroadcastReceiver {
     private static final int DEVICE_OUT_WIRED_HEADSET = 0x4;
     private static final int DEVICE_OUT_HDMI = 0x400;
 
-    private static final int FORCE_HDMI_SYSTEM_AUDIO_ENFORCED = 12;
     private static final int FOR_HDMI_SYSTEM_AUDIO = 5;
+    private static final int FOR_MEDIA = 1;
+
+    private static final int FORCE_HDMI_SYSTEM_AUDIO_ENFORCED = 12;
+    private static final int FORCE_NONE = 0;
+
+    public static final String DEVICE_OUT_WIRED_HEADSET_NAME = "headset";
+    public static final String DEVICE_OUT_WIRED_HEADPHONE_NAME = "headphone";
 
     /**
      * Intent actions
@@ -42,6 +48,7 @@ public class HeadphoneAudioCanceller extends BroadcastReceiver {
         this.context = context;
         IntentFilter filter = new IntentFilter();
         filter.addAction(AudioManager.ACTION_HEADSET_PLUG);
+        filter.addAction(AudioManager.ACTION_HDMI_AUDIO_PLUG);
         context.registerReceiver(this, filter);
     }
 
@@ -106,28 +113,31 @@ public class HeadphoneAudioCanceller extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.i(Constants.TAG, "Audio action rec :: " + action);
+
         // detected a headset plug status changes
         if (AudioManager.ACTION_HEADSET_PLUG.equals(action)) {
             Bundle extras = intent.getExtras();
-            Log.i(Constants.TAG, "DOCK_PLUG state :: " + extras.getInt("state"));
+            Log.i(Constants.TAG, "DOCK_PLUG headset state :: " + extras.getInt("state"));
 
-            //AudioManager am = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
 
             if (extras.getInt("state") == 1) {
                 // Disable wired headset. This call doesn't stop audio from playing over the headset, and
                 // may not be necessary.
-                setDeviceConnectionState(DEVICE_OUT_WIRED_HEADSET, DEVICE_STATE_UNAVAILABLE, "", "");
+                setDeviceConnectionState(DEVICE_OUT_WIRED_HEADSET, DEVICE_STATE_UNAVAILABLE, "", DEVICE_OUT_WIRED_HEADSET_NAME);
+                setDeviceConnectionState(DEVICE_OUT_WIRED_HEADPHONE, DEVICE_STATE_UNAVAILABLE, "", DEVICE_OUT_WIRED_HEADPHONE_NAME);
 
                 // Force audio out via the HDMI whenever a headset is plugged in.
-                setForceUse(FOR_HDMI_SYSTEM_AUDIO, FORCE_HDMI_SYSTEM_AUDIO_ENFORCED);
+                //setForceUse(FOR_MEDIA, 12);
                 //setDeviceConnectionState(DEVICE_OUT_HDMI, DEVICE_STATE_AVAILABLE, "", "");
             }
-        } else if (AudioManager.ACTION_HDMI_AUDIO_PLUG.equals(action)) {
+        }
+        // detected an HDMI plug connected or disconnected
+        else if (AudioManager.ACTION_HDMI_AUDIO_PLUG.equals(action)) {
             Bundle extras = intent.getExtras();
-            Log.i(Constants.TAG, "DOCK_PLUG state :: " + extras.getInt("state"));
+            Log.i(Constants.TAG, "DOCK_PLUG HDMI state :: " + extras.getInt("state"));
             if (extras.getInt("state") == 1) {
-                // Disable wired headset
-                setDeviceConnectionState(DEVICE_OUT_WIRED_HEADSET, DEVICE_STATE_UNAVAILABLE, "", "");
+                setDeviceConnectionState(DEVICE_OUT_WIRED_HEADSET, DEVICE_STATE_UNAVAILABLE, "", DEVICE_OUT_WIRED_HEADSET_NAME);
+                setDeviceConnectionState(DEVICE_OUT_WIRED_HEADPHONE, DEVICE_STATE_UNAVAILABLE, "", DEVICE_OUT_WIRED_HEADPHONE_NAME);
             }
         }
     }
