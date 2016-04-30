@@ -19,22 +19,9 @@ public class HeadphoneAudioCanceller extends BroadcastReceiver {
     // private static final int DEVICE_OUT_ANLG_DOCK_HEADSET = 0x800;
     private static final int DEVICE_OUT_WIRED_HEADPHONE = 0x8;
     private static final int DEVICE_OUT_WIRED_HEADSET = 0x4;
-    private static final int DEVICE_OUT_HDMI = 0x400;
-
-    private static final int FOR_HDMI_SYSTEM_AUDIO = 5;
-    private static final int FOR_MEDIA = 1;
-
-    private static final int FORCE_HDMI_SYSTEM_AUDIO_ENFORCED = 12;
-    private static final int FORCE_NONE = 0;
 
     public static final String DEVICE_OUT_WIRED_HEADSET_NAME = "headset";
     public static final String DEVICE_OUT_WIRED_HEADPHONE_NAME = "headphone";
-
-    /**
-     * Intent actions
-     */
-    public static final String INTENT_ACTION_ANALOG_AUDIO_DOCK_PLUG = "android.intent.action.ANALOG_AUDIO_DOCK_PLUG";
-    public static final String MEDIA_ACTION_ANALOG_AUDIO_DOCK_PLUG = "android.media.action.ANALOG_AUDIO_DOCK_PLUG";
 
 
     private final Context context;
@@ -118,17 +105,9 @@ public class HeadphoneAudioCanceller extends BroadcastReceiver {
         if (AudioManager.ACTION_HEADSET_PLUG.equals(action)) {
             Bundle extras = intent.getExtras();
             Log.i(Constants.TAG, "DOCK_PLUG headset state :: " + extras.getInt("state"));
-
-
             if (extras.getInt("state") == 1) {
-                // Disable wired headset. This call doesn't stop audio from playing over the headset, and
-                // may not be necessary.
                 setDeviceConnectionState(DEVICE_OUT_WIRED_HEADSET, DEVICE_STATE_UNAVAILABLE, "", DEVICE_OUT_WIRED_HEADSET_NAME);
                 setDeviceConnectionState(DEVICE_OUT_WIRED_HEADPHONE, DEVICE_STATE_UNAVAILABLE, "", DEVICE_OUT_WIRED_HEADPHONE_NAME);
-
-                // Force audio out via the HDMI whenever a headset is plugged in.
-                //setForceUse(FOR_MEDIA, 12);
-                //setDeviceConnectionState(DEVICE_OUT_HDMI, DEVICE_STATE_AVAILABLE, "", "");
             }
         }
         // detected an HDMI plug connected or disconnected

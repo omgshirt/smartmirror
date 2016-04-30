@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,7 +67,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     private int mCurrentWind = 0;
 
     private DailyForecast forecastToday;
-    private JSONArray mWeatherAlerts;
     private boolean mShowFullAlerts = false;
 
     private CacheManager mCacheManager = null;
@@ -117,12 +117,12 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
 
         SharedPreferences mSharedPreferences = getActivity().getSharedPreferences(Preferences.PREFS_NAME, Context.MODE_PRIVATE);
 
-        int timeVisible = mSharedPreferences.getInt(TIME_VISIBLE_PREF, View.VISIBLE);
-        if (timeVisible == View.GONE) {
+        int timeVisibility = mSharedPreferences.getInt(TIME_VISIBLE_PREF, View.VISIBLE);
+        if (timeVisibility == View.GONE) {
             hideTime();
         }
-        int weatherVisible = mSharedPreferences.getInt(WEATHER_VISIBLE_PREF, View.VISIBLE);
-        if (weatherVisible == View.GONE) {
+        int weatherVisibility = mSharedPreferences.getInt(WEATHER_VISIBLE_PREF, View.VISIBLE);
+        if (weatherVisibility == View.GONE) {
             hideWeather();
         }
 
@@ -212,8 +212,8 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         super.onStart();
 
         // Check for any cached weather data.
-        // If a cache exists, render it to the view.
-        // Update the cache if it has expired.
+        // If a cache exists, render it to the view, then
+        // update the cache if it has expired.
         if (!mCacheManager.containsKey(WEATHER_CACHE)) {
             startWeatherUpdate();
         } else {
@@ -238,7 +238,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         mCacheManager.registerCacheListener(WEATHER_CACHE, this);
     }
 
-    // when this goes out of view, halt listening
+    // when this goes out of view, unregister the listener
     @Override
     public void onPause() {
         super.onPause();
@@ -246,7 +246,6 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         mCacheManager.unRegisterCacheListener(this);
     }
 
-    // Refresh time and date displays to current preference setting
     public void updateTimeDisplay() {
         clkTime.setFormat12Hour(mPreferences.getTimeFormat());
         clkTime.setFormat24Hour(mPreferences.getTimeFormat());
@@ -254,6 +253,9 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         clkDate.setFormat24Hour(mPreferences.getDateFormat());
     }
 
+    /**
+     * Hide the time display and save to preferences
+     */
     public void hideTime() {
         mPreferences.setIsTimeVisible(false);
         layTimeLayout.setVisibility(View.GONE);
@@ -261,13 +263,25 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
+    /**
+     * Show the time display and save to preferences
+     */
     public void showTime() {
         mPreferences.setIsTimeVisible(true);
         layTimeLayout.setVisibility(View.VISIBLE);
-        layTimeDivider.setVisibility(View.VISIBLE);
+
+        // If the weather is also visible, make sure the divider is displayed.
+        if (layWeatherLayout.getVisibility() == View.VISIBLE) {
+            layTimeDivider.setVisibility(View.VISIBLE);
+        } else {
+            layTimeDivider.setVisibility(View.GONE);
+        }
         saveVisibilityPreference(TIME_VISIBLE_PREF, layTimeLayout.getVisibility());
     }
 
+    /**
+     * Hide the weather display and save to preferences
+     */
     public void hideWeather() {
         mPreferences.setIsWeatherVisible(false);
         layWeatherLayout.setVisibility(View.GONE);
@@ -275,13 +289,30 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         saveVisibilityPreference(WEATHER_VISIBLE_PREF, layWeatherLayout.getVisibility());
     }
 
+    /**
+     * Show the weather display and save to preferences
+     */
     public void showWeather() {
         mPreferences.setIsWeatherVisible(true);
         layWeatherLayout.setVisibility(View.VISIBLE);
-        layTimeDivider.setVisibility(View.VISIBLE);
+
+        // If time is also visible, make sure the divider is displayed.
+        if (layTimeLayout.getVisibility() == View.VISIBLE) {
+            layTimeDivider.setVisibility(View.VISIBLE);
+        } else {
+            layTimeDivider.setVisibility(View.GONE);
+        }
+
         saveVisibilityPreference(WEATHER_VISIBLE_PREF, layWeatherLayout.getVisibility());
     }
 
+    /**
+     * Save preferences related to the visibility of the time and weather sections.
+     * This is handled here instead of the Preferences class, as it does not (currently)
+     * have a corresponding control in the 'Settings' display.
+     * @param prefName preference name
+     * @param value value to save
+     */
     private void saveVisibilityPreference(String prefName, int value) {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Preferences.PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = sharedPreferences.edit();
@@ -292,7 +323,9 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     // ----------------------- TTS Feedback -------------------------
 
 
-
+    /**
+     * Speak the current weather conditions: includes current temp, high, low and wind speed.
+     */
     private void speakCurrentConditions() {
 
         if (forecastToday == null) return;
@@ -322,7 +355,10 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         ((MainActivity) getActivity()).speakText(text);
     }
 
-    // Get weather data from API and display
+    /** Get weather data from API and display. Show error if no data is returned.
+     *
+     * @param request Request string to send to the Weather API
+     */
     private void updateWeatherData(final String request) {
         new Thread() {
             public void run() {
@@ -353,6 +389,10 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
         mCacheManager.addCache(WEATHER_CACHE, data, time);
     }
 
+    /**
+     * Render the weather json received from the API to the display.
+     * @param json JSONObject
+     */
     private void renderWeather(JSONObject json) {
         try {
             // hourlyArray holds the next 24 hours of forecasts. Get index 0 for current temp data.
@@ -460,11 +500,11 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
             if (json.has("alerts")) {
                 //Log.i(Constants.TAG, "WeatherAlert text :: " + json.getJSONArray("alerts").toString());
 
-                mWeatherAlerts = json.getJSONArray("alerts");
-                String alertText = getWeatherAlerts();
+                JSONArray alertsJson = json.getJSONArray("alerts");
+                String alertText = getWeatherAlerts(alertsJson);
                 if (alertText.length() > 0) {
                     txtAlerts.setVisibility(View.VISIBLE);
-                    txtAlerts.setText(getWeatherAlerts());
+                    txtAlerts.setText(alertText);
                     txtAlerts.setSelected(true);
                 }
             } else {
@@ -479,38 +519,38 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     }
 
 
-    public String getWeatherAlerts() {
+    public String getWeatherAlerts(JSONArray alertsJson) {
         StringBuilder alertText = new StringBuilder();
         int i = 0;
-        while (i < mWeatherAlerts.length()) {
-            alertText.append(getAlertTitle(i));
+        while (i < alertsJson.length()) {
+            alertText.append(getAlertTitle(alertsJson, i));
             if (mShowFullAlerts) {
-                alertText.append(getAlertDescription(i));
+                alertText.append(getAlertDescription(alertsJson, i));
             }
             i++;
         }
         return alertText.toString();
     }
 
-    private String getAlertTitle(int index) {
-        // find expiration time for this alert
+
+    private String getAlertTitle(JSONArray alertsJson, int index) {
         String title = "";
         try {
-            long expirationEpochTime = Long.parseLong(mWeatherAlerts.getJSONObject(index).getString("expires"));
+            long expirationEpochTime = Long.parseLong(alertsJson.getJSONObject(index).getString("expires"));
             String expirationTime = new SimpleDateFormat(mPreferences.getTimeFormat(), Locale.US)
                     .format(new Date(expirationEpochTime));
 
-            title = mWeatherAlerts.getJSONObject(index).getString("title") + ". Expires " + expirationTime + "\n";
+            title = alertsJson.getJSONObject(index).getString("title") + ". Expires " + expirationTime + "\n";
         } catch (JSONException jse) {
             Log.e("DarkSky", "alert index not found");
         }
         return title;
     }
 
-    private String getAlertDescription(int index) {
+    private String getAlertDescription(JSONArray alertsJson, int index) {
         String description = "";
         try {
-            description = mWeatherAlerts.getJSONObject(index).getString("description") + "\n";
+            description = alertsJson.getJSONObject(index).getString("description") + "\n";
         } catch (JSONException jse) {
             Log.e("DarkSky", "alert index not found");
         }
@@ -518,34 +558,62 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
     }
 
 
-    // choose weather icon based on iconType
-    public static void setWeatherIcon(Activity activity, Typeface font, TextView tv, String iconType, long sunrise, long sunset) {
+    /**
+     * Update the given TextView to the appropriate weather icon.
+     * This will match to the weather conditions passed in by weatherDesc.
+     *
+     * @param activity hosting activity
+     * @param font font set containing weather icons
+     * @param view view to update
+     * @param weatherDesc weather description
+     * @param sunrise sunrise time in ms for the event
+     * @param sunset sunset time in ms for the event
+     */
+    public static void setWeatherIcon(Activity activity, Typeface font, TextView view, String weatherDesc, long sunrise, long sunset) {
         String icon;
         if (activity == null) return;
-        switch (iconType) {
+
+        // default to white color
+        int color = Color.WHITE;
+        int dayColor = 0xFFFFD11A;
+        int nightColor = 0xFFAAAAAA;
+        int partlyCloudColor = 0xFFFFF6CC;
+        int cloudyColor = 0xFFCCCCCC;
+        int rainColor = 0xFF80DFFF;
+        int fogColor = Color.GRAY;
+
+        switch (weatherDesc) {
             case "clear-day":
                 icon = activity.getString(R.string.weather_sunny);
+                color = dayColor;
                 break;
             case "clear-night":
                 icon = activity.getString(R.string.weather_clear_night);
+                color = nightColor;
                 break;
             case "cloudy":
                 icon = activity.getString(R.string.weather_cloudy);
+                color = cloudyColor;
                 break;
             case "partly-cloudy-day":
                 icon = activity.getString(R.string.weather_cloudy_day);
+                color = partlyCloudColor;
                 break;
             case "partly-cloudy-night":
                 icon = activity.getString(R.string.weather_partly_cloudy_night);
+                color = nightColor;
                 break;
             case "drizzle":
                 icon = activity.getString(R.string.weather_drizzle);
+                color = rainColor;
                 break;
             case "fog":
                 icon = activity.getString(R.string.weather_foggy);
+                color = fogColor;
                 break;
             case "rain":
                 icon = activity.getString(R.string.weather_rainy);
+                color = rainColor;
                 break;
             case "sleet":
                 icon = activity.getString(R.string.weather_sleet);
@@ -555,6 +623,7 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 break;
             case "thunderstorm":
                 icon = activity.getString(R.string.weather_thunder);
+                color = rainColor;
                 break;
             case "wind":
                 icon = activity.getString(R.string.weather_wind_strong);
@@ -564,14 +633,17 @@ public class WeatherFragment extends Fragment implements CacheManager.CacheListe
                 long currentTime = new Date().getTime();
                 if (currentTime >= sunrise && currentTime < sunset) {
                     icon = activity.getString(R.string.weather_sunny);
+                    color = dayColor;
                 } else {
                     icon = activity.getString(R.string.weather_clear_night);
+                    color = nightColor;
                 }
                 break;
         }
 
-        tv.setText(icon);
-        tv.setTypeface(font);
+        view.setText(icon);
+        view.setTypeface(font);
+        view.setTextColor(color);
     }
 
     /**

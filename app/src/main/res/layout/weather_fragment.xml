@@ -49,7 +49,7 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:textColor="#d1735c"
+            android:textColor="#ff5252"
             android:textSize="16sp"
             android:visibility="gone" />
 
@@ -60,19 +60,22 @@
             android:orientation="horizontal"
             android:weightSum="3">
 
-            <!-- current conditions icon -->
+            <!-- current weather & temp layout -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:gravity="center_horizontal"
+
                 android:layout_gravity="start">
 
+                <!-- Current weather icon -->
                 <TextView
                     android:id="@+id/weather_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
                     android:textSize="40sp" />
 
                 <!-- current temp -->
@@ -80,9 +83,10 @@
                     android:id="@+id/current_temp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="40sp" />
+                    android:textSize="45sp" />
             </LinearLayout>
 
+            <!-- humidity and wind speed layout -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -106,10 +110,11 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
+            <!-- today's high and low layout -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center_vertical|center_horizontal"
+                android:gravity="center_vertical|right"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
