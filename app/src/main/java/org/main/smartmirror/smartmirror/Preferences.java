@@ -65,8 +65,8 @@ public class Preferences implements LocationListener {
     public static final String PREFS_TWITTER_ACCOUNT = "PREFS_TWITTER_ACCOUNT";
 
     // default for work address
-    public static final float WORK_LAT = -1f;
-    public static final float WORK_LONG = -1f;
+    public static final float WORK_LAT = 0f;
+    public static final float WORK_LONG = 0f;
 
     public static final String CMD_SOUND_OFF = "sound off";
     public static final String CMD_SOUND_ON = "sound on";

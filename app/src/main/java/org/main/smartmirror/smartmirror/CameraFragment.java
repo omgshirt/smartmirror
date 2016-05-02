@@ -105,6 +105,9 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public static String dateTimeStr;
     public static final int REQUEST_AUTH_TOKEN = 3;
 
+    // track if a picture is counting down
+    private boolean pictureInProgress;
+
     /**
      * Conversion from screen rotation to JPEG orientation.
      */
@@ -436,7 +439,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreferences = Preferences.getInstance(getActivity());
-        System.out.println("Username: " + mPreferences.getUsername() + " ACCESS TOKEN: " + mPreferences.getAccessToken());
+        pictureInProgress = false;
+        //System.out.println("Username: " + mPreferences.getUsername() + " ACCESS TOKEN: " + mPreferences.getAccessToken());
     }
 
     @Override
@@ -489,7 +493,10 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
             Log.d("Camera", "Got message:\"" + message + "\"");
             switch (message) {
                 case Constants.TAKE_PICTURE:
-                    takePicture();
+                    // refuse command if currently prepare to take picture
+                    if (!pictureInProgress) {
+                        takePicture();
+                    }
                     break;
             }
         }
@@ -809,7 +816,8 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
      * Initiate a still image capture.
      */
     public void takePicture() {
-        new CountDownTimer(4000, 1000) {
+        pictureInProgress = true;
+        new CountDownTimer(3750, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 speakCountdown(String.valueOf(millisUntilFinished / 1000));
@@ -851,6 +859,7 @@ public class CameraFragment extends Fragment implements FragmentCompat.OnRequest
                                                @NonNull TotalCaptureResult result) {
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
+                    pictureInProgress = false;
                 }
             };
             mCaptureSession.stopRepeating();

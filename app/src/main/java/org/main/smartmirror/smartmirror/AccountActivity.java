@@ -24,7 +24,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.services.gmail.GmailScopes;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -291,26 +290,32 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             edtFacebookPassword = null;
             edtFacebookUsername = null;
         }
-        // since by default the work lat and long is set to -1 we are OK
-        // to not have an else case here
-        if (!(edtWorkAddress.getText().toString().isEmpty())) {
-            mPreferences.setWorkLocation(edtWorkAddress.getText().toString());
 
-            String strAddress = edtWorkAddress.getText().toString().replace(' ', '+');
-            convertAddressToLatLong(strAddress);
-        }
+        mPreferences.setWorkLocation(edtWorkAddress.getText().toString());
+        String strAddress = edtWorkAddress.getText().toString().replace(' ', '+');
+        convertAddressToLatLong(strAddress);
+
         mPreferences.setFirstTimeRun(false);
         finish();
     }
 
     /**
-     * Converts the given address to latitude and longitude
+     * Converts the given address to latitude and longitude.
+     * Empty string will set the Preferences latLng to 0,0
      *
      * @param addressInput the given address
      */
     private void convertAddressToLatLong(String addressInput) {
         Geocoder geocoder = new Geocoder(this);
         List<Address> addressList;
+
+        // If empty, set latLng to 0,0
+        if (addressInput.isEmpty()) {
+            mPreferences.setWorkLatitude(0);
+            mPreferences.setWorkLongitude(0);
+            return;
+        }
+
         try {
             addressList = geocoder.getFromLocationName(addressInput, 5);
             if (addressList != null) {

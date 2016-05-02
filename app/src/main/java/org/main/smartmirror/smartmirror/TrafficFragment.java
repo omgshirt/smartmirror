@@ -100,7 +100,12 @@ public class TrafficFragment extends Fragment implements CacheManager.CacheListe
         if (mPreference.getWeatherUnits().equals(Preferences.ENGLISH)) {
             distanceMatrixUnit = "imperial";
         }
-        updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
+
+        if (mWorkLat.isEmpty() && mWorkLong.isEmpty()) {
+            hideTraffic();
+        } else {
+            updateTrafficData(String.format(Constants.DISTANCE_MATRIX_API, mCurrentLat, mCurrentLong, mWorkLat, mWorkLong, distanceMatrixUnit, distanceMatrixKey));
+        }
     }
 
     private void hideTraffic() {
