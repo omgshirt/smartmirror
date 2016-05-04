@@ -409,7 +409,13 @@ public class MainActivity extends AppCompatActivity
     protected void exitSleep() {
         if (mirrorSleepState != ASLEEP) return;
         Log.i(Constants.TAG, "exitSleep() called");
-        mira.appWaking();
+
+        // If wake command was triggered by NIGHT_LIGHT command, wake silently.
+        if (nightLightOnWake) {
+            mira.appWakingSilently();
+        } else {
+            mira.appWaking();
+        }
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         final KeyguardManager.KeyguardLock kl = km.newKeyguardLock("MyKeyguardLock");
@@ -728,8 +734,10 @@ public class MainActivity extends AppCompatActivity
             handleHelpFragment(command);
         } else if (commandWakesFromSleep(command)) {
             if (mirrorSleepState == ASLEEP) {
-                // NIGHT_LIGHT will change to that fragment on wake
-                if (command.equals(Constants.NIGHT_LIGHT)) nightLightOnWake = true;
+                // NIGHT_LIGHT will change to that fragment & wakes device silently
+                if (command.equals(Constants.NIGHT_LIGHT)) {
+                    nightLightOnWake = true;
+                }
                 exitSleep();
             } else {
                 exitLightSleep();
@@ -1022,14 +1030,19 @@ public class MainActivity extends AppCompatActivity
 
         Log.i(Constants.TAG, "handleVoiceCommand:\"" + command + "\"");
 
-        // if voice is disabled, ignore everything except "start listening" and "wake / night light" commands
+        // If voice is disabled, ignore everything except "start listening" and wake commands.
+        // This way, the device can be awakened with more commands without first having to enable listening.
         if (!mPreferences.isVoiceEnabled() && !commandWakesFromSleep(command)) {
-            if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Preferences.CMD_VOICE_OFF) ||
-                    command.equals(Constants.MIRA_LISTEN)) {
+
+            if (command.equals(Preferences.CMD_VOICE_ON) || command.equals(Constants.MIRA_LISTEN)) {
                 broadcastMessage("inputAction", command);
-            } else {
+            }
+
+            /*
+            else {
                 showToast(getResources().getString(R.string.speech_voice_off_err), Toast.LENGTH_SHORT);
             }
+            */
             return;
         }
 

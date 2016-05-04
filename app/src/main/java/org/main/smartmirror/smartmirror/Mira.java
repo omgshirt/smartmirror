@@ -149,4 +149,8 @@ public class Mira {
             sayUnreadEmails();
         }
     }
+
+    public void appWakingSilently(){
+        mLastWakeTime = System.currentTimeMillis();
+    }
 }
