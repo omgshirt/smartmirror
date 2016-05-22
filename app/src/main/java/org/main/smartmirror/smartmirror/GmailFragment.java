@@ -57,6 +57,8 @@ public class GmailFragment extends Fragment {
 
     public LinearLayout fromSubBody;
 
+    private MakeRequestTask mRequestTask;
+
     GoogleAccountCredential mCredential;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
 
@@ -141,7 +143,7 @@ public class GmailFragment extends Fragment {
                 sl.scrollScrollView(message,scrollViewBody);
             }
             else if(message.contains(Constants.NEXT)){
-                displayNextMessage();
+                refreshResults();
             }
         }
     };
@@ -159,6 +161,7 @@ public class GmailFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        mRequestTask.cancel(true);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
@@ -182,7 +185,8 @@ public class GmailFragment extends Fragment {
 
     private void refreshResults() {
         if (isDeviceOnline()) {
-            new MakeRequestTask(mCredential).execute();
+            mRequestTask = new MakeRequestTask(mCredential);
+            mRequestTask.execute();
         }else{
             Log.i(Constants.TAG, "Error in GmailFragment");
         }
@@ -317,6 +321,8 @@ public class GmailFragment extends Fragment {
         @Override
         protected void onPostExecute(List<String> output) {
 
+            if (!isAdded()) return;
+
             textViewTitle.setText(getResources().getString(R.string.inbox));
 
             if(mTo.equals(getResources().getString(R.string.no_new_messages))){
@@ -335,9 +341,5 @@ public class GmailFragment extends Fragment {
                 mCallback.onNextCommand();
             }
         }
-    }
-
-    public void displayNextMessage(){
-        new MakeRequestTask(mCredential).execute();
     }
 }

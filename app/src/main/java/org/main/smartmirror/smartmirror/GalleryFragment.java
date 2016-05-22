@@ -4,12 +4,10 @@ import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +24,6 @@ import java.util.TimerTask;
 public class GalleryFragment extends Fragment {
 
     private ArrayList<String> mImageList;
-    private Drawable mImageDrawable;
     private ImageView mGalleryItem;
     private Runnable mRunnable;
     private Timer mTimer;
@@ -43,8 +40,8 @@ public class GalleryFragment extends Fragment {
         mRunnable = new Runnable() {
             @Override
             public void run() {
-                makeRandomImage(mImageList.size());
-                mGalleryItem.setImageDrawable(mImageDrawable);
+                Drawable drawable = makeRandomImage(mImageList.size());
+                mGalleryItem.setImageDrawable(drawable);
             }
         };
 
@@ -96,15 +93,16 @@ public class GalleryFragment extends Fragment {
      *
      * @param num the random number seed
      */
-    public void makeRandomImage(int num) {
+    public Drawable makeRandomImage(int num) {
         //TODO make sure that the images are truly random (they don't repeat) {Random images would repeat}
         Random imageRandomizer = new Random();
         int randomNumber = imageRandomizer.nextInt(num);
         try {
             InputStream is = getContext().getAssets().open("gallery/" + mImageList.get(randomNumber));
-            mImageDrawable = Drawable.createFromStream(is, null);
+           return Drawable.createFromStream(is, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 }
