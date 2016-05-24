@@ -29,6 +29,9 @@ public class GalleryFragment extends Fragment {
     private Timer mTimer;
     private TimerTask mTimerTask;
 
+    // length of time to show each image (in ms)
+    private int imageDisplayTime = 20000;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +73,7 @@ public class GalleryFragment extends Fragment {
                 getActivity().runOnUiThread(mRunnable);
             }
         };
-        mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, imageDisplayTime);
 
         return view;
     }

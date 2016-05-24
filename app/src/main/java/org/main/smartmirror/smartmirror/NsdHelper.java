@@ -2,14 +2,14 @@ package org.main.smartmirror.smartmirror;
 
 
 import android.content.Context;
-import android.net.nsd.NsdServiceInfo;
 import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.net.InetAddress;
-
+/**
+ * NsdHelper provides support for registering the device via NetworkServiceDiscovery
+ */
 public class NsdHelper {
 
     Context mContext;

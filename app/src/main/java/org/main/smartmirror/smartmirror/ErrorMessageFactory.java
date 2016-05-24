@@ -5,7 +5,8 @@ import android.view.Gravity;
 import android.widget.TextView;
 
 /**
- * Creates a centered text view
+ * Creates and returns a TextView containing the given String.
+ * Primarily use for building an error dialog in the middle of the display area
  */
 public class ErrorMessageFactory {
     public static TextView buildErrorMessage(Context context, String message) {

@@ -11,6 +11,11 @@ import android.util.Log;
 
 import java.lang.reflect.Method;
 
+/**
+ * When headphones are plugged in, force audio output to use HDMI instead (whether available or not).
+ * Based on reflection, this class could break at any time if Google decides to adjust the lower level
+ * API accessed by AudioSystem.setDeviceConnectionState(int, int, String, String)
+ */
 public class HeadphoneAudioCanceller extends BroadcastReceiver {
 
     private static final int DEVICE_STATE_UNAVAILABLE = 0;
@@ -79,18 +84,6 @@ public class HeadphoneAudioCanceller extends BroadcastReceiver {
             Method method = audioSystem.getMethod("setDeviceConnectionState", Integer.TYPE, Integer.TYPE, String.class, String.class);
             int status = (int)method.invoke(audioSystem, device, state, deviceAddress, deviceName);
             Log.i(Constants.TAG, "audioDevice status :: " + status);
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
-    }
-
-    private void setForceUse(int usage, int config) {
-        Class<?> audioSystem = getAudioSystem();
-
-        try {
-            Method method = audioSystem.getMethod("setForceUse", Integer.TYPE, Integer.TYPE);
-            int status = (int)method.invoke(audioSystem, usage, config);
-            Log.i(Constants.TAG, "setForceUse status :: " + status);
         } catch (Exception ignored) {
             ignored.printStackTrace();
         }

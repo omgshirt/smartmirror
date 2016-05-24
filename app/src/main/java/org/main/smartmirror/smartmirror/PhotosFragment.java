@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -39,6 +38,8 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
     private Runnable mRunnable;
     private int mCurrentPhoto = 0;
 
+    // length of time to display image (in ms)
+    private int imageDisplayTime = 20000;
     static MainActivity mainActivity;
 
     @Override
@@ -206,7 +207,7 @@ public class PhotosFragment extends Fragment implements CacheManager.CacheListen
                     mainActivity.runOnUiThread(mRunnable);
                 }
             };
-            mTimer.scheduleAtFixedRate(mTimerTask, 0, 5000);
+            mTimer.scheduleAtFixedRate(mTimerTask, 0, imageDisplayTime);
 
         } catch (Exception e) {
             e.printStackTrace();

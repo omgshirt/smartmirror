@@ -31,7 +31,7 @@ games/1e10/
 gmail/1e-4/
 go back/1e-3/
 go forward/1e-3/
-go to sleep/1e-18/
+go to sleep/1e-22/
 help/1e5/
 hide time/1e4/
 hide weather/1e1/
@@ -41,9 +41,9 @@ maximize/1e-5/
 media/1e10/
 minimize/1e-5/
 mira listen/1e-12/
-mira sleep/1e-16/
+mira sleep/1e-6/
 mira sound/1e-18/
-mira wake/1e-20/
+mira wake/1e-10/
 mirror mirror on the wall/1e-25/
 movies/1e9/
 music/1e-4/
@@ -84,7 +84,7 @@ time twelve hour/1e-10/
 time twenty-four hour/1e-20/
 travel/1e9/
 twitter/1e-5/
-wake up/1e-5/
+wake up/1e5/
 weather english/1e-8/
 weather metric/1e-8/
 wide screen/1e-8/
